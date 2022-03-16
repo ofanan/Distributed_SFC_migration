@@ -6,7 +6,7 @@ package src;
 network Node
 {
     parameters:
-        int numChildren = default (2);
+        int numChildren; // = default (2);
         bool isRoot 	  = default (false);
         @display("i=misc/node_vs,gold");
         
