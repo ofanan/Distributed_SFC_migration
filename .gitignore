@@ -1,0 +1,8 @@
+.settings/*
+out/*
+.qt*
+Makefile
+simulations/*
+*.exe
+.oppbuildspec
+.meta*
