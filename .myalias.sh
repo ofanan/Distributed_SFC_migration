@@ -9,6 +9,6 @@ alias ltr='ls -ltr'
 alias ltra='ls -ltra'
 alias py='python'
 alias aliaser='source .myalias.sh'
-alias maker='c; opp_makemake -f; make'
+alias maker='c; opp_makemake -f --deep; make'
 alias runner='c; Distributed_SFC_migration.exe &'
 

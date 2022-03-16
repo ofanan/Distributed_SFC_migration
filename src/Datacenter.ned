@@ -3,7 +3,7 @@ package src;
 //
 // TODO auto-generated type
 //
-module Datacenter
+simple Datacenter
 {
     parameters:
         int numChildren;
