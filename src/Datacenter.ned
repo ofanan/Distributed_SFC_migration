@@ -6,9 +6,10 @@ package src;
 module Datacenter
 {
     parameters:
-        int numChildren = default (2);
+        int numChildren;
+        int numParents;
         @display("i=block/routing");
     gates:
-        inout toParent;
-        inout toChild[numChildren];
+        inout toParent[numParents];
+        inout toChild [numChildren];
 }
