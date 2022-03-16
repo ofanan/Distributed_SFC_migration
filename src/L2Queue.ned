@@ -15,7 +15,7 @@ package src;
 // interface, to implement priority queueing, or to collect link statistics
 // (utilization, etc.)
 //
-module L2Queue
+simple L2Queue
 {
     parameters:
         int frameCapacity = default(0); // max number of packets; 0 means no limit
