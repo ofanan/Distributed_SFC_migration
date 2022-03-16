@@ -31,6 +31,6 @@ network Node
         queue[0].line		    <--> portToParent	     if !isRoot;
         for c=0..numChildren-1 {
             datacenter.toChild[c] <--> queue[c+1-int(isRoot)].local if numChildren>0;
-            queue[c+1].line 		  <--> portToChild[c] if numChildren>0;   
+            queue[c+1-int(isRoot)].line 		  <--> portToChild[c] if numChildren>0;   
         }
 }

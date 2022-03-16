@@ -5,13 +5,14 @@ network Tree
 {
     parameters:
         int height 				= default (2);
-        int numChildren 		= default (3);
+        int numChildren; // 		= default (3);
         int numNodes 			= int((numChildren^height-1)/(numChildren-1));
         int idxOfLastNonLeaf 	= int(numNodes-numChildren^height-1);
         int	smallestLeafIdx 	= int(numNodes-numChildren^height);
         node[0].isRoot 			= true;
-        node[0..3].numChildren = numChildren; //default(50);
-        node[4..6].numChildren = 0; //default(50);
+//        node[0..3].numChildren 	= numChildren; 
+//        node[0..3].numChildren 	= numChildren; 
+//        node[smallestLeafIdx..6].numChildren 	= 0; // leaves //smallestLeafIdx
 //        int numChildrenVec		= 
 //        int[2] gamad 			= [1, 0];
 //        node[0..numNodes].numChildren 	= numChildren; 
@@ -36,9 +37,9 @@ network Tree
 //            }
             
             
-//    connections allowunconnected:
-//        for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
-//            node[c].portToParent <--> Channel <--> node[int((c-1)/numChildren)].portToChild++;
-//        }
+    connections allowunconnected:
+        for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
+            node[c].portToParent <--> Channel <--> node[int((c-1)/numChildren)].portToChild++;
+        }
         
 }
