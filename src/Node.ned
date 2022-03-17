@@ -6,9 +6,10 @@ package src;
 network Node
 {
     parameters:
-        int numChildren; // = default (2);
-        int numParents    = default (1);
+        int numChildren; 
         bool isRoot 	  = default (false);
+        int numParents    = 1 - int(isRoot);
+        int nodeId;
         @display("i=misc/node_vs,gold");
         
     gates:

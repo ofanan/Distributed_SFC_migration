@@ -10,7 +10,6 @@ network Tree
         int idxOfLastNonLeaf 			= int(numNodes-numChildren^height-1);
         int	smallestLeafIdx 			= idxOfLastNonLeaf+1;
         node[0].isRoot 					= true;
-        node[0].numParents 				= 0;
 //        int numChildrenVec		= 
         double channelDelay	@unit(s); 
         double basicDatarate @unit(Gbps);
@@ -22,7 +21,7 @@ network Tree
         }
 
     submodules:
-            node [numNodes] : Node;
+            node [numNodes] : Node {nodeId = index;};
             
     connections allowunconnected:
         for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {

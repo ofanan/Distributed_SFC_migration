@@ -19,6 +19,9 @@ class Datacenter : public cSimpleModule
     private:
         virtual void initialize();
         virtual void handleMessage (cMessage *msg);
+        bool isRoot;
+        bool isLeaf;
+        int nodeId;
 };
 
 //
@@ -26,12 +29,15 @@ Define_Module(Datacenter);
 
 void Datacenter::initialize()
 {
+    this->nodeId = getParentModule()->par("nodeId");
+    EV << "my node id is " <<this->nodeId << endl;
+//    isLeaf =
 //    int numDatacenters = par ("numDatacenters");
-//    if (getIndex()==numDatacenters-1) {
-//        EV << "node " << getIndex () << " is sending msg";
+    if (getIndex()==21) {
+        EV << "node " << getIndex () << " is sending msg";
 //        cMessage *msg = new cMessage("dummy");
 //        send(msg, "toParent$o");
-//    }
+    }
 
 }
 

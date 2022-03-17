@@ -84,17 +84,10 @@ void L2Queue::handleMessage(cMessage *msg)
     }
     else {  // arrived on local port, connected to the local datacenter (and should be sent out, on the line)
         if (endTransmissionEvent->isScheduled()) {
-            // We Assume infinite Q capacity, and therefore comment the lines below
-//            // We are currently busy, so just queue up the packet.
-//            if (frameCapacity && queue.getLength() >= frameCapacity) {
-//                EV << "Received " << pkt << " but transmitter busy and queue full: discarding\n";
-//                delete pkt;
-//            }
-//            else {
-                EV << "Received " << msg << " but transmitter busy: queueing up\n";
-                msg->setTimestamp();
-                queue.insert(msg);
-//            }
+            // We Assume infinite Q capacity
+            EV << "Received " << msg << " but transmitter busy: queueing up\n";
+            msg->setTimestamp();
+            queue.insert(msg);
         }
         else {
             // We are idle, so we can start transmitting right away.
@@ -109,21 +102,3 @@ void L2Queue::refreshDisplay() const
     getDisplayString().setTagArg("t", 0, isBusy ? "transmitting" : "idle");
     getDisplayString().setTagArg("i", 1, isBusy ? (queue.getLength() >= 3 ? "red" : "yellow") : "");
 }
-
-//cChannel *channel = gate->getChannel(); // 4.6.3
-//getTransmissionChannel()
-//cPacket *pkt = ...; // packet to be transmitted
-//cChannel *txChannel = gate("out")->getTransmissionChannel();
-//simtime_t txFinishTime = txChannel->getTransmissionFinishTime();
-//if (txFinishTime <= simTime())
-//{
-//    // channel free; send out packet immediately
-//    send(pkt, "out");
-//}
-//else
-//{
-//    // store packet and schedule timer; when the timer expires,
-//    // the packet should be removed from the queue and sent out
-//    txQueue.insert(pkt);
-//    scheduleAt(txFinishTime, endTxMsg);
-//}
