@@ -38,20 +38,23 @@ void Datacenter::initialize()
     nodeId      = (int) (prnt->par("nodeId"));
     if (nodeId==1) {
         EV << "my node id is " << nodeId << endl;
-        cMessage *msg = new cMessage("dummy");
-//        send(msg, "toParent$o", 0);
+        cPacket *pkt = new cPacket("dummy");
+        pkt->setBitLength (10000);
+        send(pkt, "toChild$o", 0);
+        pkt = new cPacket("dummy");
+        pkt->setBitLength (10000);
+        send(pkt, "toChild$o", 0);
+        pkt = new cPacket("dummy");
+        pkt->setBitLength (10000);
+        send(pkt, "toChild$o", 0);
     }
 
 }
 
 void Datacenter::handleMessage (cMessage *msg)
 {
-    EV << "node " << getIndex() << " rcvd msg";
-    if (getIndex() == 0) {
-        EV << " sending msg to child 2";
-        cMessage *msg = new cMessage("dummy");
-        send(msg, "toChild$o", 1);
-    }
+    EV << "node " << nodeId << " rcvd msg";
+
 }
 
 

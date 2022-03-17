@@ -7,8 +7,8 @@ network Tree
         int height 						= default (3);
         int numChildren 				= default (3);
         int numNodes 					= int((numChildren^height-1)/(numChildren-1));
-        int idxOfLastNonLeaf 			= int(numNodes-numChildren^height-1);
-        int	smallestLeafIdx 			= idxOfLastNonLeaf+1;
+//        int idxOfLastNonLeaf 			= int(numNodes-numChildren^height-1);
+//        int	smallestLeafIdx 			= idxOfLastNonLeaf+1;
         node[0].isRoot 					= true;
 //        int numChildrenVec		= 
         double channelDelay	@unit(s); 
@@ -21,10 +21,13 @@ network Tree
         }
 
     submodules:
-            node [numNodes] : Node {
-                parameters:
-                nodeId = index;
-            };
+
+		simcontroller : SimController;
+
+        node [numNodes] : Node {
+            parameters:
+            nodeId = index;
+        };
             
     connections allowunconnected:
         for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {

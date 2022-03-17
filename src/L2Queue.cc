@@ -79,8 +79,8 @@ void L2Queue::handleMessage(cMessage *msg)
         }
     }
     else if (msg->arrivedOn("line$i")) {
-        // pass up
-        send(msg, "out");
+        // pass msg up to the local datacenter
+        send(msg, "local$o");
     }
     else {  // arrived on local port, connected to the local datacenter (and should be sent out, on the line)
         if (endTransmissionEvent->isScheduled()) {
