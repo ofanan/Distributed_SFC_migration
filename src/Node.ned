@@ -30,7 +30,6 @@ network Node
         connections allowunconnected:
         datacenter.toParent[0] <--> queue[0].local  if !isRoot;
         queue[0].line		   <--> portToParent[0] if !isRoot;
-//        datacenter.toChild[0]  <--> queue[1].local;
         for c=0..numChildren-1 {
             datacenter.toChild[c] <--> queue[c+numParents].local if numChildren>0;
             queue[c+1-int(isRoot)].line 		  <--> portToChild[c] if numChildren>0;   

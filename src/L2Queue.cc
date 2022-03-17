@@ -1,12 +1,3 @@
-//
-// This file is part of an OMNeT++/OMNEST simulation example.
-//
-// Copyright (C) 1992-2015 Andras Varga
-//
-// This file is distributed WITHOUT ANY WARRANTY. See the file
-// `license' for details on this and other legal matters.
-//
-
 #include <stdio.h>
 #include <string.h>
 #include <omnetpp.h>
@@ -26,13 +17,6 @@ class L2Queue : public cSimpleModule
     cMessage *endTransmissionEvent;
     bool isBusy;
 
-    simsignal_t qlenSignal;
-    simsignal_t busySignal;
-    simsignal_t queueingTimeSignal;
-    simsignal_t dropSignal;
-    simsignal_t txBytesSignal;
-    simsignal_t rxBytesSignal;
-
   public:
     L2Queue();
     virtual ~L2Queue();
@@ -41,7 +25,7 @@ class L2Queue : public cSimpleModule
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
-    virtual void startTransmitting(cMessage *msg);
+    virtual void startTransmitting(cPacket *pkt);
 };
 
 Define_Module(L2Queue);
@@ -66,30 +50,19 @@ void L2Queue::initialize()
 
     frameCapacity = par("frameCapacity");
 
-    qlenSignal = registerSignal("qlen");
-    busySignal = registerSignal("busy");
-    queueingTimeSignal = registerSignal("queueingTime");
-    dropSignal = registerSignal("drop");
-    txBytesSignal = registerSignal("txBytes");
-    rxBytesSignal = registerSignal("rxBytes");
-
-    emit(qlenSignal, queue.getLength());
-    emit(busySignal, false);
     isBusy = false;
 }
 
-void L2Queue::startTransmitting(cMessage *msg)
+void L2Queue::startTransmitting(cPacket *pkt)
 {
-    EV << "Starting transmission of " << msg << endl;
+    EV << "Starting transmission of " << pkt << endl;
     isBusy = true;
-    int64_t numBytes = check_and_cast<cPacket *>(msg)->getByteLength();
-    send(msg, "line$o");
-
-    emit(txBytesSignal, (long)numBytes);
+    int64_t numBytes = check_and_cast<pkt->getByteLength();
+    send(pkt, "line$o");
 
     // Schedule an event for the time when last bit will leave the gate.
-    simtime_t endTransmission = gate("line$o")->getTransmissionChannel()->getTransmissionFinishTime();
-    scheduleAt(endTransmission, endTransmissionEvent);
+    simtime_t endTransmissionTime = gate("line$o")->getTransmissionChannel()->getTransmissionFinishTime();
+    scheduleAt(endTransmissionTime, endTransmissionEvent);
 }
 
 void L2Queue::handleMessage(cMessage *msg)
@@ -98,42 +71,33 @@ void L2Queue::handleMessage(cMessage *msg)
         // Transmission finished, we can start next one.
         EV << "Transmission finished.\n";
         isBusy = false;
-        if (queue.isEmpty()) {
-            emit(busySignal, false);
-        }
-        else {
-            msg = (cMessage *)queue.pop();
-            emit(queueingTimeSignal, simTime() - msg->getTimestamp());
-            emit(qlenSignal, queue.getLength());
-            startTransmitting(msg);
+        if (!(queue.isEmpty())) {
+            pkt = (cPacket *)queue.pop();
+            startTransmitting(pkt);
         }
     }
     else if (msg->arrivedOn("line$i")) {
         // pass up
-        emit(rxBytesSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
         send(msg, "out");
     }
-    else {  // arrived on gate "in"
+    else {  // arrived on local port, connected to the local datacenter (and should be sent out, on the line)
         if (endTransmissionEvent->isScheduled()) {
-            // We are currently busy, so just queue up the packet.
-            if (frameCapacity && queue.getLength() >= frameCapacity) {
-                EV << "Received " << msg << " but transmitter busy and queue full: discarding\n";
-                emit(dropSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
-                delete msg;
-            }
-            else {
+            // We Assume infinite Q capacity, and therefore comment the lines below
+//            // We are currently busy, so just queue up the packet.
+//            if (frameCapacity && queue.getLength() >= frameCapacity) {
+//                EV << "Received " << pkt << " but transmitter busy and queue full: discarding\n";
+//                delete pkt;
+//            }
+//            else {
                 EV << "Received " << msg << " but transmitter busy: queueing up\n";
                 msg->setTimestamp();
                 queue.insert(msg);
-                emit(qlenSignal, queue.getLength());
-            }
+//            }
         }
         else {
             // We are idle, so we can start transmitting right away.
             EV << "Received " << msg << endl;
-            emit(queueingTimeSignal, SIMTIME_ZERO);
-            startTransmitting(msg);
-            emit(busySignal, true);
+            startTransmitting((cPacket*)msg);
         }
     }
 }
@@ -144,3 +108,20 @@ void L2Queue::refreshDisplay() const
     getDisplayString().setTagArg("i", 1, isBusy ? (queue.getLength() >= 3 ? "red" : "yellow") : "");
 }
 
+//cChannel *channel = gate->getChannel(); // 4.6.3
+//getTransmissionChannel()
+//cPacket *pkt = ...; // packet to be transmitted
+//cChannel *txChannel = gate("out")->getTransmissionChannel();
+//simtime_t txFinishTime = txChannel->getTransmissionFinishTime();
+//if (txFinishTime <= simTime())
+//{
+//    // channel free; send out packet immediately
+//    send(pkt, "out");
+//}
+//else
+//{
+//    // store packet and schedule timer; when the timer expires,
+//    // the packet should be removed from the queue and sent out
+//    txQueue.insert(pkt);
+//    scheduleAt(txFinishTime, endTxMsg);
+//}
