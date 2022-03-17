@@ -12,8 +12,8 @@ network Tree
         node[0].isRoot 					= true;
         node[0].numParents 				= 0;
 //        int numChildrenVec		= 
-        double channelDelay	@unit(s) 	= 1ms;
-        double basic_datarate	@unit(Gbps)	 	= 1Gbps;
+        double channelDelay	@unit(s); 
+        double basicDatarate @unit(Gbps);
 
         types:
         channel Channel extends ned.DatarateChannel {
@@ -27,7 +27,7 @@ network Tree
     connections allowunconnected:
         for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
 //            node[c].portToParent[0] <--> Channel <--> node[int((c-1)/numChildren)].portToChild++;
-            node[c].portToParent[0] <--> {delay=channelDelay; datarate=basic_datarate*h;} <--> node[int((c-1)/numChildren)].portToChild++;
+            node[c].portToParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> node[int((c-1)/numChildren)].portToChild++;
         }
 //        for i=0..idxOfLastNonLeaf, for c=0..numChildren-1 {
 //            node[i].portToChild[c] <--> Channel <--> node[i*numChildren+c+1].portToParent[0];

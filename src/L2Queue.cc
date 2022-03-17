@@ -57,7 +57,8 @@ void L2Queue::startTransmitting(cPacket *pkt)
 {
     EV << "Starting transmission of " << pkt << endl;
     isBusy = true;
-    int64_t numBytes = check_and_cast<pkt->getByteLength();
+    int64_t numBytes = check_and_cast<cPacket *>(pkt)->getByteLength(); //#$$$
+
     send(pkt, "line$o");
 
     // Schedule an event for the time when last bit will leave the gate.
@@ -72,8 +73,9 @@ void L2Queue::handleMessage(cMessage *msg)
         EV << "Transmission finished.\n";
         isBusy = false;
         if (!(queue.isEmpty())) {
-            pkt = (cPacket *)queue.pop();
-            startTransmitting(pkt);
+            cPacket *pkt;
+            pkt = (cPacket  *)queue.pop();
+           startTransmitting(pkt);
         }
     }
     else if (msg->arrivedOn("line$i")) {
