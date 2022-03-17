@@ -21,11 +21,13 @@ network Tree
         }
 
     submodules:
-            node [numNodes] : Node {nodeId = index;};
+            node [numNodes] : Node {
+                parameters:
+                nodeId = index;
+            };
             
     connections allowunconnected:
         for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
-//            node[c].portToParent[0] <--> Channel <--> node[int((c-1)/numChildren)].portToChild++;
             node[c].portToParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> node[int((c-1)/numChildren)].portToChild++;
         }
 //        for i=0..idxOfLastNonLeaf, for c=0..numChildren-1 {

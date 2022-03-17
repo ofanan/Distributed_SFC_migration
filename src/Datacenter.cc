@@ -36,14 +36,10 @@ void Datacenter::initialize()
     isLeaf      = ((int)(par ("numChildren"))==0);
 
     nodeId      = (int) (prnt->par("nodeId"));
-    if (isLeaf)
-            EV << "my node id is " <<(int) (par("nodeId")) << endl;
-//    isLeaf =
-//    int numDatacenters = par ("numDatacenters");
-    if (getIndex()==21) {
-        EV << "node " << getIndex () << " is sending msg";
-//        cMessage *msg = new cMessage("dummy");
-//        send(msg, "toParent$o");
+    if (nodeId==1) {
+        EV << "my node id is " << nodeId << endl;
+        cMessage *msg = new cMessage("dummy");
+//        send(msg, "toParent$o", 0);
     }
 
 }

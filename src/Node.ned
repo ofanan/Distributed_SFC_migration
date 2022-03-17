@@ -22,7 +22,6 @@ network Node
                 @display("p=140,130");
 				        numChildren = numChildren;
 				        numParents	= numParents; 
-				        nodeId	 	= nodeId;
         }        
         queue[numChildren+numParents]: L2Queue {
             parameters:
