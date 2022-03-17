@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <omnetpp.h>
+//#include "Node.h";
 
 using namespace omnetpp;
 
@@ -19,6 +20,7 @@ class Datacenter : public cSimpleModule
     private:
         virtual void initialize();
         virtual void handleMessage (cMessage *msg);
+        cSimpleModule* prnt;
         bool isRoot;
         bool isLeaf;
         int nodeId;
@@ -29,8 +31,13 @@ Define_Module(Datacenter);
 
 void Datacenter::initialize()
 {
-    this->nodeId = getParentModule()->par("nodeId");
-    EV << "my node id is " <<this->nodeId << endl;
+    prnt        = (cSimpleModule*) (getParentModule());
+    isRoot      = prnt->par ("isRoot");
+    isLeaf      = ((int)(par ("numChildren"))==0);
+
+    nodeId      = (int) (prnt->par("nodeId"));
+    if (isLeaf)
+            EV << "my node id is " <<(int) (par("nodeId")) << endl;
 //    isLeaf =
 //    int numDatacenters = par ("numDatacenters");
     if (getIndex()==21) {
