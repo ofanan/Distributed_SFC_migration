@@ -9,7 +9,7 @@ network Tree
         int numDatacenters 				= int((numChildren^height-1)/(numChildren-1));
 //        int idxOfLastNonLeaf 			= int(numNodes-numChildren^height-1);
 //        int	smallestLeafIdx 			= idxOfLastNonLeaf+1;
-        datacenter[0].numParents = 0;
+        datacenters[0].numParents = 0;
 //        int numChildrenVec		= 
         double channelDelay	@unit(s); 
         double basicDatarate @unit(Gbps);
@@ -22,15 +22,16 @@ network Tree
 
     submodules:
 
-//		tracefeeder : TraceFeeder;
+		tracefeeder : TraceFeeder;
 
-        datacenter [numDatacenters] : Datacenter {
+        datacenters [numDatacenters] : Datacenter {
             parameters:
             id = index;
+            numChildren = numChildren;
         };
             
     connections allowunconnected:
         for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
-            datacenter[c].toParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> datacenter[int((c-1)/numChildren)].toChild++;
+            datacenters[c].toParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> datacenters[int((c-1)/numChildren)].toChild++;
         }
 }

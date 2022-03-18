@@ -10,12 +10,12 @@ network Lux
         }
 
         submodules:
-            node [numNodes] : Node {
+            datacenter [numDatacenters] : Datacenter {
                 parameters:
-                nodeId = index;
+                id = index;
             };
     connections allowunconnected:
-        node[0].portToChild[0] <--> Channel <--> node[1].portToChild[0];
+        datacenter[0].toChild[0] <--> Channel <--> datacenter[1].toChild[0];
 }
 
 
