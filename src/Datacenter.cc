@@ -20,10 +20,11 @@ class Datacenter : public cSimpleModule
     private:
         virtual void initialize();
         virtual void handleMessage (cMessage *msg);
-        cSimpleModule* prnt;
+        cModule* prnt;
         bool isRoot;
         bool isLeaf;
-        int nodeId;
+        unsigned int nodeId;
+        unsigned int lvl; // level of this node in the tree
 };
 
 //
@@ -31,7 +32,7 @@ Define_Module(Datacenter);
 
 void Datacenter::initialize()
 {
-    prnt        = (cSimpleModule*) (getParentModule());
+    prnt        = (cModule*) (getParentModule());
     isRoot      = prnt->par ("isRoot");
     isLeaf      = ((int)(par ("numChildren"))==0);
 
