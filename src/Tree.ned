@@ -24,10 +24,11 @@ network Tree
 
 		tracefeeder : TraceFeeder;
 
+		solchecker: SolChecker;
+
         datacenters [numDatacenters] : Datacenter {
             parameters:
             id = index;
-            numChildren = numChildren;
         };
             
     connections allowunconnected:

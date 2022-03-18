@@ -13,9 +13,5 @@ public:
     Chain (int id);
 };
 
-Chain::Chain (int id)
-{
-    id = id;
-}
 
 #endif // ifndef CHAIN_H
