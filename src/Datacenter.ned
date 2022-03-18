@@ -1,16 +1,16 @@
 package src;
 
-//
-// TODO auto-generated type
-//
 simple Datacenter
 {
     parameters:
-        int numChildren;
-        int numParents;
-        bool isLeaf = (numChildren==0);
         @display("i=block/routing");
-        
+        int id = default (0);
+        int numChildren 	= default (4); 
+        int numParents    	= default (1);
+        bool isRoot 	  	= (numParents==0);
+        bool isLeaf			= (numChildren==0);       
+        int lvl 			= default (0); // level of this datacenter in the tree
+        int non_aug_cpu		= default (10);	
         // Add required params for the Alg, e.g.:
         // CPU cap'.
         // Have trace-reader, and, at a different module, collect stat and costs.
@@ -21,3 +21,4 @@ simple Datacenter
         inout toParent[numParents];
         inout toChild [numChildren];
 }
+

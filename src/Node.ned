@@ -3,12 +3,12 @@ package src;
 //
 // TODO auto-generated type
 //
-network Node
+module Node
 {
     parameters:
-        int numChildren; 
-        bool isRoot 	  = default (false);
-        int numParents    = 1 - int(isRoot);
+        int numChildren 	= default (4); 
+        bool isRoot 	  	= default (false);
+        int numParents    	= 1 - int(isRoot);
         int nodeId;
         @display("i=misc/node_vs,gold");
         

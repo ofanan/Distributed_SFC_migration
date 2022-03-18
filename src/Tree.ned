@@ -6,10 +6,10 @@ network Tree
     parameters:
         int height 						= default (3);
         int numChildren 				= default (3);
-        int numNodes 					= int((numChildren^height-1)/(numChildren-1));
+        int numDatacenters 				= int((numChildren^height-1)/(numChildren-1));
 //        int idxOfLastNonLeaf 			= int(numNodes-numChildren^height-1);
 //        int	smallestLeafIdx 			= idxOfLastNonLeaf+1;
-        node[0].isRoot 					= true;
+        datacenter[0].numParents = 0;
 //        int numChildrenVec		= 
         double channelDelay	@unit(s); 
         double basicDatarate @unit(Gbps);
@@ -22,18 +22,15 @@ network Tree
 
     submodules:
 
-		simcontroller : SimController;
+//		tracefeeder : TraceFeeder;
 
-        node [numNodes] : Node {
+        datacenter [numDatacenters] : Datacenter {
             parameters:
-            nodeId = index;
+            id = index;
         };
             
     connections allowunconnected:
         for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
-            node[c].portToParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> node[int((c-1)/numChildren)].portToChild++;
+            datacenter[c].toParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> datacenter[int((c-1)/numChildren)].toChild++;
         }
-//        for i=0..idxOfLastNonLeaf, for c=0..numChildren-1 {
-//            node[i].portToChild[c] <--> Channel <--> node[i*numChildren+c+1].portToParent[0];
-//        }        
 }

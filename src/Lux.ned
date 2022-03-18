@@ -1,5 +1,4 @@
 // Generate Luembourg's service network
-
 package src;
 
 network Lux
