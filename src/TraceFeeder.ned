@@ -8,6 +8,6 @@ simple TraceFeeder
 {
     parameters:
         @display("i=misc/node_vs,gold");
-		int numLeaves;    
+	    double decisionPariod @unit(s) = default(1s);
         
 }

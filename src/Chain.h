@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <vector>
-
-const int MAX_HEIGHT=5;
+#include "Parameters.h"
 
 class Chain
 {
@@ -19,7 +18,7 @@ public:
     explicit Chain (int id) {this->id = id;};
 };
 
-class RT_Chain: public Chain
+class RT_Chain : public Chain
 {
 public:
     static const int16_t S_u[MAX_HEIGHT+1];

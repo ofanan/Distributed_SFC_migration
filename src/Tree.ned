@@ -4,13 +4,10 @@ package src;
 network Tree
 {
     parameters:
-        int height 						= default (3);
-        int numChildren 				= default (3);
-        int numDatacenters 				= int((numChildren^height-1)/(numChildren-1));
-//        int idxOfLastNonLeaf 			= int(numNodes-numChildren^height-1);
-//        int	smallestLeafIdx 			= idxOfLastNonLeaf+1;
-        datacenters[0].numParents = 0;
-//        int numChildrenVec		= 
+        int height 			= default (3);
+        int numChildren 	= default (3);
+        int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
+		int numLeaves   	= default(int (numChildren^(height-1)));
         double channelDelay	@unit(s); 
         double basicDatarate @unit(Gbps);
 
@@ -30,7 +27,6 @@ network Tree
 
         datacenters [numDatacenters] : Datacenter {
             parameters:
-            id = index;
         };
             
     connections allowunconnected:

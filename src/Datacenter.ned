@@ -10,7 +10,6 @@ simple Datacenter
         bool isRoot 	= (numParents==0);
         bool isLeaf		= (numChildren==0);       
         int lvl 		= default (0); // level of this datacenter in the tree
-        int non_aug_cpu	= default (10);	
         // Add required params for the Alg, e.g.:
         // CPU cap'.
         // Have trace-reader, and, at a different module, collect stat and costs.
