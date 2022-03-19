@@ -24,6 +24,8 @@ network Tree
 
 		tracefeeder : TraceFeeder;
 
+		chainggenerator : ChainGenerator;
+
 		solchecker: SolChecker;
 
         datacenters [numDatacenters] : Datacenter {
