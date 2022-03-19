@@ -15,4 +15,8 @@ const uint8_t Non_RT_Chain_S_u_size = 2;
 
 const int16_t nonAugmentedCpuAtLvl[] = {10,20,30,40,50,60};
 
+const int16_t chainMigCost = 600;
+
+const int16_t costOfPlacingChainInLvl[] = {10,20,30,40,50,60};
+
 #endif // ifndef PARAMS_H

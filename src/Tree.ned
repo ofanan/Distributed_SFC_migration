@@ -26,6 +26,8 @@ network Tree
 		cpuaugmenter 	: CpuAugmenter;
 
 		solchecker		: SolChecker;
+		
+		paramchecker 	: ParamChecker;
 
         datacenters [numDatacenters] : Datacenter {
             parameters:
