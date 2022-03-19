@@ -9,7 +9,7 @@
 class Chain
 {
 public:
-    int id;
+    int32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
     int8_t curLvl;        // Level of the datacenter currently hosting me

@@ -1,14 +1,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <omnetpp.h>
+#include <vector>
 #include "Parameters.h"
 
 using namespace omnetpp;
 
 class Datacenter : public cSimpleModule
 {
-    private:
-        int16_t  nonAugmentedCpu;
+public:
+    int16_t  availCpu;
+    std::vector <int32_t> assigned_chains;
+    std::vector <int32_t> placed_chains;
+
+private:
         virtual void initialize();
         virtual void handleMessage (cMessage *msg);
  };
@@ -19,7 +24,9 @@ Define_Module(Datacenter);
 void Datacenter::initialize()
 {
     int16_t id = (int)(par("id"));
-    nonAugmentedCpu = cpu_cap_at_lvl[int(par("lvl"))];
+    availCpu = nonAugmentedCpuAtLvl[int(par("lvl"))];
+    assigned_chains = {};
+    placed_chains   = {};
 //    nonAugmentedCpu =
 //    if (id==1) {
 //        EV << "my node id is " << id << endl;

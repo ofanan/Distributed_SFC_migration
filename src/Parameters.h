@@ -13,6 +13,6 @@ const uint8_t RT_Chain_S_u_size = 3;
 const uint8_t Non_RT_Chain_S_u[] = {0,1,2,3,4};
 const uint8_t Non_RT_Chain_S_u_size = 2;
 
-const int16_t cpu_cap_at_lvl[] = {10,20,30,40,50,60};
+const int16_t nonAugmentedCpuAtLvl[] = {10,20,30,40,50,60};
 
 #endif // ifndef PARAMS_H
