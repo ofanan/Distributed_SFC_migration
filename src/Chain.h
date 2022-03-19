@@ -23,18 +23,19 @@ class RT_Chain: public Chain
 {
 public:
     static const int16_t S_u[MAX_HEIGHT+1];
-    static const int8_t S_u_size = 3;
-//      static std::vector <int8_t> S_u; // = [1, 2];
-
-//    static const int8_t S_u[2];
-//    static const int8_t S_u = 5; // Works!
-//    enum {S_u_enum = 2};
-//    int8_t S_uu[] = {1, 2};
-//    static std::vector <int8_t> S_u; // = [1, 2];
+    static const int8_t S_u_size;
     explicit RT_Chain(int x) : Chain(x) {
     }
 };
 
+class Non_RT_Chain: public Chain
+{
+public:
+    static const int16_t S_u[MAX_HEIGHT+1];
+    static const int8_t S_u_size;
+    explicit Non_RT_Chain(int x) : Chain(x) {
+    }
+};
 
 #endif // ifndef CHAIN_H
 
