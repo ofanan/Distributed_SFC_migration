@@ -7,7 +7,7 @@
 #include "Chain.h"
 
 const int MAX_HEIGHT=5;
-const int16_t RT_Chain_S_u[5] = {0,1,2,3,4};
+const int16_t RT_Chain_S_u[] = {0,1,2,3,4};
 const int8_t RT_Chain_S_u_size = 3;
 
 //const int16_t RT_Chain::S_u[] = {0,1,2,3,4};
