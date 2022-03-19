@@ -32,12 +32,15 @@ void TraceFeeder::initialize ()
     for (int i(0); i<numDatacenters; i++) {
         datacenter = network->getSubmodule("datacenters", i);
         if ((bool)(datacenter->par("isLeaf"))) {
-//        if ((int)(datacenter->par("numChildren"))==0) {
             leaves[leaf_id++] = datacenter;
         }
     }
-    EV << "leaf 0 has " << (int)(leaves[0]->par("numParents")) << " parents and " << (int)(leaves[0]->par("numChildren")) <<" children\n";
-    EV << "leaf 3 has " << (int)(leaves[3]->par("numParents")) << " parents and " << (int)(leaves[3]->par("numChildren")) <<" children\n";
+    Chain chain (1);
+    RT_Chain rt_chain (2);
+    EV << "chain " << chain.id << " \n";
+    EV << "RT chain " << rt_chain.my_y << " \n";
+//    EV << "leaf 0 has " << (int)(leaves[0]->par("numParents")) << " parents and " << (int)(leaves[0]->par("numChildren")) <<" children\n";
+//    EV << "leaf 3 has " << (int)(leaves[3]->par("numParents")) << " parents and " << (int)(leaves[3]->par("numChildren")) <<" children\n";
 }
 
 void TraceFeeder::handleMessage (cMessage *msg)

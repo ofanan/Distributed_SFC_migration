@@ -1,6 +1,6 @@
 #include "Chain.h"
 
-Chain::Chain (int id)
-{
-    id = id;
-}
+//Chain::Chain (int id)
+//{
+//    id = id;
+//}
