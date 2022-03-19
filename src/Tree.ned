@@ -22,6 +22,8 @@ network Tree
 		tracefeeder : TraceFeeder;
 
 		chainggenerator : ChainGenerator;
+		
+		cpuaugmenter : CpuAugmenter;
 
 		solchecker: SolChecker;
 

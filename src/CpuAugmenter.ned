@@ -1,0 +1,4 @@
+package src;
+
+simple CpuAugmenter
+{}

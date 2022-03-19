@@ -21,8 +21,8 @@ public:
 class RT_Chain : public Chain
 {
 public:
-    static const int16_t S_u[MAX_HEIGHT+1];
-    static const int8_t S_u_size;
+    static const uint8_t S_u[];
+    static const uint8_t S_u_size;
     explicit RT_Chain(int x) : Chain(x) {
     }
 };
@@ -30,8 +30,8 @@ public:
 class Non_RT_Chain: public Chain
 {
 public:
-    static const int16_t S_u[MAX_HEIGHT+1];
-    static const int8_t S_u_size;
+    static const uint8_t S_u[];
+    static const uint8_t S_u_size;
     explicit Non_RT_Chain(int x) : Chain(x) {
     }
 };

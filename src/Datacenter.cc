@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <omnetpp.h>
+#include "Parameters.h"
 
 using namespace omnetpp;
 
 class Datacenter : public cSimpleModule
 {
     private:
-        int8_t  nonAugmentedCpu;
+        int16_t  nonAugmentedCpu;
         virtual void initialize();
         virtual void handleMessage (cMessage *msg);
  };
@@ -18,6 +19,7 @@ Define_Module(Datacenter);
 void Datacenter::initialize()
 {
     int16_t id = (int)(par("id"));
+    nonAugmentedCpu = cpu_cap_at_lvl[int(par("lvl"))];
 //    nonAugmentedCpu =
 //    if (id==1) {
 //        EV << "my node id is " << id << endl;
