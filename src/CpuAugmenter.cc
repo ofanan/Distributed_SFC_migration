@@ -8,7 +8,10 @@
 using namespace omnetpp;
 
 class CpuAugmenter : public cSimpleModule
-{};
+{
+public:
+    double rsrcAug = 1.0;
+};
 
 Define_Module(CpuAugmenter);
 

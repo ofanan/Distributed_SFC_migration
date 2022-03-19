@@ -19,13 +19,13 @@ network Tree
 
     submodules:
 
-		tracefeeder : TraceFeeder;
+		tracefeeder 	: TraceFeeder;
 
 		chainggenerator : ChainGenerator;
 		
-		cpuaugmenter : CpuAugmenter;
+		cpuaugmenter 	: CpuAugmenter;
 
-		solchecker: SolChecker;
+		solchecker		: SolChecker;
 
         datacenters [numDatacenters] : Datacenter {
             parameters:

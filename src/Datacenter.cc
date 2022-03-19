@@ -23,8 +23,8 @@ Define_Module(Datacenter);
 
 void Datacenter::initialize()
 {
-    int16_t id = (int)(par("id"));
-    availCpu = nonAugmentedCpuAtLvl[int(par("lvl"))];
+    int16_t id      = (int)(par("id"));
+    availCpu        = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
     assigned_chains = {};
     placed_chains   = {};
 //    nonAugmentedCpu =

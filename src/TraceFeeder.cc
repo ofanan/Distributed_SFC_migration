@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Chain.h"
+#include "Parameters.h"
 
 using namespace omnetpp;
 
