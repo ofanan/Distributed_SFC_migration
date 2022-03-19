@@ -39,7 +39,8 @@ void TraceFeeder::initialize ()
     RT_Chain rt_chain (2);
 //    EV << "chain " << chain.id << " \n";
 
-    EV << "RT chain.S_u[4] " << rt_chain.S_u[4] << " \n";
+    EV << "RT chain.S_u[4]=" << rt_chain.S_u[4] << " \n";
+    EV << "RT chain.S_u_size=" << (int)(rt_chain.S_u_size) << " \n";
 //    EV << "leaf 0 has " << (int)(leaves[0]->par("numParents")) << " parents and " << (int)(leaves[0]->par("numChildren")) <<" children\n";
 //    EV << "leaf 3 has " << (int)(leaves[3]->par("numParents")) << " parents and " << (int)(leaves[3]->par("numChildren")) <<" children\n";
 }

@@ -22,7 +22,8 @@ public:
 class RT_Chain: public Chain
 {
 public:
-    static const int S_u[10];
+    static const int16_t S_u[MAX_HEIGHT+1];
+    static const int8_t S_u_size = 3;
 //      static std::vector <int8_t> S_u; // = [1, 2];
 
 //    static const int8_t S_u[2];
