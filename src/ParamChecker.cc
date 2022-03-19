@@ -7,6 +7,9 @@
 
 using namespace omnetpp;
 
+/*
+Check that the simulations' parameters are valid and feasible.
+*/
 class ParamChecker : public cSimpleModule
 {
 private:
@@ -17,7 +20,9 @@ Define_Module(ParamChecker);
 
 void ParamChecker::initialize ()
 {
-	EV << "Hi. I'm ParamChecker\n";
+	EV << "Hi. I'm ParamChecker. Finishing sim\n";
+	endSimulation();
+
 	
 }
 
