@@ -3,15 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-
-//class Chain
-//{
-//public:
-//    int my_x;
-//    explicit Chain(int x) {
-//        my_x = x;
-//    }
-//};
+#include <vector>
 
 class Chain
 {
@@ -25,21 +17,17 @@ public:
     explicit Chain (int id) {this->id = id;};
 };
 
-//class RT_Chain: public Chain
-//{
-//public:
-//    int my_y;
-//    explicit RT_Chain(int x) : Chain(x) {
-//        my_y = 7;
-//    }
-//};
-
 class RT_Chain: public Chain
 {
 public:
-    int my_y;
+    static const int S_u[5];
+
+//    static const int8_t S_u[2];
+//    static const int8_t S_u = 5; // Works!
+//    enum {S_u_enum = 2};
+//    int8_t S_uu[] = {1, 2};
+//    static std::vector <int8_t> S_u; // = [1, 2];
     explicit RT_Chain(int x) : Chain(x) {
-        my_y = 7;
     }
 };
 
