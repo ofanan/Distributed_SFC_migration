@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <vector>
 
+const int MAX_HEIGHT=5;
+
 class Chain
 {
 public:
@@ -20,7 +22,8 @@ public:
 class RT_Chain: public Chain
 {
 public:
-    static const int S_u[5];
+    static const int S_u[10];
+//      static std::vector <int8_t> S_u; // = [1, 2];
 
 //    static const int8_t S_u[2];
 //    static const int8_t S_u = 5; // Works!
