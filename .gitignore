@@ -6,3 +6,4 @@ simulations/*
 *.exe
 .oppbuildspec
 .meta*
+.cmdenv-log
