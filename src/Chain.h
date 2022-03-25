@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <vector>
 #include "Parameters.h"
 
 class Chain
@@ -37,5 +36,3 @@ public:
 };
 
 #endif // ifndef CHAIN_H
-
-//Code a "chain generator", connected to the TraceFeeder. It

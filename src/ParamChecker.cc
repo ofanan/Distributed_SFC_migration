@@ -20,9 +20,6 @@ Define_Module(ParamChecker);
 
 void ParamChecker::initialize ()
 {
-	EV << "Hi. I'm ParamChecker. Finishing sim\n";
-	endSimulation();
-
-	
+//	endSimulation();
 }
 

@@ -7,9 +7,9 @@ simple Datacenter
         int id 			= default (0);
         int numChildren = default (4); 
         int numParents 	= default (1);
-        bool isRoot 	= (numParents==0);
-        bool isLeaf		= (numChildren==0);       
         int lvl 		= default (0); // level of this datacenter in the tree
+        bool isRoot         = (numParents==0);
+        bool isLeaf         = (numChildren==0);
         // Add required params for the Alg, e.g.:
         // CPU cap'.
         // Have trace-reader, and, at a different module, collect stat and costs.
@@ -17,7 +17,8 @@ simple Datacenter
         // Beware that some STL (datastructrues of Cpp (arrays, vectors?)) may be not compatible with Omnetpp. Then, read the documentation to find an omnetpp compatible equivalent.
         // variables: avail cpu, assigned chains, ...
     gates:
-        inout toParent[numParents];
-        inout toChild [numChildren];
+//        inout toParent[numParents];
+//        inout toChild [numChildren];
+		inout port[numParents+numChildren];    
 }
 

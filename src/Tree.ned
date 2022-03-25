@@ -1,5 +1,4 @@
 package src;
-//import node.*;
 
 network Tree
 {
@@ -19,22 +18,22 @@ network Tree
 
     submodules:
 
-		trace_feeder 	: TraceFeeder;
+//		trace_feeder 	: TraceFeeder;
+//
+//		chain_generator : ChainGenerator;
+//		
+//		cpu_augmenter 	: CpuAugmenter;
+//
+//		sol_checker		: SolChecker;
+//		
+//		param_checker 	: ParamChecker;
 
-		chain_generator : ChainGenerator;
-		
-		cpu_augmenter 	: CpuAugmenter;
-
-		sol_checker		: SolChecker;
-		
-		param_checker 	: ParamChecker;
-
-        datacenters [numDatacenters] : Datacenter {
+        datacenter [numDatacenters] : Datacenter {
             parameters:
         };
             
     connections allowunconnected:
-        for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
-            datacenters[c].toParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> datacenters[int((c-1)/numChildren)].toChild++;
-        }
+//        for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
+//            datacenter[c].toParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> datacenter[int((c-1)/numChildren)].toChild++;
+//        }
 }
