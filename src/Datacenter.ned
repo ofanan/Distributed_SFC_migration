@@ -17,8 +17,6 @@ simple Datacenter
         // Beware that some STL (datastructrues of Cpp (arrays, vectors?)) may be not compatible with Omnetpp. Then, read the documentation to find an omnetpp compatible equivalent.
         // variables: avail cpu, assigned chains, ...
     gates:
-//        inout toParent[numParents];
-//        inout toChild [numChildren];
 		inout port[numParents+numChildren];    
 }
 

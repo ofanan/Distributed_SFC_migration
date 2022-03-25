@@ -34,7 +34,7 @@ network Lux
         };
     connections allowunconnected:
 
-		// Connect the root. This is a special case, as the root has one less port (it doesn't hae
+		// Connect the root. This is a special case, as the root has one less port (it doesn't haveu a parent). Furhtermore, in Monaco, the root has only 3 children.
 		for child=1..numChildren { 
 			datacenter[0].port[child-1] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenter[child].port[0];		
 		}
@@ -43,7 +43,6 @@ network Lux
             datacenter[dc].port[0] <--> {delay=channelDelay; datarate=basicDatarate*hop_cnt_from_root;} <--> datacenter[int((dc-1)/numChildren)].port[dc%numChildren+1];
         }
 
-//		datacenter[0].port[0] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenter[1].port[0];		
 }
 
 
