@@ -5,7 +5,7 @@ network Lux
 {
     parameters:
         int height 			= default (3);
-        int numChildren 	= default (3);
+        int numChildren 	= default (4);
         int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
 		int numLeaves   	= default(int (numChildren^(height-1)));
         double channelDelay	@unit(s); 
