@@ -33,13 +33,15 @@ network Lux
             parameters:
         };
     connections allowunconnected:
-		for c=0..numChildren-1 {
-			datacenter[0].port[c] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenter[c+1].port++;		
-		}
 
-//        for h=1..height-1, for c=int((numChildren^h-1)/(numChildren-1))..int((numChildren^(h+1)-1)/(numChildren-1)-1) {
-//            datacenter[c].toParent[0] <--> {delay=channelDelay; datarate=basicDatarate*h;} <--> datacenter[int((c-1)/numChildren)].toChild++;
-//        }
+		// Connect the root. This is a special case, as the root has one less port (it doesn't hae
+//		for child=1..numChildren { 
+//			datacenter[0].port[child-1] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenter[child].port[0];		
+//		}
+
+        for hop_cnt_from_root=2..height-1, for dc=int((numChildren^hop_cnt_from_root-1)/(numChildren-1))..int((numChildren^(hop_cnt_from_root+1)-1)/(numChildren-1)-1) {
+            datacenter[dc].port[0] <--> {delay=channelDelay; datarate=basicDatarate*hop_cnt_from_root;} <--> datacenter[int((dc-1)/numChildren)].port[dc%numChildren];
+        }
 }
 
 
