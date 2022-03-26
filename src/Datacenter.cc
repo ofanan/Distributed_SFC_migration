@@ -19,13 +19,13 @@ public:
     std::set <int32_t> placedchains; // For some reason, uncommenting this line makes a build-netw. error.
     std::vector <cMessage*> endTransmissionEvent;
 
-//    ~Datacenter();
+    ~Datacenter();
 
 private:
     std::vector <cQueue>    outputQ;
     std::vector <bool>      outputQisBusy;
         virtual void initialize();
-//        virtual void handleMessage (cMessage *msg);
+        virtual void handleMessage (cMessage *msg);
 //    void startXmt (cPacket *pkt, int outputQnum);
 //    std::string qNumToOutputName (int8_t qNum);
 };
@@ -36,32 +36,32 @@ Define_Module(Datacenter);
 void Datacenter::initialize()
 {
     availCpu        = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
-      numChildren   = (int16_t) (par("numChildren"));
-      numParents    = (int16_t) (par("numParents"));
-    bool isRoot;//          = (numParents==0);
-    bool isLeaf;//         = (numChildren==0);
+    numChildren     = (int16_t) (par("numChildren"));
+    numParents      = (int16_t) (par("numParents"));
+    isRoot          = (numParents==0);
+    isLeaf          = (numChildren==0);
     outputQ.             resize (numParents + numChildren);
     outputQisBusy.       resize (numParents + numChildren);
-//    endTransmissionEvent.resize (numParents + numChildren);
-//    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
-//    std::fill(endTransmissionEvent.begin(), endTransmissionEvent.end(), nullptr);
-//
+    endTransmissionEvent.resize (numParents + numChildren);
+    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
+    std::fill(endTransmissionEvent.begin(), endTransmissionEvent.end(), nullptr);
+
 }
 
-//Datacenter::~Datacenter()
-//{
-//    for (int i(0); i < numParents + numChildren; i++) {
-//        cancelAndDelete(endTransmissionEvent[i]);
-//    }
-//}
+Datacenter::~Datacenter()
+{
+    for (int i(0); i < numParents + numChildren; i++) {
+        cancelAndDelete(endTransmissionEvent[i]);
+    }
+}
 
-//
+
 //}
 //
-//void Datacenter::handleMessage (cMessage *msg)
-//{
-//    EV << "DC " << int (par ("id")) << " rcvd msg";
-//}
+void Datacenter::handleMessage (cMessage *msg)
+{
+    EV << "DC " << int (par ("id")) << " rcvd msg";
+}
 
 //std::string Datacenter::qNumToOutputName (int8_t qNum)
 //{
