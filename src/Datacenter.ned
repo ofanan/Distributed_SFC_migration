@@ -5,8 +5,8 @@ simple Datacenter
     parameters:
         @display("i=block/routing");
         int id 			= default (0);
-        int numChildren = default (4); 
         int numParents 	= default (1);
+        int numChildren = default (4); 
         int lvl 		= default (0); // level of this datacenter in the tree
         bool isRoot         = (numParents==0);
         bool isLeaf         = (numChildren==0);

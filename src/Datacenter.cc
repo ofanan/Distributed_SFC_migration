@@ -13,6 +13,7 @@ class Datacenter : public cSimpleModule
 public:
     int16_t numChildren;
     int16_t numParents;
+    int16_t numPorts;
     bool isRoot;
     bool isLeaf;
     int16_t  availCpu;
@@ -24,6 +25,7 @@ public:
 private:
     std::vector <cQueue>    outputQ;
     std::vector <bool>      outputQisBusy;
+    std::vector <cChannel*> xmtChnl;
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
     void xmt (cPacket *pkt, int16_t portNum);
@@ -37,10 +39,17 @@ void Datacenter::initialize()
     availCpu        = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
     numChildren     = (int16_t) (par("numChildren"));
     numParents      = (int16_t) (par("numParents"));
+    numPorts        = numParents + numChildren;
     isRoot          = (numParents==0);
     isLeaf          = (numChildren==0);
-    outputQ.             resize (numParents + numChildren);
-    outputQisBusy.       resize (numParents + numChildren);
+
+    outputQ.        resize (numPorts);
+    outputQisBusy.  resize (numPorts);
+    xmtChnl.        resize (numPorts);
+    for (int portNum (0); portNum < numPorts; portNum++) {
+        xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
+    }
+
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     cPacket *pkt = new cPacket;
     xmt (pkt, 0);
@@ -87,17 +96,14 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
     EV << "Starting transmission of " << pkt << endl;
     outputQisBusy[portNum] = true;
 
-//    char port_str[20];
-//    sprintf (port_str, "port$o", portNum);
     send(pkt, "port$o", portNum);
 
     // Schedule an event for the time when last bit will leave the gate.
-    simtime_t endTransmissionTime = gate("port$o", portNum)->getTransmissionChannel()->getTransmissionFinishTime(); //$$$ Not only 0 $$$should call getTransmissionChannel only once, and save the xmtChannel
+    simtime_t endTransmissionTime = xmtChnl[portNum]->getTransmissionFinishTime();
 
-    endXmtPkt *msg = new endXmtPkt (""); //((uint8_t)portNum);
+    endXmtPkt *msg = new endXmtPkt ("");
     msg->setPortNum (portNum);
 
-    //    msg -> portNum = portNum;
     scheduleAt(endTransmissionTime, msg);
 }
 
