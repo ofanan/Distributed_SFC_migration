@@ -17,17 +17,15 @@ public:
     int16_t  availCpu;
     std::set <int32_t> assignedchains;
     std::set <int32_t> placedchains; // For some reason, uncommenting this line makes a build-netw. error.
-    std::vector <cMessage*> endTransmissionEvent;
 
     ~Datacenter();
 
 private:
     std::vector <cQueue>    outputQ;
     std::vector <bool>      outputQisBusy;
-        virtual void initialize();
-        virtual void handleMessage (cMessage *msg);
-//    void startXmt (cPacket *pkt, int outputQnum);
-//    std::string qNumToOutputName (int8_t qNum);
+    virtual void initialize();
+    virtual void handleMessage (cMessage *msg);
+    void startXmt (cPacket *pkt, int16_t portNum);
 };
 
 Define_Module(Datacenter);
@@ -42,22 +40,19 @@ void Datacenter::initialize()
     isLeaf          = (numChildren==0);
     outputQ.             resize (numParents + numChildren);
     outputQisBusy.       resize (numParents + numChildren);
-    endTransmissionEvent.resize (numParents + numChildren);
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
-    std::fill(endTransmissionEvent.begin(), endTransmissionEvent.end(), nullptr);
 
 }
 
 Datacenter::~Datacenter()
 {
-    for (int i(0); i < numParents + numChildren; i++) {
-        cancelAndDelete(endTransmissionEvent[i]);
-    }
+    // cancelAndDelete all self msgs, and possibly other msgs.
+//    for (int i(0); i < numParents + numChildren; i++) {
+//        cancelAndDelete(endTransmissionEvent[i]);
+//    }
 }
 
 
-//}
-//
 void Datacenter::handleMessage (cMessage *msg)
 {
     EV << "DC " << int (par ("id")) << " rcvd msg";
@@ -80,20 +75,26 @@ void Datacenter::handleMessage (cMessage *msg)
 //    return res;
 //
 //}
-//
-//
-//void Datacenter::startXmt(cPacket *pkt, int outputQnum)
-//{
-//    EV << "Starting transmission of " << pkt << endl;
-//    outputQisBusy[outputQnum] = true;
-//
-//    std::string outputName = qNumToOutputName(outputQnum);
-////    send(pkt, outputName); //"toChild[0]$o"); //outputName);
-//
-//    // Schedule an event for the time when last bit will leave the gate.
-//    simtime_t endTransmissionTime = gate("toChild[0]$o")->getTransmissionChannel()->getTransmissionFinishTime();
-//    scheduleAt(endTransmissionTime, endTransmissionEvent[outputQnum]);
-//}
+
+
+/*
+ * Xmt the given packet to the given output port; schedule a self msg for the end of transmission.
+ */
+void Datacenter::startXmt(cPacket *pkt, int16_t portNum)
+{
+    EV << "Starting transmission of " << pkt << endl;
+    outputQisBusy[portNum] = true;
+
+    char port_str[20];
+    sprintf (port_str, "port[%d]$o", portNum);
+    send(pkt, port_str); //"port[0]$o");
+
+    // Schedule an event for the time when last bit will leave the gate.
+    simtime_t endTransmissionTime = gate("toChild[0]$o")->getTransmissionChannel()->getTransmissionFinishTime();
+
+    // $$$ Schedule a self-msg for endXmtevent. The msg should include a filed, noting the portNum.
+    //scheduleAt(endTransmissionTime, endTransmissionEvent);
+}
 
 //
 //
