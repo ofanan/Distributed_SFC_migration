@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include "Parameters.h"
+#include "endXmtPkt_m.h"
 
 using namespace omnetpp;
 
@@ -25,7 +26,7 @@ private:
     std::vector <bool>      outputQisBusy;
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
-    void startXmt (cPacket *pkt, int16_t portNum);
+    void xmt (cPacket *pkt, int16_t portNum);
 };
 
 Define_Module(Datacenter);
@@ -41,7 +42,8 @@ void Datacenter::initialize()
     outputQ.             resize (numParents + numChildren);
     outputQisBusy.       resize (numParents + numChildren);
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
-
+    cPacket *pkt = new cPacket;
+    xmt (pkt, 0);
 }
 
 Datacenter::~Datacenter()
@@ -80,22 +82,22 @@ void Datacenter::handleMessage (cMessage *msg)
 /*
  * Xmt the given packet to the given output port; schedule a self msg for the end of transmission.
  */
-void Datacenter::startXmt(cPacket *pkt, int16_t portNum)
+void Datacenter::xmt(cPacket *pkt, int16_t portNum)
 {
     EV << "Starting transmission of " << pkt << endl;
     outputQisBusy[portNum] = true;
 
-    char port_str[20];
-    sprintf (port_str, "port[%d]$o", portNum);
-    send(pkt, port_str); //"port[0]$o");
+//    char port_str[20];
+//    sprintf (port_str, "port$o", portNum);
+    send(pkt, "port$o", portNum);
 
     // Schedule an event for the time when last bit will leave the gate.
-    simtime_t endTransmissionTime = gate("toChild[0]$o")->getTransmissionChannel()->getTransmissionFinishTime();
+    simtime_t endTransmissionTime = gate("port$o", portNum)->getTransmissionChannel()->getTransmissionFinishTime(); //$$$ Not only 0 $$$should call getTransmissionChannel only once, and save the xmtChannel
 
-    // $$$ Schedule a self-msg for endXmtevent. The msg should include a filed, noting the portNum.
-    //scheduleAt(endTransmissionTime, endTransmissionEvent);
+    endXmtPkt *msg = new endXmtPkt (""); //((uint8_t)portNum);
+    msg->setPortNum (portNum);
+
+    //    msg -> portNum = portNum;
+    scheduleAt(endTransmissionTime, msg);
 }
 
-//
-//
-//
