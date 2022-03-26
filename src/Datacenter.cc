@@ -22,8 +22,8 @@ public:
 //    ~Datacenter();
 
 private:
-//    std::vector <cQueue>    outputQ;
-//    std::vector <bool>      outputQisBusy;
+    std::vector <cQueue>    outputQ;
+    std::vector <bool>      outputQisBusy;
         virtual void initialize();
 //        virtual void handleMessage (cMessage *msg);
 //    void startXmt (cPacket *pkt, int outputQnum);
@@ -38,10 +38,10 @@ void Datacenter::initialize()
     availCpu        = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
       numChildren   = (int16_t) (par("numChildren"));
       numParents    = (int16_t) (par("numParents"));
-//    bool isRoot;//          = (numParents==0);
-//    bool isLeaf;//         = (numChildren==0);
-//    outputQ.             resize (numParents + numChildren);
-//    outputQisBusy.       resize (numParents + numChildren);
+    bool isRoot;//          = (numParents==0);
+    bool isLeaf;//         = (numChildren==0);
+    outputQ.             resize (numParents + numChildren);
+    outputQisBusy.       resize (numParents + numChildren);
 //    endTransmissionEvent.resize (numParents + numChildren);
 //    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
 //    std::fill(endTransmissionEvent.begin(), endTransmissionEvent.end(), nullptr);
