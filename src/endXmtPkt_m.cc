@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.7 from endXmtPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.7 from src/endXmtPkt.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
