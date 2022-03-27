@@ -19,13 +19,13 @@ public:
     int16_t  availCpu;
     std::set <int32_t> assignedchains;
     std::set <int32_t> placedchains; // For some reason, uncommenting this line makes a build-netw. error.
-
     ~Datacenter();
 
 private:
-    std::vector <cQueue>    outputQ;
-    std::vector <bool>      outputQisBusy;
-    std::vector <cChannel*> xmtChnl;
+    std::vector <cQueue>     outputQ;
+    std::vector <bool>       outputQisBusy;
+    std::vector <cChannel*>  xmtChnl;
+    std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
     void handleSelfMsg (cMessage *msg);
@@ -48,21 +48,22 @@ void Datacenter::initialize()
     outputQ.        resize (numPorts);
     outputQisBusy.  resize (numPorts);
     xmtChnl.        resize (numPorts);
+    endXmtEvents.   resize (numPorts);
     for (int portNum (0); portNum < numPorts; portNum++) {
         xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
     }
 
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
-    cPacket *pkt = new cPacket;
+    std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
+    cPacket *pkt = new cPacket();
     xmt (pkt, 0);
 }
 
 Datacenter::~Datacenter()
 {
-    // cancelAndDelete all self msgs, and possibly other msgs.
-//    for (int i(0); i < numParents + numChildren; i++) {
-//        cancelAndDelete(endTransmissionEvent[i]);
-//    }
+    for (int i(0); i < numPorts; i++) {
+        cancelAndDelete(endXmtEvents[i]);
+    }
 }
 
 /*
@@ -73,6 +74,7 @@ void Datacenter::handleSelfMsg (cMessage *msg)
 {
     endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
     int16_t portNum = end_xmt_pkt -> getPortNum();
+    endXmtEvents[portNum] = nullptr; //remove the message from my list of scheduled future end-of-pkt-xmt events.
     EV << "Rcvd self msg. portNum = " << portNum;
     if (outputQ[portNum].isEmpty()) {
         return;
@@ -116,9 +118,9 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
     // Schedule an event for the time when last bit will leave the gate.
     simtime_t endTransmissionTime = xmtChnl[portNum]->getTransmissionFinishTime();
 
-    endXmtPkt *msg = new endXmtPkt ("");
-    msg->setPortNum (portNum);
+    endXmtEvents[portNum] = new endXmtPkt ("");
+    endXmtEvents[portNum]->setPortNum (portNum);
 
-    scheduleAt(endTransmissionTime, msg);
+    scheduleAt(endTransmissionTime, endXmtEvents[portNum]);
 }
 
