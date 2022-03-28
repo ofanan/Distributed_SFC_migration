@@ -102,6 +102,7 @@ void Datacenter::handleMessage (cMessage *msg)
     if (dynamic_cast<bottomUpPkt*>(msg) != nullptr)
     {
         bottomUpPkt *datagram = (bottomUpPkt*)msg;
+        delete (datagram);
     }
     delete (msg);
 
