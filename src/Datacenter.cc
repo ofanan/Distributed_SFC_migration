@@ -27,7 +27,7 @@ public:
 
 private:
 //    std::vector <cQueue>     outputQ;
-    cQueue outputQ[10];
+//    cQueue outputQ[10];
 //    std::vector <bool>       outputQisBusy;
     std::vector <cChannel*>  xmtChnl;
     std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
@@ -94,9 +94,9 @@ void Datacenter::handleSelfMsg (cMessage *msg)
     int16_t portNum = end_xmt_pkt -> getPortNum();
     delete (msg);
     EV << "Rcvd self msg. portNum = " << portNum;
-    if (outputQ[portNum].isEmpty()) {
-        return;
-    }
+//    if (outputQ[portNum].isEmpty()) {
+//        return;
+//    }
 
 //    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
 //    cPacket *pkt = (cPacket*) outputQ[portNum].pop();
