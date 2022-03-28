@@ -28,15 +28,12 @@
  * <pre>
  * packet bottomUpPkt
  * {
- *     int route[];
  * }
  * </pre>
  */
 class bottomUpPkt : public ::omnetpp::cPacket
 {
   protected:
-    int *route; // array ptr
-    unsigned int route_arraysize;
 
   private:
     void copy(const bottomUpPkt& other);
@@ -55,10 +52,6 @@ class bottomUpPkt : public ::omnetpp::cPacket
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual void setRouteArraySize(unsigned int size);
-    virtual unsigned int getRouteArraySize() const;
-    virtual int getRoute(unsigned int k) const;
-    virtual void setRoute(unsigned int k, int route);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const bottomUpPkt& obj) {obj.parsimPack(b);}

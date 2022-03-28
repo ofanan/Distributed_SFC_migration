@@ -27,7 +27,7 @@ public:
 
 private:
     std::vector <cQueue>     outputQ;
-    std::vector <bool>       outputQisBusy;
+//    std::vector <bool>       outputQisBusy;
     std::vector <cChannel*>  xmtChnl;
     std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     virtual void initialize();
@@ -52,21 +52,21 @@ void Datacenter::initialize()
     isLeaf          = (numChildren==0);
 
     outputQ.        resize (numPorts);
-    outputQisBusy.  resize (numPorts);
     xmtChnl.        resize (numPorts);
     endXmtEvents.   resize (numPorts);
     for (int portNum (0); portNum < numPorts; portNum++) {
         xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
     }
 
-    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
+    //    outputQisBusy.  resize (numPorts);
+////    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-    bottomUpPkt *pkt = new bottomUpPkt(); // this inialization causes the problem!
-    pkt->setRouteArraySize(1);
-    pkt->setRoute(0, 7);
+//    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
+//    pkt->setRouteArraySize(1);
+//    pkt->setRoute(0, 7);
 //    pkt->setNotAssigned(unsigned k, long route);
 //    virtual void setRouteArraySize(unsigned n);
-//    cPacket *pkt = new cPacket();
+    cPacket *pkt = new cPacket();
     xmt (pkt, 0);
 }
 
@@ -88,15 +88,17 @@ Datacenter::~Datacenter()
  */
 void Datacenter::handleSelfMsg (cMessage *msg)
 {
-    endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
-    int16_t portNum = end_xmt_pkt -> getPortNum();
-    delete (msg);
-    EV << "Rcvd self msg. portNum = " << portNum;
-    if (outputQ[portNum].isEmpty()) {
-        return;
-    }
-    cPacket *pkt = (cPacket*) outputQ[portNum].pop();
-    xmt (pkt, portNum);
+//    endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
+//    int16_t portNum = end_xmt_pkt -> getPortNum();
+//    delete (msg);
+//    EV << "Rcvd self msg. portNum = " << portNum;
+//    if (outputQ[portNum].isEmpty()) {
+//        return;
+//    }
+//
+//    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
+//    cPacket *pkt = (cPacket*) outputQ[portNum].pop();
+//    xmt (pkt, portNum);
 }
 
 
@@ -119,12 +121,13 @@ void Datacenter::handleMessage (cMessage *msg)
     else if (dynamic_cast<PrepareReshufflePkt*>(msg) != nullptr)
     {
         prepareReshuffle ();
+        delete (msg);
     }
     else
     {
         EV <<"BU rcvd a pkt  of an unknown type\n";
+        delete (msg);
     }
-    delete (msg);
 
 }
 
@@ -151,12 +154,13 @@ void Datacenter::prepareReshuffle ()
  */
 void Datacenter::sendViaQ (cPacket *pkt, int16_t portNum)
 {
-    if (!outputQisBusy[portNum]) {
-        outputQ[portNum].insert (pkt);
-    }
-    else {
-        xmt (pkt, portNum);
-    }
+////    if (!outputQisBusy[portNum]) {
+//    if (endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
+//        outputQ[portNum].insert (pkt);
+//    }
+//    else {
+//        xmt (pkt, portNum);
+//    }
 }
     /*
  * Xmt the given packet to the given output port; schedule a self msg for the end of transmission.
@@ -164,12 +168,12 @@ void Datacenter::sendViaQ (cPacket *pkt, int16_t portNum)
 void Datacenter::xmt(cPacket *pkt, int16_t portNum)
 {
     EV << "Starting transmission of " << pkt << endl;
-    outputQisBusy[portNum] = true;
+//    outputQisBusy[portNum] = true;
 
     send(pkt, "port$o", portNum);
 
-    // Schedule an event for the time when last bit will leave the gate.
-    endXmtEvents[portNum] = new endXmtPkt ("");
-    endXmtEvents[portNum]->setPortNum (portNum);
+//    // Schedule an event for the time when last bit will leave the gate.
+//    endXmtEvents[portNum] = new endXmtPkt ("");
+//    endXmtEvents[portNum]->setPortNum (portNum);
 //    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
