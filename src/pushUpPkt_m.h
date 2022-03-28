@@ -20,12 +20,11 @@
 
 // cplusplus {{
 #pragma once
-#include <list>
 #include "Chain.h"
 // }}
 
 /**
- * Class generated from <tt>src/pushUpPkt.msg:11</tt> by nedtool.
+ * Class generated from <tt>src/pushUpPkt.msg:10</tt> by nedtool.
  * <pre>
  * packet pushUpPkt
  * {

@@ -95,10 +95,16 @@ void Datacenter::handleMessage (cMessage *msg)
 {
     if (msg -> isSelfMessage()) {
         handleSelfMsg (msg);
+        return;
     }
-    else {
-        delete (msg);
+
+    // Now we know that this is not a self-msg
+    if (dynamic_cast<bottomUpPkt*>(msg) != nullptr)
+    {
+        bottomUpPkt *datagram = (bottomUpPkt*)msg;
     }
+    delete (msg);
+
 }
 
 /*

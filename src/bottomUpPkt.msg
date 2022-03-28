@@ -1,6 +1,5 @@
 cplusplus {{
 #pragma once
-#include <list>
 #include "Chain.h"
 }}
 
