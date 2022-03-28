@@ -6,6 +6,8 @@
 #include "Parameters.h"
 #include "endXmtPkt_m.h"
 #include "bottomUpPkt_m.h"
+#include "pushUpPkt_m.h"
+#include "prepareReshufflePkt_m.h"
 
 using namespace omnetpp;
 
@@ -30,9 +32,12 @@ private:
     std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
-    void handleSelfMsg (cMessage *msg);
-    void sendViaQ (cPacket *pkt, int16_t portNum);
-    void xmt (cPacket *pkt, int16_t portNum);
+    void handleSelfMsg    (cMessage *msg);
+    void sendViaQ         (cPacket *pkt, int16_t portNum);
+    void xmt              (cPacket *pkt, int16_t portNum);
+    void bottomUp         (cMessage *msg);
+    void pushUp           (cMessage *msg);
+    void prepareReshuffle ();
 };
 
 Define_Module(Datacenter);
@@ -101,11 +106,34 @@ void Datacenter::handleMessage (cMessage *msg)
     // Now we know that this is not a self-msg
     if (dynamic_cast<bottomUpPkt*>(msg) != nullptr)
     {
-        bottomUpPkt *datagram = (bottomUpPkt*)msg;
-        delete (datagram);
+        bottomUp (msg);
+    }
+    if (dynamic_cast<pushUpPkt*>(msg) != nullptr)
+    {
+        pushUp (msg);
+    }
+    if (dynamic_cast<PrepareReshufflePkt*>(msg) != nullptr)
+    {
+        prepareReshuffle ();
     }
     delete (msg);
 
+}
+
+void Datacenter::bottomUp (cMessage *msg)
+{
+    bottomUpPkt *pkt = (bottomUpPkt*)msg;
+    delete (pkt);
+}
+
+void Datacenter::pushUp (cMessage *msg)
+{
+    pushUpPkt *pkt = (pushUpPkt*)msg;
+    delete (pkt);
+}
+
+void Datacenter::prepareReshuffle ()
+{
 }
 
 /*
