@@ -28,16 +28,15 @@
  * <pre>
  * packet bottomUpPkt
  * {
- *     ChainList notAssigned;
- *     ChainList pushUpList;
+ *     int route[];
  * }
  * </pre>
  */
 class bottomUpPkt : public ::omnetpp::cPacket
 {
   protected:
-    ChainList notAssigned;
-    ChainList pushUpList;
+    int *route; // array ptr
+    unsigned int route_arraysize;
 
   private:
     void copy(const bottomUpPkt& other);
@@ -56,12 +55,10 @@ class bottomUpPkt : public ::omnetpp::cPacket
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual ChainList& getNotAssigned();
-    virtual const ChainList& getNotAssigned() const {return const_cast<bottomUpPkt*>(this)->getNotAssigned();}
-    virtual void setNotAssigned(const ChainList& notAssigned);
-    virtual ChainList& getPushUpList();
-    virtual const ChainList& getPushUpList() const {return const_cast<bottomUpPkt*>(this)->getPushUpList();}
-    virtual void setPushUpList(const ChainList& pushUpList);
+    virtual void setRouteArraySize(unsigned int size);
+    virtual unsigned int getRouteArraySize() const;
+    virtual int getRoute(unsigned int k) const;
+    virtual void setRoute(unsigned int k, int route);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const bottomUpPkt& obj) {obj.parsimPack(b);}

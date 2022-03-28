@@ -13,8 +13,8 @@ public:
     int32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
-    int16_t curLvl;        // Level of the datacenter currently hosting me
-    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter)
+    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?
+//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
     Chain (){};
     Chain (int32_t id) {this->id = id;};
 //    explicit Chain (int id);
@@ -46,5 +46,6 @@ public:
 };
 
 typedef std::list<Chain> ChainList;
+//typedef Chain[] ChainArray;
 
 //#endif // ifndef CHAIN_H

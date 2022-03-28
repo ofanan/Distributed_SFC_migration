@@ -61,7 +61,11 @@ void Datacenter::initialize()
 
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-    bottomUpPkt *pkt = new bottomUpPkt();
+    bottomUpPkt *pkt = new bottomUpPkt(); // this inialization causes the problem!
+    pkt->setRouteArraySize(1);
+    pkt->setRoute(0, 7);
+//    pkt->setNotAssigned(unsigned k, long route);
+//    virtual void setRouteArraySize(unsigned n);
 //    cPacket *pkt = new cPacket();
     xmt (pkt, 0);
 }
