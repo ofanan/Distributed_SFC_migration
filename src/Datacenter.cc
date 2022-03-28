@@ -58,8 +58,8 @@ void Datacenter::initialize()
         xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
     }
 
-    //    outputQisBusy.  resize (numPorts);
-////    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
+//    outputQisBusy.  resize (numPorts);
+//    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 //    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
 //    pkt->setRouteArraySize(1);
@@ -88,9 +88,9 @@ Datacenter::~Datacenter()
  */
 void Datacenter::handleSelfMsg (cMessage *msg)
 {
-//    endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
-//    int16_t portNum = end_xmt_pkt -> getPortNum();
-//    delete (msg);
+    endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
+    int16_t portNum = end_xmt_pkt -> getPortNum();
+    delete (msg);
 //    EV << "Rcvd self msg. portNum = " << portNum;
 //    if (outputQ[portNum].isEmpty()) {
 //        return;
@@ -173,8 +173,9 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
 
     send(pkt, "port$o", portNum);
 
-//    // Schedule an event for the time when last bit will leave the gate.
-//    endXmtEvents[portNum] = new endXmtPkt ("");
-//    endXmtEvents[portNum]->setPortNum (portNum);
-//    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
+    // Schedule an event for the time when last bit will leave the gate.
+    endXmtEvents[portNum] = new endXmtPkt ("");
+    endXmtEvents[portNum]->setPortNum (portNum);
+    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
+
