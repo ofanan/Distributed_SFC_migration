@@ -91,11 +91,11 @@ void Datacenter::handleSelfMsg (cMessage *msg)
     endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
     int16_t portNum = end_xmt_pkt -> getPortNum();
     delete (msg);
-//    EV << "Rcvd self msg. portNum = " << portNum;
-//    if (outputQ[portNum].isEmpty()) {
-//        return;
-//    }
-//
+    EV << "Rcvd self msg. portNum = " << portNum;
+    if (outputQ[portNum].isEmpty()) {
+        return;
+    }
+
 //    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
 //    cPacket *pkt = (cPacket*) outputQ[portNum].pop();
 //    xmt (pkt, portNum);
