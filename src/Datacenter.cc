@@ -26,7 +26,8 @@ public:
     ~Datacenter();
 
 private:
-    std::vector <cQueue>     outputQ;
+//    std::vector <cQueue>     outputQ;
+    cQueue outputQ[10];
 //    std::vector <bool>       outputQisBusy;
     std::vector <cChannel*>  xmtChnl;
     std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
@@ -51,11 +52,12 @@ void Datacenter::initialize()
     isRoot          = (numParents==0);
     isLeaf          = (numChildren==0);
 
-    outputQ.        resize (numPorts);
+//    outputQ.        resize (numPorts);
     xmtChnl.        resize (numPorts);
     endXmtEvents.   resize (numPorts);
     for (int portNum (0); portNum < numPorts; portNum++) {
         xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
+//        outputQ[portNum] = new cQueue;
     }
 
 //    outputQisBusy.  resize (numPorts);
