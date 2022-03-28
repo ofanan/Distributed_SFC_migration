@@ -57,8 +57,8 @@ void Datacenter::initialize()
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 //    bottomUpPkt *pkt = new bottomUpPkt();
-//    cPacket *pkt = new cPacket();
-//    xmt (pkt, 0);
+    cPacket *pkt = new cPacket();
+    xmt (pkt, 0);
 }
 
 Datacenter::Datacenter()
@@ -126,11 +126,8 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
     send(pkt, "port$o", portNum);
 
     // Schedule an event for the time when last bit will leave the gate.
-    simtime_t endTransmissionTime = xmtChnl[portNum]->getTransmissionFinishTime();
-
     endXmtEvents[portNum] = new endXmtPkt ("");
     endXmtEvents[portNum]->setPortNum (portNum);
-
-    scheduleAt(endTransmissionTime, endXmtEvents[portNum]);
+    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
 
