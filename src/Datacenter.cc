@@ -147,6 +147,7 @@ void Datacenter::prepareReshuffle ()
 {
 }
 
+
 /*
  * Send the given packet.
  * If the output port is free, xmt the pkt immediately.
