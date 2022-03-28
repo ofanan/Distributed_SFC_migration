@@ -56,7 +56,8 @@ void Datacenter::initialize()
 
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-    bottomUpPkt *pkt = new bottomUpPkt();
+//    bottomUpPkt *pkt = new bottomUpPkt();
+    cPacket *pkt = new cPacket();
     xmt (pkt, 0);
 }
 
