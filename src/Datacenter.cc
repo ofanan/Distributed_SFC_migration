@@ -62,8 +62,8 @@ void Datacenter::initialize()
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 //    bottomUpPkt *pkt = new bottomUpPkt();
-//    cPacket *pkt = new cPacket();
-//    xmt (pkt, 0);
+    cPacket *pkt = new cPacket();
+    xmt (pkt, 0);
 }
 
 Datacenter::Datacenter()
@@ -104,17 +104,21 @@ void Datacenter::handleMessage (cMessage *msg)
     }
 
     // Now we know that this is not a self-msg
-    if (dynamic_cast<bottomUpPkt*>(msg) != nullptr)
+    else if (dynamic_cast<bottomUpPkt*>(msg) != nullptr)
     {
         bottomUp (msg);
     }
-    if (dynamic_cast<pushUpPkt*>(msg) != nullptr)
+    else if (dynamic_cast<pushUpPkt*>(msg) != nullptr)
     {
         pushUp (msg);
     }
-    if (dynamic_cast<PrepareReshufflePkt*>(msg) != nullptr)
+    else if (dynamic_cast<PrepareReshufflePkt*>(msg) != nullptr)
     {
         prepareReshuffle ();
+    }
+    else
+    {
+        EV <<"BU rcvd a pkt  of an unknown type\n";
     }
     delete (msg);
 
@@ -163,6 +167,6 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
     // Schedule an event for the time when last bit will leave the gate.
     endXmtEvents[portNum] = new endXmtPkt ("");
     endXmtEvents[portNum]->setPortNum (portNum);
-    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
+//    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
 
