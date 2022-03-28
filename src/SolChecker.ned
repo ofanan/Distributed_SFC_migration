@@ -1,7 +1,7 @@
 package src;
 
 //
-// Read the input files, showing users' mobility, and call the leaf datacenters to place new/migrated chains accordingly.
+// Check the feasibility of the solution, calculate its cost, and prints the relevant data to files.
 //
 
 simple SolChecker

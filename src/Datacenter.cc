@@ -5,6 +5,7 @@
 #include <set>
 #include "Parameters.h"
 #include "endXmtPkt_m.h"
+#include "bottomUpPkt_m.h"
 
 using namespace omnetpp;
 
@@ -55,7 +56,7 @@ void Datacenter::initialize()
 
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-    cPacket *pkt = new cPacket();
+    bottomUpPkt *pkt = new bottomUpPkt();
     xmt (pkt, 0);
 }
 
