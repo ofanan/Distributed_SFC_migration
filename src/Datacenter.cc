@@ -19,6 +19,7 @@ public:
     int16_t  availCpu;
     std::set <int32_t> assignedchains;
     std::set <int32_t> placedchains; // For some reason, uncommenting this line makes a build-netw. error.
+    Datacenter();
     ~Datacenter();
 
 private:
@@ -34,7 +35,6 @@ private:
 };
 
 Define_Module(Datacenter);
-
 
 void Datacenter::initialize()
 {
@@ -59,10 +59,15 @@ void Datacenter::initialize()
     xmt (pkt, 0);
 }
 
+Datacenter::Datacenter()
+{
+   endXmtEvents = std::vector <endXmtPkt*> ();
+}
+
 Datacenter::~Datacenter()
 {
     for (int i(0); i < numPorts; i++) {
-        cancelAndDelete(endXmtEvents[i]);
+        cancelAndDelete (endXmtEvents[i]);
     }
 }
 
@@ -74,7 +79,7 @@ void Datacenter::handleSelfMsg (cMessage *msg)
 {
     endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
     int16_t portNum = end_xmt_pkt -> getPortNum();
-    endXmtEvents[portNum] = nullptr; //remove the message from my list of scheduled future end-of-pkt-xmt events.
+    delete (msg);
     EV << "Rcvd self msg. portNum = " << portNum;
     if (outputQ[portNum].isEmpty()) {
         return;
@@ -88,6 +93,9 @@ void Datacenter::handleMessage (cMessage *msg)
 {
     if (msg -> isSelfMessage()) {
         handleSelfMsg (msg);
+    }
+    else {
+        delete (msg);
     }
 }
 
