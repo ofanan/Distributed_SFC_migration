@@ -60,7 +60,7 @@ void Datacenter::initialize()
 //        outputQ[portNum] = new cQueue;
     }
 
-//    outputQisBusy.  resize (numPorts);
+    outputQisBusy.  resize (numPorts);
     std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 //    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
@@ -69,7 +69,8 @@ void Datacenter::initialize()
 //    pkt->setNotAssigned(unsigned k, long route);
 //    virtual void setRouteArraySize(unsigned n);
     cPacket *pkt = new cPacket();
-    xmt (pkt, 0);
+//    xmt (pkt, 0);
+    sendViaQ (pkt, 0);
 }
 
 Datacenter::Datacenter()
@@ -157,13 +158,13 @@ void Datacenter::prepareReshuffle ()
  */
 void Datacenter::sendViaQ (cPacket *pkt, int16_t portNum)
 {
-////    if (!outputQisBusy[portNum]) {
+    if (!outputQisBusy[portNum]) {
 //    if (endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
-//        outputQ[portNum].insert (pkt);
-//    }
-//    else {
-//        xmt (pkt, portNum);
-//    }
+        outputQ[portNum].insert (pkt);
+    }
+    else {
+        xmt (pkt, portNum);
+    }
 }
     /*
  * Xmt the given packet to the given output port; schedule a self msg for the end of transmission.
