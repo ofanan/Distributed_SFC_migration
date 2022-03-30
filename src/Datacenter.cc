@@ -62,7 +62,7 @@ void Datacenter::initialize()
     pkt->setNotAssignedArraySize (1);
     int32_t chain_id = 7;
     std::vector <int16_t> S_u = {1,2};
-    Chain chain (chain_id, S_u);
+    RT_Chain chain (chain_id);
     pkt->setNotAssigned (0, chain);
     sendViaQ (pkt, 0);
 }

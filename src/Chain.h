@@ -31,13 +31,20 @@ class RT_Chain : public Chain
 {
 public:
     static const uint8_t mu_u[];
-//    RT_Chain ()
+    RT_Chain (int32_t id)
+    {
+        this->id = id;
+    };
 };
 
 class Non_RT_Chain: public Chain
 {
 public:
     static const uint8_t mu_u[];
+    Non_RT_Chain (int32_t id)
+    {
+        this->id = id;
+    };
 //    explicit Non_RT_Chain(int x) : Chain(x) {    }
 };
 
