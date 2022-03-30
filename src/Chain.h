@@ -43,3 +43,4 @@ public:
 
 typedef std::list<Chain> ChainList;
 //typedef Chain[] ChainArray;
+
