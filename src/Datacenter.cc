@@ -26,9 +26,9 @@ public:
     ~Datacenter();
 
 private:
-//    std::vector <cQueue>     outputQ;
+    std::vector <cQueue>     outputQ;
 //    cQueue outputQ[10];
-//    std::vector <bool>       outputQisBusy;
+    std::vector <bool>       outputQisBusy;
     std::vector <cChannel*>  xmtChnl;
     std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     virtual void initialize();
@@ -52,7 +52,7 @@ void Datacenter::initialize()
     isRoot          = (numParents==0);
     isLeaf          = (numChildren==0);
 
-//    outputQ.        resize (numPorts);
+    outputQ.        resize (numPorts);
     xmtChnl.        resize (numPorts);
     endXmtEvents.   resize (numPorts);
     for (int portNum (0); portNum < numPorts; portNum++) {
@@ -61,7 +61,7 @@ void Datacenter::initialize()
     }
 
 //    outputQisBusy.  resize (numPorts);
-//    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
+    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 //    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
 //    pkt->setRouteArraySize(1);
@@ -85,7 +85,7 @@ Datacenter::~Datacenter()
 }
 
 /*
- * Currently, the only self-message is that indicating the end of the transmission of a pkt.
+ * Currently, the only self-message is the one indicating the end of the transmission of a pkt.
  * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
  */
 void Datacenter::handleSelfMsg (cMessage *msg)
@@ -94,13 +94,13 @@ void Datacenter::handleSelfMsg (cMessage *msg)
     int16_t portNum = end_xmt_pkt -> getPortNum();
     delete (msg);
     EV << "Rcvd self msg. portNum = " << portNum;
-//    if (outputQ[portNum].isEmpty()) {
-//        return;
-//    }
+    if (outputQ[portNum].isEmpty()) {
+        return;
+    }
 
 //    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
-//    cPacket *pkt = (cPacket*) outputQ[portNum].pop();
-//    xmt (pkt, portNum);
+    cPacket *pkt = (cPacket*) outputQ[portNum].pop();
+    xmt (pkt, portNum);
 }
 
 
