@@ -68,8 +68,8 @@ void Datacenter::initialize()
 //    pkt->setRoute(0, 7);
 //    pkt->setNotAssigned(unsigned k, long route);
 //    virtual void setRouteArraySize(unsigned n);
-//    cPacket *pkt = new cPacket();
-//    xmt (pkt, 0);
+    cPacket *pkt = new cPacket();
+    xmt (pkt, 0);
 }
 
 Datacenter::Datacenter()
