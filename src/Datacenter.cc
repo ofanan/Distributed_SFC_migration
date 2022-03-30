@@ -64,7 +64,6 @@ void Datacenter::initialize()
 //    pkt->setNotAssigned(unsigned k, long route);
 //    virtual void setRouteArraySize(unsigned n);
 //    cPacket *pkt = new cPacket();
-//    xmt (pkt, 0);
     sendViaQ (pkt, 0);
 }
 
