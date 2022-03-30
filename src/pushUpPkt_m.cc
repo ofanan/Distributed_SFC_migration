@@ -181,15 +181,20 @@ Register_Class(pushUpPkt)
 
 pushUpPkt::pushUpPkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
+    pushUpList_arraysize = 0;
+    this->pushUpList = 0;
 }
 
 pushUpPkt::pushUpPkt(const pushUpPkt& other) : ::omnetpp::cPacket(other)
 {
+    pushUpList_arraysize = 0;
+    this->pushUpList = 0;
     copy(other);
 }
 
 pushUpPkt::~pushUpPkt()
 {
+    delete [] this->pushUpList;
 }
 
 pushUpPkt& pushUpPkt::operator=(const pushUpPkt& other)
@@ -202,29 +207,59 @@ pushUpPkt& pushUpPkt::operator=(const pushUpPkt& other)
 
 void pushUpPkt::copy(const pushUpPkt& other)
 {
-    this->pushUpList = other.pushUpList;
+    delete [] this->pushUpList;
+    this->pushUpList = (other.pushUpList_arraysize==0) ? nullptr : new Chain[other.pushUpList_arraysize];
+    pushUpList_arraysize = other.pushUpList_arraysize;
+    for (unsigned int i=0; i<pushUpList_arraysize; i++)
+        this->pushUpList[i] = other.pushUpList[i];
 }
 
 void pushUpPkt::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
-    doParsimPacking(b,this->pushUpList);
+    b->pack(pushUpList_arraysize);
+    doParsimArrayPacking(b,this->pushUpList,pushUpList_arraysize);
 }
 
 void pushUpPkt::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
-    doParsimUnpacking(b,this->pushUpList);
+    delete [] this->pushUpList;
+    b->unpack(pushUpList_arraysize);
+    if (pushUpList_arraysize==0) {
+        this->pushUpList = 0;
+    } else {
+        this->pushUpList = new Chain[pushUpList_arraysize];
+        doParsimArrayUnpacking(b,this->pushUpList,pushUpList_arraysize);
+    }
 }
 
-ChainList& pushUpPkt::getPushUpList()
+void pushUpPkt::setPushUpListArraySize(unsigned int size)
 {
-    return this->pushUpList;
+    Chain *pushUpList2 = (size==0) ? nullptr : new Chain[size];
+    unsigned int sz = pushUpList_arraysize < size ? pushUpList_arraysize : size;
+    for (unsigned int i=0; i<sz; i++)
+        pushUpList2[i] = this->pushUpList[i];
+    pushUpList_arraysize = size;
+    delete [] this->pushUpList;
+    this->pushUpList = pushUpList2;
 }
 
-void pushUpPkt::setPushUpList(const ChainList& pushUpList)
+unsigned int pushUpPkt::getPushUpListArraySize() const
 {
-    this->pushUpList = pushUpList;
+    return pushUpList_arraysize;
+}
+
+Chain& pushUpPkt::getPushUpList(unsigned int k)
+{
+    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
+    return this->pushUpList[k];
+}
+
+void pushUpPkt::setPushUpList(unsigned int k, const Chain& pushUpList)
+{
+    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
+    this->pushUpList[k] = pushUpList;
 }
 
 class pushUpPktDescriptor : public omnetpp::cClassDescriptor
@@ -304,7 +339,7 @@ unsigned int pushUpPktDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISCOMPOUND,
+        FD_ISARRAY | FD_ISCOMPOUND,
     };
     return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
@@ -340,7 +375,7 @@ const char *pushUpPktDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "ChainList",
+        "Chain",
     };
     return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
 }
@@ -381,6 +416,7 @@ int pushUpPktDescriptor::getFieldArraySize(void *object, int field) const
     }
     pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
     switch (field) {
+        case 0: return pp->getPushUpListArraySize();
         default: return 0;
     }
 }
@@ -409,7 +445,7 @@ std::string pushUpPktDescriptor::getFieldValueAsString(void *object, int field, 
     }
     pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getPushUpList(); return out.str();}
+        case 0: {std::stringstream out; out << pp->getPushUpList(i); return out.str();}
         default: return "";
     }
 }
@@ -437,7 +473,7 @@ const char *pushUpPktDescriptor::getFieldStructName(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
-        case 0: return omnetpp::opp_typename(typeid(ChainList));
+        case 0: return omnetpp::opp_typename(typeid(Chain));
         default: return nullptr;
     };
 }
@@ -452,7 +488,7 @@ void *pushUpPktDescriptor::getFieldStructValuePointer(void *object, int field, i
     }
     pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
     switch (field) {
-        case 0: return (void *)(&pp->getPushUpList()); break;
+        case 0: return (void *)(&pp->getPushUpList(i)); break;
         default: return nullptr;
     }
 }

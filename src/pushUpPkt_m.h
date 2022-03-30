@@ -24,18 +24,19 @@
 // }}
 
 /**
- * Class generated from <tt>src/pushUpPkt.msg:10</tt> by nedtool.
+ * Class generated from <tt>src/pushUpPkt.msg:9</tt> by nedtool.
  * <pre>
  * packet pushUpPkt
  * {
- *     ChainList pushUpList;
+ *     Chain pushUpList[];
  * }
  * </pre>
  */
 class pushUpPkt : public ::omnetpp::cPacket
 {
   protected:
-    ChainList pushUpList;
+    Chain *pushUpList; // array ptr
+    unsigned int pushUpList_arraysize;
 
   private:
     void copy(const pushUpPkt& other);
@@ -54,9 +55,11 @@ class pushUpPkt : public ::omnetpp::cPacket
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual ChainList& getPushUpList();
-    virtual const ChainList& getPushUpList() const {return const_cast<pushUpPkt*>(this)->getPushUpList();}
-    virtual void setPushUpList(const ChainList& pushUpList);
+    virtual void setPushUpListArraySize(unsigned int size);
+    virtual unsigned int getPushUpListArraySize() const;
+    virtual Chain& getPushUpList(unsigned int k);
+    virtual const Chain& getPushUpList(unsigned int k) const {return const_cast<pushUpPkt*>(this)->getPushUpList(k);}
+    virtual void setPushUpList(unsigned int k, const Chain& pushUpList);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const pushUpPkt& obj) {obj.parsimPack(b);}

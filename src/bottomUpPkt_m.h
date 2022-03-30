@@ -29,6 +29,7 @@
  * packet bottomUpPkt
  * {
  *     Chain notAssigned[];
+ *     Chain pushUpList[];
  * }
  * </pre>
  */
@@ -37,6 +38,8 @@ class bottomUpPkt : public ::omnetpp::cPacket
   protected:
     Chain *notAssigned; // array ptr
     unsigned int notAssigned_arraysize;
+    Chain *pushUpList; // array ptr
+    unsigned int pushUpList_arraysize;
 
   private:
     void copy(const bottomUpPkt& other);
@@ -60,6 +63,11 @@ class bottomUpPkt : public ::omnetpp::cPacket
     virtual Chain& getNotAssigned(unsigned int k);
     virtual const Chain& getNotAssigned(unsigned int k) const {return const_cast<bottomUpPkt*>(this)->getNotAssigned(k);}
     virtual void setNotAssigned(unsigned int k, const Chain& notAssigned);
+    virtual void setPushUpListArraySize(unsigned int size);
+    virtual unsigned int getPushUpListArraySize() const;
+    virtual Chain& getPushUpList(unsigned int k);
+    virtual const Chain& getPushUpList(unsigned int k) const {return const_cast<bottomUpPkt*>(this)->getPushUpList(k);}
+    virtual void setPushUpList(unsigned int k, const Chain& pushUpList);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const bottomUpPkt& obj) {obj.parsimPack(b);}
