@@ -93,7 +93,7 @@ void Datacenter::handleSelfMsg (cMessage *msg)
 {
     endXmtPkt *end_xmt_pkt = (endXmtPkt*) msg;
     int16_t portNum = end_xmt_pkt -> getPortNum();
-    endXmtEvnt[portNum] = nullptr;
+    endXmtEvents[portNum] = nullptr;
     delete (msg);
     EV << "Rcvd self msg. portNum = " << portNum;
     if (outputQ[portNum].isEmpty()) {
