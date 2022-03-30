@@ -137,6 +137,7 @@ void Datacenter::handleMessage (cMessage *msg)
 void Datacenter::bottomUp (cMessage *msg)
 {
     bottomUpPkt *pkt = (bottomUpPkt*)msg;
+    EV <<"rcvd bottomUpPkt\n";
     delete (pkt);
 }
 
@@ -175,8 +176,12 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
     send(pkt, "port$o", portNum);
 
     // Schedule an event for the time when last bit will leave the gate.
-    endXmtEvents[portNum] = new endXmtPkt ("");
-    endXmtEvents[portNum]->setPortNum (portNum);
-    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
+    endXmtPkt *endxmtpkt = new endXmtPkt ("");
+    endxmtpkt->setPortNum (portNum);
+    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endxmtpkt);
+//    endXmtEvents[portNum] = new endXmtPkt ("");
+//    endXmtEvents[portNum]->setPortNum (portNum);
+//    scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
 
+//Error happens (in Linux) when xmt a pkt (even a cPacket) AND the current ~Datacenter is used.
