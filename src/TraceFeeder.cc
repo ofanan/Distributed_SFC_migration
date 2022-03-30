@@ -33,12 +33,17 @@ void TraceFeeder::initialize ()
     cModule *datacenter = new cModule;
     int leaf_id = 0;
     for (int i(0); i<numDatacenters; i++) {
-        datacenter = network->getSubmodule("datacenters", i);
-        if ((bool)(datacenter->par("isLeaf"))) {
+        datacenter = network->getSubmodule("datacenter", i);
+//        if ( int(datacenter->par("numChildren"))==0) {
+        if ( bool(datacenter->par("isLeaf"))==0) {
+//          if (true) {
             leaves[leaf_id++] = datacenter;
+//            int gamad = (network->getSubmodule("datacenter", i))->par("numChildren");
+
+//            leaf_id++;
         }
     }
-
+    EV << "numLeaves=" << leaf_id;
     // Open the trace input file
 
     // Schedule a self-event for beginning reading the trace

@@ -19,15 +19,15 @@ network Lux
 
     submodules:
 
-//		trace_feeder 	: TraceFeeder;
-//
-//		chain_generator : ChainGenerator;
-//		
-//		cpu_augmenter 	: CpuAugmenter;
-//
-//		sol_checker		: SolChecker;
-//		
-//		param_checker 	: ParamChecker;
+		trace_feeder 	: TraceFeeder;
+
+		chain_generator : ChainGenerator;
+		
+		cpu_augmenter 	: CpuAugmenter;
+
+		sol_checker		: SolChecker;
+		
+		param_checker 	: ParamChecker;
 
         datacenter [numDatacenters] : Datacenter {
             parameters:
