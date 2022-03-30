@@ -59,6 +59,11 @@ void Datacenter::initialize()
 
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
     bottomUpPkt *pkt = new bottomUpPkt();
+    pkt->setNotAssignedArraySize (1);
+    int32_t chain_id = 7;
+    std::vector <int16_t> S_u = {1,2};
+    Chain chain (chain_id, S_u);
+    pkt->setNotAssigned (0, chain);
 //    pkt->setRouteArraySize(1);
 //    pkt->setRoute(0, 7);
 //    pkt->setNotAssigned(unsigned k, long route);
