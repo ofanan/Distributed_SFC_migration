@@ -58,12 +58,12 @@ void Datacenter::initialize()
     }
 
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-//    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
+    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
 //    pkt->setRouteArraySize(1);
 //    pkt->setRoute(0, 7);
 //    pkt->setNotAssigned(unsigned k, long route);
 //    virtual void setRouteArraySize(unsigned n);
-    cPacket *pkt = new cPacket();
+//    cPacket *pkt = new cPacket();
 //    xmt (pkt, 0);
     sendViaQ (pkt, 0);
 }
