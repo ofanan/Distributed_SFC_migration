@@ -58,7 +58,7 @@ void Datacenter::initialize()
     }
 
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
+    bottomUpPkt *pkt = new bottomUpPkt();
 //    pkt->setRouteArraySize(1);
 //    pkt->setRoute(0, 7);
 //    pkt->setNotAssigned(unsigned k, long route);
@@ -69,14 +69,15 @@ void Datacenter::initialize()
 
 Datacenter::Datacenter()
 {
-//   endXmtEvents = std::vector <endXmtPkt*> ();
 }
 
 Datacenter::~Datacenter()
 {
-//    for (int i(0); i < numPorts; i++) {
-//        cancelAndDelete (endXmtEvents[i]);
-//    }
+    for (int i(0); i < numPorts; i++) {
+        if (endXmtEvents[i] != nullptr) {
+            cancelAndDelete (endXmtEvents[i]);
+        }
+    }
 }
 
 /*

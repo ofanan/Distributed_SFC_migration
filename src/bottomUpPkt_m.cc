@@ -181,15 +181,20 @@ Register_Class(bottomUpPkt)
 
 bottomUpPkt::bottomUpPkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
+    notAssigned_arraysize = 0;
+    this->notAssigned = 0;
 }
 
 bottomUpPkt::bottomUpPkt(const bottomUpPkt& other) : ::omnetpp::cPacket(other)
 {
+    notAssigned_arraysize = 0;
+    this->notAssigned = 0;
     copy(other);
 }
 
 bottomUpPkt::~bottomUpPkt()
 {
+    delete [] this->notAssigned;
 }
 
 bottomUpPkt& bottomUpPkt::operator=(const bottomUpPkt& other)
@@ -202,16 +207,59 @@ bottomUpPkt& bottomUpPkt::operator=(const bottomUpPkt& other)
 
 void bottomUpPkt::copy(const bottomUpPkt& other)
 {
+    delete [] this->notAssigned;
+    this->notAssigned = (other.notAssigned_arraysize==0) ? nullptr : new Chain[other.notAssigned_arraysize];
+    notAssigned_arraysize = other.notAssigned_arraysize;
+    for (unsigned int i=0; i<notAssigned_arraysize; i++)
+        this->notAssigned[i] = other.notAssigned[i];
 }
 
 void bottomUpPkt::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
+    b->pack(notAssigned_arraysize);
+    doParsimArrayPacking(b,this->notAssigned,notAssigned_arraysize);
 }
 
 void bottomUpPkt::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
+    delete [] this->notAssigned;
+    b->unpack(notAssigned_arraysize);
+    if (notAssigned_arraysize==0) {
+        this->notAssigned = 0;
+    } else {
+        this->notAssigned = new Chain[notAssigned_arraysize];
+        doParsimArrayUnpacking(b,this->notAssigned,notAssigned_arraysize);
+    }
+}
+
+void bottomUpPkt::setNotAssignedArraySize(unsigned int size)
+{
+    Chain *notAssigned2 = (size==0) ? nullptr : new Chain[size];
+    unsigned int sz = notAssigned_arraysize < size ? notAssigned_arraysize : size;
+    for (unsigned int i=0; i<sz; i++)
+        notAssigned2[i] = this->notAssigned[i];
+    notAssigned_arraysize = size;
+    delete [] this->notAssigned;
+    this->notAssigned = notAssigned2;
+}
+
+unsigned int bottomUpPkt::getNotAssignedArraySize() const
+{
+    return notAssigned_arraysize;
+}
+
+Chain& bottomUpPkt::getNotAssigned(unsigned int k)
+{
+    if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
+    return this->notAssigned[k];
+}
+
+void bottomUpPkt::setNotAssigned(unsigned int k, const Chain& notAssigned)
+{
+    if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
+    this->notAssigned[k] = notAssigned;
 }
 
 class bottomUpPktDescriptor : public omnetpp::cClassDescriptor
@@ -279,7 +327,7 @@ const char *bottomUpPktDescriptor::getProperty(const char *propertyname) const
 int bottomUpPktDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 0+basedesc->getFieldCount() : 0;
+    return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
 unsigned int bottomUpPktDescriptor::getFieldTypeFlags(int field) const
@@ -290,7 +338,10 @@ unsigned int bottomUpPktDescriptor::getFieldTypeFlags(int field) const
             return basedesc->getFieldTypeFlags(field);
         field -= basedesc->getFieldCount();
     }
-    return 0;
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISARRAY | FD_ISCOMPOUND,
+    };
+    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
 
 const char *bottomUpPktDescriptor::getFieldName(int field) const
@@ -301,12 +352,17 @@ const char *bottomUpPktDescriptor::getFieldName(int field) const
             return basedesc->getFieldName(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    static const char *fieldNames[] = {
+        "notAssigned",
+    };
+    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
 
 int bottomUpPktDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount() : 0;
+    if (fieldName[0]=='n' && strcmp(fieldName, "notAssigned")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -318,7 +374,10 @@ const char *bottomUpPktDescriptor::getFieldTypeString(int field) const
             return basedesc->getFieldTypeString(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    static const char *fieldTypeStrings[] = {
+        "Chain",
+    };
+    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **bottomUpPktDescriptor::getFieldPropertyNames(int field) const
@@ -357,6 +416,7 @@ int bottomUpPktDescriptor::getFieldArraySize(void *object, int field) const
     }
     bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
     switch (field) {
+        case 0: return pp->getNotAssignedArraySize();
         default: return 0;
     }
 }
@@ -385,6 +445,7 @@ std::string bottomUpPktDescriptor::getFieldValueAsString(void *object, int field
     }
     bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
     switch (field) {
+        case 0: {std::stringstream out; out << pp->getNotAssigned(i); return out.str();}
         default: return "";
     }
 }
@@ -411,7 +472,10 @@ const char *bottomUpPktDescriptor::getFieldStructName(int field) const
             return basedesc->getFieldStructName(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    switch (field) {
+        case 0: return omnetpp::opp_typename(typeid(Chain));
+        default: return nullptr;
+    };
 }
 
 void *bottomUpPktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
@@ -424,6 +488,7 @@ void *bottomUpPktDescriptor::getFieldStructValuePointer(void *object, int field,
     }
     bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
     switch (field) {
+        case 0: return (void *)(&pp->getNotAssigned(i)); break;
         default: return nullptr;
     }
 }
