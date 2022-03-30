@@ -181,5 +181,3 @@ void Datacenter::xmt(cPacket *pkt, int16_t portNum)
     endXmtEvents[portNum]->setPortNum (portNum);
     scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
-
-//Error happens (in Linux) when xmt a pkt (even a cPacket) AND the current ~Datacenter is used.
