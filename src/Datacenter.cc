@@ -27,8 +27,6 @@ public:
 
 private:
     std::vector <cQueue>     outputQ;
-//    cQueue outputQ[10];
-    std::vector <bool>       outputQisBusy;
     std::vector <cChannel*>  xmtChnl;
     std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     virtual void initialize();
@@ -57,11 +55,8 @@ void Datacenter::initialize()
     endXmtEvents.   resize (numPorts);
     for (int portNum (0); portNum < numPorts; portNum++) {
         xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
-//        outputQ[portNum] = new cQueue;
     }
 
-    outputQisBusy.  resize (numPorts);
-    std::fill(outputQisBusy.begin(), outputQisBusy.end(), false);
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 //    bottomUpPkt *pkt = new PrepareReshufflePkt(); // this inialization causes the problem!
 //    pkt->setRouteArraySize(1);
@@ -158,7 +153,6 @@ void Datacenter::prepareReshuffle ()
  */
 void Datacenter::sendViaQ (cPacket *pkt, int16_t portNum)
 {
-//    if (!outputQisBusy[portNum]) {
     if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
         outputQ[portNum].insert (pkt);
     }
@@ -172,7 +166,6 @@ void Datacenter::sendViaQ (cPacket *pkt, int16_t portNum)
 void Datacenter::xmt(cPacket *pkt, int16_t portNum)
 {
     EV << "Starting transmission of " << pkt << endl;
-//    outputQisBusy[portNum] = true;
 
     send(pkt, "port$o", portNum);
 
