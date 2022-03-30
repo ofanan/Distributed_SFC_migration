@@ -1,8 +1,4 @@
 #pragma once
-//#ifndef CHAIN_H
-//#define CHAIN_H
-
-
 #include <stdio.h>
 #include <stdint.h>
 #include <vector>
@@ -33,14 +29,13 @@ public:
     static const uint8_t mu_u[];
 };
 
-//class Non_RT_Chain: public Chain
-//{
-//public:
-//    static const uint8_t mu_u[];
-////    explicit Non_RT_Chain(int x) : Chain(x) {    }
-//};
+class Non_RT_Chain: public Chain
+{
+public:
+    static const uint8_t mu_u[];
+//    explicit Non_RT_Chain(int x) : Chain(x) {    }
+};
 
 typedef std::list<Chain> ChainList;
 //typedef Chain[] ChainArray;
 
-//#endif // ifndef CHAIN_H

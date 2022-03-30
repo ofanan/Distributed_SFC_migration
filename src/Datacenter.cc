@@ -64,11 +64,6 @@ void Datacenter::initialize()
     std::vector <int16_t> S_u = {1,2};
     Chain chain (chain_id, S_u);
     pkt->setNotAssigned (0, chain);
-//    pkt->setRouteArraySize(1);
-//    pkt->setRoute(0, 7);
-//    pkt->setNotAssigned(unsigned k, long route);
-//    virtual void setRouteArraySize(unsigned n);
-//    cPacket *pkt = new cPacket();
     sendViaQ (pkt, 0);
 }
 
