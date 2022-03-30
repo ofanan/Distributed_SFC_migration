@@ -41,16 +41,16 @@ void TraceFeeder::initialize ()
 //    // Init the vector "leaves" with ptrs to all the leaves in the netw'
     leaves.resize (numLeaves);
     int leaf_id = 0;
-    cModule *datacenters;
+    cModule *datacenter;
     for (int i(0); i<numDatacenters; i++) {
-        datacenters = network->getSubmodule("datacenters", i);
-        if (bool(datacenters->par("isLeaf"))==0) {
-            leaves[leaf_id++] = datacenters;
+        datacenter = network->getSubmodule("datacenters", i);
+        if (bool(datacenter->par("isLeaf"))==0) {
+            leaves[leaf_id++] = datacenter;
         }
     }
     EV << "numLeaves=" << leaf_id;
-    // Open the trace input file
 
+    // Open the trace input file
     // Schedule a self-event for beginning reading the trace
 }
 
