@@ -158,8 +158,8 @@ void Datacenter::prepareReshuffle ()
  */
 void Datacenter::sendViaQ (cPacket *pkt, int16_t portNum)
 {
-    if (!outputQisBusy[portNum]) {
-//    if (endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
+//    if (!outputQisBusy[portNum]) {
+    if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
         outputQ[portNum].insert (pkt);
     }
     else {
