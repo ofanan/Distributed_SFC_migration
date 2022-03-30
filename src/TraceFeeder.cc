@@ -41,11 +41,11 @@ void TraceFeeder::initialize ()
 //    // Init the vector "leaves" with ptrs to all the leaves in the netw'
     leaves.resize (numLeaves);
     int leaf_id = 0;
-    cModule *datacenter;
+    cModule *datacenters;
     for (int i(0); i<numDatacenters; i++) {
-        datacenter = network->getSubmodule("datacenter", i);
-        if (bool(datacenter->par("isLeaf"))==0) {
-            leaves[leaf_id++] = datacenter;
+        datacenters = network->getSubmodule("datacenters", i);
+        if (bool(datacenters->par("isLeaf"))==0) {
+            leaves[leaf_id++] = datacenters;
         }
     }
     EV << "numLeaves=" << leaf_id;

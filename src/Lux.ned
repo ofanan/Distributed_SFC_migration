@@ -29,18 +29,18 @@ network Lux
 		
 		param_checker 	: ParamChecker;
 
-        datacenter [numDatacenters] : Datacenter {
+        datacenters [numDatacenters] : Datacenter {
             parameters:
         };
     connections allowunconnected:
 
 		// Connect the root. This is a special case, as the root has one less port (it doesn't haveu a parent). Furhtermore, in Monaco, the root has only 3 children.
 		for child=1..numChildren { 
-			datacenter[0].port[child-1] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenter[child].port[0];		
+			datacenters[0].port[child-1] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenters[child].port[0];		
 		}
 
         for hop_cnt_from_root=2..height-1, for dc=int((numChildren^hop_cnt_from_root-1)/(numChildren-1))..int((numChildren^(hop_cnt_from_root+1)-1)/(numChildren-1)-1) {
-            datacenter[dc].port[0] <--> {delay=channelDelay; datarate=basicDatarate*hop_cnt_from_root;} <--> datacenter[int((dc-1)/numChildren)].port[dc%numChildren+1];
+            datacenters[dc].port[0] <--> {delay=channelDelay; datarate=basicDatarate*hop_cnt_from_root;} <--> datacenters[int((dc-1)/numChildren)].port[dc%numChildren+1];
         }
 
 }
