@@ -1,0 +1,70 @@
+Make:
+///////////////////////////
+c; opp_makemake -u cmdenv -f -deep; make
+where -u Cmdenv dismisses the Gui.
+The -deep flag means: search for source files also in all sub-dirs.
+
+Run:
+///////////////////////////
+c; Distributed_SFC_migration.exe -f omnetpp.ini -u Cmdenv
+-n shows the directories of the source files. May have to write the, explicitly, namely: 
+c; opp_run -u Cmdenv -f omnetpp.ini -n C:/omnetpp-5.7/ofanan/Distributed_SFC_migration
+When running with Cmdenv, one should change in omnetpp.ini to:
+[General]
+cmdenv-config-name = Dummy
+Run, while including sub-dirs:
+c; Distributed_SFC_migration.exe -u Cmdenv -f & C:/omnetpp-5.7/ofanan/Distributed_SFC_migration/omnetpp.ini 
+
+Git:
+///////////////////////////
+git push -f https://github.com/ofanan/Distributed_SFC_migration.git HEAD:master
+
+In Paolo's server:
+///////////////////////////
+./configure WITH_TKENV=no WITH_QTEVN=no WITH_OSG=no
+Results in:
+WARNING: The configuration script could not detect the following packages:
+    MPI (optional)  LibXML/Expat  Akaroa (optional)
+Scroll up to see the warning messages (use shift+PgUp), and search config.log
+for more details. While you can use OMNeT++ in the current configuration,
+be aware that some functionality may be unavailable or incomplete.
+
+Push to Paolo's server:
+scp c:/omnetpp-5.7/ofanan/CmdenvChecker/*.ini itamar@130.192.9.117:/home/itamar/omnetpp-5.7/CmdenvChecker
+
+Pull from Paolo's server:
+scp itamar@130.192.9.117:/home/itamar/omnetpp-5.7/CmdenvChecker/CmdenvChecker c:/omnetpp-5.7/ofanan/CmdenvChecker/
+
+Compiling in Paolo's server:
+c; opp_makemake -u cmdenv -f -deep; make
+c; ./CmdenvChecker -u Cmdenv -f omnetpp.ini
+
+Building a container
+////////////////////////
+singularity exec omnetpp.img bash `./CmdenvChecker -m -u Cmdenv -c Dummy’ # doesn't work
+	
+singularity /bin/sh exec omnetpp.sif ./CmdenvChecker.exe
+singularity run -B /vagrant/omnetpp/ omnetpp.sif bash -c './omnetpp.sif opp_makemake'
+The "-B" (--build) flage shows vagrant where's the .sif file located, thus solving an annoying error.
+singularity exec --cleanenv -B /vagrant/omnetpp/ omnetpp.sif opp_makemake -f --deep -u Cmdenv # This doesn't work
+
+The run below COULD work, but doesn't, due to a new bug.
+singularity exec -B /vagrant/omnetpp/ omnetpp.sif ./CmdenvChecker.exe # 
+
+singularity exec --cleanenv --bind ${DATA_DIRECTORY}:/data --bind ${OUTPUT_DIRECTORY}:/out  ${qmtools_SINGULARITY_IMG} /home/qmtraffic.sh"
+
+Running: 
+> singularity exec -B /vagrant/omnetpp/ omnetpp.sif bash -c './CmdenvChecker.exe'
+Results in:
+/bin/bash: ./CmdenvChecker.exe: cannot execute binary file: Exec format error
+because the CmdenvChecker.exe was compiled by 'Windows compiler.
+Hence, need to compile on a Linux machine / VirtualBox, and only then move the file (using a BINARY move!) to the HPC.
+May first check whether it works locally, on a vagrant, as explained in Generations_Phthon_Java_npp_Eclipse.txt.
+
+singularity exec --cleanenv -B /vagrant/omnetpp/:/data -B /vagrant/omnetpp/:/out  ./omnetpp.sif
+
+cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration
+source .myalias.sh
+cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration/src
+
+cQueue, cArray
