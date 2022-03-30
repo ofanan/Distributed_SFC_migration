@@ -20,8 +20,8 @@ public:
     bool isRoot;
     bool isLeaf;
     int16_t  availCpu;
-    std::set <int32_t> assignedchains;
-    std::set <int32_t> placedchains; // For some reason, uncommenting this line makes a build-netw. error.
+    std::set <int32_t> potentiallyPlacedChains;
+    std::set <int32_t> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
     Datacenter();
     ~Datacenter();
 

@@ -15,8 +15,10 @@ public:
     std::vector <int16_t> S_u;         // List of delay-feasible servers
 //    int16_t S_u[];         // List of delay-feasible servers
 //    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
-    Chain ()
-    {};
+    Chain (int32_t id)
+    {
+        this->id = id;
+    };
     Chain (int32_t id, std::vector <int16_t> S_u) {
         this->id = id;
         this->S_u = S_u;
@@ -27,6 +29,7 @@ class RT_Chain : public Chain
 {
 public:
     static const uint8_t mu_u[];
+//    RT_Chain ()
 };
 
 class Non_RT_Chain: public Chain
@@ -38,4 +41,3 @@ public:
 
 typedef std::list<Chain> ChainList;
 //typedef Chain[] ChainArray;
-
