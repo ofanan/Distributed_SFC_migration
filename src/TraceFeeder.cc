@@ -48,8 +48,9 @@ void TraceFeeder::initialize ()
             leaves[leaf_id++] = datacenter;
         }
     }
-    EV << "numLeaves=" << leaf_id;
 
+    RT_Chain rt_chain (0);
+    EV << "numLeaves=" << leaf_id;
     // Open the trace input file
     // Schedule a self-event for beginning reading the trace
 }
