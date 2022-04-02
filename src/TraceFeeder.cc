@@ -39,23 +39,34 @@ void TraceFeeder::initialize ()
     network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
     numDatacenters  = (int) (network -> par ("numDatacenters"));
     numLeaves       = (int) (network -> par ("numLeaves"));
-
+//
 //    // Init the vector "leaves" with ptrs to all the leaves in the netw'
-    datacenters.resize (numDatacenters);
-//    gateOfDatacenters.resize (numDatacenters);
     leaves.resize (numLeaves);
+    datacenters.resize (numDatacenters);
     int leaf_id = 0;
-    cModule *datacenter;
     for (int dc(0); dc<numDatacenters; dc++) {
-////        datacenters[dc] = network->getSubmodule("datacenters", dc);
-////        directMsgsPort
-////        gateOfDatacenters[dc] = gate("$o", portNum);
-////                cGate *outGate    = gate("port$o", portNum);
-        if (bool(datacenter->par("isLeaf"))==0) {
-            leaves[0] = datacenter;
-//            leaves[leaf_id++] = datacenter;
+        datacenters[dc] = network->getSubmodule("datacenters", dc);
+        if (bool(datacenters[dc]->par("isLeaf"))==0) {
+            leaves[leaf_id++] = datacenters[dc];
         }
     }
+
+////    // Init the vector "leaves" with ptrs to all the leaves in the netw'
+//    datacenters.resize (numDatacenters);
+////    gateOfDatacenters.resize (numDatacenters);
+//    leaves.resize (numLeaves);
+//    int leaf_id = 0;
+//    cModule *datacenter;
+//    for (int dc(0); dc<numDatacenters; dc++) {
+//////        datacenters[dc] = network->getSubmodule("datacenters", dc);
+//////        directMsgsPort
+//////        gateOfDatacenters[dc] = gate("$o", portNum);
+//////                cGate *outGate    = gate("port$o", portNum);
+//        if (bool(datacenter->par("isLeaf"))==0) {
+//            leaves[0] = datacenter;
+////            leaves[leaf_id++] = datacenter;
+//        }
+//    }
 
 //    sendDirect (new cMessage("dummy"), datacenters[0], "directMsgsPort$i");
 //    EV << "sent direct msg to root\n";
