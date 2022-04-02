@@ -17,6 +17,8 @@ public:
     int16_t numChildren;
     int16_t numParents;
     int16_t numPorts;
+    int16_t idOfParent;
+    std::vector <int16_t> idOfChildren;
     bool isRoot;
     bool isLeaf;
     int16_t  availCpu;
@@ -53,18 +55,35 @@ void Datacenter::initialize()
     outputQ.        resize (numPorts);
     xmtChnl.        resize (numPorts);
     endXmtEvents.   resize (numPorts);
+    idOfChildren.   resize (numChildren);
     for (int portNum (0); portNum < numPorts; portNum++) {
-        xmtChnl[portNum] = gate("port$o", portNum)->getTransmissionChannel();
+        cGate *outGate    = gate("port$o", portNum);
+        xmtChnl[portNum]  = outGate->getTransmissionChannel();
+        cModule *nghbr    =  outGate->getNextGate()->getOwnerModule();
+        if (isRoot) {
+          idOfChildren[portNum] = int16_t (nghbr -> par ("id"));
+        }
+        else {
+          if (portNum==0) {
+            idOfParent = int16_t (nghbr -> par ("id"));
+          }
+          else {
+            idOfChildren[portNum-1] = int16_t (nghbr -> par ("id"));
+          }
+        }       
     }
 
     std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-    bottomUpPkt *pkt = new bottomUpPkt();
-    pkt->setNotAssignedArraySize (1);
-    int32_t chain_id = 7;
-    std::vector <int16_t> S_u = {1,2};
-    RT_Chain chain (chain_id);
-    pkt->setNotAssigned (0, chain);
-    sendViaQ (pkt, 0);
+    
+    
+//    // For debugging only: gen and xmt a BU pkt
+//    bottomUpPkt *pkt = new bottomUpPkt();
+//    pkt->setNotAssignedArraySize (1);
+//    int32_t chain_id = 7;
+//    std::vector <int16_t> S_u = {1,2};
+//    RT_Chain chain (chain_id);
+//    pkt->setNotAssigned (0, chain);
+//    sendViaQ (pkt, 0);
 }
 
 Datacenter::Datacenter()

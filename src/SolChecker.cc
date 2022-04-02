@@ -28,8 +28,8 @@ void SolChecker::initialize ()
     for (int i(0); i<numDatacenters; i++) {
         datacenters[i] = network->getSubmodule("datacenters", i);
     }
-    EV << "DC 0 has " << (int)(datacenters[0]->par("numParents")) << " parents and " << (int)(datacenters[0]->par("numChildren")) <<" children\n";
-    EV << "DC 12 has " << (int)(datacenters[12]->par("numParents")) << " parents and " << (int)(datacenters[12]->par("numChildren")) <<" children\n";
+//    EV << "DC 0 has " << (int)(datacenters[0]->par("numParents")) << " parents and " << (int)(datacenters[0]->par("numChildren")) <<" children\n";
+//    EV << "DC 12 has " << (int)(datacenters[12]->par("numParents")) << " parents and " << (int)(datacenters[12]->par("numChildren")) <<" children\n";
 }
 
 void SolChecker::handleMessage (cMessage *msg)

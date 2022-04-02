@@ -50,7 +50,13 @@ void TraceFeeder::initialize ()
     }
 
     RT_Chain rt_chain (0);
-    EV << "numLeaves=" << leaf_id;
+
+//sendDirect(cMessage *msg, cModule *mod, int gateId)
+//sendDirect(cMessage *msg, cModule *mod, const char *gateName, int index=-1)
+//sendDirect(cMessage *msg, cGate *gate)
+//cModule *targetModule = getParentModule()->getSubmodule("node2");
+//sendDirect(new cMessage("msg"), targetModule, "in");
+//directMsgsPort
     // Open the trace input file
     // Schedule a self-event for beginning reading the trace
 }
