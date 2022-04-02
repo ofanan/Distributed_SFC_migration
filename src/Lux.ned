@@ -25,7 +25,7 @@ network Lux
 		
 		cpu_augmenter 	: CpuAugmenter;
 
-		sol_checker		: SolChecker;
+//		sol_checker		: SolChecker;
 		
 		param_checker 	: ParamChecker;
 

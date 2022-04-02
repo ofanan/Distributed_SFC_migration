@@ -14,7 +14,9 @@ private:
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
-    std::vector <cModule*> leaves;
+    std::vector <cModule*> datacenters; // pointes to all the datacenters
+    std::vector <cModule*> leaves;      // pointes to all the leaves
+//    std::vector <cGate*> gateOfDatacenters; // pointes to all the datacenters' direct msg's ports
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
 public:
@@ -37,20 +39,35 @@ void TraceFeeder::initialize ()
     network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
     numDatacenters  = (int) (network -> par ("numDatacenters"));
     numLeaves       = (int) (network -> par ("numLeaves"));
-//
+
 //    // Init the vector "leaves" with ptrs to all the leaves in the netw'
+    datacenters.resize (numDatacenters);
+//    gateOfDatacenters.resize (numDatacenters);
     leaves.resize (numLeaves);
     int leaf_id = 0;
     cModule *datacenter;
-    for (int i(0); i<numDatacenters; i++) {
-        datacenter = network->getSubmodule("datacenters", i);
+    for (int dc(0); dc<numDatacenters; dc++) {
+////        datacenters[dc] = network->getSubmodule("datacenters", dc);
+////        directMsgsPort
+////        gateOfDatacenters[dc] = gate("$o", portNum);
+////                cGate *outGate    = gate("port$o", portNum);
         if (bool(datacenter->par("isLeaf"))==0) {
-            leaves[leaf_id++] = datacenter;
+            leaves[0] = datacenter;
+//            leaves[leaf_id++] = datacenter;
         }
     }
 
-    RT_Chain rt_chain (0);
+//    sendDirect (new cMessage("dummy"), datacenters[0], "directMsgsPort$i");
+//    EV << "sent direct msg to root\n";
+//    RT_Chain rt_chain (0);
 
+
+    // Discover the input gates of all the datacenters.
+//    directMsgsPort
+//    for (int dc(0); dc < numDatacenters; dc++) {
+//      gateOfDatacenters[dc] = 
+//        cGate *outGate    = gate("port$o", portNum);
+//    }
 //sendDirect(cMessage *msg, cModule *mod, int gateId)
 //sendDirect(cMessage *msg, cModule *mod, const char *gateName, int index=-1)
 //sendDirect(cMessage *msg, cGate *gate)

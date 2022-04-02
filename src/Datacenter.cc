@@ -56,6 +56,8 @@ void Datacenter::initialize()
     xmtChnl.        resize (numPorts);
     endXmtEvents.   resize (numPorts);
     idOfChildren.   resize (numChildren);
+    
+    // Discover the xmt channels to the neighbors, and the neighbors' id's.
     for (int portNum (0); portNum < numPorts; portNum++) {
         cGate *outGate    = gate("port$o", portNum);
         xmtChnl[portNum]  = outGate->getTransmissionChannel();
