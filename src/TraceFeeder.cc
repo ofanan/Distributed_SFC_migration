@@ -17,7 +17,8 @@ class TraceFeeder : public cSimpleModule
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
-//    std::set <Chain> curChains;
+    std::set <Chain*> curChains;
+    std::set <int> curInts;
     std::vector <cModule*> datacenters; // pointes to all the datacenters
     std::vector <cModule*> leaves;      // pointes to all the leaves
     virtual void initialize();
@@ -59,7 +60,13 @@ void TraceFeeder::initialize ()
 
   std::vector <int16_t> S_u = {1,2,3};
   RT_Chain chain0 (0, S_u);
-//  curChains.insert (chain0);
+  int *p = new int; 
+  Chain *chainptr = new Chain (1, S_u);
+  // (0,S_u); 
+//  Chain = new Chain ();
+//  Chain chainchain (0); //= new Chain (0);
+//  this->curChains.insert (chainchain);
+//  this->curInts.insert (1);
   initBottomUpMsg *msg2snd = new initBottomUpMsg ();
   msg2snd->setNotAssignedArraySize (1);
   msg2snd->setNotAssigned (0, {chain0});
