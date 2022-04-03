@@ -65,7 +65,7 @@ void Datacenter::initialize()
   for (int portNum (0); portNum < numPorts; portNum++) {
     cGate *outGate    = gate("port$o", portNum);
     xmtChnl[portNum]  = outGate->getTransmissionChannel();
-    cModule *nghbr    =  outGate->getNextGate()->getOwnerModule();
+    cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
     if (isRoot) {
       idOfChildren[portNum] = int16_t (nghbr -> par ("id"));
     }
@@ -157,6 +157,10 @@ void Datacenter::handleMessage (cMessage *msg)
 }
 
 void Datacenter::handleInitBottomUpMsg () {
+  initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
+  Chain chain0 = msg->getNotAssigned (0);
+  chain0.nxtDatacenter = 7;
+//  Chain chain0 = msg-> 
 }
 
 void Datacenter::bottomUp ()

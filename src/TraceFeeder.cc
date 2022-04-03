@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <omnetpp.h>
+#include <iostream>
+#include <fstream>
 #include <vector>
-
+#include <set>
 #include "Chain.h"
 #include "Parameters.h"
+#include "initBottomUpMsg_m.h"
 
 using namespace omnetpp;
 
@@ -14,11 +17,13 @@ class TraceFeeder : public cSimpleModule
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
+//    std::set <Chain> curChains;
     std::vector <cModule*> datacenters; // pointes to all the datacenters
     std::vector <cModule*> leaves;      // pointes to all the leaves
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
   public:
+    std::ofstream outFile;
     TraceFeeder ();
     ~TraceFeeder ();
 };
@@ -35,6 +40,7 @@ TraceFeeder::~TraceFeeder()
 
 void TraceFeeder::initialize ()
 {
+  outFile.open ("example.txt");
   network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
   numDatacenters  = (int) (network -> par ("numDatacenters"));
   numLeaves       = (int) (network -> par ("numLeaves"));
@@ -49,12 +55,22 @@ void TraceFeeder::initialize ()
       leaves[leaf_id++] = datacenters[dc];
     }
   }
+  
 
-  RT_Chain chain0 (0);
-  sendDirect (new cMessage("dummy"), leaves[0], "directMsgsPort$i");
-//    EV << "sent direct msg to root\n";
-//    RT_Chain rt_chain (0);
-
+  std::vector <int16_t> S_u = {1,2,3};
+  RT_Chain chain0 (0, S_u);
+//  curChains.insert (chain0);
+  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
+  msg2snd->setNotAssignedArraySize (1);
+  msg2snd->setNotAssigned (0, {chain0});
+  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
+  outFile << "sent direct msg. Chain id=" << chain0.id << endl; 
+  cMessage *selfmsg = new cMessage ("");
+  scheduleAt (simTime()+0.1, selfmsg);
+  
+//  EV << "sent direct msg\n";
+//  outFile << "Writing this to a file.\n";
+//  outFile.close();
 
     // Discover the input gates of all the datacenters.
 //    directMsgsPort
@@ -74,6 +90,10 @@ void TraceFeeder::initialize ()
 
 void TraceFeeder::handleMessage (cMessage *msg)
 {
+  if (msg -> isSelfMessage()) {
+    outFile << "rcvd self msg\n"; 
+  }
+
     // If self.msg:
     // - Read from the trace the data for a single slot.
     // - Init the placement alg'
