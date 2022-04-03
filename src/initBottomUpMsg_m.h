@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.7 from initBottomUpMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.7 from src/initBottomUpMsg.msg.
 //
 
 #ifndef __INITBOTTOMUPMSG_M_H
@@ -24,12 +24,11 @@
 // }}
 
 /**
- * Class generated from <tt>initBottomUpMsg.msg:12</tt> by nedtool.
+ * Class generated from <tt>src/initBottomUpMsg.msg:12</tt> by nedtool.
  * <pre>
  * message initBottomUpMsg
  * {
  *     Chain notAssigned[];
- *     Chain pushUpList[];
  * }
  * </pre>
  */
@@ -38,8 +37,6 @@ class initBottomUpMsg : public ::omnetpp::cMessage
   protected:
     Chain *notAssigned; // array ptr
     unsigned int notAssigned_arraysize;
-    Chain *pushUpList; // array ptr
-    unsigned int pushUpList_arraysize;
 
   private:
     void copy(const initBottomUpMsg& other);
@@ -63,11 +60,6 @@ class initBottomUpMsg : public ::omnetpp::cMessage
     virtual Chain& getNotAssigned(unsigned int k);
     virtual const Chain& getNotAssigned(unsigned int k) const {return const_cast<initBottomUpMsg*>(this)->getNotAssigned(k);}
     virtual void setNotAssigned(unsigned int k, const Chain& notAssigned);
-    virtual void setPushUpListArraySize(unsigned int size);
-    virtual unsigned int getPushUpListArraySize() const;
-    virtual Chain& getPushUpList(unsigned int k);
-    virtual const Chain& getPushUpList(unsigned int k) const {return const_cast<initBottomUpMsg*>(this)->getPushUpList(k);}
-    virtual void setPushUpList(unsigned int k, const Chain& pushUpList);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const initBottomUpMsg& obj) {obj.parsimPack(b);}
