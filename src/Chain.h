@@ -7,11 +7,11 @@
 
 class Chain
 {
-public:
+  public:
     int32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
-    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?
+/*    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?*/
     std::vector <int16_t> S_u;         // List of delay-feasible servers
 //    int16_t S_u[];         // List of delay-feasible servers
 //    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
@@ -30,21 +30,23 @@ public:
 class RT_Chain : public Chain
 {
 public:
-    static const uint8_t mu_u[];
-    RT_Chain (int32_t id)
-    {
-        this->id = id;
-    };
+  static const uint8_t mu_u[];
+  RT_Chain (int32_t id)
+  {
+    this->id = id;
+    curDatacenter = nxtDatacenter = -1;
+  };
 };
 
 class Non_RT_Chain: public Chain
 {
 public:
-    static const uint8_t mu_u[];
-    Non_RT_Chain (int32_t id)
-    {
-        this->id = id;
-    };
+  static const uint8_t mu_u[];
+  Non_RT_Chain (int32_t id)
+  {
+    this->id = id;
+    curDatacenter = nxtDatacenter = -1;
+  };
 //    explicit Non_RT_Chain(int x) : Chain(x) {    }
 };
 

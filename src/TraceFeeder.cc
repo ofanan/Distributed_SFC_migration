@@ -10,16 +10,15 @@ using namespace omnetpp;
 
 class TraceFeeder : public cSimpleModule
 {
-private:
+  private:
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
     std::vector <cModule*> datacenters; // pointes to all the datacenters
     std::vector <cModule*> leaves;      // pointes to all the leaves
-//    std::vector <cGate*> gateOfDatacenters; // pointes to all the datacenters' direct msg's ports
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
-public:
+  public:
     TraceFeeder ();
     ~TraceFeeder ();
 };
@@ -36,22 +35,23 @@ TraceFeeder::~TraceFeeder()
 
 void TraceFeeder::initialize ()
 {
-    network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
-    numDatacenters  = (int) (network -> par ("numDatacenters"));
-    numLeaves       = (int) (network -> par ("numLeaves"));
+  network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+  numDatacenters  = (int) (network -> par ("numDatacenters"));
+  numLeaves       = (int) (network -> par ("numLeaves"));
 //
 //    // Init the vector "leaves" with ptrs to all the leaves in the netw'
-    leaves.resize (numLeaves);
-    datacenters.resize (numDatacenters);
-    int leaf_id = 0;
-    for (int dc(0); dc<numDatacenters; dc++) {
-        datacenters[dc] = network->getSubmodule("datacenters", dc);
-        if (bool(datacenters[dc]->par("isLeaf"))==0) {
-            leaves[leaf_id++] = datacenters[dc];
-        }
+  leaves.resize (numLeaves);
+  datacenters.resize (numDatacenters);
+  int leaf_id = 0;
+  for (int dc(0); dc<numDatacenters; dc++) {
+    datacenters[dc] = network->getSubmodule("datacenters", dc);
+    if (bool(datacenters[dc]->par("isLeaf"))==0) {
+      leaves[leaf_id++] = datacenters[dc];
     }
+  }
 
-    sendDirect (new cMessage("dummy"), datacenters[0], "directMsgsPort$i");
+  RT_Chain chain0 (0);
+  sendDirect (new cMessage("dummy"), leaves[0], "directMsgsPort$i");
 //    EV << "sent direct msg to root\n";
 //    RT_Chain rt_chain (0);
 
