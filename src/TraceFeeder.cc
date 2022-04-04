@@ -61,10 +61,18 @@ void TraceFeeder::initialize ()
   
 
   outFile.open ("example.txt");
-  std::vector <int16_t> S_u = {1,2,3};
+  std::vector <int16_t> S_u = {7,2,3};
   RT_Chain chain0 (0, S_u);
   newChains.insert (chain0);
-  std::set<Chain>::iterator firstMatch = std::find_if (newChains.begin(), newChains.end(), findChain(0));
+  std::set<Chain>::iterator iter = std::find_if (newChains.begin(), newChains.end(), findChain(0));
+  if (iter==newChains.end()) {
+    outFile << "didn't find\n";
+  }
+  else {
+    outFile << "found\n";
+    Chain foundChain = *iter;
+    outFile << "chain's S_u[0]=" << foundChain.S_u[0];
+  }
   /*std::set<Chain>::iterator result = std::find_if(chains.begin(), chains.end(), */
 /*                                              find_by_id("green"));*/
 /*if(result != cars.end()) {*/

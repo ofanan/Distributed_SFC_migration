@@ -1,0 +1,2 @@
+found
+chain's S_u[0]=7
