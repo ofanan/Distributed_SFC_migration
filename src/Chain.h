@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CHAIN_H
+#define CHAIN_H
+//#pragma once
 #include <stdio.h>
 #include <stdint.h>
 
@@ -10,6 +12,7 @@
 #include "Parameters.h"
 
 using namespace std;
+
 
 class Chain
 {
@@ -36,6 +39,18 @@ class Chain
       return (this->isRtChain && !(right.isRtChain));
     }
 };
+
+void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain);
+
+/*void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain) { */
+/*  set<Chain>::iterator it;*/
+/*  for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){*/
+/*    if (it -> id == req_id) { // Found the requested chain*/
+/*      foundChain = *it;    */
+/*      return;*/
+/*    }*/
+/*  }*/
+/*}*/
 
 /*void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain) { */
 /*  set<Chain>::iterator it;*/
@@ -72,7 +87,7 @@ class Non_RT_Chain: public Chain
     };
 };
 
-
+#endif
 
 /*struct findChain {*/
 /*    findChain(const int32_t & id) : id(id) {}*/

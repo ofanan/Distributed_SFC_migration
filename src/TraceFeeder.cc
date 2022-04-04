@@ -68,15 +68,19 @@ void TraceFeeder::initialize ()
   
   Chain foundChain;
   int32_t req_id = 0;
-  set<Chain>::iterator it;
-  for(it = newChains.begin(); it!=newChains.end(); ++it){
-    if (it -> id == req_id) { // Found the requested chain
-      foundChain = *it;    
-      break;
-    }
-  }
+  //findChainInSet (newChains, req_id, &foundChain);
+//  outFile << "chain's S_u[0]=" << foundChain.S_u[0];
+
+
   
-  outFile << "chain's S_u[0]=" << foundChain.S_u[0];
+//  set<Chain>::iterator it;
+//  for(it = newChains.begin(); it!=newChains.end(); ++it){
+//    if (it -> id == req_id) { // Found the requested chain
+//      foundChain = *it;    
+//      break;
+//    }
+//  }
+  
 }
 //  std::set<Chain>::iterator iter = std::find_if (newChains.begin(), newChains.end(), findChain(0));
 //  if (iter==newChains.end()) {
