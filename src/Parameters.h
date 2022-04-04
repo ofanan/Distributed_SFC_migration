@@ -11,3 +11,5 @@ const int16_t nonAugmentedCpuAtLvl[HEIGHT] = {10,20,30,40,50};
 const int16_t chainMigCost = 600;
 
 const int16_t costOfPlacingChainAtLvl[HEIGHT] = {10,20,30,40,50};
+
+
