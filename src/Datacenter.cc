@@ -42,6 +42,7 @@ class Datacenter : public cSimpleModule
     void bottomUp         ();
     void pushUp           ();
     void prepareReshuffle ();
+    void sendDirect       (); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
     void handleInitBottomUpMsg ();
 };
 
@@ -160,7 +161,7 @@ void Datacenter::handleInitBottomUpMsg () {
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
   Chain chain0 = msg->getNotAssigned (0);
   chain0.nxtDatacenter = 7;
-//  Chain chain0 = msg-> 
+  delete curHandledMsg;
 }
 
 void Datacenter::bottomUp ()
@@ -176,10 +177,11 @@ void Datacenter::pushUp ()
     delete (pkt);
 }
 
-void Datacenter::prepareReshuffle ()
-{
+void Datacenter::prepareReshuffle () {
 }
 
+void Datacenter::sendDirect () {
+}
 
 /*
  * Send the given packet.
