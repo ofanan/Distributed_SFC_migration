@@ -68,3 +68,8 @@ source .myalias.sh
 cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration/src
 
 cQueue, cArray
+
+
+c; ./Distributed_SFC_migration --record-eventlog=true -f Comnetpp.ini -u Cmdenv --cmdenv-redirect-output=true 
+
+
