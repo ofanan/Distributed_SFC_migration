@@ -1,2 +1,0 @@
-sent direct msg. Chain id=0
-rcvd self msg

@@ -3,8 +3,11 @@
 #include <omnetpp.h>
 #include <iostream>
 #include <fstream>
+
 #include <vector>
 #include <set>
+#include <algorithm>
+
 #include "Chain.h"
 #include "Parameters.h"
 #include "initBottomUpMsg_m.h"
@@ -17,7 +20,7 @@ class TraceFeeder : public cSimpleModule
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
-    std::set <Chain*> curChains;
+    std::set <Chain> allChains, newChains, crtiChains;
     std::set <int> curInts;
     std::vector <cModule*> datacenters; // pointes to all the datacenters
     std::vector <cModule*> leaves;      // pointes to all the leaves
@@ -41,7 +44,6 @@ TraceFeeder::~TraceFeeder()
 
 void TraceFeeder::initialize ()
 {
-  outFile.open ("example.txt");
   network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
   numDatacenters  = (int) (network -> par ("numDatacenters"));
   numLeaves       = (int) (network -> par ("numLeaves"));
@@ -58,22 +60,27 @@ void TraceFeeder::initialize ()
   }
   
 
+  outFile.open ("example.txt");
   std::vector <int16_t> S_u = {1,2,3};
   RT_Chain chain0 (0, S_u);
-  int *p = new int; 
-  Chain *chainptr = new Chain (1, S_u);
-  // (0,S_u); 
-//  Chain = new Chain ();
-//  Chain chainchain (0); //= new Chain (0);
-//  this->curChains.insert (chainchain);
-//  this->curInts.insert (1);
-  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
-  msg2snd->setNotAssignedArraySize (1);
-  msg2snd->setNotAssigned (0, {chain0});
-  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
-  outFile << "sent direct msg. Chain id=" << chain0.id << endl; 
-  cMessage *selfmsg = new cMessage ("");
-  scheduleAt (simTime()+0.1, selfmsg);
+  newChains.insert (chain0);
+  std::set<Chain>::iterator firstMatch = std::find_if (newChains.begin(), newChains.end(), findChain(0));
+  /*std::set<Chain>::iterator result = std::find_if(chains.begin(), chains.end(), */
+/*                                              find_by_id("green"));*/
+/*if(result != cars.end()) {*/
+/*    // we found something*/
+/*}*/
+/*else {*/
+/*    // no match*/
+/*}*/
+
+//  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
+//  msg2snd->setNotAssignedArraySize (1);
+//  msg2snd->setNotAssigned (0, {chain0});
+//  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
+//  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
+//  cMessage *selfmsg = new cMessage ("");
+//  scheduleAt (simTime()+0.1, selfmsg);
   
 //  EV << "sent direct msg\n";
 //  outFile << "Writing this to a file.\n";
