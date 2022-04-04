@@ -1,0 +1,4 @@
+sent direct msg. Chain id=0, curDatacenter=-1
+nxtDC=-1 
+rcvd self msg
+nxtDC=-1 

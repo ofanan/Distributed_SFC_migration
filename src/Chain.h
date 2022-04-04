@@ -40,27 +40,11 @@ class Chain
     }
 };
 
+/* 
+* Accessory function, for finding a chain within a given list of chains.
+* We assume that a chain is inequivocally identified by its id.
+*/
 void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain);
-
-/*void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain) { */
-/*  set<Chain>::iterator it;*/
-/*  for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){*/
-/*    if (it -> id == req_id) { // Found the requested chain*/
-/*      foundChain = *it;    */
-/*      return;*/
-/*    }*/
-/*  }*/
-/*}*/
-
-/*void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain) { */
-/*  set<Chain>::iterator it;*/
-/*  for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){*/
-/*    if (it -> id == req_id) { // Found the requested chain*/
-/*      foundChain = *it;    */
-/*      return;*/
-/*    }*/
-/*  }*/
-/*}*/
 
 class RT_Chain : public Chain
 {
@@ -88,26 +72,6 @@ class Non_RT_Chain: public Chain
 };
 
 #endif
-
-/*struct findChain {*/
-/*    findChain(const int32_t & id) : id(id) {}*/
-/*    bool operator()(const Chain & chain) {*/
-/*        return chain.id == id;*/
-/*    }*/
-/*private:*/
-/*    int32_t id;*/
-/*};*/
-
-//Chain findChainInSet (set<Chain> setOfChains, int32_t id) { 
-/*  set<Chain>::iterator iter = find_if (setOfChains.begin(), setOfChains.end(), findChain(id));*/
-/*  if (iter==setOfChains.end()) {*/
-/*    cout << "error! didn't find the chain\n";*/
-/*    exit (0);*/
-/*  }*/
-/*  else {*/
-/*    return *iter;*/
-/*  }*/
-/*}*/
 
 /*typedef list<Chain> ChainList;*/
 //typedef Chain[] ChainArray;

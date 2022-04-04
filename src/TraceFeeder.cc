@@ -66,48 +66,38 @@ void TraceFeeder::initialize ()
   RT_Chain chain0 (0, S_u);
   newChains.insert (chain0);
   
+  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
+  msg2snd->setNotAssignedArraySize (1);
+  msg2snd->setNotAssigned (0, {chain0});
+  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
+  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
+  cMessage *selfmsg = new cMessage ("");
+  scheduleAt (simTime()+0.1, selfmsg);
+  
   Chain foundChain;
   int32_t req_id = 0;
-  //findChainInSet (newChains, req_id, &foundChain);
-//  outFile << "chain's S_u[0]=" << foundChain.S_u[0];
-
-
-  
-//  set<Chain>::iterator it;
-//  for(it = newChains.begin(); it!=newChains.end(); ++it){
-//    if (it -> id == req_id) { // Found the requested chain
-//      foundChain = *it;    
-//      break;
-//    }
-//  }
-  
+  findChainInSet (newChains, req_id, foundChain);
+  outFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
 }
-//  std::set<Chain>::iterator iter = std::find_if (newChains.begin(), newChains.end(), findChain(0));
-//  if (iter==newChains.end()) {
-//    outFile << "didn't find\n";
-//  }
-//  else {
-//    outFile << "found\n";
-//    Chain foundChain = *iter;
-//    outFile << "chain's S_u[0]=" << foundChain.S_u[0];
-//  }
-  /*std::set<Chain>::iterator result = std::find_if(chains.begin(), chains.end(), */
-/*                                              find_by_id("green"));*/
-/*if(result != cars.end()) {*/
-/*    // we found something*/
-/*}*/
-/*else {*/
-/*    // no match*/
-/*}*/
 
-//  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
-//  msg2snd->setNotAssignedArraySize (1);
-//  msg2snd->setNotAssigned (0, {chain0});
-//  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
-//  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
-//  cMessage *selfmsg = new cMessage ("");
-//  scheduleAt (simTime()+0.1, selfmsg);
-  
+
+void TraceFeeder::handleMessage (cMessage *msg)
+{
+  if (msg -> isSelfMessage()) {
+    outFile << "rcvd self msg\n"; 
+  Chain foundChain;
+  int32_t req_id = 0;
+  findChainInSet (newChains, req_id, foundChain);
+  outFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
+  }
+
+    // If self.msg:
+    // - Read from the trace the data for a single slot.
+    // - Init the placement alg'
+    // - Schedule an event for the next run
+}
+
+
 //  EV << "sent direct msg\n";
 //  outFile << "Writing this to a file.\n";
 //  outFile.close();
@@ -127,14 +117,3 @@ void TraceFeeder::initialize ()
     // Open the trace input file
     // Schedule a self-event for beginning reading the trace
 
-void TraceFeeder::handleMessage (cMessage *msg)
-{
-  if (msg -> isSelfMessage()) {
-    outFile << "rcvd self msg\n"; 
-  }
-
-    // If self.msg:
-    // - Read from the trace the data for a single slot.
-    // - Init the placement alg'
-    // - Schedule an event for the next run
-}
