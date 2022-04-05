@@ -21,27 +21,25 @@ class TraceFeeder : public cSimpleModule
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
-    std::set <Chain> allChains, newChains, crtiChains;
-    std::set <int> curInts;
-    std::vector <cModule*> datacenters; // pointes to all the datacenters
-    std::vector <cModule*> leaves;      // pointes to all the leaves
-    virtual void initialize();
-    virtual void handleMessage (cMessage *msg);
+    set <Chain> allChains, newChains, crtiChains;
+    set <int> curInts;
+    vector <cModule*> datacenters; // pointes to all the datacenters
+    vector <cModule*> leaves;      // pointes to all the leaves
+    void initialize();
+    void handleMessage (cMessage *msg);
+		void readTraceLine ();
+		void openFiles ();
   public:
-    std::ofstream outFile;
+    ofstream outFile;
     TraceFeeder ();
     ~TraceFeeder ();
 };
 
 Define_Module(TraceFeeder);
 
-TraceFeeder::TraceFeeder()
-{
-}
+TraceFeeder::TraceFeeder() {}
 
-TraceFeeder::~TraceFeeder()
-{
-}
+TraceFeeder::~TraceFeeder() {}
 
 void TraceFeeder::initialize ()
 {
@@ -49,7 +47,7 @@ void TraceFeeder::initialize ()
   numDatacenters  = (int) (network -> par ("numDatacenters"));
   numLeaves       = (int) (network -> par ("numLeaves"));
 //
-//    // Init the vector "leaves" with ptrs to all the leaves in the netw'
+  // Init the vectors of "datacenters" (containing all DCs), and the vector of "leaves", with ptrs to all DCs, all leaves, resp.
   leaves.resize (numLeaves);
   datacenters.resize (numDatacenters);
   int leaf_id = 0;
@@ -60,26 +58,27 @@ void TraceFeeder::initialize ()
     }
   }
   
+}
 
+// Open input, output, and log files 
+void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
-  std::vector <int16_t> S_u = {7,2,3};
+}
+
+void TraceFeeder::readTraceLine ()
+{
+  vector <int16_t> S_u = {7,2,3};
   RT_Chain chain0 (0, S_u);
   newChains.insert (chain0);
-  
+    
   initBottomUpMsg *msg2snd = new initBottomUpMsg ();
   msg2snd->setNotAssignedArraySize (1);
   msg2snd->setNotAssigned (0, {chain0});
   sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
-  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
+//  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
   cMessage *selfmsg = new cMessage ("");
   scheduleAt (simTime()+0.1, selfmsg);
-  
-  Chain foundChain;
-  int32_t req_id = 0;
-  findChainInSet (newChains, req_id, foundChain);
-  outFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
 }
-
 
 void TraceFeeder::handleMessage (cMessage *msg)
 {

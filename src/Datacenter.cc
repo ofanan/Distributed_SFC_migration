@@ -11,6 +11,7 @@
 #include "prepareReshufflePkt_m.h"
 
 using namespace omnetpp;
+using namespace std;
 
 class Datacenter : public cSimpleModule
 {
@@ -19,12 +20,12 @@ class Datacenter : public cSimpleModule
     int16_t numParents;
     int16_t numPorts;
     int16_t idOfParent;
-    std::vector <int16_t> idOfChildren;
+    std::vector <int16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
     int16_t  availCpu;
-    std::set <int32_t> potentiallyPlacedChains;
-    std::set <int32_t> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
+    set <Chain> potentiallyPlacedChains;
+    set <Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
     Datacenter();
     ~Datacenter();
 
@@ -180,6 +181,7 @@ void Datacenter::pushUp ()
 void Datacenter::prepareReshuffle () {
 }
 
+// Send a direct message, e.g. to the traceFeeder, to inform about the placement of a pkt.
 void Datacenter::sendDirect () {
 }
 
