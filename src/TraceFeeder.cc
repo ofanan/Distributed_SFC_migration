@@ -21,16 +21,19 @@ class TraceFeeder : public cSimpleModule
     cModule* network; // Pointer to the network on which the simulation is running
     int numDatacenters;
     int numLeaves;
-    set <Chain> allChains, newChains, crtiChains;
+    set <Chain> allChains, newChains, critChains;
     set <int> curInts;
     vector <cModule*> datacenters; // pointes to all the datacenters
     vector <cModule*> leaves;      // pointes to all the leaves
     void initialize();
     void handleMessage (cMessage *msg);
-		void readTraceLine ();
+		void readnewUsrsLine ();
 		void openFiles ();
+		void runTrace  ();
   public:
+  	string traceFileName = "results/poa_files/short.poa";
     ofstream outFile;
+    ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
 };
@@ -46,8 +49,8 @@ void TraceFeeder::initialize ()
   network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
   numDatacenters  = (int) (network -> par ("numDatacenters"));
   numLeaves       = (int) (network -> par ("numLeaves"));
-//
-  // Init the vectors of "datacenters" (containing all DCs), and the vector of "leaves", with ptrs to all DCs, all leaves, resp.
+
+  // Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
   leaves.resize (numLeaves);
   datacenters.resize (numDatacenters);
   int leaf_id = 0;
@@ -57,7 +60,8 @@ void TraceFeeder::initialize ()
       leaves[leaf_id++] = datacenters[dc];
     }
   }
-  
+	openFiles ();
+	runTrace ();	  
 }
 
 // Open input, output, and log files 
@@ -65,7 +69,22 @@ void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
 }
 
-void TraceFeeder::readTraceLine ()
+// Open input, output, and log files 
+void TraceFeeder::runTrace () {
+	traceFile = ifstream (traceFileName);
+  string line;
+  if (!traceFile.is_open ()) {
+  	outFile << "wrong poa file name -> finishing simulation."; 
+		endSimulation();
+  }
+  while (getline (traceFile, line)) {
+  	outFile << line << endl;
+  }
+  traceFile.close ();
+  outFile.close ();
+}
+
+void TraceFeeder::readnewUsrsLine ()
 {
   vector <int16_t> S_u = {7,2,3};
   RT_Chain chain0 (0, S_u);

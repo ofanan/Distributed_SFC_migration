@@ -32,9 +32,10 @@ class Chain
         curDatacenter = nxtDatacenter = -1;
     };
         
-    // We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level l, namely,
-    // the amount of CPU rsrcs required for locating the chain at a certain lvl.
-    // However, in our current sim settings, all of this is degenerated to the fast and efficient rule that an RT chain has higher priority (==smaller #), over a non-RT chain.
+/* 
+We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU rsrcs required for locating the chain at a certain lvl.
+However, in our current sim settings, all of this is degenerated to the fast and efficient rule that an RT chain has higher priority (==smaller #), over a non-RT chain.
+*/
     bool operator< (const Chain &right) const {
       return (this->isRtChain && !(right.isRtChain));
     }
