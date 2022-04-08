@@ -3,6 +3,9 @@
 #include <omnetpp.h>
 #include <iostream>
 #include <fstream>
+#include <boost/tokenizer.hpp>
+#include <regex>
+#include <utility>
 
 #include <vector>
 #include <set>
@@ -14,6 +17,7 @@
 
 using namespace omnetpp;
 using namespace std;
+using namespace boost;
 
 class TraceFeeder : public cSimpleModule
 {
@@ -27,11 +31,13 @@ class TraceFeeder : public cSimpleModule
     vector <cModule*> leaves;      // pointes to all the leaves
     void initialize();
     void handleMessage (cMessage *msg);
-		void readnewUsrsLine ();
+		void readNewUsrsLine ();
+		void readOldUsrsLine ();
 		void openFiles ();
 		void runTrace  ();
   public:
   	string traceFileName = "results/poa_files/short.poa";
+  	string outFileName   = "example.txt";
     ofstream outFile;
     ifstream traceFile;
     TraceFeeder ();
@@ -72,31 +78,71 @@ void TraceFeeder::openFiles () {
 // Open input, output, and log files 
 void TraceFeeder::runTrace () {
 	traceFile = ifstream (traceFileName);
+	outFile   = ofstream (outFileName);
+	
+//	string text = "token, test   string";
+
+//  char_separator<char> slashSlash("//");
+//  tokenizer<char_separator<char>> tokens(text, sep);
+//    for (const auto& t : tokens) {
+//        outFile << t << "." << endl;
+//    }
+	
   string line;
   if (!traceFile.is_open ()) {
   	outFile << "wrong poa file name -> finishing simulation."; 
 		endSimulation();
   }
-  while (getline (traceFile, line)) {
-  	outFile << line << endl;
+  while (getline (traceFile, line)) { 
+  	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
+  	}
+  	else if ( (line.substr(0,8)).compare("t = ")==0) {
+  	}
+  	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
+  		readNewUsrsLine ();
+  	}
+  	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
+  		readOldUsrsLine ();
+  	}
+  	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
+  		continue;
+  	}
+//  	char_separator<char> slashSlash("//");
+//	  tokenizer<char_separator<char>> tokens(text, sep);
+//    for (const auto& t : tokens) {
+//        outFile << t << "." << endl;
+//    }
+
+//  	outFile << line << endl;
+//stringstream ss("bla bla");
+//string s;
+
+//while (getline(ss, s, ' ')) {
+// cout << s << endl;
+//}
+
   }
   traceFile.close ();
   outFile.close ();
 }
 
-void TraceFeeder::readnewUsrsLine ()
+void TraceFeeder::readOldUsrsLine ()
 {
-  vector <int16_t> S_u = {7,2,3};
-  RT_Chain chain0 (0, S_u);
-  newChains.insert (chain0);
-    
-  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
-  msg2snd->setNotAssignedArraySize (1);
-  msg2snd->setNotAssigned (0, {chain0});
-  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
-//  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
-  cMessage *selfmsg = new cMessage ("");
-  scheduleAt (simTime()+0.1, selfmsg);
+}
+
+void TraceFeeder::readNewUsrsLine ()
+{
+//  vector <int16_t> S_u = {7,2,3};
+//  RT_Chain chain0 (0, S_u);
+//  newChains.insert (chain0);
+//    
+//  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
+//  msg2snd->setNotAssignedArraySize (1);
+//  msg2snd->setNotAssigned (0, {chain0});
+//  sendDirect (msg2snd, leaves[0], "directMsgsPort$i");
+////  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
+//  cMessage *selfmsg = new cMessage ("");
+//  scheduleAt (simTime()+0.1, selfmsg);
 }
 
 void TraceFeeder::handleMessage (cMessage *msg)
