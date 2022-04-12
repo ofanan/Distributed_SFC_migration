@@ -7,3 +7,5 @@ simulations/*
 .oppbuildspec
 .meta*
 .cmdenv-log
+.alias_pusher.txt
+

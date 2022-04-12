@@ -9,7 +9,7 @@ alias ltr='c; ls -ltr'
 alias ltra='ls -ltra'
 alias py='python'
 alias aliaser='source /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration/.myalias'
-#alias myalias='ge /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration/.myalias &'
+alias myalias='ge /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration/.myalias &'
 alias ge='gedit'
 alias basher='ged ~/.bashrc'
 alias maker='c; opp_makemake -f --deep; make'
@@ -19,7 +19,6 @@ alias runL='cd /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration; c; ./D
 alias runT='cd /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration; c; ./Distributed_SFC_migration -f Tree.ini&'
 alias Crunner='cd /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration; c; ./Distributed_SFC_migration -f Comnetpp.ini -u Cmdenv &'
 #alias pusher='git push -f https://github.com/ofanan/Distributed_SFC_migration.git HEAD:main'
-alias pusher='git push -f https://github.com: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@github.com/ofanan/Distributed_SFC_migration.git HEAD:main'
 alias commit='c; git add -A; git commit'
 
 
