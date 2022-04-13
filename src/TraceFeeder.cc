@@ -23,6 +23,7 @@ class TraceFeeder : public cSimpleModule
 {
   private:
     cModule* network; // Pointer to the network on which the simulation is running
+    string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
     int numDatacenters;
     int numLeaves;
     set <Chain> allChains, newChains, critChains;
@@ -46,7 +47,8 @@ class TraceFeeder : public cSimpleModule
 
 Define_Module(TraceFeeder);
 
-TraceFeeder::TraceFeeder() {}
+TraceFeeder::TraceFeeder() {
+}
 
 TraceFeeder::~TraceFeeder() {}
 
@@ -55,6 +57,7 @@ void TraceFeeder::initialize ()
   network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
   numDatacenters  = (int) (network -> par ("numDatacenters"));
   numLeaves       = (int) (network -> par ("numLeaves"));
+	networkName = (network -> par ("name")).stdstringValue();
 
   // Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
   leaves.resize (numLeaves);
@@ -73,6 +76,7 @@ void TraceFeeder::initialize ()
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
+//  outFile << networkName << endl;
 }
 
 // Open input, output, and log files 

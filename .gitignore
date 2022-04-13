@@ -8,4 +8,5 @@ simulations/*
 .meta*
 .cmdenv-log
 .alias_pusher.txt
+Distributed_SFC_migration*
 

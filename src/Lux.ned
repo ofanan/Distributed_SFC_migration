@@ -4,7 +4,7 @@ package src;
 network Lux
 {
   parameters:
-  	string name     = "Lux";
+  	string name     = default("Lux");
     int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
 		int numLeaves   	= default(int (numChildren^(height-1)));
     double channelDelay	@unit(s); 
@@ -18,7 +18,7 @@ network Lux
 
   submodules:
 
-//		trace_feeder 	: TraceFeeder;
+		trace_feeder 	: TraceFeeder;
 
 //		chain_generator : ChainGenerator;
 		
