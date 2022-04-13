@@ -70,13 +70,13 @@ void TraceFeeder::initialize ()
     }
   }
 	openFiles ();
-	runTrace ();	  
+//	runTrace ();	  
 }
 
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
-//  outFile << networkName << endl;
+  outFile << networkName << endl;
 }
 
 // Open input, output, and log files 
