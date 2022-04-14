@@ -16,11 +16,13 @@ using namespace std;
 class Datacenter : public cSimpleModule
 {
   public:
+    cModule* network; // Pointer to the network on which the simulation is running
+  	string networkName;
     int16_t numChildren;
     int16_t numParents;
     int16_t numPorts;
     int16_t idOfParent;
-    std::vector <int16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
+    vector <int16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
     int16_t  availCpu;
@@ -28,11 +30,11 @@ class Datacenter : public cSimpleModule
     set <Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
     Datacenter();
     ~Datacenter();
-
+  	
   private:
-    std::vector <cQueue>     outputQ;
-    std::vector <cChannel*>  xmtChnl;
-    std::vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
+    vector <cQueue>     outputQ;
+    vector <cChannel*>  xmtChnl;
+    vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
     virtual void initialize();
@@ -51,44 +53,45 @@ Define_Module(Datacenter);
 
 void Datacenter::initialize()
 {
-  availCpu        = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
-  numChildren     = (int16_t) (par("numChildren"));
-  numParents      = (int16_t) (par("numParents"));
-  numPorts        = numParents + numChildren;
-  isRoot          = (numParents==0);
-  isLeaf          = (numChildren==0);
-
+	network     = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+	networkName = (network -> par ("name")).stdstringValue();
+  availCpu    = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
+  numChildren = (int16_t) (par("numChildren"));
+  numParents  = (int16_t) (par("numParents"));
+  numPorts    = numParents + numChildren;
+  isRoot      = (numParents==0);
+  isLeaf      = (numChildren==0);
   outputQ.        resize (numPorts);
   xmtChnl.        resize (numPorts);
   endXmtEvents.   resize (numPorts);
   idOfChildren.   resize (numChildren);
   
   // Discover the xmt channels to the neighbors, and the neighbors' id's.
-  for (int portNum (0); portNum < numPorts; portNum++) {
-    cGate *outGate    = gate("port$o", portNum);
-    xmtChnl[portNum]  = outGate->getTransmissionChannel();
-    cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
-    if (isRoot) {
-      idOfChildren[portNum] = int16_t (nghbr -> par ("id"));
-    }
-    else {
-      if (portNum==0) {
-        idOfParent = int16_t (nghbr -> par ("id"));
-      }
-      else {
-        idOfChildren[portNum-1] = int16_t (nghbr -> par ("id"));
-      }
-    }       
+	for (int portNum (0); portNum < numPorts; portNum++) {
+	  cGate *outGate    = gate("port$o", portNum);
+	  xmtChnl[portNum]  = outGate->getTransmissionChannel();
+	  cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
+	  if (isRoot) {
+	    idOfChildren[portNum] = int16_t (nghbr -> par ("id"));
+	  }
+	  else {
+	    if (portNum==0) {
+	      idOfParent = int16_t (nghbr -> par ("id"));
+	    }
+	    else {
+	      idOfChildren[portNum-1] = int16_t (nghbr -> par ("id"));
+	    }
+  	}       
   }
 
-  std::fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
+  fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
   
   
 //    // For debugging only: gen and xmt a BU pkt
 //    bottomUpPkt *pkt = new bottomUpPkt();
 //    pkt->setNotAssignedArraySize (1);
 //    int32_t chain_id = 7;
-//    std::vector <int16_t> S_u = {1,2};
+//    vector <int16_t> S_u = {1,2};
 //    RT_Chain chain (chain_id);
 //    pkt->setNotAssigned (0, chain);
 //    sendViaQ (pkt, 0);

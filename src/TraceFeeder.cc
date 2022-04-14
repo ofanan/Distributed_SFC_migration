@@ -32,8 +32,8 @@ class TraceFeeder : public cSimpleModule
     vector <cModule*> leaves;      // pointes to all the leaves
     void initialize();
     void handleMessage (cMessage *msg);
-		void readNewUsrsLine ();
-		void readOldUsrsLine ();
+		void readNewUsrsLine (string line);
+		void readOldUsrsLine (string line);
 		void openFiles ();
 		void runTrace  ();
   public:
@@ -55,9 +55,9 @@ TraceFeeder::~TraceFeeder() {}
 void TraceFeeder::initialize ()
 {
   network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+	networkName 		= (network -> par ("name")).stdstringValue();
   numDatacenters  = (int) (network -> par ("numDatacenters"));
   numLeaves       = (int) (network -> par ("numLeaves"));
-	networkName = (network -> par ("name")).stdstringValue();
 
   // Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
   leaves.resize (numLeaves);
@@ -70,7 +70,7 @@ void TraceFeeder::initialize ()
     }
   }
 	openFiles ();
-//	runTrace ();	  
+	runTrace ();	  
 }
 
 // Open input, output, and log files 
@@ -84,14 +84,6 @@ void TraceFeeder::runTrace () {
 	traceFile = ifstream (traceFileName);
 	outFile   = ofstream (outFileName);
 	
-//	string text = "token, test   string";
-
-//  char_separator<char> slashSlash("//");
-//  tokenizer<char_separator<char>> tokens(text, sep);
-//    for (const auto& t : tokens) {
-//        outFile << t << "." << endl;
-//    }
-	
   string line;
   if (!traceFile.is_open ()) {
   	outFile << "wrong poa file name -> finishing simulation."; 
@@ -103,10 +95,11 @@ void TraceFeeder::runTrace () {
   	else if ( (line.substr(0,8)).compare("t = ")==0) {
   	}
   	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-  		readNewUsrsLine ();
+  		readNewUsrsLine (line.substr(9)); 
+  		
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		readOldUsrsLine ();
+  		readOldUsrsLine (line.substr(9));
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		continue;
@@ -130,12 +123,27 @@ void TraceFeeder::runTrace () {
   outFile.close ();
 }
 
-void TraceFeeder::readOldUsrsLine ()
+void TraceFeeder::readOldUsrsLine (string line)
 {
 }
 
-void TraceFeeder::readNewUsrsLine ()
+void TraceFeeder::readNewUsrsLine (string line)
 {
+
+  char_separator<char> sep("() ");
+  char_separator<char> comma(",");
+  tokenizer<char_separator<char>> tokens(line, sep);
+  for (const auto& token : tokens) {
+  		istringstream newUsrToken(token); 
+  		string numStr;
+  		getline (newUsrToken, numStr, ',');
+      outFile << "usr num = " << numStr;
+  		getline (newUsrToken, numStr, ',');      
+      outFile << " cell num = " << numStr << endl;
+  }
+    
+	
+
 //  vector <int16_t> S_u = {7,2,3};
 //  RT_Chain chain0 (0, S_u);
 //  newChains.insert (chain0);
