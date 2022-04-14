@@ -43,6 +43,7 @@ class TraceFeeder : public cSimpleModule
     ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
+    void parseUsrPoaToken (string token, int32_t &usr, int16_t &poa);
 };
 
 Define_Module(TraceFeeder);
@@ -127,23 +128,36 @@ void TraceFeeder::readOldUsrsLine (string line)
 {
 }
 
+// parse a token of the type "u,poa" where u is the usr number and poa is the user's current Poa
+void TraceFeeder::parseUsrPoaToken (string token, int32_t &usr, int16_t &poa)
+{
+	istringstream newUsrToken(token); 
+  string numStr; 
+	getline (newUsrToken, numStr, ',');
+	usr = stoi (numStr);
+	getline (newUsrToken, numStr, ',');
+	poa = stoi (numStr);
+}
+
 void TraceFeeder::readNewUsrsLine (string line)
 {
 
   char_separator<char> sep("() ");
-  char_separator<char> comma(",");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int num;
-  string numStr;
+  string numStr; // = "7";
+  int num; // = stoi (numStr);
+   int32_t usr;
+   int16_t poa; 
   for (const auto& token : tokens) {
-  		istringstream newUsrToken(token); 
-  		getline (newUsrToken, numStr, ',');
-      outFile << "usr num = " << numStr;
-  		getline (newUsrToken, numStr, ',');      
-      outFile << " cell num = " << numStr << endl;
+  		 parseUsrPoaToken (token, usr, poa);
+			 outFile << "usr num = " << usr << " poa = " << poa << endl;
+//  		istringstream newUsrToken(token); 
+//  		getline (newUsrToken, numStr, ',');
+//  		num = stoi (numStr);
+//      outFile << "usr num = " << numStr;
+//  		getline (newUsrToken, numStr, ',');      
+//      outFile << " cell num = " << numStr << endl;
   }
-    
-	
 
 //  vector <int16_t> S_u = {7,2,3};
 //  RT_Chain chain0 (0, S_u);
