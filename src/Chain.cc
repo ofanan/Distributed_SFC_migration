@@ -10,7 +10,7 @@
 #include "Chain.h"
 
 /* 
-* Accessory function, for finding a chain within a given list of chains.
+* Find a chain within a given set of chains.
 * We assume that a chain is inequivocally identified by its id.
 */
 void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain) { 

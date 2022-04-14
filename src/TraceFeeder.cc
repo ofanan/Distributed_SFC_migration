@@ -133,9 +133,10 @@ void TraceFeeder::readNewUsrsLine (string line)
   char_separator<char> sep("() ");
   char_separator<char> comma(",");
   tokenizer<char_separator<char>> tokens(line, sep);
+  int num;
+  string numStr;
   for (const auto& token : tokens) {
   		istringstream newUsrToken(token); 
-  		string numStr;
   		getline (newUsrToken, numStr, ',');
       outFile << "usr num = " << numStr;
   		getline (newUsrToken, numStr, ',');      
