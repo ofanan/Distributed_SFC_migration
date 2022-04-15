@@ -58,33 +58,32 @@ TraceFeeder::~TraceFeeder() {}
 
 void TraceFeeder::initialize (int stage)
 {
-  network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
-	networkName 		= (network -> par ("name")).stdstringValue();
-  numDatacenters  = (int) (network -> par ("numDatacenters"));
-  numLeaves       = (int) (network -> par ("numLeaves"));
-
-
-  if (stage==1) {
-
-		openFiles ();
-		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
-		leaves.resize (numLeaves);
-		datacenters.resize (numDatacenters);
-		int leaf_id = 0;
-		for (int dc(0); dc<numDatacenters; dc++) {
-		  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
-		  if (bool(datacenters[dc]->par("isLeaf"))==1) {
-		    leaves[leaf_id++] = datacenters[dc];
-		  }
-		}
-  	discoverPathsToRoot ();
-	//	runTrace ();	  
+  if (stage==0) {
+		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+		networkName 		= (network -> par ("name")).stdstringValue();
+		numDatacenters  = (int) (network -> par ("numDatacenters"));
+		numLeaves       = (int) (network -> par ("numLeaves"));
+		return;
 	}
+	
+	openFiles ();
+	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
+	leaves.resize (numLeaves);
+	datacenters.resize (numDatacenters);
+	int leaf_id = 0;
+	for (int dc(0); dc<numDatacenters; dc++) {
+	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
+	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
+	    leaves[leaf_id++] = datacenters[dc];
+	  }
+	}
+	discoverPathsToRoot ();
+//	runTrace ();	  
 }
 
 void TraceFeeder::discoverPathsToRoot () {
 	outFile << "id of prnt of leaf 100 is " << leaves[100]->idOfParent << endl;
-	for (int leaf_id(0) ; leaf_id < 3; leaf_id++)  {
+	for (int leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
 	  outFile << "id of prnt of leaf " << leaf_id << " is " << leaves[leaf_id]->idOfParent << endl;
 	}
 }
