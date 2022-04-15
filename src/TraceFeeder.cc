@@ -11,6 +11,7 @@
 #include <set>
 #include <algorithm>
 
+#include "Datacenter.h"
 #include "Chain.h"
 #include "Parameters.h"
 #include "initBottomUpMsg_m.h"
@@ -28,7 +29,7 @@ class TraceFeeder : public cSimpleModule
     int numLeaves;
     set <Chain> allChains, newChains, critChains;
     set <int> curInts;
-    vector <cModule*> datacenters; // pointes to all the datacenters
+    vector <Datacenter*> datacenters; // pointes to all the datacenters
     vector <cModule*> leaves;      // pointes to all the leaves
     void initialize();
     void handleMessage (cMessage *msg);
@@ -65,7 +66,7 @@ void TraceFeeder::initialize ()
   datacenters.resize (numDatacenters);
   int leaf_id = 0;
   for (int dc(0); dc<numDatacenters; dc++) {
-    datacenters[dc] = network->getSubmodule("datacenters", dc);
+    datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
     if (bool(datacenters[dc]->par("isLeaf"))==0) {
       leaves[leaf_id++] = datacenters[dc];
     }
