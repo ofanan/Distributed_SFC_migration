@@ -22,5 +22,5 @@ alias runCT='cd /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration; c; ./
 alias runM='cd /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration; c; ./Distributed_SFC_migration -f Monaco.ini &'
 alias runCM='cd /home/ofanan/omnetpp-5.7/ofanan/Distributed_SFC_migration; c; ./Distributed_SFC_migration -f MonacoC.ini -u Cmdenv &'
 alias commit='c; git add -A; git commit'
-
+alias compush='commit; pusher'
 

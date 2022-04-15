@@ -1,14 +1,17 @@
 #ifndef DATACENTER_H
 #define DATACENTER_H
 #include <stdio.h>
-#include <stdint.h>
-
+#include <string.h>
+#include <omnetpp.h>
 #include <vector>
 #include <set>
-#include <algorithm>
-
-#include <omnetpp.h>
+#include "Datacenter.h"
 #include "Parameters.h"
+#include "endXmtPkt_m.h"
+#include "bottomUpPkt_m.h"
+#include "initBottomUpMsg_m.h"
+#include "pushUpPkt_m.h"
+#include "prepareReshufflePkt_m.h"
 
 using namespace omnetpp;
 using namespace std;
