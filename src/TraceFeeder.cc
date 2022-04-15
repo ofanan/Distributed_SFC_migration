@@ -30,7 +30,7 @@ class TraceFeeder : public cSimpleModule
     set <Chain> allChains, newChains, critChains;
     set <int> curInts;
     vector <Datacenter*> datacenters; // pointes to all the datacenters
-    vector <cModule*> leaves;      // pointes to all the leaves
+    vector <Datacenter*> leaves;      // pointes to all the leaves
     void initialize();
     void handleMessage (cMessage *msg);
 		void readNewUsrsLine (string line);
