@@ -31,7 +31,8 @@ class TraceFeeder : public cSimpleModule
     set <int> curInts;
     vector <Datacenter*> datacenters; // pointes to all the datacenters
     vector <Datacenter*> leaves;      // pointes to all the leaves
-    void initialize();
+    void initialize(int stage);
+    virtual int numInitStages() const {return 2;};
     void handleMessage (cMessage *msg);
 		void readNewUsrsLine (string line);
 		void readOldUsrsLine (string line);
@@ -54,7 +55,7 @@ TraceFeeder::TraceFeeder() {
 
 TraceFeeder::~TraceFeeder() {}
 
-void TraceFeeder::initialize ()
+void TraceFeeder::initialize (int stage)
 {
   network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 	networkName 		= (network -> par ("name")).stdstringValue();
@@ -71,15 +72,17 @@ void TraceFeeder::initialize ()
       leaves[leaf_id++] = datacenters[dc];
     }
   }
-	openFiles ();
-	runTrace ();	  
+  if (stage==1) {
+		openFiles ();
+	//	runTrace ();	  
+	}
 }
 
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
   outFile << networkName << endl;
-  //outFile << "id of prnt of leaf 0 is " << leaves[0]->idOfParent
+  outFile << "id of prnt of leaf 100 is " << leaves[100]->idOfParent << endl;
 }
 
 // Open input, output, and log files 

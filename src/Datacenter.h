@@ -41,7 +41,7 @@ class Datacenter : public cSimpleModule
     vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
-    virtual void initialize();
+    virtual void initialize(int stage);
     virtual void handleMessage (cMessage *msg);
     void handleSelfMsg    ();
     void sendViaQ         (int16_t portNum);
