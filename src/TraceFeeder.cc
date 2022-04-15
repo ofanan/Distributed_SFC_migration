@@ -32,12 +32,13 @@ class TraceFeeder : public cSimpleModule
     vector <Datacenter*> datacenters; // pointes to all the datacenters
     vector <Datacenter*> leaves;      // pointes to all the leaves
     void initialize(int stage);
-    virtual int numInitStages() const {return 2;};
+    virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
     void handleMessage (cMessage *msg);
 		void readNewUsrsLine (string line);
 		void readOldUsrsLine (string line);
 		void openFiles ();
 		void runTrace  ();
+		void discoverPathsToRoot ();
   public:
   	string traceFileName = "results/poa_files/short.poa";
   	string outFileName   = "example.txt";
@@ -73,16 +74,23 @@ void TraceFeeder::initialize (int stage)
     }
   }
   if (stage==1) {
-		openFiles ();
+	  openFiles ();
+  	discoverPathsToRoot ();
 	//	runTrace ();	  
 	}
+}
+
+void TraceFeeder::discoverPathsToRoot () {
+	outFile << "id of prnt of leaf 100 is " << leaves[100]->idOfParent << endl;
+//	for (int leaf_id(0) ; leaf_id < 1; leaf_id++)  {
+//	  outFile << "id of prnt of leaf " << leaf_id << " is " << leaves[leaf_id]->idOfParent << endl;
+//	}
 }
 
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
   outFile << networkName << endl;
-  outFile << "id of prnt of leaf 100 is " << leaves[100]->idOfParent << endl;
 }
 
 // Open input, output, and log files 

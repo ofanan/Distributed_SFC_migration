@@ -16,7 +16,7 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-void Datacenter::initialize(int stage)
+void Datacenter::initialize()
 {
 	network     = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 	networkName = (network -> par ("name")).stdstringValue();
