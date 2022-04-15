@@ -80,7 +80,7 @@ void Datacenter::initialize()
 	    if (portNum==0) { // port 0 is towards the parents
 	      idOfParent = int16_t (nghbr -> par ("id"));
 	    }
-	    else { // ports 1...numOfChildren are towards the children
+	    else { // ports 1...numChildren are towards the children
 	      idOfChildren[portNum-1] = int16_t (nghbr -> par ("id"));
 	    }
   	}       

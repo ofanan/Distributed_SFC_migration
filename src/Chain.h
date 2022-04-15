@@ -1,6 +1,5 @@
 #ifndef CHAIN_H
 #define CHAIN_H
-//#pragma once
 #include <stdio.h>
 #include <stdint.h>
 
