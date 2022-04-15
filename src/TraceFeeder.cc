@@ -78,6 +78,7 @@ void TraceFeeder::initialize ()
 void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
   outFile << networkName << endl;
+  //outFile << "id of prnt of leaf 0 is " << leaves[0]->idOfParent
 }
 
 // Open input, output, and log files 
@@ -146,17 +147,11 @@ void TraceFeeder::readNewUsrsLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   string numStr; // = "7";
   int num; // = stoi (numStr);
-   int32_t usr;
-   int16_t poa; 
+  int32_t usr;
+  int16_t poa; 
   for (const auto& token : tokens) {
-  		 parseUsrPoaToken (token, usr, poa);
-			 outFile << "usr num = " << usr << " poa = " << poa << endl;
-//  		istringstream newUsrToken(token); 
-//  		getline (newUsrToken, numStr, ',');
-//  		num = stoi (numStr);
-//      outFile << "usr num = " << numStr;
-//  		getline (newUsrToken, numStr, ',');      
-//      outFile << " cell num = " << numStr << endl;
+  	parseUsrPoaToken (token, usr, poa);
+		outFile << "usr num = " << usr << " poa = " << poa << endl;
   }
 
 //  vector <int16_t> S_u = {7,2,3};

@@ -18,6 +18,7 @@ class Datacenter : public cSimpleModule
   public:
     cModule* network; // Pointer to the network on which the simulation is running
   	string networkName;
+  	int16_t lvl; // level in the tree (leaf's lvl is 0).
     int16_t numChildren;
     int16_t numParents;
     int16_t numPorts;
@@ -55,9 +56,10 @@ void Datacenter::initialize()
 {
 	network     = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 	networkName = (network -> par ("name")).stdstringValue();
-  availCpu    = nonAugmentedCpuAtLvl[int(par("lvl"))]; // Consider rsrc aug here?
   numChildren = (int16_t) (par("numChildren"));
   numParents  = (int16_t) (par("numParents"));
+  lvl				  = (int16_t) (par("lvl"));
+  availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
   numPorts    = numParents + numChildren;
   isRoot      = (numParents==0);
   isLeaf      = (numChildren==0);
@@ -75,10 +77,10 @@ void Datacenter::initialize()
 	    idOfChildren[portNum] = int16_t (nghbr -> par ("id"));
 	  }
 	  else {
-	    if (portNum==0) {
+	    if (portNum==0) { // port 0 is towards the parents
 	      idOfParent = int16_t (nghbr -> par ("id"));
 	    }
-	    else {
+	    else { // ports 1...numOfChildren are towards the children
 	      idOfChildren[portNum-1] = int16_t (nghbr -> par ("id"));
 	    }
   	}       
