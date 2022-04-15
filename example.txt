@@ -1,3 +1,5 @@
 Monaco
-In discoverPathsToRoot
-id of prnt of leaf 100 is 37
+id of prnt of leaf 100 is 99
+id of prnt of leaf 0 is 125
+id of prnt of leaf 1 is 109
+id of prnt of leaf 2 is 96
