@@ -24,3 +24,11 @@ alias runCM='cd /home/ofanan/omnetpp-6.0/ofanan/Distributed_SFC_migration; c; ./
 alias commit='c; git add -A; git commit'
 alias compush='commit; pusher'
 
+
+
+
+
+
+
+
+
