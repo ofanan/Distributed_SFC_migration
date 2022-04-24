@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.7 from src/bottomUpPkt.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from src/bottomUpPkt.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,6 +26,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
+#include <type_traits>
 #include "bottomUpPkt_m.h"
 
 namespace omnetpp {
@@ -67,7 +69,7 @@ void doParsimUnpacking(omnetpp::cCommBuffer *buffer, std::list<T,A>& l)
 {
     int n;
     doParsimUnpacking(buffer, n);
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         l.push_back(T());
         doParsimUnpacking(buffer, l.back());
     }
@@ -87,7 +89,7 @@ void doParsimUnpacking(omnetpp::cCommBuffer *buffer, std::set<T,Tr,A>& s)
 {
     int n;
     doParsimUnpacking(buffer, n);
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         T x;
         doParsimUnpacking(buffer, x);
         s.insert(x);
@@ -110,7 +112,7 @@ void doParsimUnpacking(omnetpp::cCommBuffer *buffer, std::map<K,V,Tr,A>& m)
 {
     int n;
     doParsimUnpacking(buffer, n);
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         K k; V v;
         doParsimUnpacking(buffer, k);
         doParsimUnpacking(buffer, v);
@@ -148,63 +150,24 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 }  // namespace omnetpp
 
-
-// forward
-template<typename T, typename A>
-std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec);
-
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
-
-// operator<< for std::vector<T>
-template<typename T, typename A>
-inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
-{
-    out.put('{');
-    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
-    {
-        if (it != vec.begin()) {
-            out.put(','); out.put(' ');
-        }
-        out << *it;
-    }
-    out.put('}');
-    
-    char buf[32];
-    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
-    out.write(buf, strlen(buf));
-    return out;
-}
-
 Register_Class(bottomUpPkt)
 
-bottomUpPkt::bottomUpPkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
+bottomUpPkt::bottomUpPkt(const char *name, short kind) : ::omnetpp::cPacket(name, kind)
 {
-    notAssigned_arraysize = 0;
-    this->notAssigned = 0;
-    pushUpList_arraysize = 0;
-    this->pushUpList = 0;
 }
 
 bottomUpPkt::bottomUpPkt(const bottomUpPkt& other) : ::omnetpp::cPacket(other)
 {
-    notAssigned_arraysize = 0;
-    this->notAssigned = 0;
-    pushUpList_arraysize = 0;
-    this->pushUpList = 0;
     copy(other);
 }
 
 bottomUpPkt::~bottomUpPkt()
 {
-    delete [] this->notAssigned;
-    delete [] this->pushUpList;
 }
 
 bottomUpPkt& bottomUpPkt::operator=(const bottomUpPkt& other)
 {
-    if (this==&other) return *this;
+    if (this == &other) return *this;
     ::omnetpp::cPacket::operator=(other);
     copy(other);
     return *this;
@@ -212,142 +175,62 @@ bottomUpPkt& bottomUpPkt::operator=(const bottomUpPkt& other)
 
 void bottomUpPkt::copy(const bottomUpPkt& other)
 {
-    delete [] this->notAssigned;
-    this->notAssigned = (other.notAssigned_arraysize==0) ? nullptr : new Chain[other.notAssigned_arraysize];
-    notAssigned_arraysize = other.notAssigned_arraysize;
-    for (unsigned int i=0; i<notAssigned_arraysize; i++)
-        this->notAssigned[i] = other.notAssigned[i];
-    delete [] this->pushUpList;
-    this->pushUpList = (other.pushUpList_arraysize==0) ? nullptr : new Chain[other.pushUpList_arraysize];
-    pushUpList_arraysize = other.pushUpList_arraysize;
-    for (unsigned int i=0; i<pushUpList_arraysize; i++)
-        this->pushUpList[i] = other.pushUpList[i];
 }
 
 void bottomUpPkt::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
-    b->pack(notAssigned_arraysize);
-    doParsimArrayPacking(b,this->notAssigned,notAssigned_arraysize);
-    b->pack(pushUpList_arraysize);
-    doParsimArrayPacking(b,this->pushUpList,pushUpList_arraysize);
 }
 
 void bottomUpPkt::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
-    delete [] this->notAssigned;
-    b->unpack(notAssigned_arraysize);
-    if (notAssigned_arraysize==0) {
-        this->notAssigned = 0;
-    } else {
-        this->notAssigned = new Chain[notAssigned_arraysize];
-        doParsimArrayUnpacking(b,this->notAssigned,notAssigned_arraysize);
-    }
-    delete [] this->pushUpList;
-    b->unpack(pushUpList_arraysize);
-    if (pushUpList_arraysize==0) {
-        this->pushUpList = 0;
-    } else {
-        this->pushUpList = new Chain[pushUpList_arraysize];
-        doParsimArrayUnpacking(b,this->pushUpList,pushUpList_arraysize);
-    }
-}
-
-void bottomUpPkt::setNotAssignedArraySize(unsigned int size)
-{
-    Chain *notAssigned2 = (size==0) ? nullptr : new Chain[size];
-    unsigned int sz = notAssigned_arraysize < size ? notAssigned_arraysize : size;
-    for (unsigned int i=0; i<sz; i++)
-        notAssigned2[i] = this->notAssigned[i];
-    notAssigned_arraysize = size;
-    delete [] this->notAssigned;
-    this->notAssigned = notAssigned2;
-}
-
-unsigned int bottomUpPkt::getNotAssignedArraySize() const
-{
-    return notAssigned_arraysize;
-}
-
-Chain& bottomUpPkt::getNotAssigned(unsigned int k)
-{
-    if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
-    return this->notAssigned[k];
-}
-
-void bottomUpPkt::setNotAssigned(unsigned int k, const Chain& notAssigned)
-{
-    if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
-    this->notAssigned[k] = notAssigned;
-}
-
-void bottomUpPkt::setPushUpListArraySize(unsigned int size)
-{
-    Chain *pushUpList2 = (size==0) ? nullptr : new Chain[size];
-    unsigned int sz = pushUpList_arraysize < size ? pushUpList_arraysize : size;
-    for (unsigned int i=0; i<sz; i++)
-        pushUpList2[i] = this->pushUpList[i];
-    pushUpList_arraysize = size;
-    delete [] this->pushUpList;
-    this->pushUpList = pushUpList2;
-}
-
-unsigned int bottomUpPkt::getPushUpListArraySize() const
-{
-    return pushUpList_arraysize;
-}
-
-Chain& bottomUpPkt::getPushUpList(unsigned int k)
-{
-    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
-    return this->pushUpList[k];
-}
-
-void bottomUpPkt::setPushUpList(unsigned int k, const Chain& pushUpList)
-{
-    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
-    this->pushUpList[k] = pushUpList;
 }
 
 class bottomUpPktDescriptor : public omnetpp::cClassDescriptor
 {
   private:
-    mutable const char **propertynames;
+    mutable const char **propertyNames;
+    enum FieldConstants {
+    };
   public:
     bottomUpPktDescriptor();
     virtual ~bottomUpPktDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
-    virtual const char *getProperty(const char *propertyname) const override;
+    virtual const char *getProperty(const char *propertyName) const override;
     virtual int getFieldCount() const override;
     virtual const char *getFieldName(int field) const override;
     virtual int findField(const char *fieldName) const override;
     virtual unsigned int getFieldTypeFlags(int field) const override;
     virtual const char *getFieldTypeString(int field) const override;
     virtual const char **getFieldPropertyNames(int field) const override;
-    virtual const char *getFieldProperty(int field, const char *propertyname) const override;
-    virtual int getFieldArraySize(void *object, int field) const override;
+    virtual const char *getFieldProperty(int field, const char *propertyName) const override;
+    virtual int getFieldArraySize(omnetpp::any_ptr object, int field) const override;
+    virtual void setFieldArraySize(omnetpp::any_ptr object, int field, int size) const override;
 
-    virtual const char *getFieldDynamicTypeString(void *object, int field, int i) const override;
-    virtual std::string getFieldValueAsString(void *object, int field, int i) const override;
-    virtual bool setFieldValueAsString(void *object, int field, int i, const char *value) const override;
+    virtual const char *getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const override;
+    virtual std::string getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const override;
+    virtual void setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const override;
+    virtual omnetpp::cValue getFieldValue(omnetpp::any_ptr object, int field, int i) const override;
+    virtual void setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const override;
 
     virtual const char *getFieldStructName(int field) const override;
-    virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
+    virtual omnetpp::any_ptr getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const override;
+    virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
 Register_ClassDescriptor(bottomUpPktDescriptor)
 
-bottomUpPktDescriptor::bottomUpPktDescriptor() : omnetpp::cClassDescriptor("bottomUpPkt", "omnetpp::cPacket")
+bottomUpPktDescriptor::bottomUpPktDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(bottomUpPkt)), "omnetpp::cPacket")
 {
-    propertynames = nullptr;
+    propertyNames = nullptr;
 }
 
 bottomUpPktDescriptor::~bottomUpPktDescriptor()
 {
-    delete[] propertynames;
+    delete[] propertyNames;
 }
 
 bool bottomUpPktDescriptor::doesSupport(omnetpp::cObject *obj) const
@@ -357,196 +240,238 @@ bool bottomUpPktDescriptor::doesSupport(omnetpp::cObject *obj) const
 
 const char **bottomUpPktDescriptor::getPropertyNames() const
 {
-    if (!propertynames) {
+    if (!propertyNames) {
         static const char *names[] = {  nullptr };
-        omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-        const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
-        propertynames = mergeLists(basenames, names);
+        omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+        const char **baseNames = base ? base->getPropertyNames() : nullptr;
+        propertyNames = mergeLists(baseNames, names);
     }
-    return propertynames;
+    return propertyNames;
 }
 
-const char *bottomUpPktDescriptor::getProperty(const char *propertyname) const
+const char *bottomUpPktDescriptor::getProperty(const char *propertyName) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? basedesc->getProperty(propertyname) : nullptr;
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    return base ? base->getProperty(propertyName) : nullptr;
 }
 
 int bottomUpPktDescriptor::getFieldCount() const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount() : 2;
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    return base ? 0+base->getFieldCount() : 0;
 }
 
 unsigned int bottomUpPktDescriptor::getFieldTypeFlags(int field) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldTypeFlags(field);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldTypeFlags(field);
+        field -= base->getFieldCount();
     }
-    static unsigned int fieldTypeFlags[] = {
-        FD_ISARRAY | FD_ISCOMPOUND,
-        FD_ISARRAY | FD_ISCOMPOUND,
-    };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return 0;
 }
 
 const char *bottomUpPktDescriptor::getFieldName(int field) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldName(field);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldName(field);
+        field -= base->getFieldCount();
     }
-    static const char *fieldNames[] = {
-        "notAssigned",
-        "pushUpList",
-    };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
+    return nullptr;
 }
 
 int bottomUpPktDescriptor::findField(const char *fieldName) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='n' && strcmp(fieldName, "notAssigned")==0) return base+0;
-    if (fieldName[0]=='p' && strcmp(fieldName, "pushUpList")==0) return base+1;
-    return basedesc ? basedesc->findField(fieldName) : -1;
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    return base ? base->findField(fieldName) : -1;
 }
 
 const char *bottomUpPktDescriptor::getFieldTypeString(int field) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldTypeString(field);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldTypeString(field);
+        field -= base->getFieldCount();
     }
-    static const char *fieldTypeStrings[] = {
-        "Chain",
-        "Chain",
-    };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
+    return nullptr;
 }
 
 const char **bottomUpPktDescriptor::getFieldPropertyNames(int field) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldPropertyNames(field);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldPropertyNames(field);
+        field -= base->getFieldCount();
     }
     switch (field) {
         default: return nullptr;
     }
 }
 
-const char *bottomUpPktDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *bottomUpPktDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldProperty(field, propertyname);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldProperty(field, propertyName);
+        field -= base->getFieldCount();
     }
     switch (field) {
         default: return nullptr;
     }
 }
 
-int bottomUpPktDescriptor::getFieldArraySize(void *object, int field) const
+int bottomUpPktDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldArraySize(object, field);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldArraySize(object, field);
+        field -= base->getFieldCount();
     }
-    bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
     switch (field) {
-        case 0: return pp->getNotAssignedArraySize();
-        case 1: return pp->getPushUpListArraySize();
         default: return 0;
     }
 }
 
-const char *bottomUpPktDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+void bottomUpPktDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldDynamicTypeString(object,field,i);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldArraySize(object, field, size);
+            return;
+        }
+        field -= base->getFieldCount();
     }
-    bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
+    switch (field) {
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'bottomUpPkt'", field);
+    }
+}
+
+const char *bottomUpPktDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldDynamicTypeString(object,field,i);
+        field -= base->getFieldCount();
+    }
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string bottomUpPktDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string bottomUpPktDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldValueAsString(object,field,i);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldValueAsString(object,field,i);
+        field -= base->getFieldCount();
     }
-    bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getNotAssigned(i); return out.str();}
-        case 1: {std::stringstream out; out << pp->getPushUpList(i); return out.str();}
         default: return "";
     }
 }
 
-bool bottomUpPktDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+void bottomUpPktDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->setFieldValueAsString(object,field,i,value);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldValueAsString(object, field, i, value);
+            return;
+        }
+        field -= base->getFieldCount();
     }
-    bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
     switch (field) {
-        default: return false;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'bottomUpPkt'", field);
+    }
+}
+
+omnetpp::cValue bottomUpPktDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldValue(object,field,i);
+        field -= base->getFieldCount();
+    }
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
+    switch (field) {
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'bottomUpPkt' as cValue -- field index out of range?", field);
+    }
+}
+
+void bottomUpPktDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldValue(object, field, i, value);
+            return;
+        }
+        field -= base->getFieldCount();
+    }
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
+    switch (field) {
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'bottomUpPkt'", field);
     }
 }
 
 const char *bottomUpPktDescriptor::getFieldStructName(int field) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldStructName(field);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldStructName(field);
+        field -= base->getFieldCount();
     }
-    switch (field) {
-        case 0: return omnetpp::opp_typename(typeid(Chain));
-        case 1: return omnetpp::opp_typename(typeid(Chain));
-        default: return nullptr;
-    };
+    return nullptr;
 }
 
-void *bottomUpPktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+omnetpp::any_ptr bottomUpPktDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldStructValuePointer(object, field, i);
-        field -= basedesc->getFieldCount();
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldStructValuePointer(object, field, i);
+        field -= base->getFieldCount();
     }
-    bottomUpPkt *pp = (bottomUpPkt *)object; (void)pp;
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
     switch (field) {
-        case 0: return (void *)(&pp->getNotAssigned(i)); break;
-        case 1: return (void *)(&pp->getPushUpList(i)); break;
-        default: return nullptr;
+        default: return omnetpp::any_ptr(nullptr);
     }
 }
 
+void bottomUpPktDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldStructValuePointer(object, field, i, ptr);
+            return;
+        }
+        field -= base->getFieldCount();
+    }
+    bottomUpPkt *pp = omnetpp::fromAnyPtr<bottomUpPkt>(object); (void)pp;
+    switch (field) {
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'bottomUpPkt'", field);
+    }
+}
+
+namespace omnetpp {
+
+}  // namespace omnetpp
 

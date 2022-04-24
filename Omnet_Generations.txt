@@ -41,6 +41,16 @@ c; ./CmdenvChecker -u Cmdenv -f omnetpp.ini
 
 Building a container
 ////////////////////////
+singularity build omnetpp.img docker://omnetpp/omnetpp:u18.04-5.6.2
+
+When being at user ofanan (not root):
+> cd $OMNET_PATH/samples/tictoc
+> singularity exec ../../ofanan/omnetpp.img $OMNET_PATH/samples/tictoc/tictoc
+
+$OMNET_PATH/samples/aloha/aloha: error while loading shared libraries: libQt5Gui.so.5: cannot open shared object file: No such file or directory
+
+
+
 singularity exec omnetpp.img bash `./CmdenvChecker -m -u Cmdenv -c Dummy’ # doesn't work
 	
 singularity /bin/sh exec omnetpp.sif ./CmdenvChecker.exe
@@ -67,9 +77,44 @@ cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration
 source .myalias.sh
 cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration/src
 
-cQueue, cArray
+#!/bin/sh
+docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" omnetpp/omnetpp:u18.04-5.5.1
 
 
-c; ./Distributed_SFC_migration --record-eventlog=true -f Comnetpp.ini -u Cmdenv --cmdenv-redirect-output=true 
+singularity build omnetpp.img docker://omnetpp/omnetpp:u18.04-5.6.2
+docker pull omnetpp/omnetpp:u18.04-5.6.2
 
+docker pull omnetpp/omnetpp:u18.04-5.6.2
+docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" omnetpp/omnetpp:u20.04-5.5.1
+
+sudo singularity build omnetpp.simg omnetpp.recipe
+
+sudo $SINGULARITY_DOCKER_USERNAME=ofanan $SINGULARITY_DOCKER_PASSWORD=cj,ua,v7*9 singularity -d build omnetpp.simg docker://omnetpp-base
+
+
+
+To install Omnet:
+apt-get update && apt-get install -y build-essential 
+apt-get update && apt-get install -y clang lld gdb bison flex perl python3 python3-pip qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5opengl5-dev libxml2-dev zlib1g-dev doxygen graphviz libwebkit2gtk-4.0-37 
+
+python3 -m pip install --user --upgrade numpy pandas matplotlib scipy seaborn posix_ipc
+
+apt-get install -y openscenegraph-plugin-osgearth libosgearth-dev mpi-default-dev
+
+cd omnetpp-6.0
+source setenv
+To set the environment variables permanently, edit .profile or .zprofile in your home in your home directory and add a line something like this:
+[-f "$HOME/omnetpp-6.0/setenv" ] && source "$HOME/omnetpp-6.0/setenv"
+
+In the top-level OMNeT++ directory, type:
+./configure
+
+
+
+
+singularity exec /home/ofanan/omnetpp.img $OMNET_PATH/samples/tictoc/tictoc
+FATAL:   stat /home/ofanan/omnetpp-5.6.2/samples/tictoc/tictoc: no such file or directory
+
+singularity exec /home/ofanan/omnetpp.img opp_makemake
+FATAL:   "opp_makemake": executable file not found in $PATH
 
