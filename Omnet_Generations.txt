@@ -1,7 +1,7 @@
 Make:
 ///////////////////////////
 c; opp_makemake -u cmdenv -f -deep; make
-where -u Cmdenv dismisses the Gui.
+where -u Cmdenv dismisses the G
 The -deep flag means: search for source files also in all sub-dirs.
 
 Run:
@@ -48,8 +48,27 @@ When being at user ofanan (not root):
 > singularity exec ../../ofanan/omnetpp.img $OMNET_PATH/samples/tictoc/tictoc
 
 $OMNET_PATH/samples/aloha/aloha: error while loading shared libraries: libQt5Gui.so.5: cannot open shared object file: No such file or directory
+While in user ofanan (not as "root", as otherwise you can't see my files):
+> singularity shell omnetpp.img 
+For binding a directory (may be helpful if calling sinularity as root), use 
+> singularity shell -B /home/ofanan omnetpp.img 
+Generates the following error:
+./tictoc: error while loading shared libraries: libQt5Gui.so.5: cannot open shared object file: No such file or directory
+However, I actually have the following libs:
+/usr/lib/x86_64-linux-gnu/libQt5Core.prl
+/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8
+/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12
+/usr/lib/x86_64-linux-gnu/libQt5Core.so
+/usr/lib/x86_64-linux-gnu/libQt5Core.so.5
+sudo strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
+Didn't help. But maybe this makes a prob' only for GUI running. Hence, I'm currently tryint to run with cdmenv (no GUI), in Distributed_SFC_mig.
+No! unfurtunately, it's require also by my cmdenv run.
 
-
+This happens only while within singularity. 
+The file is actually found at:
+/usr/lib/x86_64-linux-gnu/libQt5Gui.so.5
+But it's actually mere:
+/usr/lib/x86_64-linux-gnu/libQt5Gui.so.5 -> libQt5Gui.so.5.12.8
 
 singularity exec omnetpp.img bash `./CmdenvChecker -m -u Cmdenv -c Dummy’ # doesn't work
 	
@@ -117,4 +136,78 @@ FATAL:   stat /home/ofanan/omnetpp-5.6.2/samples/tictoc/tictoc: no such file or 
 
 singularity exec /home/ofanan/omnetpp.img opp_makemake
 FATAL:   "opp_makemake": executable file not found in $PATH
+
+singularity shell -c omnetpp.img 
+
+
+sudo singularity build omnet-5.6.2-plus-libs.sif omnet_inc.def 
+apt-get update -y
+apt-get install -y libboost-all-dev
+apt install --reinstall libqt5widgets5 libqt5gui5 libqt5dbus5 libqt5network5 libqt5core5a
+
+Adding
+strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
+to the .def file causes this fault:
+strip: '/usr/lib/x86_64-linux-gnu/libQt5Core.so.5': No such file
+
+sudo singularity shell  -B $OMNET_PATH/samples/tictoc omnet-5.6.2-plus-libs.sif
+
+sudo singularity exec -B $OMNET_PATH/samples/tictoc omnet-5.6.2-plus-libs.sif tictoc
+results in:
+error while loading shared libraries: liboppcmdenv.so: cannot open shared object file: No such file or directory
+
+
+copy the .sif to /home/ofanan.
+Then: 
+cd /home/ofanan
+sudo singularity shell -B /home --writable omnet-5.6.2-plus-libs.sif
+
+Docker
+------
+from /home/ofanan/containers, having inside the dir the Dockerfile from
+https://github.com/omnetpp/dockerfiles/blob/master/omnetpp/Dockerfile
+docker build . -t omnetpp-5.6.2 
+docker login
+docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
+docker push ofanan/omnetpp-5.6.2
+docker run -it ofanan/omnetpp-5.6.2
+// -i: interactively. -t: terminal
+For some reason, now the "run" immediately stops.
+For getting a shell, may have to do:
+docker run -it ofanan/omnetpp-5.6.2 /bin/sh
+
+docker run --rm -it ofanan/omnetpp-5.6.2 /bin/sh # --rm deletes the container upon exiting it
+
+From inside the docker:
+cd omnetpp/
+Run the docker, and run a cmd outside:
+docker run -it omnetpp-5.6.2 ls
+
+
+docker image prune // remove ALL currently not-running containers.
+
+find container's id:
+docker ps
+Run a command within a running container:
+docker exec <container-id> cat /data.txt
+Prob': the run docker usually runs, and finishes - and therefore cannot be watched by "exec".
+docker stop <container-id>
+Use bind mount for the docker: 
+https://docs.docker.com/get-started/06_bind_mounts/
+docker run ofanan/omnetpp-5.6.2 bash -c "tail -f /dev/null"
+ // makes the docker run forever (unless stopped).
+     -w /Distributed_SFC_migration -v "home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration:/Distributed_SFC_migration" 
+
+Doesn't work:     
+docker run -it ofanan/omnetpp-5.6.2 -w /Distributed_SFC_migration -v home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration:/Distributed_SFC_migration
+
+     
+# doesn't work
+docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" \
+   -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0
+omnetpp/omnetpp-gui:u18.04-5.6.2
+
+
+RUN cd /root/omnetpp-$VERSION/Distributed_SFC_migration
+RUN "source .myalias"
 

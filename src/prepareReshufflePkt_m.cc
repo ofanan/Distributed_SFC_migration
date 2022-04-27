@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/endXmtPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/prepareReshufflePkt.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "endXmtPkt_m.h"
+#include "prepareReshufflePkt_m.h"
 
 namespace omnetpp {
 
@@ -177,64 +177,50 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
     return out;
 }
 
-Register_Class(endXmtPkt)
+Register_Class(PrepareReshufflePkt)
 
-endXmtPkt::endXmtPkt(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
+PrepareReshufflePkt::PrepareReshufflePkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
-    this->portNum = 0;
 }
 
-endXmtPkt::endXmtPkt(const endXmtPkt& other) : ::omnetpp::cMessage(other)
+PrepareReshufflePkt::PrepareReshufflePkt(const PrepareReshufflePkt& other) : ::omnetpp::cPacket(other)
 {
     copy(other);
 }
 
-endXmtPkt::~endXmtPkt()
+PrepareReshufflePkt::~PrepareReshufflePkt()
 {
 }
 
-endXmtPkt& endXmtPkt::operator=(const endXmtPkt& other)
+PrepareReshufflePkt& PrepareReshufflePkt::operator=(const PrepareReshufflePkt& other)
 {
     if (this==&other) return *this;
-    ::omnetpp::cMessage::operator=(other);
+    ::omnetpp::cPacket::operator=(other);
     copy(other);
     return *this;
 }
 
-void endXmtPkt::copy(const endXmtPkt& other)
+void PrepareReshufflePkt::copy(const PrepareReshufflePkt& other)
 {
-    this->portNum = other.portNum;
 }
 
-void endXmtPkt::parsimPack(omnetpp::cCommBuffer *b) const
+void PrepareReshufflePkt::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::omnetpp::cMessage::parsimPack(b);
-    doParsimPacking(b,this->portNum);
+    ::omnetpp::cPacket::parsimPack(b);
 }
 
-void endXmtPkt::parsimUnpack(omnetpp::cCommBuffer *b)
+void PrepareReshufflePkt::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::omnetpp::cMessage::parsimUnpack(b);
-    doParsimUnpacking(b,this->portNum);
+    ::omnetpp::cPacket::parsimUnpack(b);
 }
 
-int16_t endXmtPkt::getPortNum() const
-{
-    return this->portNum;
-}
-
-void endXmtPkt::setPortNum(int16_t portNum)
-{
-    this->portNum = portNum;
-}
-
-class endXmtPktDescriptor : public omnetpp::cClassDescriptor
+class PrepareReshufflePktDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
   public:
-    endXmtPktDescriptor();
-    virtual ~endXmtPktDescriptor();
+    PrepareReshufflePktDescriptor();
+    virtual ~PrepareReshufflePktDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -256,24 +242,24 @@ class endXmtPktDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(endXmtPktDescriptor)
+Register_ClassDescriptor(PrepareReshufflePktDescriptor)
 
-endXmtPktDescriptor::endXmtPktDescriptor() : omnetpp::cClassDescriptor("endXmtPkt", "omnetpp::cMessage")
+PrepareReshufflePktDescriptor::PrepareReshufflePktDescriptor() : omnetpp::cClassDescriptor("PrepareReshufflePkt", "omnetpp::cPacket")
 {
     propertynames = nullptr;
 }
 
-endXmtPktDescriptor::~endXmtPktDescriptor()
+PrepareReshufflePktDescriptor::~PrepareReshufflePktDescriptor()
 {
     delete[] propertynames;
 }
 
-bool endXmtPktDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool PrepareReshufflePktDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<endXmtPkt *>(obj)!=nullptr;
+    return dynamic_cast<PrepareReshufflePkt *>(obj)!=nullptr;
 }
 
-const char **endXmtPktDescriptor::getPropertyNames() const
+const char **PrepareReshufflePktDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -284,19 +270,19 @@ const char **endXmtPktDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *endXmtPktDescriptor::getProperty(const char *propertyname) const
+const char *PrepareReshufflePktDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int endXmtPktDescriptor::getFieldCount() const
+int PrepareReshufflePktDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 1+basedesc->getFieldCount() : 1;
+    return basedesc ? 0+basedesc->getFieldCount() : 0;
 }
 
-unsigned int endXmtPktDescriptor::getFieldTypeFlags(int field) const
+unsigned int PrepareReshufflePktDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -304,13 +290,10 @@ unsigned int endXmtPktDescriptor::getFieldTypeFlags(int field) const
             return basedesc->getFieldTypeFlags(field);
         field -= basedesc->getFieldCount();
     }
-    static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
-    };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return 0;
 }
 
-const char *endXmtPktDescriptor::getFieldName(int field) const
+const char *PrepareReshufflePktDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -318,21 +301,16 @@ const char *endXmtPktDescriptor::getFieldName(int field) const
             return basedesc->getFieldName(field);
         field -= basedesc->getFieldCount();
     }
-    static const char *fieldNames[] = {
-        "portNum",
-    };
-    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
+    return nullptr;
 }
 
-int endXmtPktDescriptor::findField(const char *fieldName) const
+int PrepareReshufflePktDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='p' && strcmp(fieldName, "portNum")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *endXmtPktDescriptor::getFieldTypeString(int field) const
+const char *PrepareReshufflePktDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -340,13 +318,10 @@ const char *endXmtPktDescriptor::getFieldTypeString(int field) const
             return basedesc->getFieldTypeString(field);
         field -= basedesc->getFieldCount();
     }
-    static const char *fieldTypeStrings[] = {
-        "int16_t",
-    };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
+    return nullptr;
 }
 
-const char **endXmtPktDescriptor::getFieldPropertyNames(int field) const
+const char **PrepareReshufflePktDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -359,7 +334,7 @@ const char **endXmtPktDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *endXmtPktDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *PrepareReshufflePktDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -372,7 +347,7 @@ const char *endXmtPktDescriptor::getFieldProperty(int field, const char *propert
     }
 }
 
-int endXmtPktDescriptor::getFieldArraySize(void *object, int field) const
+int PrepareReshufflePktDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -380,13 +355,13 @@ int endXmtPktDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    endXmtPkt *pp = (endXmtPkt *)object; (void)pp;
+    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *endXmtPktDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *PrepareReshufflePktDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -394,13 +369,13 @@ const char *endXmtPktDescriptor::getFieldDynamicTypeString(void *object, int fie
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    endXmtPkt *pp = (endXmtPkt *)object; (void)pp;
+    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string endXmtPktDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string PrepareReshufflePktDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -408,14 +383,13 @@ std::string endXmtPktDescriptor::getFieldValueAsString(void *object, int field, 
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    endXmtPkt *pp = (endXmtPkt *)object; (void)pp;
+    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getPortNum());
         default: return "";
     }
 }
 
-bool endXmtPktDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool PrepareReshufflePktDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -423,14 +397,13 @@ bool endXmtPktDescriptor::setFieldValueAsString(void *object, int field, int i, 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    endXmtPkt *pp = (endXmtPkt *)object; (void)pp;
+    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
     switch (field) {
-        case 0: pp->setPortNum(string2long(value)); return true;
         default: return false;
     }
 }
 
-const char *endXmtPktDescriptor::getFieldStructName(int field) const
+const char *PrepareReshufflePktDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -438,12 +411,10 @@ const char *endXmtPktDescriptor::getFieldStructName(int field) const
             return basedesc->getFieldStructName(field);
         field -= basedesc->getFieldCount();
     }
-    switch (field) {
-        default: return nullptr;
-    };
+    return nullptr;
 }
 
-void *endXmtPktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *PrepareReshufflePktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -451,7 +422,7 @@ void *endXmtPktDescriptor::getFieldStructValuePointer(void *object, int field, i
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    endXmtPkt *pp = (endXmtPkt *)object; (void)pp;
+    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
