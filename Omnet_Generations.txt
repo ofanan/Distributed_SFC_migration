@@ -108,6 +108,7 @@ docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" omnetpp/omne
 
 sudo singularity build omnetpp.simg omnetpp.recipe
 
+
 sudo $SINGULARITY_DOCKER_USERNAME=ofanan $SINGULARITY_DOCKER_PASSWORD=cj,ua,v7*9 singularity -d build omnetpp.simg docker://omnetpp-base
 
 
@@ -140,6 +141,7 @@ FATAL:   "opp_makemake": executable file not found in $PATH
 singularity shell -c omnetpp.img 
 
 
+
 sudo singularity build omnet-5.6.2-plus-libs.sif omnet_inc.def 
 apt-get update -y
 apt-get install -y libboost-all-dev
@@ -168,7 +170,7 @@ from /home/ofanan/containers, having inside the dir the Dockerfile from
 https://github.com/omnetpp/dockerfiles/blob/master/omnetpp/Dockerfile
 docker build . -t omnetpp-5.6.2 
 docker login
-docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
+# docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
 docker push ofanan/omnetpp-5.6.2
 docker run -it ofanan/omnetpp-5.6.2
 // -i: interactively. -t: terminal
@@ -211,3 +213,8 @@ omnetpp/omnetpp-gui:u18.04-5.6.2
 RUN cd /root/omnetpp-$VERSION/Distributed_SFC_migration
 RUN "source .myalias"
 
+To solve annoying "perl" problem within singularity shell:
+LANG = C
+
+The current prob': the make succeeds, but doesn't really write a makefile. 
+Maybe have to change the permissions already during the generation by docker / singularity
