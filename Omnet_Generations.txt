@@ -221,3 +221,7 @@ Maybe have to change the permissions already during the generation by docker / s
 
 scp /home/ofanan/containers/omnetpp-5.6.2.img icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration
 
+sudo singularity run -B /home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/ omnetpp-5.6.2.img 
+
+sudo singularity exec -B /home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/  /home/ofanan/containers/omnetpp-5.6.2.img bash -c '/home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/singularity_runner.sh' 
+
