@@ -104,7 +104,6 @@ singularity build omnetpp.img docker://omnetpp/omnetpp:u18.04-5.6.2
 docker pull omnetpp/omnetpp:u18.04-5.6.2
 
 docker pull omnetpp/omnetpp:u18.04-5.6.2
-docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" omnetpp/omnetpp:u20.04-5.5.1
 
 sudo singularity build omnetpp.simg omnetpp.recipe
 
@@ -218,3 +217,7 @@ LANG = C
 
 The current prob': the make succeeds, but doesn't really write a makefile. 
 Maybe have to change the permissions already during the generation by docker / singularity
+
+
+scp /home/ofanan/containers/omnetpp-5.6.2.img icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration
+
