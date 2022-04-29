@@ -1,14 +1,14 @@
-Make:
+Omnet Make:
 ///////////////////////////
 c; opp_makemake -u cmdenv -f -deep; make
-where -u Cmdenv dismisses the G
+where -u Cmdenv dismisses the GUI
+The resulting exe file may be written to /out/clang-release. Also, make may gengerate in the current dir an additional exe, which is merely a hard-link to the .exe file in /out/clang-release.
 The -deep flag means: search for source files also in all sub-dirs.
 
-Run:
+Omnet Run:
 ///////////////////////////
 c; Distributed_SFC_migration.exe -f omnetpp.ini -u Cmdenv
--n shows the directories of the source files. May have to write the, explicitly, namely: 
-c; opp_run -u Cmdenv -f omnetpp.ini -n C:/omnetpp-5.7/ofanan/Distributed_SFC_migration
+
 When running with Cmdenv, one should change in omnetpp.ini to:
 [General]
 cmdenv-config-name = Dummy
@@ -22,12 +22,6 @@ git push -f https://github.com/ofanan/Distributed_SFC_migration.git HEAD:master
 In Paolo's server:
 ///////////////////////////
 ./configure WITH_TKENV=no WITH_QTEVN=no WITH_OSG=no
-Results in:
-WARNING: The configuration script could not detect the following packages:
-    MPI (optional)  LibXML/Expat  Akaroa (optional)
-Scroll up to see the warning messages (use shift+PgUp), and search config.log
-for more details. While you can use OMNeT++ in the current configuration,
-be aware that some functionality may be unavailable or incomplete.
 
 Push to Paolo's server:
 scp c:/omnetpp-5.7/ofanan/CmdenvChecker/*.ini itamar@130.192.9.117:/home/itamar/omnetpp-5.7/CmdenvChecker
@@ -39,189 +33,65 @@ Compiling in Paolo's server:
 c; opp_makemake -u cmdenv -f -deep; make
 c; ./CmdenvChecker -u Cmdenv -f omnetpp.ini
 
-Building a container
-////////////////////////
-singularity build omnetpp.img docker://omnetpp/omnetpp:u18.04-5.6.2
-
-When being at user ofanan (not root):
-> cd $OMNET_PATH/samples/tictoc
-> singularity exec ../../ofanan/omnetpp.img $OMNET_PATH/samples/tictoc/tictoc
-
-$OMNET_PATH/samples/aloha/aloha: error while loading shared libraries: libQt5Gui.so.5: cannot open shared object file: No such file or directory
-While in user ofanan (not as "root", as otherwise you can't see my files):
-> singularity shell omnetpp.img 
-For binding a directory (may be helpful if calling sinularity as root), use 
-> singularity shell -B /home/ofanan omnetpp.img 
-Generates the following error:
-./tictoc: error while loading shared libraries: libQt5Gui.so.5: cannot open shared object file: No such file or directory
-However, I actually have the following libs:
-/usr/lib/x86_64-linux-gnu/libQt5Core.prl
-/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8
-/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12
-/usr/lib/x86_64-linux-gnu/libQt5Core.so
-/usr/lib/x86_64-linux-gnu/libQt5Core.so.5
-sudo strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
-Didn't help. But maybe this makes a prob' only for GUI running. Hence, I'm currently tryint to run with cdmenv (no GUI), in Distributed_SFC_mig.
-No! unfurtunately, it's require also by my cmdenv run.
-
-This happens only while within singularity. 
-The file is actually found at:
-/usr/lib/x86_64-linux-gnu/libQt5Gui.so.5
-But it's actually mere:
-/usr/lib/x86_64-linux-gnu/libQt5Gui.so.5 -> libQt5Gui.so.5.12.8
-
-singularity exec omnetpp.img bash `./CmdenvChecker -m -u Cmdenv -c Dummy’ # doesn't work
-	
-singularity /bin/sh exec omnetpp.sif ./CmdenvChecker.exe
-singularity run -B /vagrant/omnetpp/ omnetpp.sif bash -c './omnetpp.sif opp_makemake'
-The "-B" (--build) flage shows vagrant where's the .sif file located, thus solving an annoying error.
-singularity exec --cleanenv -B /vagrant/omnetpp/ omnetpp.sif opp_makemake -f --deep -u Cmdenv # This doesn't work
-
-The run below COULD work, but doesn't, due to a new bug.
-singularity exec -B /vagrant/omnetpp/ omnetpp.sif ./CmdenvChecker.exe # 
-
-singularity exec --cleanenv --bind ${DATA_DIRECTORY}:/data --bind ${OUTPUT_DIRECTORY}:/out  ${qmtools_SINGULARITY_IMG} /home/qmtraffic.sh"
-
-Running: 
-> singularity exec -B /vagrant/omnetpp/ omnetpp.sif bash -c './CmdenvChecker.exe'
-Results in:
-/bin/bash: ./CmdenvChecker.exe: cannot execute binary file: Exec format error
-because the CmdenvChecker.exe was compiled by 'Windows compiler.
-Hence, need to compile on a Linux machine / VirtualBox, and only then move the file (using a BINARY move!) to the HPC.
-May first check whether it works locally, on a vagrant, as explained in Generations_Phthon_Java_npp_Eclipse.txt.
-
-singularity exec --cleanenv -B /vagrant/omnetpp/:/data -B /vagrant/omnetpp/:/out  ./omnetpp.sif
-
-cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration
-source .myalias.sh
-cd C:/omnetpp-5.7/ofanan/Distributed_SFC_migration/src
-
-#!/bin/sh
-docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" omnetpp/omnetpp:u18.04-5.5.1
-
-
-singularity build omnetpp.img docker://omnetpp/omnetpp:u18.04-5.6.2
-docker pull omnetpp/omnetpp:u18.04-5.6.2
-
-docker pull omnetpp/omnetpp:u18.04-5.6.2
-
-sudo singularity build omnetpp.simg omnetpp.recipe
-
-
-sudo $SINGULARITY_DOCKER_USERNAME=ofanan $SINGULARITY_DOCKER_PASSWORD=cj,ua,v7*9 singularity -d build omnetpp.simg docker://omnetpp-base
-
-
-
-To install Omnet:
-apt-get update && apt-get install -y build-essential 
-apt-get update && apt-get install -y clang lld gdb bison flex perl python3 python3-pip qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5opengl5-dev libxml2-dev zlib1g-dev doxygen graphviz libwebkit2gtk-4.0-37 
-
-python3 -m pip install --user --upgrade numpy pandas matplotlib scipy seaborn posix_ipc
-
-apt-get install -y openscenegraph-plugin-osgearth libosgearth-dev mpi-default-dev
-
-cd omnetpp-6.0
-source setenv
-To set the environment variables permanently, edit .profile or .zprofile in your home in your home directory and add a line something like this:
-[-f "$HOME/omnetpp-6.0/setenv" ] && source "$HOME/omnetpp-6.0/setenv"
-
-In the top-level OMNeT++ directory, type:
-./configure
-
-
-
-
-singularity exec /home/ofanan/omnetpp.img $OMNET_PATH/samples/tictoc/tictoc
-FATAL:   stat /home/ofanan/omnetpp-5.6.2/samples/tictoc/tictoc: no such file or directory
-
-singularity exec /home/ofanan/omnetpp.img opp_makemake
-FATAL:   "opp_makemake": executable file not found in $PATH
-
-singularity shell -c omnetpp.img 
-
-
-
-sudo singularity build omnet-5.6.2-plus-libs.sif omnet_inc.def 
-apt-get update -y
-apt-get install -y libboost-all-dev
-apt install --reinstall libqt5widgets5 libqt5gui5 libqt5dbus5 libqt5network5 libqt5core5a
-
-Adding
-strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
-to the .def file causes this fault:
-strip: '/usr/lib/x86_64-linux-gnu/libQt5Core.so.5': No such file
-
-sudo singularity shell  -B $OMNET_PATH/samples/tictoc omnet-5.6.2-plus-libs.sif
-
-sudo singularity exec -B $OMNET_PATH/samples/tictoc omnet-5.6.2-plus-libs.sif tictoc
-results in:
-error while loading shared libraries: liboppcmdenv.so: cannot open shared object file: No such file or directory
-
-
-copy the .sif to /home/ofanan.
-Then: 
-cd /home/ofanan
-sudo singularity shell -B /home --writable omnet-5.6.2-plus-libs.sif
+Building container
+///////////////////
+First, have to build (and locally check) a docker container.
+When this works, convert the docker container to a singularity container.
 
 Docker
-------
-from /home/ofanan/containers, having inside the dir the Dockerfile from
-https://github.com/omnetpp/dockerfiles/blob/master/omnetpp/Dockerfile
+///////////////////
 docker build . -t omnetpp-5.6.2 
 docker login
-# docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
+docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
 docker push ofanan/omnetpp-5.6.2
 docker run -it ofanan/omnetpp-5.6.2
 // -i: interactively. -t: terminal
-For some reason, now the "run" immediately stops.
-For getting a shell, may have to do:
+For getting a shell, may have to run:
 docker run -it ofanan/omnetpp-5.6.2 /bin/sh
 
 docker run --rm -it ofanan/omnetpp-5.6.2 /bin/sh # --rm deletes the container upon exiting it
-
-From inside the docker:
-cd omnetpp/
-Run the docker, and run a cmd outside:
-docker run -it omnetpp-5.6.2 ls
-
-
-docker image prune // remove ALL currently not-running containers.
 
 find container's id:
 docker ps
 Run a command within a running container:
 docker exec <container-id> cat /data.txt
-Prob': the run docker usually runs, and finishes - and therefore cannot be watched by "exec".
+
 docker stop <container-id>
-Use bind mount for the docker: 
-https://docs.docker.com/get-started/06_bind_mounts/
-docker run ofanan/omnetpp-5.6.2 bash -c "tail -f /dev/null"
- // makes the docker run forever (unless stopped).
-     -w /Distributed_SFC_migration -v "home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration:/Distributed_SFC_migration" 
-
-Doesn't work:     
-docker run -it ofanan/omnetpp-5.6.2 -w /Distributed_SFC_migration -v home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration:/Distributed_SFC_migration
-
-     
-# doesn't work
-docker run --rm -it -v "$(pwd):/root/models" -u "$(id -u):$(id -g)" \
-   -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0
-omnetpp/omnetpp-gui:u18.04-5.6.2
-
-
-RUN cd /root/omnetpp-$VERSION/Distributed_SFC_migration
-RUN "source .myalias"
 
 To solve annoying "perl" problem within singularity shell:
 LANG = C
 
-The current prob': the make succeeds, but doesn't really write a makefile. 
-Maybe have to change the permissions already during the generation by docker / singularity
-
-
-scp /home/ofanan/containers/omnetpp-5.6.2.img icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration
+scp /containers/omnetpp-5.6.2.img icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration
 
 sudo singularity run -B /home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/ omnetpp-5.6.2.img 
+    
+Cleaning unused images
+docker image prune // remove ALL currently not-running containers.
+Or...
+docker images
+docker rmi -f <docker_id>
 
-sudo singularity exec -B /home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/  /home/ofanan/containers/omnetpp-5.6.2.img bash -c '/home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/singularity_runner.sh' 
+SINGULARITY
+////////////////////////
+Need to use exactly the same version as in the cloud. Polito's HPC uses singularity-3.2.1.
+Need to run singularity using my own user (NOT ROOT), but by using sudo (when called locally; not on the cloud).
+
+Given my docker image ofanan/omnetpp-5.6.2 found in dockerHub, the command to generate singularity from it is:
+sudo singularity build omnetpp-5.6.2.img docker://ofanan/omnetpp-5.6.2
+
+To build from a .def (".recipe") file:
+sudo singularity build omnet-5.6.2.img my_def_file.def 
+
+Can check the container by:
+sudo singularity shell omnetpp.img 
+
+For binding a directory (may be helpful if calling sinularity as root), use 
+> singularity shell -B /home/ofanan omnetpp.img 
+
+However, this is solved by NOT using nor /home/ofanan, neither /root, by docker.
+
+singularity /bin/sh exec omnetpp.sif ./CmdenvChecker.exe
+
+sudo $SINGULARITY_DOCKER_USERNAME=ofanan $SINGULARITY_DOCKER_PASSWORD=cj,ua,v7*9 singularity -d build omnetpp.simg docker://omnetpp-base
+
 
