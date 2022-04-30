@@ -25,4 +25,5 @@ alias runCM='cd $OMNET_PATH/ofanan/Distributed_SFC_migration; c; ./Distributed_S
 alias commit='c; git add -A; git commit'
 alias compush='commit; pusher'
 alias Gen='ge /home/ofanan/omnetpp-5.6.2/ofanan/Distributed_SFC_migration/Omnet_Generations.txt &'
+alias basher='ge ~/.bashrc &'
 
