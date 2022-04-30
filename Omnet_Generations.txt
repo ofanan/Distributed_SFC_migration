@@ -88,10 +88,3 @@ sudo singularity shell omnetpp.img
 For binding a directory (may be helpful if calling sinularity as root), use 
 > singularity shell -B /home/ofanan omnetpp.img 
 
-However, this is solved by NOT using nor /home/ofanan, neither /root, by docker.
-
-singularity /bin/sh exec omnetpp.sif ./CmdenvChecker.exe
-
-sudo $SINGULARITY_DOCKER_USERNAME=ofanan $SINGULARITY_DOCKER_PASSWORD=cj,ua,v7*9 singularity -d build omnetpp.simg docker://omnetpp-base
-
-
