@@ -30,6 +30,7 @@ class Datacenter : public cSimpleModule
     bool isRoot;
     bool isLeaf;
     int16_t  availCpu;
+    int16_t id;
     set <Chain> potentiallyPlacedChains;
     set <Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
     Datacenter();

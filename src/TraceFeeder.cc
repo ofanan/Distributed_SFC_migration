@@ -20,6 +20,7 @@ using namespace omnetpp;
 using namespace std;
 using namespace boost;
 
+const int16_t root_id = 0;
 class TraceFeeder : public cSimpleModule
 {
   private:
@@ -82,8 +83,15 @@ void TraceFeeder::initialize (int stage)
 }
 
 void TraceFeeder::discoverPathsToRoot () {
-	for (int leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
-	  outFile << "id of prnt of leaf " << leaf_id << " is " << leaves[leaf_id]->idOfParent << endl;
+	int16_t dc_id = 0;
+	for (int16_t leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
+		dc_id = leaves[leaf_id]->id;
+		outFile << "S_u=[" << dc_id;
+		while (dc_id != root_id) {
+		 	dc_id = datacenters[dc_id]->idOfParent;
+			outFile << "," << dc_id;
+		}
+		outFile << "]\n";
 	}
 }
 

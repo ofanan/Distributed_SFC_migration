@@ -23,6 +23,7 @@ void Datacenter::initialize()
   numChildren = (int16_t) (par("numChildren"));
   numParents  = (int16_t) (par("numParents"));
   lvl				  = (int16_t) (par("lvl"));
+  id					= (int16_t) (par("id"));
   availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
   numPorts    = numParents + numChildren;
   isRoot      = (numParents==0);
