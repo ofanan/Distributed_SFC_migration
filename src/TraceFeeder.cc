@@ -40,8 +40,8 @@ class TraceFeeder : public cSimpleModule
 		void runTrace  ();
 		void discoverPathsToRoot ();
   public:
-  	string traceFileName = "results/poa_files/short.poa";
-  	string outFileName   = "example.txt";
+    string traceFileName = "results/poa_files/short.poa";
+ 		string outFileName   = "example.txt";
     ofstream outFile;
     ifstream traceFile;
     TraceFeeder ();
@@ -82,7 +82,6 @@ void TraceFeeder::initialize (int stage)
 }
 
 void TraceFeeder::discoverPathsToRoot () {
-	outFile << "id of prnt of leaf 100 is " << leaves[100]->idOfParent << endl;
 	for (int leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
 	  outFile << "id of prnt of leaf " << leaf_id << " is " << leaves[leaf_id]->idOfParent << endl;
 	}
