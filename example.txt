@@ -1,7 +1,2 @@
 30540
-usr num = 0 poa = 314RT
-usr num = 1 poa = 497RT
-usr num = 2 poa = 497non-RT
 30548
-usr num = 0 poa = 1283RT
-usr num = 61 poa = 1283RT

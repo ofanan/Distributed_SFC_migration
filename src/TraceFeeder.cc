@@ -182,14 +182,15 @@ void TraceFeeder::readNewUsrsLine (string line)
 
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t usr;
+  int32_t usr_id;
   int16_t poa; 
   for (const auto& token : tokens) {
-  	parseUsrPoaToken (token, usr, poa);
-  	if (rand () < RT_chain_rand_int)
-			outFile << "usr num = " << usr << " poa = " << poa << "RT" << endl;
+  	parseUsrPoaToken (token, usr_id, poa);
+  	if (rand () < RT_chain_rand_int) {
+			RT_Chain newChain (usr_id, pathToRoot[poa]); 
+		}
 		else
-					outFile << "usr num = " << usr << " poa = " << poa << "non-RT" << endl;
+			Non_RT_Chain newChain (usr_id, pathToRoot[poa]); 
 //  	int randInt = rand ();
 //  	Chain 
 //			outFile << "usr num = " << usr << " poa = " << poa << "rand = " << randInt << endl;
