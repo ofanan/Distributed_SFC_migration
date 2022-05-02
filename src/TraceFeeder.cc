@@ -6,6 +6,7 @@
 #include <boost/tokenizer.hpp>
 #include <regex>
 #include <utility>
+#include <cstdlib>
 
 #include <vector>
 #include <set>
@@ -26,12 +27,18 @@ class TraceFeeder : public cSimpleModule
   private:
     cModule* network; // Pointer to the network on which the simulation is running
     string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
-    int numDatacenters;
-    int numLeaves;
+    int16_t numDatacenters;
+    int16_t numLeaves;
+    int16_t height; // height of the tree
+    int     t; //sim time (in seconds)
+    uint32_t seed = 42;
+    float  RT_chain_pr = 0.5; // prob' that a new chain is an RT chain
+    int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     set <Chain> allChains, newChains, critChains;
     set <int> curInts;
     vector <Datacenter*> datacenters; // pointes to all the datacenters
     vector <Datacenter*> leaves;      // pointes to all the leaves
+    vector <vector<int16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
     void initialize(int stage);
     virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
     void handleMessage (cMessage *msg);
@@ -62,8 +69,10 @@ void TraceFeeder::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
-		numDatacenters  = (int) (network -> par ("numDatacenters"));
-		numLeaves       = (int) (network -> par ("numLeaves"));
+		numDatacenters  = (int16_t) (network -> par ("numDatacenters"));
+		numLeaves       = (int16_t) (network -> par ("numLeaves"));
+		height       		= (int16_t) (network -> par ("height"));
+		srand(seed); // set the seed of random num generation
 		return;
 	}
 	
@@ -79,19 +88,23 @@ void TraceFeeder::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-//	runTrace ();	  
+	runTrace ();	  
 }
 
 void TraceFeeder::discoverPathsToRoot () {
+	pathToRoot.resize (numLeaves);
 	int16_t dc_id = 0;
 	for (int16_t leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
+		pathToRoot[leaf_id].resize (height);
 		dc_id = leaves[leaf_id]->id;
-		outFile << "S_u=[" << dc_id;
+//		outFile << "S_u=[" << dc_id;
+	  int height = 0;
 		while (dc_id != root_id) {
 		 	dc_id = datacenters[dc_id]->idOfParent;
-			outFile << "," << dc_id;
+		 	pathToRoot[leaf_id][height] = dc_id;
+	//		outFile << "," << dc_id;
 		}
-		outFile << "]\n";
+//		outFile << "]\n";
 	}
 }
 
@@ -114,11 +127,15 @@ void TraceFeeder::runTrace () {
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
   	}
-  	else if ( (line.substr(0,8)).compare("t = ")==0) {
+  	else if ( (line.substr(0,4)).compare("t = ")==0) {
+  		char lineAsCharArray[line.length()+1];
+  		strcpy (lineAsCharArray, line.c_str());
+  		strtok (lineAsCharArray, " = ");
+  		t = atoi (strtok (NULL, " = "));
+  		outFile << t << endl;
   	}
   	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
   		readNewUsrsLine (line.substr(9)); 
-  		
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
   		readOldUsrsLine (line.substr(9));
@@ -165,13 +182,17 @@ void TraceFeeder::readNewUsrsLine (string line)
 
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  string numStr; // = "7";
-  int num; // = stoi (numStr);
   int32_t usr;
   int16_t poa; 
   for (const auto& token : tokens) {
   	parseUsrPoaToken (token, usr, poa);
-		outFile << "usr num = " << usr << " poa = " << poa << endl;
+  	if (rand () < RT_chain_rand_int)
+			outFile << "usr num = " << usr << " poa = " << poa << "RT" << endl;
+		else
+					outFile << "usr num = " << usr << " poa = " << poa << "non-RT" << endl;
+//  	int randInt = rand ();
+//  	Chain 
+//			outFile << "usr num = " << usr << " poa = " << poa << "rand = " << randInt << endl;
   }
 
 //  vector <int16_t> S_u = {7,2,3};
