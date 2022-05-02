@@ -171,15 +171,12 @@ void TraceFeeder::readOldChainsLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chain_id;
   int16_t poa; 
-  Chain newChain; // will hold the new chain to be inserted each time
+  Chain oldChain; // will hold the new chain to be inserted each time
   
   // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	parseChainPoaToken (token, chain_id, poa);
-  	outFile  << pathToRoot[poa][0] << ", " << endl;
-  	find
-		critChainsOfLeaf[poa].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
-		newChains.insert (newChain); 
+  	findChainInSet (allChains, chain_id, oldChain); // find the chain; the chain will be inserted into oldChain.
   }
 
 }
@@ -211,7 +208,6 @@ void TraceFeeder::readNewChainsLine (string line)
   // parse each new chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	parseChainPoaToken (token, chain_id, poa);
-  	outFile  << pathToRoot[poa][0] << ", " << endl;
   	if (rand () < RT_chain_rand_int) {
 			newChain = Non_RT_Chain (chain_id,   	vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
 		}
@@ -237,8 +233,7 @@ void TraceFeeder::handleMessage (cMessage *msg)
   if (msg -> isSelfMessage()) {
     outFile << "rcvd self msg\n"; 
   Chain foundChain;
-  int32_t req_id = 0;
-  findChainInSet (newChains, req_id, foundChain);
+  int32_t id = 0;
   outFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
   }
 

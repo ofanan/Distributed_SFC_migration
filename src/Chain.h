@@ -43,7 +43,7 @@ However, in our current sim settings, all of this is degenerated to the fast and
 * Accessory function, for finding a chain within a given list of chains.
 * We assume that a chain is inequivocally identified by its id.
 */
-void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain);
+void findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain);
 
 class RT_Chain : public Chain
 {

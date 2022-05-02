@@ -19,10 +19,10 @@ const uint8_t Non_RT_Chain::mu_u_len = 4;
 * Find a chain within a given set of chains.
 * We assume that a chain is inequivocally identified by its id.
 */
-void findChainInSet (set<Chain> setOfChains, int32_t req_id, Chain& foundChain) { 
+void findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain) { 
   set<Chain>::iterator it;
   for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){
-    if (it -> id == req_id) { // Found the requested chain
+    if (it -> id == id) { // Found the requested chain
       foundChain = *it;    
       return;
     }
