@@ -54,7 +54,7 @@ class TraceFeeder : public cSimpleModule
     ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
-    void parseChainPoaToken (string token, int32_t &usr, int16_t &poa);
+    void parseChainPoaToken (string token, int32_t &chain_id, int16_t &poa);
 };
 
 Define_Module(TraceFeeder);
@@ -166,13 +166,13 @@ void TraceFeeder::readOldChainsLine (string line)
 {
 }
 
-// parse a token of the type "u,poa" where u is the usr number and poa is the user's current Poa
-void TraceFeeder::parseChainPoaToken (string token, int32_t &usr, int16_t &poa)
+// parse a token of the type "u,poa" where u is the chain_id number and poa is the user's current Poa
+void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &poa)
 {
 	istringstream newChainToken(token); 
   string numStr; 
 	getline (newChainToken, numStr, ',');
-	usr = stoi (numStr);
+	chain_id = stoi (numStr);
 	getline (newChainToken, numStr, ',');
 	poa = stoi (numStr);
 }
@@ -182,18 +182,18 @@ void TraceFeeder::readNewChainsLine (string line)
 
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t usr_id;
+  int32_t chain_id;
   int16_t poa; 
   Chain newChain; // will hold the new chain to be inserted each time
   
   // parse each new chain in the trace (.poa file), find its delay feasible locations, and insert it into the set of new chains
   for (const auto& token : tokens) {
-  	parseChainPoaToken (token, usr_id, poa);
+  	parseChainPoaToken (token, chain_id, poa);
   	if (rand () < RT_chain_rand_int) {
-			newChain = RT_Chain 	  (usr_id, pathToRoot[poa]); 
+			newChain = RT_Chain 	  (chain_id, pathToRoot[poa]); 
 		}
 		else {
-			newChain = Non_RT_Chain (usr_id, pathToRoot[poa]); 
+			newChain = Non_RT_Chain (chain_id, pathToRoot[poa]); 
 		}
 		
 		newChains.insert (newChain); 
