@@ -21,7 +21,6 @@ class Chain
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
     vector <int16_t> S_u;         // List of delay-feasible servers
     bool isRtChain;
-//    int16_t S_u[];         // List of delay-feasible servers
 /*    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?*/
 //    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
     Chain () {};
