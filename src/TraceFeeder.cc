@@ -192,6 +192,14 @@ void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &
 	}
 }
 
+/*
+Read a trace line that includes data about new / critical chains.
+Inputs:
+- line: the line to parse. The line contains data in the format (c_1, poa_1)(c_2, poa_2), ... where poa_i is the updated poa of chain c_i.
+- isNewChainsLine: when true, the line details new chains.
+If the chain is new, the function adds it to the set of new chains.
+Else, the chain finds the chain in the db "all Chains", and inserts the chain to the set of critical chains.
+*/
 void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 {
   char_separator<char> sep("() ");
