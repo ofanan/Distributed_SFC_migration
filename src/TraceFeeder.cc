@@ -42,8 +42,8 @@ class TraceFeeder : public cSimpleModule
     void initialize(int stage);
     virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
     void handleMessage (cMessage *msg);
-		void readNewUsrsLine (string line);
-		void readOldUsrsLine (string line);
+		void readNewChainsLine (string line);
+		void readOldChainsLine (string line);
 		void openFiles ();
 		void runTrace  ();
 		void discoverPathsToRoot ();
@@ -54,7 +54,7 @@ class TraceFeeder : public cSimpleModule
     ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
-    void parseUsrPoaToken (string token, int32_t &usr, int16_t &poa);
+    void parseChainPoaToken (string token, int32_t &usr, int16_t &poa);
 };
 
 Define_Module(TraceFeeder);
@@ -135,10 +135,10 @@ void TraceFeeder::runTrace () {
   		outFile << t << endl;
   	}
   	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-  		readNewUsrsLine (line.substr(9)); 
+  		readNewChainsLine (line.substr(9)); 
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		readOldUsrsLine (line.substr(9));
+  		readOldChainsLine (line.substr(9));
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		continue;
@@ -162,22 +162,22 @@ void TraceFeeder::runTrace () {
   outFile.close ();
 }
 
-void TraceFeeder::readOldUsrsLine (string line)
+void TraceFeeder::readOldChainsLine (string line)
 {
 }
 
 // parse a token of the type "u,poa" where u is the usr number and poa is the user's current Poa
-void TraceFeeder::parseUsrPoaToken (string token, int32_t &usr, int16_t &poa)
+void TraceFeeder::parseChainPoaToken (string token, int32_t &usr, int16_t &poa)
 {
-	istringstream newUsrToken(token); 
+	istringstream newChainToken(token); 
   string numStr; 
-	getline (newUsrToken, numStr, ',');
+	getline (newChainToken, numStr, ',');
 	usr = stoi (numStr);
-	getline (newUsrToken, numStr, ',');
+	getline (newChainToken, numStr, ',');
 	poa = stoi (numStr);
 }
 
-void TraceFeeder::readNewUsrsLine (string line)
+void TraceFeeder::readNewChainsLine (string line)
 {
 
   char_separator<char> sep("() ");
@@ -188,13 +188,14 @@ void TraceFeeder::readNewUsrsLine (string line)
   
   // parse each new chain in the trace (.poa file), find its delay feasible locations, and insert it into the set of new chains
   for (const auto& token : tokens) {
-  	parseUsrPoaToken (token, usr_id, poa);
+  	parseChainPoaToken (token, usr_id, poa);
   	if (rand () < RT_chain_rand_int) {
 			newChain = RT_Chain 	  (usr_id, pathToRoot[poa]); 
 		}
 		else {
 			newChain = Non_RT_Chain (usr_id, pathToRoot[poa]); 
 		}
+		
 		newChains.insert (newChain); 
   }
 

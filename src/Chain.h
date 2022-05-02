@@ -53,9 +53,6 @@ public:
   static const uint8_t mu_u_len;
     RT_Chain (int32_t id, vector <int16_t> S_u) {
       this->id        = id;
-/*vector<T>::const_iterator first = myVec.begin() + 100000;*/
-/*vector<T>::const_iterator last = myVec.begin() + 101000;*/
-/*vector<T> newVec(first, last);*/
       this->S_u       = S_u;
       this->isRtChain = true;
       curDatacenter   = nxtDatacenter = -1;
