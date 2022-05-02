@@ -48,7 +48,7 @@ class TraceFeeder : public cSimpleModule
 		void runTrace  ();
 		void discoverPathsToRoot ();
   public:
-    string traceFileName = "results/poa_files/short.poa";
+    string traceFileName = "results/poa_files/Tree_short.poa";
  		string outFileName   = "example.txt";
     ofstream outFile;
     ifstream traceFile;
@@ -143,6 +143,11 @@ void TraceFeeder::runTrace () {
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		continue;
   	}
+  }
+  traceFile.close ();
+  outFile.close ();
+}
+  	
 //  	char_separator<char> slashSlash("//");
 //	  tokenizer<char_separator<char>> tokens(text, sep);
 //    for (const auto& t : tokens) {
@@ -157,10 +162,6 @@ void TraceFeeder::runTrace () {
 // cout << s << endl;
 //}
 
-  }
-  traceFile.close ();
-  outFile.close ();
-}
 
 void TraceFeeder::readOldChainsLine (string line)
 {
@@ -175,6 +176,10 @@ void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &
 	chain_id = stoi (numStr);
 	getline (newChainToken, numStr, ',');
 	poa = stoi (numStr);
+	if (poa > numLeaves) {
+		outFile << "Error at t=" << t << ": poa is " << poa << "while the number of leaves in the network is only " << numLeaves << "; EXITING" << endl;
+		endSimulation();
+	}
 }
 
 void TraceFeeder::readNewChainsLine (string line)
@@ -185,12 +190,16 @@ void TraceFeeder::readNewChainsLine (string line)
   int32_t chain_id;
   int16_t poa; 
   Chain newChain; // will hold the new chain to be inserted each time
+//  vector <int16_t> S_u
   
   // parse each new chain in the trace (.poa file), find its delay feasible locations, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	parseChainPoaToken (token, chain_id, poa);
+  	outFile  << pathToRoot[poa][0] << ", " << endl;
   	if (rand () < RT_chain_rand_int) {
-			newChain = RT_Chain 	  (chain_id, pathToRoot[poa]); 
+//	  	vector<int16_t> S_u (pathToRoot[poa].begin(), pathToRoot[poa].begin()+2); //= {pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1}; 
+//	  	outFile << S_u[0] << endl;
+//			newChain = Non_RT_Chain (chain_id, S_u); 
 		}
 		else {
 			newChain = Non_RT_Chain (chain_id, pathToRoot[poa]); 
