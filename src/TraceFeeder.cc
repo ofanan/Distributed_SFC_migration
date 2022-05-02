@@ -34,16 +34,17 @@ class TraceFeeder : public cSimpleModule
     uint32_t seed = 42;
     float  RT_chain_pr = 0.5; // prob' that a new chain is an RT chain
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
+    int16_t numNewChains, numCritChains;
     set <Chain> allChains, newChains, critChains;
     set <int> curInts;
-    map <int16_t, set<Chain>> critChainsOfLeaf; // will hold the critical chain of each leaf (poa) that currently has critical chains.
-//    set <set<Chain>> critChainsOfLeaf; // will hold the critical chain of each leaf
+    map <int16_t, set<Chain>> critAndMovedChainsOfLeaf; // will hold the critical chain of each leaf (poa) that currently has critical chains.
     vector <Datacenter*> datacenters; // pointes to all the datacenters
     vector <Datacenter*> leaves;      // pointes to all the leaves
     vector <vector<int16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
     void initialize(int stage);
     virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
     void handleMessage (cMessage *msg);
+		void readChainsLine (string line, bool isNewChainsLine); // read a trace line, containing a list of chain and their updated PoAs.
 		void readNewChainsLine (string line);
 		void readOldChainsLine (string line);
 		void openFiles ();
@@ -137,10 +138,10 @@ void TraceFeeder::runTrace () {
   		outFile << t << endl;
   	}
   	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-  		readNewChainsLine (line.substr(9)); 
+  		readChainsLine (line.substr(9), true); 
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		readOldChainsLine (line.substr(9));
+  		readChainsLine (line.substr(9), false);
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		continue;
@@ -165,22 +166,6 @@ void TraceFeeder::runTrace () {
 //}
 
 
-void TraceFeeder::readOldChainsLine (string line)
-{
-  char_separator<char> sep("() ");
-  tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t chain_id;
-  int16_t poa; 
-  Chain oldChain; // will hold the new chain to be inserted each time
-  
-  // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
-  for (const auto& token : tokens) {
-  	parseChainPoaToken (token, chain_id, poa);
-  	findChainInSet (allChains, chain_id, oldChain); // find the chain; the chain will be inserted into oldChain.
-  }
-
-}
-
 // parse a token of the type "u,poa" where u is the chain_id number and poa is the user's current Poa
 void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &poa)
 {
@@ -196,28 +181,74 @@ void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &
 	}
 }
 
-void TraceFeeder::readNewChainsLine (string line)
+void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 {
-
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chain_id;
   int16_t poa; 
-  Chain newChain; // will hold the new chain to be inserted each time
+  Chain chain; // will hold the new chain to be inserted each time
   
-  // parse each new chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
+  // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	parseChainPoaToken (token, chain_id, poa);
-  	if (rand () < RT_chain_rand_int) {
-			newChain = Non_RT_Chain (chain_id,   	vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
+  	if (isNewChainsLine) {
+			if (rand () < RT_chain_rand_int) { // randomly decided that this is an RT chain 
+				chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
+			}
+			else {
+				chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+			}
+			newChains.insert (chain); 
 		}
-		else {
-			newChain = Non_RT_Chain (chain_id,   	vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
-		}
-		
-		critChainsOfLeaf[poa].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
-		newChains.insert (newChain); 
+  	else {
+			findChainInSet (allChains, chain_id, chain); // find the moved chain.
+			critChains.insert (chain); // insert the moved chain to the list of critical chains.
+  	}
   }
+}
+
+void TraceFeeder::readOldChainsLine (string line)
+{
+//  char_separator<char> sep("() ");
+//  tokenizer<char_separator<char>> tokens(line, sep);
+//  int32_t chain_id;
+//  int16_t poa; 
+//  Chain critChain; // will hold the new chain to be inserted each time
+//  
+//  // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
+//  for (const auto& token : tokens) {
+//  	parseChainPoaToken (token, chain_id, poa);
+//  	findChainInSet (allChains, chain_id, critChain); // find the moved chain.
+//  	critChains.insert (critChain); // insert the moved chain to the list of critical chains.
+//  } 
+}
+
+void TraceFeeder::readNewChainsLine (string line)
+{
+
+//  char_separator<char> sep("() ");
+//  tokenizer<char_separator<char>> tokens(line, sep);
+//  int32_t chain_id;
+//  int16_t poa; 
+//  Chain newChain; // will hold the new chain to be inserted each time
+//  
+//  // parse each new chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
+//  for (const auto& token : tokens) {
+//  	parseChainPoaToken (token, chain_id, poa);
+//  	if (rand () < RT_chain_rand_int) {
+//			newChain = Non_RT_Chain (chain_id,   	vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
+//		}
+//		else {
+//			newChain = Non_RT_Chain (chain_id,   	vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+//		}
+//		
+//		newChains.insert (newChain); 
+//  }
+
+//		critAndMovedChainsOfLeaf[poa].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
+//		critAndMovedChainsOfLeaf[poa].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new PoA=leaf.
+//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new PoA=leaf.	
 
 //  initBottomUpMsg *msg2snd = new initBottomUpMsg ();
 //  msg2snd->setNotAssignedArraySize (1);
