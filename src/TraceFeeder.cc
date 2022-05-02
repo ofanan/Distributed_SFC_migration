@@ -184,16 +184,18 @@ void TraceFeeder::readNewUsrsLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t usr_id;
   int16_t poa; 
+  Chain newChain; // will hold the new chain to be inserted each time
+  
+  // parse each new chain in the trace (.poa file), find its delay feasible locations, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	parseUsrPoaToken (token, usr_id, poa);
   	if (rand () < RT_chain_rand_int) {
-			RT_Chain newChain (usr_id, pathToRoot[poa]); 
+			newChain = RT_Chain 	  (usr_id, pathToRoot[poa]); 
 		}
-		else
-			Non_RT_Chain newChain (usr_id, pathToRoot[poa]); 
-//  	int randInt = rand ();
-//  	Chain 
-//			outFile << "usr num = " << usr << " poa = " << poa << "rand = " << randInt << endl;
+		else {
+			newChain = Non_RT_Chain (usr_id, pathToRoot[poa]); 
+		}
+		newChains.insert (newChain); 
   }
 
 //  vector <int16_t> S_u = {7,2,3};

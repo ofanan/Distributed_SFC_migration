@@ -50,8 +50,12 @@ class RT_Chain : public Chain
 {
 public:
   static const uint8_t mu_u[];
+  static const uint8_t mu_u_len;
     RT_Chain (int32_t id, vector <int16_t> S_u) {
       this->id        = id;
+/*vector<T>::const_iterator first = myVec.begin() + 100000;*/
+/*vector<T>::const_iterator last = myVec.begin() + 101000;*/
+/*vector<T> newVec(first, last);*/
       this->S_u       = S_u;
       this->isRtChain = true;
       curDatacenter   = nxtDatacenter = -1;
@@ -62,6 +66,7 @@ class Non_RT_Chain: public Chain
 {
   public:
     static const uint8_t mu_u[];
+	  static const uint8_t mu_u_len;
 //    explicit Non_RT_Chain(int x) : Chain(x) {    }
     Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
        this->id       = id;
