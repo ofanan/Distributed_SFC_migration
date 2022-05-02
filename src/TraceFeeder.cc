@@ -45,8 +45,10 @@ class TraceFeeder : public cSimpleModule
     virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
     void handleMessage (cMessage *msg);
 		void readChainsLine (string line, bool isNewChainsLine); // read a trace line, containing a list of chain and their updated PoAs.
-		void readNewChainsLine (string line);
-		void readOldChainsLine (string line);
+//		void readNewChainsLine (string line);
+//		void readOldChainsLine (string line);
+
+		void initAlg ();
 		void openFiles ();
 		void runTrace  ();
 		void discoverPathsToRoot ();
@@ -142,6 +144,9 @@ void TraceFeeder::runTrace () {
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
   		readChainsLine (line.substr(9), false);
+  		
+  		// Now, that we finished reading and parsing all the data about new / old critical chains, call a placement algorithm to place all the new / critical chains.
+  		initAlg ();
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		continue;
@@ -151,6 +156,12 @@ void TraceFeeder::runTrace () {
   outFile.close ();
 }
   	
+  	
+void TraceFeeder::initAlg () {  	
+//		critAndMovedChainsOfLeaf[poa].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
+//		critAndMovedChainsOfLeaf[poa].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new PoA=leaf.
+//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new PoA=leaf.	
+}  	
 //  	char_separator<char> slashSlash("//");
 //	  tokenizer<char_separator<char>> tokens(text, sep);
 //    for (const auto& t : tokens) {
@@ -208,8 +219,8 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
   }
 }
 
-void TraceFeeder::readOldChainsLine (string line)
-{
+//void TraceFeeder::readOldChainsLine (string line)
+//{
 //  char_separator<char> sep("() ");
 //  tokenizer<char_separator<char>> tokens(line, sep);
 //  int32_t chain_id;
@@ -222,10 +233,10 @@ void TraceFeeder::readOldChainsLine (string line)
 //  	findChainInSet (allChains, chain_id, critChain); // find the moved chain.
 //  	critChains.insert (critChain); // insert the moved chain to the list of critical chains.
 //  } 
-}
+//}
 
-void TraceFeeder::readNewChainsLine (string line)
-{
+//void TraceFeeder::readNewChainsLine (string line)
+//{
 
 //  char_separator<char> sep("() ");
 //  tokenizer<char_separator<char>> tokens(line, sep);
@@ -257,7 +268,7 @@ void TraceFeeder::readNewChainsLine (string line)
 ////  outFile << "sent direct msg. Chain id=" << chain0.id << ", curDatacenter=" <<chain0.curDatacenter << endl; 
 //  cMessage *selfmsg = new cMessage ("");
 //  scheduleAt (simTime()+0.1, selfmsg);
-}
+//}
 
 void TraceFeeder::handleMessage (cMessage *msg)
 {
