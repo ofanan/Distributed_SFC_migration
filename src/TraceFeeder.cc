@@ -52,6 +52,7 @@ class TraceFeeder : public cSimpleModule
 		void runTrace  ();
 		void readChainsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void readChainsLine (string line, bool isNewChainsLine); // read a trace line, containing a list of chain and their updated PoAs.
+		void rlzRsrcsOfChains ();
 		void initAlg ();
     void handleMessage (cMessage *msg);
 		
@@ -99,6 +100,13 @@ void TraceFeeder::initialize (int stage)
 	runTrace ();	  
 }
 
+// Open input, output, and log files 
+void TraceFeeder::openFiles () {
+  outFile.open ("example.txt");
+  outFile << networkName << endl;
+}
+
+
 void TraceFeeder::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
 	int16_t dc_id = 0;
@@ -113,13 +121,6 @@ void TraceFeeder::discoverPathsToRoot () {
 	}
 }
 
-// Open input, output, and log files 
-void TraceFeeder::openFiles () {
-  outFile.open ("example.txt");
-  outFile << networkName << endl;
-}
-
-// Open input, output, and log files 
 void TraceFeeder::runTrace () {
 	traceFile = ifstream (traceFileName);
 	outFile   = ofstream (outFileName);
@@ -148,7 +149,9 @@ void TraceFeeder::runTrace () {
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
   		readChainsLine (line.substr(9), false);
   		
-  		// Now, that we finished reading and parsing all the data about new / old critical chains, call a placement algorithm to place all the new / critical chains.
+  		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
+  		// place all the new / critical chains.
+  		rlzRsrcsOfChains ();
   		initAlg ();
   	}
   }
@@ -156,6 +159,23 @@ void TraceFeeder::runTrace () {
   outFile.close ();
 }
   	
+// Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
+void TraceFeeder::rlzRsrcsOfChains ()
+{
+	
+	map <string, int32_t> myMap {};
+	myMap["1"] = 7;
+//	for (auto const& [key, val] : myMap)
+//	{
+//		cout << key  << ':' << val << endl;
+//	}
+//	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+//	for (auto const& [key, val] : chainsThatLeft)
+//	{
+//		cout << key  << ':' << val << endl;
+//	}
+
+}
   	
 void TraceFeeder::initAlg () {  	
 //		critAndMovedChainsOfLeaf[poa].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
