@@ -36,9 +36,7 @@ class TraceFeeder : public cSimpleModule
     float  RT_chain_pr = 0.5; // prob' that a new chain is an RT chain
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     int16_t numNewChains, numCritChains;
-//    set <Chain> allChains, newChains, critChains;
     unordered_map <int32_t, Chain> allChains, newChains, critChains;
-//    unordered_map <int16_t,int32_t> gamad;
     set <int> curInts;
     map <int16_t, set<int32_t>> chainsThatLeft; // chainsThatLeft[i] will hold the list of chains that left user i (either moved to another PoA, or left the sim').
     map <int16_t, set<Chain>> critAndMovedChainsOfLeaf; // will hold the critical chain of each leaf (poa) that currently has critical chains.
@@ -228,13 +226,16 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	chain_id = stoi (token);
-//		if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
-//			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsThatLeftLine\n";
-//			endSimulation();
-//		}
-//  	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
-//  	outFile << "erasing chain " << chain_id << endl;
-//  	allChains.erase (chain);// remove the chain from the list of chains.
+	  auto search = allChains.find(chain_id);
+	  if (search == allChains.end()) {
+			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in ChainsThatLeftLine\n";
+			endSimulation();
+	  }
+	  else {
+  		chainsThatLeft[search->second.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  		outFile << "erasing chain " << chain_id << endl;
+  		allChains.erase (chain_id);// remove the chain from the list of chains.
+	  }
   }
 }
 

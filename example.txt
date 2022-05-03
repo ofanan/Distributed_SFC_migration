@@ -1,3 +1,4 @@
 30540
 30548
+erasing chain 0
 Error in t=30548: didn't find chain id 3 in allChains, in readChainsLine (old chains)
