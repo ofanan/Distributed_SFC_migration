@@ -163,8 +163,15 @@ void TraceFeeder::runTrace () {
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 	
-	map <string, int32_t> myMap {};
-	myMap["1"] = 7;
+	map <int16_t, int32_t> myMap {};
+	myMap[1] = 7;
+	for (auto const& x : myMap)
+	{
+    outFile << x.first  // string (key)
+              << ':' 
+              << x.second // string's value 
+              << endl;
+	}
 //	for (auto const& [key, val] : myMap)
 //	{
 //		cout << key  << ':' << val << endl;
