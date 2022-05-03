@@ -163,25 +163,15 @@ void TraceFeeder::runTrace () {
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 	
-	map <int16_t, int32_t> myMap {};
-	myMap[1] = 7;
-	for (auto const& x : myMap)
+	set<int16_t>::iterator it;
+	// chainsThatLeft[1] = {{1,7}};
+	for (auto const& chainsThatLeftDatacenter : chainsThatLeft)
 	{
-    outFile << x.first  // string (key)
-              << ':' 
-              << x.second // string's value 
-              << endl;
-	}
-//	for (auto const& [key, val] : myMap)
-//	{
-//		cout << key  << ':' << val << endl;
-//	}
-//	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
-//	for (auto const& [key, val] : chainsThatLeft)
-//	{
-//		cout << key  << ':' << val << endl;
-//	}
-
+		outFile << "yalla Hapoel\n";
+		for(auto chain_id : chainsThatLeftDatacenter.second) {
+			outFile << chain_id << " ";			
+		}    
+		outFile << endl;
 }
   	
 void TraceFeeder::initAlg () {  	
