@@ -264,35 +264,23 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 				else {
 					chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
 				}
-				outFile << "inserting new chain id " << chain_id << endl;
 //				newChains.insert (chain); 
 				allChains[chain_id] = chain; 
 		}
-		outFile << "allChains contains " << allChains.size() << " chains\n";
 	}
 	else {
-//			outFile << "allChains contains " << allChains.size() << " chains: ";
-//			for (auto chain : allChains) {
-//				outFile << chain.id << " ";
-//			}
-//			outFile << endl;
 		for (const auto& token : tokens) {
+			Chain chain;
 			parseChainPoaToken (token, chain_id, poa);
-//		  Chain chain; // will hold the new chain to be inserted each time
 		  auto search = allChains.find(chain_id);
 		  if (search == allChains.end()) {
-		  	outFile << "didn't find chain " << chain_id << endl;
+				outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
+				endSimulation();
 		  }
 		  else {
-		  	outFile << "Found the chain. Its id is " << search->second.id << endl;
+				critChains[chain_id] = search->second; // insert the moved chain to the map of critical chains.
+				chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 		  }
-
-//			if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
-//				outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
-//				endSimulation();
-//			}
-//			critChains.insert (chain); // insert the moved chain to the list of critical chains.
-//			chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
 		}
 	}
 }

@@ -1,11 +1,3 @@
 30540
-inserting new chain id 0
-inserting new chain id 1
-inserting new chain id 2
-allChains contains 3 chains
 30548
-inserting new chain id 61
-allChains contains 4 chains
-Found the chain. Its id is 1
-Found the chain. Its id is 2
-didn't find chain 3
+Error in t=30548: didn't find chain id 3 in allChains, in readChainsLine (old chains)
