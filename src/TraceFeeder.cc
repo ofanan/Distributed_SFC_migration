@@ -229,6 +229,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   	chain_id = stoi (token);
 		if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
 			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsThatLeftLine\n";
+			endSimulation();
 		}
   	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
   	allChains.erase (chain);// remove the chain from the list of chains.
@@ -252,25 +253,30 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
   Chain chain; // will hold the new chain to be inserted each time
   
   // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
-  for (const auto& token : tokens) {
-  	parseChainPoaToken (token, chain_id, poa);
-  	if (isNewChainsLine) {
-			if (rand () < RT_chain_rand_int) { // randomly decided that this is an RT chain 
-				chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
-			}
-			else {
-				chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
-			}
-			newChains.insert (chain); 
+  if (isNewChainsLine) {
+		for (const auto& token : tokens) {
+			parseChainPoaToken (token, chain_id, poa);
+				if (rand () < RT_chain_rand_int) { // randomly decided that this is an RT chain 
+					chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
+				}
+				else {
+					chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+				}
+				newChains.insert (chain); 
+				allChains.insert (chain); 
 		}
-  	else {
-  		if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
-  			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
-  		}
+	}
+	else {
+		for (const auto& token : tokens) {
+			parseChainPoaToken (token, chain_id, poa);
+			if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
+				outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
+				endSimulation();
+			}
 			critChains.insert (chain); // insert the moved chain to the list of critical chains.
 			chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
-  	}
-  }
+		}
+	}
 }
 
 
