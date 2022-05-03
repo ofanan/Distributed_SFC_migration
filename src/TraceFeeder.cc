@@ -200,14 +200,17 @@ Inputs:
 */
 void TraceFeeder::readChainsThatLeftLine (string line)
 {
-//  char_separator<char> sep("() ");
-//  tokenizer<char_separator<char>> tokens(line, sep);
-//  int32_t chain_id;
-//  int16_t poa; 
-//  Chain chain; // will hold the new chain to be inserted each time
-//  
-//  // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
-//  for (const auto& token : tokens) {
+  char_separator<char> sep(" ");
+  tokenizer<char_separator<char>> tokens(line, sep);
+  int32_t chain_id;
+  
+  // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
+  outFile <<  "chains that left: ";
+  for (const auto& token : tokens) {
+  	outFile << token << ",";
+  	//chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  }
+  outFile << endl;
 }
 
 /*
@@ -241,7 +244,7 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
   	else {
 			findChainInSet (allChains, chain_id, chain); // find the moved chain.
 			critChains.insert (chain); // insert the moved chain to the list of critical chains.
-			chainsThatLeft[chain.curDatacenter].insert (chain.id);
+			chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
   	}
   }
 }
