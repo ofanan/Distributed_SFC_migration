@@ -163,8 +163,6 @@ void TraceFeeder::runTrace () {
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 	
-	set<int16_t>::iterator it;
-	// chainsThatLeft[1] = {{1,7}};
 	for (auto const& chainsThatLeftDatacenter : chainsThatLeft)
 	{
 		outFile << "Chains that left dc " << chainsThatLeftDatacenter.first << ": ";
@@ -232,6 +230,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 			endSimulation();
 		}
   	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  	outFile << "erasing chain " << chain_id << endl;
   	allChains.erase (chain);// remove the chain from the list of chains.
   }
 }
@@ -250,11 +249,11 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chain_id;
   int16_t poa; 
-  Chain chain; // will hold the new chain to be inserted each time
   
   // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
   if (isNewChainsLine) {
 		for (const auto& token : tokens) {
+		  Chain chain; // will hold the new chain to be inserted each time
 			parseChainPoaToken (token, chain_id, poa);
 				if (rand () < RT_chain_rand_int) { // randomly decided that this is an RT chain 
 					chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)); 
@@ -262,13 +261,21 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 				else {
 					chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
 				}
+				outFile << "inserting new chain id " << chain_id << endl;
 				newChains.insert (chain); 
 				allChains.insert (chain); 
 		}
 	}
 	else {
+			outFile << "allChains contains " << allChains.size() << " chains: ";
+			for (auto chain : allChains) {
+				outFile << chain.id << " ";
+			}
+			outFile << endl;
 		for (const auto& token : tokens) {
 			parseChainPoaToken (token, chain_id, poa);
+		  Chain chain; // will hold the new chain to be inserted each time
+
 			if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
 				outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
 				endSimulation();

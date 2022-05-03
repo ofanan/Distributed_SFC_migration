@@ -1,3 +1,10 @@
 30540
+inserting new chain id 0
+inserting new chain id 1
+inserting new chain id 2
+allChains contains 1 chains: 0 
 30548
+erasing chain 0
+inserting new chain id 61
+allChains contains 1 chains: 61 
 Error in t=30548: didn't find chain id 1 in allChains, in readChainsLine (old chains)

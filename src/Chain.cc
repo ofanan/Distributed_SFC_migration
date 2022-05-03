@@ -25,13 +25,21 @@ Inputs:
 Return value: true iff the requested chain was found.
 */
 bool findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain) { 
-  set<Chain>::iterator it;
-  for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){
-    if (it -> id == id) { // Found the requested chain
-      foundChain = *it;    
+	for (auto const& chain : setOfChains) {
+    if (chain.id == id) { // Found the requested chain
+      foundChain = chain;    
       return true;
     }
   }
   return false;
+
+//  set<Chain>::iterator it;
+//  for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){
+//    if (it -> id == id) { // Found the requested chain
+//      foundChain = *it;    
+//      return true;
+//    }
+//  }
+//  return false;
 }
 
