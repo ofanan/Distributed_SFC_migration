@@ -167,11 +167,12 @@ void TraceFeeder::rlzRsrcsOfChains ()
 	// chainsThatLeft[1] = {{1,7}};
 	for (auto const& chainsThatLeftDatacenter : chainsThatLeft)
 	{
-		outFile << "yalla Hapoel\n";
+		outFile << "Chains that left dc " << chainsThatLeftDatacenter.first << ": ";
 		for(auto chain_id : chainsThatLeftDatacenter.second) {
 			outFile << chain_id << " ";			
 		}    
 		outFile << endl;
+	}
 }
   	
 void TraceFeeder::initAlg () {  	
@@ -226,7 +227,9 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
   for (const auto& token : tokens) {
   	chain_id = stoi (token);
-		findChainInSet (allChains, chain_id, chain); // find the moved chain.
+		if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
+			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsThatLeftLine\n";
+		}
   	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
   	allChains.erase (chain);// remove the chain from the list of chains.
   }
@@ -261,7 +264,9 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 			newChains.insert (chain); 
 		}
   	else {
-			findChainInSet (allChains, chain_id, chain); // find the moved chain.
+  		if (!findChainInSet (allChains, chain_id, chain)) { // find the moved chain.
+  			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
+  		}
 			critChains.insert (chain); // insert the moved chain to the list of critical chains.
 			chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
   	}

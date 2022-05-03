@@ -44,19 +44,19 @@ class Chain
 * Accessory function, for finding a chain within a given list of chains.
 * We assume that a chain is inequivocally identified by its id.
 */
-void findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain);
+bool findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain);
 
 class RT_Chain : public Chain
 {
 public:
   static const uint8_t mu_u[];
   static const uint8_t mu_u_len;
-    RT_Chain (int32_t id, vector <int16_t> S_u) {
-      this->id        = id;
-      this->S_u       = S_u;
-      this->isRtChain = true;
-      curDatacenter   = nxtDatacenter = -1;
-    };
+  RT_Chain (int32_t id, vector <int16_t> S_u) {
+    this->id        = id;
+    this->S_u       = S_u;
+    this->isRtChain = true;
+    curDatacenter   = nxtDatacenter = -1;
+  };
 };
 
 class Non_RT_Chain: public Chain

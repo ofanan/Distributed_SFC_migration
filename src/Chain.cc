@@ -16,16 +16,22 @@ const uint8_t RT_Chain	  ::mu_u_len = 3;
 const uint8_t Non_RT_Chain::mu_u_len = 4;
 
 /* 
-* Find a chain within a given set of chains.
-* We assume that a chain is inequivocally identified by its id.
+ind a chain within a given set of chains.
+We assume that a chain is inequivocally identified by its id.
+Inputs: 
+- setOfChains: look for the chain within this set.
+- id: of the requested chain.
+- &foundChain: a reference, to which the found chain (if there exists) will be written.
+Return value: true iff the requested chain was found.
 */
-void findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain) { 
+bool findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain) { 
   set<Chain>::iterator it;
   for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){
     if (it -> id == id) { // Found the requested chain
       foundChain = *it;    
-      return;
+      return true;
     }
   }
+  return false;
 }
 
