@@ -30,6 +30,9 @@ class Chain
 		curDatacenter = nxtDatacenter = -1;
     };
         
+    bool operator== (const Chain &right) const {
+      return (this->id == right.id);
+    }
 		/* 
 		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 
 		rsrcs required for locating the chain at a certain lvl.

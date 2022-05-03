@@ -2,9 +2,10 @@
 inserting new chain id 0
 inserting new chain id 1
 inserting new chain id 2
-allChains contains 1 chains: 0 
+allChains contains 3 chains
 30548
-erasing chain 0
 inserting new chain id 61
-allChains contains 1 chains: 61 
-Error in t=30548: didn't find chain id 1 in allChains, in readChainsLine (old chains)
+allChains contains 4 chains
+Found the chain. Its id is 1
+Found the chain. Its id is 2
+didn't find chain 3
