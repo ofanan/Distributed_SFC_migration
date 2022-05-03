@@ -10,7 +10,7 @@ class noncobject Chain;
 
 message initBottomUpMsg
 {
-    Chain notAssigned[];
+	Chain notAssigned[]; // new or critical chains to be assigned 
 //    ChainList notAssigned; // Should fix by 6.2.8 in the RTFM.
 }
 

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/pushUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from leftChainsMsg.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "pushUpPkt_m.h"
+#include "leftChainsMsg_m.h"
 
 namespace omnetpp {
 
@@ -177,98 +177,100 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
     return out;
 }
 
-Register_Class(pushUpPkt)
+Register_Class(leftChainsMsg)
 
-pushUpPkt::pushUpPkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
+leftChainsMsg::leftChainsMsg(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
 {
-    pushUpList_arraysize = 0;
-    this->pushUpList = 0;
+    leftChains_arraysize = 0;
+    this->leftChains = 0;
 }
 
-pushUpPkt::pushUpPkt(const pushUpPkt& other) : ::omnetpp::cPacket(other)
+leftChainsMsg::leftChainsMsg(const leftChainsMsg& other) : ::omnetpp::cMessage(other)
 {
-    pushUpList_arraysize = 0;
-    this->pushUpList = 0;
+    leftChains_arraysize = 0;
+    this->leftChains = 0;
     copy(other);
 }
 
-pushUpPkt::~pushUpPkt()
+leftChainsMsg::~leftChainsMsg()
 {
-    delete [] this->pushUpList;
+    delete [] this->leftChains;
 }
 
-pushUpPkt& pushUpPkt::operator=(const pushUpPkt& other)
+leftChainsMsg& leftChainsMsg::operator=(const leftChainsMsg& other)
 {
     if (this==&other) return *this;
-    ::omnetpp::cPacket::operator=(other);
+    ::omnetpp::cMessage::operator=(other);
     copy(other);
     return *this;
 }
 
-void pushUpPkt::copy(const pushUpPkt& other)
+void leftChainsMsg::copy(const leftChainsMsg& other)
 {
-    delete [] this->pushUpList;
-    this->pushUpList = (other.pushUpList_arraysize==0) ? nullptr : new Chain[other.pushUpList_arraysize];
-    pushUpList_arraysize = other.pushUpList_arraysize;
-    for (unsigned int i=0; i<pushUpList_arraysize; i++)
-        this->pushUpList[i] = other.pushUpList[i];
+    delete [] this->leftChains;
+    this->leftChains = (other.leftChains_arraysize==0) ? nullptr : new int32_t[other.leftChains_arraysize];
+    leftChains_arraysize = other.leftChains_arraysize;
+    for (unsigned int i=0; i<leftChains_arraysize; i++)
+        this->leftChains[i] = other.leftChains[i];
 }
 
-void pushUpPkt::parsimPack(omnetpp::cCommBuffer *b) const
+void leftChainsMsg::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::omnetpp::cPacket::parsimPack(b);
-    b->pack(pushUpList_arraysize);
-    doParsimArrayPacking(b,this->pushUpList,pushUpList_arraysize);
+    ::omnetpp::cMessage::parsimPack(b);
+    b->pack(leftChains_arraysize);
+    doParsimArrayPacking(b,this->leftChains,leftChains_arraysize);
 }
 
-void pushUpPkt::parsimUnpack(omnetpp::cCommBuffer *b)
+void leftChainsMsg::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::omnetpp::cPacket::parsimUnpack(b);
-    delete [] this->pushUpList;
-    b->unpack(pushUpList_arraysize);
-    if (pushUpList_arraysize==0) {
-        this->pushUpList = 0;
+    ::omnetpp::cMessage::parsimUnpack(b);
+    delete [] this->leftChains;
+    b->unpack(leftChains_arraysize);
+    if (leftChains_arraysize==0) {
+        this->leftChains = 0;
     } else {
-        this->pushUpList = new Chain[pushUpList_arraysize];
-        doParsimArrayUnpacking(b,this->pushUpList,pushUpList_arraysize);
+        this->leftChains = new int32_t[leftChains_arraysize];
+        doParsimArrayUnpacking(b,this->leftChains,leftChains_arraysize);
     }
 }
 
-void pushUpPkt::setPushUpListArraySize(unsigned int size)
+void leftChainsMsg::setLeftChainsArraySize(unsigned int size)
 {
-    Chain *pushUpList2 = (size==0) ? nullptr : new Chain[size];
-    unsigned int sz = pushUpList_arraysize < size ? pushUpList_arraysize : size;
+    int32_t *leftChains2 = (size==0) ? nullptr : new int32_t[size];
+    unsigned int sz = leftChains_arraysize < size ? leftChains_arraysize : size;
     for (unsigned int i=0; i<sz; i++)
-        pushUpList2[i] = this->pushUpList[i];
-    pushUpList_arraysize = size;
-    delete [] this->pushUpList;
-    this->pushUpList = pushUpList2;
+        leftChains2[i] = this->leftChains[i];
+    for (unsigned int i=sz; i<size; i++)
+        leftChains2[i] = 0;
+    leftChains_arraysize = size;
+    delete [] this->leftChains;
+    this->leftChains = leftChains2;
 }
 
-unsigned int pushUpPkt::getPushUpListArraySize() const
+unsigned int leftChainsMsg::getLeftChainsArraySize() const
 {
-    return pushUpList_arraysize;
+    return leftChains_arraysize;
 }
 
-Chain& pushUpPkt::getPushUpList(unsigned int k)
+int32_t leftChainsMsg::getLeftChains(unsigned int k) const
 {
-    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
-    return this->pushUpList[k];
+    if (k>=leftChains_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", leftChains_arraysize, k);
+    return this->leftChains[k];
 }
 
-void pushUpPkt::setPushUpList(unsigned int k, const Chain& pushUpList)
+void leftChainsMsg::setLeftChains(unsigned int k, int32_t leftChains)
 {
-    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
-    this->pushUpList[k] = pushUpList;
+    if (k>=leftChains_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", leftChains_arraysize, k);
+    this->leftChains[k] = leftChains;
 }
 
-class pushUpPktDescriptor : public omnetpp::cClassDescriptor
+class leftChainsMsgDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
   public:
-    pushUpPktDescriptor();
-    virtual ~pushUpPktDescriptor();
+    leftChainsMsgDescriptor();
+    virtual ~leftChainsMsgDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -290,24 +292,24 @@ class pushUpPktDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(pushUpPktDescriptor)
+Register_ClassDescriptor(leftChainsMsgDescriptor)
 
-pushUpPktDescriptor::pushUpPktDescriptor() : omnetpp::cClassDescriptor("pushUpPkt", "omnetpp::cPacket")
+leftChainsMsgDescriptor::leftChainsMsgDescriptor() : omnetpp::cClassDescriptor("leftChainsMsg", "omnetpp::cMessage")
 {
     propertynames = nullptr;
 }
 
-pushUpPktDescriptor::~pushUpPktDescriptor()
+leftChainsMsgDescriptor::~leftChainsMsgDescriptor()
 {
     delete[] propertynames;
 }
 
-bool pushUpPktDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool leftChainsMsgDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<pushUpPkt *>(obj)!=nullptr;
+    return dynamic_cast<leftChainsMsg *>(obj)!=nullptr;
 }
 
-const char **pushUpPktDescriptor::getPropertyNames() const
+const char **leftChainsMsgDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -318,19 +320,19 @@ const char **pushUpPktDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *pushUpPktDescriptor::getProperty(const char *propertyname) const
+const char *leftChainsMsgDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int pushUpPktDescriptor::getFieldCount() const
+int leftChainsMsgDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int pushUpPktDescriptor::getFieldTypeFlags(int field) const
+unsigned int leftChainsMsgDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -339,12 +341,12 @@ unsigned int pushUpPktDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISARRAY | FD_ISCOMPOUND,
+        FD_ISARRAY | FD_ISEDITABLE,
     };
     return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *pushUpPktDescriptor::getFieldName(int field) const
+const char *leftChainsMsgDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -353,20 +355,20 @@ const char *pushUpPktDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "pushUpList",
+        "leftChains",
     };
     return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
 
-int pushUpPktDescriptor::findField(const char *fieldName) const
+int leftChainsMsgDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='p' && strcmp(fieldName, "pushUpList")==0) return base+0;
+    if (fieldName[0]=='l' && strcmp(fieldName, "leftChains")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *pushUpPktDescriptor::getFieldTypeString(int field) const
+const char *leftChainsMsgDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -375,12 +377,12 @@ const char *pushUpPktDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "Chain",
+        "int32_t",
     };
     return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **pushUpPktDescriptor::getFieldPropertyNames(int field) const
+const char **leftChainsMsgDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -393,7 +395,7 @@ const char **pushUpPktDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *pushUpPktDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *leftChainsMsgDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -406,7 +408,7 @@ const char *pushUpPktDescriptor::getFieldProperty(int field, const char *propert
     }
 }
 
-int pushUpPktDescriptor::getFieldArraySize(void *object, int field) const
+int leftChainsMsgDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -414,14 +416,14 @@ int pushUpPktDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
+    leftChainsMsg *pp = (leftChainsMsg *)object; (void)pp;
     switch (field) {
-        case 0: return pp->getPushUpListArraySize();
+        case 0: return pp->getLeftChainsArraySize();
         default: return 0;
     }
 }
 
-const char *pushUpPktDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *leftChainsMsgDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -429,13 +431,13 @@ const char *pushUpPktDescriptor::getFieldDynamicTypeString(void *object, int fie
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
+    leftChainsMsg *pp = (leftChainsMsg *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string pushUpPktDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string leftChainsMsgDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -443,14 +445,14 @@ std::string pushUpPktDescriptor::getFieldValueAsString(void *object, int field, 
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
+    leftChainsMsg *pp = (leftChainsMsg *)object; (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getPushUpList(i); return out.str();}
+        case 0: return long2string(pp->getLeftChains(i));
         default: return "";
     }
 }
 
-bool pushUpPktDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool leftChainsMsgDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -458,13 +460,14 @@ bool pushUpPktDescriptor::setFieldValueAsString(void *object, int field, int i, 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
+    leftChainsMsg *pp = (leftChainsMsg *)object; (void)pp;
     switch (field) {
+        case 0: pp->setLeftChains(i,string2long(value)); return true;
         default: return false;
     }
 }
 
-const char *pushUpPktDescriptor::getFieldStructName(int field) const
+const char *leftChainsMsgDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -473,12 +476,11 @@ const char *pushUpPktDescriptor::getFieldStructName(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
-        case 0: return omnetpp::opp_typename(typeid(Chain));
         default: return nullptr;
     };
 }
 
-void *pushUpPktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *leftChainsMsgDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -486,9 +488,8 @@ void *pushUpPktDescriptor::getFieldStructValuePointer(void *object, int field, i
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
+    leftChainsMsg *pp = (leftChainsMsg *)object; (void)pp;
     switch (field) {
-        case 0: return (void *)(&pp->getPushUpList(i)); break;
         default: return nullptr;
     }
 }
