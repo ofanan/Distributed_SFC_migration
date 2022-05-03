@@ -195,6 +195,7 @@ void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &
 
 /*
 Read and handle a trace line that details the IDs of chains that left the simulated area.
+The function inserts all the IDs of chains that left some datacenter dc to chainsThatLeft[dc].
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 */
@@ -202,15 +203,16 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 {
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
+  Chain chain; // will hold the new chain to be inserted each time
   int32_t chain_id;
   
   // parse each old chain in the trace (.poa file), find its delay feasible datacenters, and insert it into the set of new chains
-  outFile <<  "chains that left: ";
   for (const auto& token : tokens) {
-  	outFile << token << ",";
-  	//chainsThatLeft[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  	chain_id = stoi (token);
+		findChainInSet (allChains, chain_id, chain); // find the moved chain.
+  	chainsThatLeft[chain.curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  	allChains.erase (chain);// remove the chain from the list of chains.
   }
-  outFile << endl;
 }
 
 /*
