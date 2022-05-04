@@ -35,7 +35,7 @@ class TraceFeeder : public cSimpleModule
     int16_t height; // height of the tree
     int     t; //sim time (in seconds)
     uint32_t seed = 42;
-    float  RT_chain_pr = 0.5; // prob' that a new chain is an RT chain
+    float  RT_chain_pr = 1.0; // prob' that a new chain is an RT chain
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_map <int32_t, Chain> allChains; // chains are mapped by their IDs. 
     unordered_map <int16_t, unordered_set<int32_t> > chainsThatLeftDatacenter;//chainsThatLeftDC[i] will hold the list of IDs of chains that left DC i (either towards another PoA, or left the sim').
@@ -52,9 +52,9 @@ class TraceFeeder : public cSimpleModule
 		// Other Functions
 		void runTrace  ();
 		void readChainsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
-		void readChainsLine (string line, bool isNewChainsLine); // read a trace line, containing a list of chain and their updated PoAs.
+		void readNewChainsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
+		void readOldChainsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
 		void rlzRsrcsOfChains ();
-		void insertToChainsThatJoinedPoa (int16_t poa, Chain chain);
 		void initAlg ();
     void handleMessage (cMessage *msg);
 		
@@ -151,10 +151,10 @@ void TraceFeeder::runTrace () {
   		readChainsThatLeftLine (line.substr(15));
   	} 	
   	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-  		readChainsLine (line.substr(9), true); 
+  		readNewChainsLine (line.substr(9)); 
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		readChainsLine (line.substr(9), false);
+  		readOldChainsLine (line.substr(9));
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
@@ -221,46 +221,56 @@ Inputs:
 If the chain is new, the function adds it to the set of new chains.
 Else, the chain finds the chain in the db "all Chains", and inserts the chain to the set of critical chains.
 */
-void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
+void TraceFeeder::readNewChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chain_id;
   int16_t poa; 
+	Chain chain; // will hold the new chain to be inserted each time
   
-  if (isNewChainsLine) {   // parse each new chain in the trace (.poa file), find its delay-feasible datacenters, and insert it into allChains
   
-		for (const auto& token : tokens) {
-		  Chain chain; // will hold the new chain to be inserted each time
-			parseChainPoaToken (token, chain_id, poa);
-			if (rand () < RT_chain_rand_int) {
-				chain = RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
+	for (const auto& token : tokens) {
+		parseChainPoaToken (token, chain_id, poa);
+		if (rand () < RT_chain_rand_int) {
+			// Generate an RT (highest-priority) chain, and insert it to the beginning of the vector of chains that joined the relevant PoA (leaf DC)
+			chain = RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
+			chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
+		}
+		else {
+			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant PoA (leaf DC)
+			chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+			chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
+		}
+		allChains[chain_id] = chain; 
+	}	
+}
+
+// parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new PoA (to place that chain).
+void TraceFeeder::readOldChainsLine (string line)
+{
+  char_separator<char> sep("() ");
+  tokenizer<char_separator<char>> tokens(line, sep);
+  int32_t chain_id;
+  int16_t poa; 
+	Chain chain; // will hold the new chain to be inserted each time
+
+	for (const auto& token : tokens) {
+		parseChainPoaToken (token, chain_id, poa);
+	  auto search = allChains.find(chain_id);
+	  if (search == allChains.end()) {
+			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
+//				endSimulation();
+	  }
+	  else {
+			if (chain.isRT_Chain) {
+				chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 			}
 			else {
-				chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+				chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 			}
-//			chain = (rand () < RT_chain_rand_int)? // randomly decide whether this is an RT chain 
-//							RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)) :
-//							Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
-			insertToChainsThatJoinedPoa (poa, chain);
-			allChains[chain_id] = chain; 
-		}
-	
-	}
-	else { // parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new PoA (to place that chain).
-		for (const auto& token : tokens) {
-			Chain chain;
-			parseChainPoaToken (token, chain_id, poa);
-		  auto search = allChains.find(chain_id);
-		  if (search == allChains.end()) {
-				outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
-//				endSimulation();
-		  }
-		  else {
-				insertToChainsThatJoinedPoa (poa, chain);
-				chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
-		  }
-		}
+			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+	  }
 	}
 }
 
@@ -269,16 +279,6 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 //	chainsThatJoinedPoa[poa].insert (chain);
 //} 
 
-void TraceFeeder::insertToChainsThatJoinedPoa (int16_t poa, Chain chain)
-{
-	if (typeid(chain).name() == typeid(RT_Chain).name()) {
-		outFile << "RT\n";
-	} 
-	else {
-		outFile << "Non-RT\n";
-	}
-	//chainsThatJoinedPoa[poa].insert (chain);
-} 
 
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').

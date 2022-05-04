@@ -20,7 +20,7 @@ class Chain
     int16_t curDatacenter; // Id of the datacenter currently hosting me
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
     vector <int16_t> S_u;         // List of delay-feasible servers
-    bool isRtChain;
+    bool isRT_Chain;
 /*    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?*/
 //    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
     Chain () {};
@@ -39,7 +39,7 @@ class Chain
 		However, in our current sim settings, all of this is degenerated to the fast and efficient rule that an RT chain has higher priority (==smaller #), over a non-RT chain.
 		*/
     bool operator< (const Chain &right) const {
-      return (this->isRtChain && !(right.isRtChain));
+      return (this->isRT_Chain && !(right.isRT_Chain));
     }
 };
 
@@ -57,7 +57,7 @@ public:
   RT_Chain (int32_t id, vector <int16_t> S_u) {
     this->id        = id;
     this->S_u       = S_u;
-    this->isRtChain = true;
+    this->isRT_Chain = true;
     curDatacenter   = nxtDatacenter = -1;
   };
 };
@@ -71,7 +71,7 @@ class Non_RT_Chain: public Chain
     Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
        this->id       = id;
       this->S_u       = S_u;
-      this->isRtChain = false;
+      this->isRT_Chain = false;
       curDatacenter   = nxtDatacenter = -1;
     };
 };
