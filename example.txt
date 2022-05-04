@@ -1,4 +1,11 @@
 30540
+****** RECALL: should update stts of new, crit and old chains b4 next time slot****
+Non-RT
+Non-RT
+Non-RT
 30548
-erasing chain 0
+****** RECALL: should update stts of new, crit and old chains b4 next time slot****
+Non-RT
+Non-RT
+Non-RT
 Error in t=30548: didn't find chain id 3 in allChains, in readChainsLine (old chains)

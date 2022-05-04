@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from initBottomUpMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/initBottomUpMsg.msg.
 //
 
 #ifndef __INITBOTTOMUPMSG_M_H
@@ -24,7 +24,7 @@
 // }}
 
 /**
- * Class generated from <tt>initBottomUpMsg.msg:12</tt> by nedtool.
+ * Class generated from <tt>src/initBottomUpMsg.msg:12</tt> by nedtool.
  * <pre>
  * message initBottomUpMsg
  * {

@@ -77,7 +77,6 @@ TraceFeeder::~TraceFeeder() {}
 
 void TraceFeeder::initialize (int stage)
 {
-
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
@@ -229,23 +228,16 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
   int16_t poa; 
   
   if (isNewChainsLine) {   // parse each new chain in the trace (.poa file), find its delay-feasible datacenters, and insert it into allChains
-  
+  /*
 		for (const auto& token : tokens) {
 		  Chain chain; // will hold the new chain to be inserted each time
 			parseChainPoaToken (token, chain_id, poa);
-			if (rand () < RT_chain_rand_int) {
-				chain = RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
-			}
-			else {
-				chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
-			}
-//			chain = (rand () < RT_chain_rand_int)? // randomly decide whether this is an RT chain 
-//							RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)) :
-//							Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
-			insertToChainsThatJoinedPoa (poa, chain);
-			allChains[chain_id] = chain; 
+			chain = (rand () < RT_chain_rand_int)? // randomly decide whether this is an RT chain 
+							RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1)) :
+							Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+			allChains.insert (chain); 
 		}
-	
+	*/
 	}
 	else { // parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new PoA (to place that chain).
 		for (const auto& token : tokens) {
@@ -254,7 +246,7 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 		  auto search = allChains.find(chain_id);
 		  if (search == allChains.end()) {
 				outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
-//				endSimulation();
+				endSimulation();
 		  }
 		  else {
 				insertToChainsThatJoinedPoa (poa, chain);
@@ -271,12 +263,7 @@ void TraceFeeder::readChainsLine (string line, bool isNewChainsLine)
 
 void TraceFeeder::insertToChainsThatJoinedPoa (int16_t poa, Chain chain)
 {
-	if (typeid(chain).name() == typeid(RT_Chain).name()) {
-		outFile << "RT\n";
-	} 
-	else {
-		outFile << "Non-RT\n";
-	}
+	outFile << typeid(RT_Chain).name(); 
 	//chainsThatJoinedPoa[poa].insert (chain);
 } 
 
