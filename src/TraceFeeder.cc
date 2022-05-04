@@ -214,12 +214,11 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 }
 
 /*
-Read a trace line that includes data about new / critical chains.
+Read a trace line that includes data about new chains.
+Generate a new chain, and add it to the allChains.
+Also, add the new generated chain to chainsThatJoinedPoa[poa], where poa is the curent poa of this new chain (poa is indicated in the trace, .poa file).
 Inputs:
 - line: the line to parse. The line contains data in the format (c_1, poa_1)(c_2, poa_2), ... where poa_i is the updated poa of chain c_i.
-- isNewChainsLine: when true, the line details new chains.
-If the chain is new, the function adds it to the set of new chains.
-Else, the chain finds the chain in the db "all Chains", and inserts the chain to the set of critical chains.
 */
 void TraceFeeder::readNewChainsLine (string line)
 {
@@ -246,6 +245,14 @@ void TraceFeeder::readNewChainsLine (string line)
 	}	
 }
 
+/*
+- Read a trace line that includes data about old chains, that moved and thus became critical.
+- Find the chain in the db "allChains". 
+- insert the chain to chainsThatJoinedPoa[poa], where poa is the new, updated poa.
+- insert the chain to chainsThatLeftPoa[poa'], where poa' is the old, previous poa.
+Inputs:
+- line: the line to parse. The line contains data in the format (c_1, poa_1)(c_2, poa_2), ... where poa_i is the updated poa of chain c_i.
+*/
 // parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new PoA (to place that chain).
 void TraceFeeder::readOldChainsLine (string line)
 {
@@ -273,13 +280,6 @@ void TraceFeeder::readOldChainsLine (string line)
 	  }
 	}
 }
-
-//void TraceFeeder::insertToChainsThatLeft (int16_t poa, Chain chain)
-//{
-//	chainsThatJoinedPoa[poa].insert (chain);
-//} 
-
-
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
 void TraceFeeder::rlzRsrcsOfChains ()
