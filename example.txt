@@ -1,7 +1,7 @@
 30540
-adding chain 0 :0,0,;adding chain 1 :0,0,;adding chain 2 :0,0,;After readNewCHainsLine: allChains=chain 2: 0,0,;chain 1: 0,0,;chain 0: 0,0,;
-After readOldCHainsLine: allChains=chain 2: chain 1: chain 0: 
+adding chain 0 :0,0,0;adding chain 1 :0,0,0;adding chain 2 :0,0,0;After readNewCHainsLine: allChains=chain 2: 0,0,32510;chain 1: 0,0,0;chain 0: 0,0,0;
+After readOldCHainsLine: allChains=chain 2: 0,0,0;chain 1: 0,0,0;chain 0: 0,0,0;
 30548
 erasing chain 0
-adding chain 61 :0,0,;After readNewCHainsLine: allChains=chain 61: 0,0,;chain 2: 0,0,;chain 1: 0,0,;chain 0: 0,0,;
-After readOldCHainsLine: allChains=chain 71787259: chain 61: chain 2: chain 1: chain 0: 
+adding chain 61 :0,0,0;After readNewCHainsLine: allChains=chain 61: 0,0,32510;chain 2: 0,0,0;chain 1: 0,0,0;chain 0: 0,0,0;
+After readOldCHainsLine: allChains=chain -369147141: 0,0,0,0;chain 61: 0,0,0;chain 2: 0,0,0;chain 1: 0,0,0;chain 0: 0,0,0;

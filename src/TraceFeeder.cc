@@ -176,12 +176,7 @@ void TraceFeeder::printAllChains (bool printSu=false, bool printPoa=false, bool 
 	outFile << "allChains=";
 	for (auto const & c : allChains) {
 		outFile << "chain "<< c.id << ": ";
-		if (printSu) {
-			for (auto const & i: c.S_u) {
-				outFile << i << ",";
-			}
-			outFile << ";"; 
-		}
+		MyConfig::printVec (outFile, c.S_u);
 	}	
 	outFile << endl;
 }
