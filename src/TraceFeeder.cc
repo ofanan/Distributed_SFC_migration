@@ -40,8 +40,8 @@ class TraceFeeder : public cSimpleModule
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 //    unordered_map <int32_t, Chain> allChains; // All the currently active chains. 
-    unordered_map <int16_t, unordered_set<int32_t> > chainsThatLeftDatacenter;//chainsThatLeftDC[i] will hold the list of IDs of chains that left DC i (either towards another PoA, or left the sim').
-    unordered_map <int16_t, vector<Chain>> chainsThatJoinedPoa; // chainsThatJoinedPoa[i] will hold the list of chains that joined leaf (PoA) i
+    unordered_map <int16_t, unordered_set<int32_t> > chainsThatLeftDatacenter;//chainsThatLeftDC[i] will hold the list of IDs of chains that left DC i (either towards another leaf, or left the sim').
+    unordered_map <int16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
     vector <vector<int16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
 
@@ -61,7 +61,7 @@ class TraceFeeder : public cSimpleModule
     void handleMessage (cMessage *msg);
     
     // Functions used for debugging
-    void printAllChains (bool printSu, bool printPoa, bool printCurDatacenter); // print the list of all chains
+    void printAllChains (bool printSu, bool printPoA, bool printCurDatacenter); // print the list of all chains
 		
   public:
     string traceFileName = "results/poa_files/Tree_short.poa";
@@ -70,7 +70,7 @@ class TraceFeeder : public cSimpleModule
     ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
-    void parseChainPoaToken (string token, int32_t &chainId, int16_t &poa);
+    void parseChainPoaToken (string token, int32_t &chainId, int16_t &poaId);
 };
 
 Define_Module(TraceFeeder);
@@ -98,11 +98,11 @@ void TraceFeeder::initialize (int stage)
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
-	int leaf_id = 0;
+	int leafId = 0;
 	for (int dc(0); dc<numDatacenters; dc++) {
 	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
 	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
-	    leaves[leaf_id++] = datacenters[dc];
+	    leaves[leafId++] = datacenters[dc];
 	  }
 	}
 	discoverPathsToRoot ();
@@ -119,27 +119,26 @@ void TraceFeeder::openFiles () {
 void TraceFeeder::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
 	int16_t dc_id;
-	for (int16_t leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
-		pathToRoot[leaf_id].resize (height);
-		dc_id = leaves[leaf_id]->id;
+	for (int16_t leafId(0) ; leafId < numLeaves; leafId++)  {
+		pathToRoot[leafId].resize (height);
+		dc_id = leaves[leafId]->id;
 	  int height = 0;
 		while (dc_id != root_id) {
-		 	pathToRoot[leaf_id][height++] = dc_id;
+		 	pathToRoot[leafId][height++] = dc_id;
 		 	dc_id = datacenters[dc_id]->idOfParent;
 		}
-		outFile << "path to root of leaf id " << leaf_id << ": ";
-	  MyConfig::printVec (outFile, pathToRoot[leaf_id]);
-	  endSimulation ();
+		outFile << "path to root of leaf id " << leafId << ": ";
+	  MyConfig::printVec (outFile, pathToRoot[leafId]);
 	}
+	outFile << endl;
 }
 
 void TraceFeeder::runTrace () {
 	traceFile = ifstream (traceFileName);
-	outFile   = ofstream (outFileName);
 	
   string line;
   if (!traceFile.is_open ()) {
-  	outFile << "Poa file was not found -> finishing simulation."; 
+  	outFile << "poa file was not found -> finishing simulation."; 
 		endSimulation();
   }
   while (getline (traceFile, line)) { 
@@ -174,7 +173,7 @@ void TraceFeeder::runTrace () {
 }
 
 // Print all the chains. Default: print only the chains IDs. 
-void TraceFeeder::printAllChains (bool printSu=false, bool printPoa=false, bool printCurDatacenter=false)
+void TraceFeeder::printAllChains (bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
 {
 	outFile << "allChains=";
 	for (auto const & c : allChains) {
@@ -185,17 +184,17 @@ void TraceFeeder::printAllChains (bool printSu=false, bool printPoa=false, bool 
 }
 
   	
-// parse a token of the type "u,poa" where u is the chainId number and poa is the user's current Poa
-void TraceFeeder::parseChainPoaToken (string token, int32_t &chainId, int16_t &poa)
+// parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
+void TraceFeeder::parseChainPoaToken (string token, int32_t &chainId, int16_t &poaId)
 {
 	istringstream newChainToken(token); 
   string numStr; 
 	getline (newChainToken, numStr, ',');
 	chainId = stoi (numStr);
 	getline (newChainToken, numStr, ',');
-	poa = stoi (numStr);
-	if (poa > numLeaves) {
-		outFile << "Error at t=" << t << ": poa is " << poa << "while the number of leaves in the network is only " << numLeaves << "; EXITING" << endl;
+	poaId = stoi (numStr);
+	if (poaId > numLeaves) {
+		outFile << "Error at t=" << t << ": poaId is " << poaId << "while the number of leaves in the network is only " << numLeaves << "; EXITING" << endl;
 		endSimulation();
 	}
 }
@@ -234,32 +233,31 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 /*
 Read a trace line that includes data about new chains.
 Generate a new chain, and add it to the allChains.
-Also, add the new generated chain to chainsThatJoinedPoa[poa], where poa is the curent poa of this new chain (poa is indicated in the trace, .poa file).
+Also, add the new generated chain to chainsThatJoinedLeaf[leaf], where leaf is the curent leaf, co-located with the poa of this new chain (poa is indicated in the trace, .poa file).
 Inputs: 
-- line: the line to parse. The line contains data in the format (c_1, poa_1)(c_2, poa_2), ... where poa_i is the updated poa of chain c_i.
+- line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated PoA of chain c_i.
 */
 void TraceFeeder::readNewChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chainId;
-  int16_t poa; 
+  int16_t poaId, leaf; 
 	Chain chain; // will hold the new chain to be inserted each time
   
   
 	for (const auto& token : tokens) {
-		parseChainPoaToken (token, chainId, poa);
+		parseChainPoaToken (token, chainId, poaId);
+		leaf = leaves[poaId]->id;
 		if (rand () < RT_chain_rand_int) {
-			// Generate an RT (highest-priority) chain, and insert it to the beginning of the vector of chains that joined the relevant PoA (leaf DC)
-			chain = RT_Chain     (chainId, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
-			outFile << "adding chain " << chainId << " :";
-			MyConfig::printVec (outFile, chain.S_u);
-			chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
+			// Generate an RT (highest-priority) chain, and insert it to the beginning of the vector of chains that joined the relevant leaf (leaf DC)
+			chain = RT_Chain     (chainId, vector<int16_t> (pathToRoot[leaf].begin(), pathToRoot[leaf].begin()+RT_Chain::mu_u_len-1));
+			chainsThatJoinedLeaf[leaf].insert (chainsThatJoinedLeaf[leaf].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 		}
 		else {
-			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant PoA (leaf DC)
-			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
-			chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
+			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
+			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[leaf].begin(), pathToRoot[leaf].begin()+Non_RT_Chain::mu_u_len-1)); 
+			chainsThatJoinedLeaf[leaf].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 		}
 		allChains.insert (chain);
 	}	
@@ -270,22 +268,22 @@ void TraceFeeder::readNewChainsLine (string line)
 /*
 - Read a trace line that includes data about old chains, that moved and thus became critical.
 - Find the chain in the db "allChains". 
-- insert the chain to chainsThatJoinedPoa[poa], where poa is the new, updated poa.
-- insert the chain to chainsThatLeftPoa[poa'], where poa' is the old, previous poa.
+- insert the chain to chainsThatJoinedLeaf[leaf], where leaf is the new, updated leaf.
 Inputs:
-- line: the line to parse. The line contains data in the format (c_1, poa_1)(c_2, poa_2), ... where poa_i is the updated poa of chain c_i.
+- line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated leaf of chain c_i.
 */
-// parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new PoA (to place that chain).
+// parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new leaf (to place that chain).
 void TraceFeeder::readOldChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chainId;
-  int16_t poa; 
+  int16_t poaId, leaf;
 	Chain chain; // will hold the new chain to be inserted each time
 
 	for (const auto& token : tokens) {
-		parseChainPoaToken (token, chainId, poa);
+		parseChainPoaToken (token, chainId, leaf);
+		leaf = leaves[poaId]->id;
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
 			outFile << "Error in t=" << t << ": didn't find chain id " << chainId << " in allChains, in readChainsLine (old chains)\n";
@@ -294,13 +292,13 @@ void TraceFeeder::readOldChainsLine (string line)
 	  else {
 			
 			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-			chain.S_u = pathToRoot[poa]; //Update S_u of the chain to reflect its new location
+			chain.S_u = pathToRoot[leaf]; //Update S_u of the chain to reflect its new location
 			allChains.insert (chain);
 			if (chain.isRT_Chain) {
-				chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
+				chainsThatJoinedLeaf[leaf].insert (chainsThatJoinedLeaf[leaf].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 			}
 			else {
-				chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
+				chainsThatJoinedLeaf[leaf].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 			}
 			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	  }
@@ -336,9 +334,9 @@ void TraceFeeder::initAlg () {
 		outFile << endl;
 	}
 	*/
-//		critAndMovedChainsOfLeaf[poa].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
-//		critAndMovedChainsOfLeaf[poa].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new PoA=leaf.
-//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new PoA=leaf.	
+//		critAndMovedChainsOfLeaf[leaf].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
+//		critAndMovedChainsOfLeaf[leaf].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.
+//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.	
 }  	
 //  	char_separator<char> slashSlash("//");
 //	  tokenizer<char_separator<char>> tokens(text, sep);
