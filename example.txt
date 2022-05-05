@@ -1,7 +1,2 @@
-30540
-adding chain 0 :0,0,0;adding chain 1 :0,0,0;adding chain 2 :0,0,0;After readNewCHainsLine: allChains=chain 2: 0,0,32749;chain 1: 0,0,0;chain 0: 0,0,0;
-After readOldCHainsLine: allChains=chain 2: 0,0,0;chain 1: 0,0,0;chain 0: 0,0,0;
-30548
-erasing chain 0
-adding chain 61 :0,0,0;After readNewCHainsLine: allChains=chain 61: 0,0,32749;chain 2: 0,0,0;chain 1: 0,0,0;chain 0: 0,0,0;
-After readOldCHainsLine: allChains=chain 1674547963: 0,0,0,0;chain 61: 0,0,0;chain 2: 0,0,0;chain 1: 0,0,0;chain 0: 0,0,0;
+Tree
+path to root of leaf id 0: 4,1,0;

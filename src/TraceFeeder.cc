@@ -118,15 +118,18 @@ void TraceFeeder::openFiles () {
 
 void TraceFeeder::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
-	int16_t dc_id = 0;
+	int16_t dc_id;
 	for (int16_t leaf_id(0) ; leaf_id < numLeaves; leaf_id++)  {
 		pathToRoot[leaf_id].resize (height);
 		dc_id = leaves[leaf_id]->id;
 	  int height = 0;
 		while (dc_id != root_id) {
+		 	pathToRoot[leaf_id][height++] = dc_id;
 		 	dc_id = datacenters[dc_id]->idOfParent;
-		 	pathToRoot[leaf_id][height] = dc_id;
 		}
+		outFile << "path to root of leaf id " << leaf_id << ": ";
+	  MyConfig::printVec (outFile, pathToRoot[leaf_id]);
+	  endSimulation ();
 	}
 }
 
