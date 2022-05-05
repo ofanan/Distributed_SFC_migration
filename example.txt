@@ -1,5 +1,9 @@
 30540
-****** RECALL: should update stts of new, crit and old chains b4 next time slot****
+After reading chains that left: allChains=
+After readNewCHainsLine: allChains=2 1 0 
+After readOldCHainsLine: allChains=2 1 0 
 30548
-****** RECALL: should update stts of new, crit and old chains b4 next time slot****
-Error in t=30548: didn't find chain id 3 in allChains, in readChainsLine (old chains)
+erasing chain 0
+After reading chains that left: allChains=2 1 
+After readNewCHainsLine: allChains=61 2 1 
+After readOldCHainsLine: allChains=61 2 1 

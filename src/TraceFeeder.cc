@@ -57,6 +57,9 @@ class TraceFeeder : public cSimpleModule
 		void rlzRsrcsOfChains ();
 		void initAlg ();
     void handleMessage (cMessage *msg);
+    
+    // Functions used for debugging
+    void printAllChains (bool printPoa, bool printCurDatacenter); // print the list of all chains
 		
   public:
     string traceFileName = "results/poa_files/Tree_short.poa";
@@ -87,6 +90,12 @@ void TraceFeeder::initialize (int stage)
 		srand(seed); // set the seed of random num generation
 		return;
 	}
+	
+	vector <int16_t> S_u = {8};
+	Chain c0 = Chain (0, S_u);
+	Chain c1 (1, S_u);
+	unordered_set <Chain, Chain_hash> dummy;
+//	dummy.insert (c0);
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	openFiles ();
@@ -145,7 +154,6 @@ void TraceFeeder::runTrace () {
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
   		outFile << t << endl;
-  		outFile << "****** RECALL: should update stts of new, crit and old chains b4 next time slot****\n";
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));
@@ -165,6 +173,17 @@ void TraceFeeder::runTrace () {
   traceFile.close ();
   outFile.close ();
 }
+
+// Print all the chains. Default: print only the chains IDs. 
+void TraceFeeder::printAllChains (bool printPoa = false, bool printCurDatacenter = false)
+{
+	outFile << "allChains=";
+	for (auto const & x : allChains) {
+		outFile << x.first << " ";
+	}	
+	outFile << endl;
+}
+
   	
 // parse a token of the type "u,poa" where u is the chain_id number and poa is the user's current Poa
 void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &poa)
@@ -190,7 +209,6 @@ Inputs:
 */
 void TraceFeeder::readChainsThatLeftLine (string line)
 {
-/*
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
@@ -210,14 +228,15 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   		allChains.erase (chain_id);// remove the chain from the list of chains.
 	  }
   }
-  */
+  outFile << "After reading chains that left: ";
+  printAllChains ();
 }
 
 /*
 Read a trace line that includes data about new chains.
 Generate a new chain, and add it to the allChains.
 Also, add the new generated chain to chainsThatJoinedPoa[poa], where poa is the curent poa of this new chain (poa is indicated in the trace, .poa file).
-Inputs:
+Inputs: 
 - line: the line to parse. The line contains data in the format (c_1, poa_1)(c_2, poa_2), ... where poa_i is the updated poa of chain c_i.
 */
 void TraceFeeder::readNewChainsLine (string line)
@@ -243,6 +262,8 @@ void TraceFeeder::readNewChainsLine (string line)
 		}
 		allChains[chain_id] = chain; 
 	}	
+  outFile << "After readNewCHainsLine: ";
+  printAllChains ();
 }
 
 /*
@@ -279,6 +300,8 @@ void TraceFeeder::readOldChainsLine (string line)
 			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	  }
 	}
+  outFile << "After readOldCHainsLine: ";
+  printAllChains ();
 }
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').

@@ -76,6 +76,16 @@ class Non_RT_Chain: public Chain
     };
 };
 
+// Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
+struct Chain_hash
+{
+  template <class T1, class Chain>
+  size_t operator () (pair<T1, Chain> const &c) const
+  {
+  	return hash<T1>()(c.id());    
+  }
+};
+
 #endif
 
 /*typedef list<Chain> ChainList;*/
