@@ -15,7 +15,7 @@
 #include <unordered_set>
 #include <typeinfo>
 
-#include "MyConfig.h"
+//#include "MyConfig.h"
 #include "Datacenter.h"
 #include "Chain.h"
 #include "Parameters.h"
@@ -127,8 +127,6 @@ void TraceFeeder::discoverPathsToRoot () {
 		 	pathToRoot[leafId][height++] = dc_id;
 		 	dc_id = datacenters[dc_id]->idOfParent;
 		}
-		outFile << "path to root of leaf id " << leafId << ": ";
-	  MyConfig::printVec (outFile, pathToRoot[leafId]);
 	}
 	outFile << endl;
 }
@@ -172,13 +170,22 @@ void TraceFeeder::runTrace () {
   outFile.close ();
 }
 
+/*
+void TraceFeeder::printVec (vector <class T> &vec ) 
+{
+//		for_each(chain.S_u.begin(), chain.S_u.end(),[](int number){cout << number << ";";});
+
+}
+*/
+
 // Print all the chains. Default: print only the chains IDs. 
 void TraceFeeder::printAllChains (bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
 {
-	outFile << "allChains=";
-	for (auto const & c : allChains) {
-		outFile << "chain "<< c.id << ": ";
-		MyConfig::printVec (outFile, c.S_u);
+	outFile << "allChains\n*******************\n";
+	for (auto const & chain : allChains) {
+		outFile << "chain "<< chain.id << ": ";
+		for_each(chain.S_u.begin(), chain.S_u.end(),[](int number){cout << number << ";";});
+		outFile << endl;
 	}	
 	outFile << endl;
 }
@@ -242,22 +249,19 @@ void TraceFeeder::readNewChainsLine (string line)
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chainId;
-  int16_t poaId, leaf; 
+  int16_t poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
-  
   
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
-		leaf = leaves[poaId]->id;
 		if (rand () < RT_chain_rand_int) {
-			// Generate an RT (highest-priority) chain, and insert it to the beginning of the vector of chains that joined the relevant leaf (leaf DC)
-			chain = RT_Chain     (chainId, vector<int16_t> (pathToRoot[leaf].begin(), pathToRoot[leaf].begin()+RT_Chain::mu_u_len-1));
-			chainsThatJoinedLeaf[leaf].insert (chainsThatJoinedLeaf[leaf].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
+			chain = RT_Chain (chainId, vector<int16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len-1}); 
+			chainsThatJoinedLeaf[poaId].insert (chainsThatJoinedLeaf[poaId].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
-			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[leaf].begin(), pathToRoot[leaf].begin()+Non_RT_Chain::mu_u_len-1)); 
-			chainsThatJoinedLeaf[leaf].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
+			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len-1)); 
+			chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 		}
 		allChains.insert (chain);
 	}	
@@ -275,6 +279,8 @@ Inputs:
 // parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new leaf (to place that chain).
 void TraceFeeder::readOldChainsLine (string line)
 {
+//$$$$$$$$$$$$$$$ SHOULD FIX AS IN readNew
+/*
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chainId;
@@ -306,6 +312,7 @@ void TraceFeeder::readOldChainsLine (string line)
 	
   outFile << "After readOldCHainsLine: ";
   printAllChains ();
+  */
 }
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
