@@ -15,6 +15,7 @@
 #include <unordered_set>
 #include <typeinfo>
 
+#include "MyConfig.h"
 #include "Datacenter.h"
 #include "Chain.h"
 #include "Parameters.h"
@@ -60,7 +61,7 @@ class TraceFeeder : public cSimpleModule
     void handleMessage (cMessage *msg);
     
     // Functions used for debugging
-    void printAllChains (bool printPoa, bool printCurDatacenter); // print the list of all chains
+    void printAllChains (bool printSu, bool printPoa, bool printCurDatacenter); // print the list of all chains
 		
   public:
     string traceFileName = "results/poa_files/Tree_short.poa";
@@ -170,14 +171,19 @@ void TraceFeeder::runTrace () {
 }
 
 // Print all the chains. Default: print only the chains IDs. 
-void TraceFeeder::printAllChains (bool printPoa = false, bool printCurDatacenter = false)
+void TraceFeeder::printAllChains (bool printSu=false, bool printPoa=false, bool printCurDatacenter=false)
 {
-//	outFile << "allChains=";
-//	for (auto const & x : allChains) {
-////		outFile << x.first << " ";
-//		outFile << x.id << " ";
-//	}	
-//	outFile << endl;
+	outFile << "allChains=";
+	for (auto const & c : allChains) {
+		outFile << "chain "<< c.id << ": ";
+		if (printSu) {
+			for (auto const & i: c.S_u) {
+				outFile << i << ",";
+			}
+			outFile << ";"; 
+		}
+	}	
+	outFile << endl;
 }
 
   	
@@ -224,7 +230,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 	  }
   }
 //  outFile << "After reading chains that left: ";
-//  printAllChains ();
+//  printAllChains (true);
 }
 
 /*
@@ -248,6 +254,8 @@ void TraceFeeder::readNewChainsLine (string line)
 		if (rand () < RT_chain_rand_int) {
 			// Generate an RT (highest-priority) chain, and insert it to the beginning of the vector of chains that joined the relevant PoA (leaf DC)
 			chain = RT_Chain     (chainId, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
+			outFile << "adding chain " << chainId << " :";
+			MyConfig::printVec (outFile, chain.S_u);
 			chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 		}
 		else {
@@ -255,10 +263,10 @@ void TraceFeeder::readNewChainsLine (string line)
 			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
 			chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 		}
-		// $$$ modify the existing chain in allChains		allChains[chainId] = chain; 
+		allChains.insert (chain);
 	}	
   outFile << "After readNewCHainsLine: ";
-  printAllChains ();
+  printAllChains (true);
 }
 
 /*
@@ -300,8 +308,6 @@ void TraceFeeder::readOldChainsLine (string line)
 	  }
 	}
 	
-	// Change the S_u of the relevant chain
-	// $$ now, update the chain that left
   outFile << "After readOldCHainsLine: ";
   printAllChains ();
 }

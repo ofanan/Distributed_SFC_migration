@@ -42,6 +42,7 @@ class Chain
     bool operator< (const Chain &right) const {
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
+    
 };
 
 /* 
