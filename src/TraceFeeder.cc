@@ -15,7 +15,7 @@
 #include <unordered_set>
 #include <typeinfo>
 
-//#include "MyConfig.h"
+#include "MyConfig.h"
 #include "Datacenter.h"
 #include "Chain.h"
 #include "Parameters.h"
@@ -170,13 +170,14 @@ void TraceFeeder::runTrace () {
   outFile.close ();
 }
 
-/*
-void TraceFeeder::printVec (vector <class T> &vec ) 
-{
-//		for_each(chain.S_u.begin(), chain.S_u.end(),[](int number){cout << number << ";";});
 
-}
-*/
+//void TraceFeeder::printVec (outFile vector <class T> &vec ) 
+//{
+//	for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+//		outFile << *it << ";";
+//	}
+//}
+
 
 // Print all the chains. Default: print only the chains IDs. 
 void TraceFeeder::printAllChains (bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)

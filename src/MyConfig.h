@@ -19,15 +19,18 @@ class MyConfig {
 	
 		// Print vector in a formated fashion
 		static void printVec (ofstream &outFile, vector<int16_t> vec) {
-		  for_each(vec.begin(), vec.end(),[](int number){outFile << number << ";";});
+			for (vector <int16_t>::const_iterator it (vec.begin()); it <= vec.end(); it++){
+				outFile << *it << ";";
+			}
+/*		  for_each(vec.begin(), vec.end(),[](int number){outFile << number << ";";});*/
 		  outFile << endl;
 		};
 		
 		// Print vector in a formated fashion
-		static void printVec (ofstream &outFile, vector<int32_t> vec) {
-		  for_each(vec.begin(), vec.end(),[](int number){outFile << number << ";";});
-		  outFile << endl;
-		};
+/*		static void printVec (ofstream &outFile, vector<int32_t> vec) {*/
+/*		  for_each(vec.begin(), vec.end(),[](int number){outFile << number << ";";});*/
+/*		  outFile << endl;*/
+/*		};*/
 };
 
 #endif
