@@ -1,3 +1,4 @@
 30540
 After readNewCHainsLine: After readOldCHainsLine: 30548
+erasing chain 0
 After readNewCHainsLine: After readOldCHainsLine: 

@@ -69,7 +69,7 @@ class TraceFeeder : public cSimpleModule
     ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
-    void parseChainPoaToken (string token, int32_t &chain_id, int16_t &poa);
+    void parseChainPoaToken (string token, int32_t &chainId, int16_t &poa);
 };
 
 Define_Module(TraceFeeder);
@@ -111,24 +111,6 @@ void TraceFeeder::initialize (int stage)
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
   outFile.open ("example.txt");
-  
-  vector <int32_t> S_u = {9};
-  outFile << S_u[0];
-	Chain c0 = Chain (0, {8});
-	Chain dummyChain (0, {666});
-	unordered_set <Chain, ChainHash> dummySet;
-	dummySet.insert (c0);
-	
-	auto search = dummySet.find (dummyChain);
-//  unordered_set<Chain>::const_iterator search = dummySet.find (dummyChain);
-  
-	if (search==dummySet.end()) {
-		outFile << "not found";
-	}
-	else {
-		outFile << "Found chain id " << (int) search->id << "S_u[0]=" << (*search).S_u[0];
-	}
-	
   outFile << networkName << endl;
 }
 
@@ -199,13 +181,13 @@ void TraceFeeder::printAllChains (bool printPoa = false, bool printCurDatacenter
 }
 
   	
-// parse a token of the type "u,poa" where u is the chain_id number and poa is the user's current Poa
-void TraceFeeder::parseChainPoaToken (string token, int32_t &chain_id, int16_t &poa)
+// parse a token of the type "u,poa" where u is the chainId number and poa is the user's current Poa
+void TraceFeeder::parseChainPoaToken (string token, int32_t &chainId, int16_t &poa)
 {
 	istringstream newChainToken(token); 
   string numStr; 
 	getline (newChainToken, numStr, ',');
-	chain_id = stoi (numStr);
+	chainId = stoi (numStr);
 	getline (newChainToken, numStr, ',');
 	poa = stoi (numStr);
 	if (poa > numLeaves) {
@@ -226,21 +208,20 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
-  int32_t chain_id;
+  int32_t chainId;
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
   for (const auto& token : tokens) {
-  	chain_id = stoi (token);
-//	  auto search = allChains.find(chain_id);
-//	  if (search == allChains.end()) {
-//			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " that left\n";
-//			endSimulation();
-//	  }
-//	  else {
-//  		chainsThatLeftDatacenter[search->curDatacenter].insert (chain_id); // insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
-//  		outFile << "erasing chain " << chain_id << endl;
-//  		allChains.erase (chain_id);// remove the chain from the list of chains.
-//	  }
+  	chainId = stoi (token);
+  	if (!(findChainInSet (allChains, chainId, chain))) {
+			outFile << "Error in t=" << t << ": didn't find chain id " << chainId << " that left\n";
+			endSimulation();
+	  }
+	  else {
+  		chainsThatLeftDatacenter[chain.curDatacenter].insert (chainId);  //insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  		outFile << "erasing chain " << chainId << endl;
+  		allChains.erase (chain);// remove the chain from the list of chains.
+	  }
   }
 //  outFile << "After reading chains that left: ";
 //  printAllChains ();
@@ -257,24 +238,24 @@ void TraceFeeder::readNewChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t chain_id;
+  int32_t chainId;
   int16_t poa; 
 	Chain chain; // will hold the new chain to be inserted each time
   
   
 	for (const auto& token : tokens) {
-		parseChainPoaToken (token, chain_id, poa);
+		parseChainPoaToken (token, chainId, poa);
 		if (rand () < RT_chain_rand_int) {
 			// Generate an RT (highest-priority) chain, and insert it to the beginning of the vector of chains that joined the relevant PoA (leaf DC)
-			chain = RT_Chain     (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
+			chain = RT_Chain     (chainId, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+RT_Chain::mu_u_len-1));
 			chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant PoA (leaf DC)
-			chain = Non_RT_Chain (chain_id, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
+			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poa].begin(), pathToRoot[poa].begin()+Non_RT_Chain::mu_u_len-1)); 
 			chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 		}
-		// $$$ modify the existing chain in allChains		allChains[chain_id] = chain; 
+		// $$$ modify the existing chain in allChains		allChains[chainId] = chain; 
 	}	
   outFile << "After readNewCHainsLine: ";
   printAllChains ();
@@ -293,27 +274,34 @@ void TraceFeeder::readOldChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t chain_id;
+  int32_t chainId;
   int16_t poa; 
 	Chain chain; // will hold the new chain to be inserted each time
 
 	for (const auto& token : tokens) {
-		parseChainPoaToken (token, chain_id, poa);
-//	  auto search = allChains.find(chain_id);
-//	  if (search == allChains.end()) {
-//			outFile << "Error in t=" << t << ": didn't find chain id " << chain_id << " in allChains, in readChainsLine (old chains)\n";
-////				endSimulation();
-//	  }
-//	  else {
-//			if (chain.isRT_Chain) {
-//				chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
-//			}
-//			else {
-//				chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
-//			}
-//			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
-//	  }
+		parseChainPoaToken (token, chainId, poa);
+  	chainId = stoi (token);
+  	if (!(findChainInSet (allChains, chainId, chain))) {
+			outFile << "Error in t=" << t << ": didn't find chain id " << chainId << " in allChains, in readChainsLine (old chains)\n";
+			endSimulation();
+	  }
+	  else {
+			
+			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+			chain.S_u = pathToRoot[poa]; //Update S_u of the chain to reflect its new location
+			allChains.insert (chain);
+			if (chain.isRT_Chain) {
+				chainsThatJoinedPoa[poa].insert (chainsThatJoinedPoa[poa].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
+			}
+			else {
+				chainsThatJoinedPoa[poa].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
+			}
+			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+	  }
 	}
+	
+	// Change the S_u of the relevant chain
+	// $$ now, update the chain that left
   outFile << "After readOldCHainsLine: ";
   printAllChains ();
 }
@@ -325,8 +313,8 @@ void TraceFeeder::rlzRsrcsOfChains ()
 	for (auto const& item : chainsThatLeftDatacenter)
 	{
 		outFile << "Chains that left dc " << item.first << ": ";
-		for(auto chain_id : item.second) {
-			outFile << chain_id << " ";			
+		for(auto chainId : item.second) {
+			outFile << chainId << " ";			
 		}    
 		outFile << endl;
 	}
@@ -338,8 +326,8 @@ void TraceFeeder::initAlg () {
 	for (auto const& chain : chainsThatJoinedDatacenter)
 	{
 		outFile << "Chains that joined dc " << chain.first << ": ";
-		for(auto chain_id : chain.second) {
-			outFile << chain_id << " ";			
+		for(auto chainId : chain.second) {
+			outFile << chainId << " ";			
 		}    
 		outFile << endl;
 	}

@@ -86,7 +86,7 @@ struct ChainHash {
 
 bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chainId, Chain &c)
 {
-	Chain dummy (chainId, {0});
+	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);
 	
 	return true;
