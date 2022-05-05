@@ -1,9 +1,3 @@
 30540
-After reading chains that left: allChains=
-After readNewCHainsLine: allChains=2 1 0 
-After readOldCHainsLine: allChains=2 1 0 
-30548
-erasing chain 0
-After reading chains that left: allChains=2 1 
-After readNewCHainsLine: allChains=61 2 1 
-After readOldCHainsLine: allChains=61 2 1 
+After readNewCHainsLine: After readOldCHainsLine: 30548
+After readNewCHainsLine: After readOldCHainsLine: 

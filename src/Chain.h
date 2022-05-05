@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <unordered_set>
 
 #include <omnetpp.h>
 #include "Parameters.h"
@@ -77,34 +78,33 @@ class Non_RT_Chain: public Chain
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
-struct Chain_hash
-{
-  template <int, class Chain>
-//  size_t operator () (pair<int, Chain> const &c) const
-  size_t operator () (const Chain &c) const  {
-  	return hash<int>()(c.id());    
+struct ChainHash {
+	size_t operator()(const Chain& c) const {
+  	return hash<int>()(c.id);
   }
 };
 
-struct ChainHash {
-    size_t operator()(const Chain& c) const {
-/*        std::hash<int> hasher;*/
-/*        size_t seed = 0;*/
-/*        for (int i : v) {*/
-/*            seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);*/
-/*        }*/
-        return 7;
-    }
-};
+bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chainId, Chain &c)
+{
+	Chain dummy (chainId, {0});
+	auto search = setOfChains.find (dummy);
+	
+	return true;
+	if (search==setOfChains.end()) {
+		return false;
+	}
+	else {
+		return false;
+		c = *search;
+	}
+}
 
-/*struct Chain_hash*/
-/*{*/
-/*  template <class T1, class Chain>*/
-/*  size_t operator () (pair<T1, Chain> const &c) const*/
-/*  {*/
-/*  	return hash<T1>()(c.id());    */
-/*  }*/
+/*class unorderedSetOfChains {*/
+/*	unordered_set <Chain>	setOfChains;*/
+/*	*/
+/*	*/
 /*};*/
+
 #endif
 
 /*typedef list<Chain> ChainList;*/
