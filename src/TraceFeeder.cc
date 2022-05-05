@@ -94,8 +94,8 @@ void TraceFeeder::initialize (int stage)
 	vector <int16_t> S_u = {8};
 	Chain c0 = Chain (0, S_u);
 	Chain c1 (1, S_u);
-	unordered_set <Chain, Chain_hash> dummy;
-//	dummy.insert (c0);
+	unordered_set <Chain, ChainHash> dummy;
+	dummy.insert (c0);
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	openFiles ();
