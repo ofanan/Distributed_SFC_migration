@@ -17,18 +17,18 @@ using namespace std;
 class MyConfig {
 	public:
 		static void printVec (ofstream &outFile, vector<int16_t> vec) {
-			std::vector<int> v = {1,2,3};
 			for(auto it = begin(vec); it != end(vec); it++) {
 		  	outFile << *it << ",";
 			}
-			outFile << *(end(vec)) << ";";
+			outFile << *(end(vec)) << ";" ;
 		};
+		
 		static void printVec (ofstream &outFile, vector<int32_t> vec) {
-				for (auto i : vec) {
-					outFile << i << ",";
-				}
-				outFile << ";";
-			};
+			for(auto it = begin(vec); it != end(vec); it++) {
+		  	outFile << *it << ",";
+			}
+			outFile << *(end(vec)) << ";" ;
+		};
 };
 
 #endif
