@@ -3,15 +3,42 @@ Tree
 30540
 After readNewCHainsLine: allChains
 *******************
-chain 2: 7;2;0;
-chain 1: 6;1;0;
-chain 0: 5;1;0;
+chain 2: 6;1;0;
+chain 1: 5;1;0;
+chain 0: 4;1;0;
+
+After readOldCHainsLine: allChains
+*******************
+chain 2: 6;1;0;
+chain 1: 5;1;0;
+chain 0: 4;1;0;
 
 30548
-erasing chain 0
+b4 erasing chain 0
+allChains
+*******************
+chain 2: 6;1;0;
+chain 1: 5;1;0;
+chain 0: 4;1;0;
+
+ chain 0 is:
+chain 0: 4;1;0;
+erasing the chain returned 1
+after erasing chain 0
+allChains
+*******************
+chain 2: 6;1;0;
+chain 1: 5;1;0;
+
 After readNewCHainsLine: allChains
 *******************
 chain 61: 6;1;0;
-chain 2: 7;2;0;
-chain 1: 6;1;0;
+chain 2: 6;1;0;
+chain 1: 5;1;0;
+
+After readOldCHainsLine: allChains
+*******************
+chain 2: 5;1;0;0;
+chain 1: 6;1;0;0;
+chain 61: 6;1;0;
 

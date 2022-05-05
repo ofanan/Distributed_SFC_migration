@@ -61,6 +61,7 @@ class TraceFeeder : public cSimpleModule
     void handleMessage (cMessage *msg);
     
     // Functions used for debugging
+		void printChain (const Chain &c);
     void printAllChains (bool printSu, bool printPoA, bool printCurDatacenter); // print the list of all chains
 		
   public:
@@ -171,12 +172,16 @@ void TraceFeeder::runTrace () {
 }
 
 
-//void TraceFeeder::printVec (outFile vector <class T> &vec ) 
-//{
-//	for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
-//		outFile << *it << ";";
-//	}
-//}
+// Print a single chain. Default: print only the chains IDs. 
+void TraceFeeder::printChain (const Chain &chain)
+{
+	outFile << "chain " << chain.id << ": ";
+	for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+		outFile << *it << ";";
+	}
+	outFile << endl;
+}
+
 
 
 // Print all the chains. Default: print only the chains IDs. 
@@ -184,7 +189,7 @@ void TraceFeeder::printAllChains (bool printSu=false, bool printleaf=false, bool
 {
 	outFile << "allChains\n*******************\n";
 	for (auto const & chain : allChains) {
-		outFile << "chain "<< chain.id << ": ";
+		outFile << "chain " << chain.id << ": ";
 		for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
 			outFile << *it << ";";
 		}
@@ -233,8 +238,13 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 	  }
 	  else {
   		chainsThatLeftDatacenter[chain.curDatacenter].insert (chainId);  //insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
-  		outFile << "erasing chain " << chainId << endl;
-  		allChains.erase (chain);// remove the chain from the list of chains.
+  		outFile << "b4 erasing chain " << chainId << endl;
+		  printAllChains (true);
+		  outFile << " chain 0 is:\n";
+		  printChain (chain);
+  		outFile << "erasing the chain returned " << allChains.erase (chain) << endl;// remove the chain from the list of chains.
+  		outFile << "after erasing chain " << chainId << endl;
+		  printAllChains (true);
 	  }
   }
 //  outFile << "After reading chains that left: ";
@@ -283,17 +293,14 @@ Inputs:
 // parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new leaf (to place that chain).
 void TraceFeeder::readOldChainsLine (string line)
 {
-//$$$$$$$$$$$$$$$ SHOULD FIX AS IN readNew
-/*
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   int32_t chainId;
-  int16_t poaId, leaf;
+  int16_t poaId;
 	Chain chain; // will hold the new chain to be inserted each time
 
 	for (const auto& token : tokens) {
-		parseChainPoaToken (token, chainId, leaf);
-		leaf = leaves[poaId]->id;
+		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
 			outFile << "Error in t=" << t << ": didn't find chain id " << chainId << " in allChains, in readChainsLine (old chains)\n";
@@ -302,13 +309,13 @@ void TraceFeeder::readOldChainsLine (string line)
 	  else {
 			
 			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-			chain.S_u = pathToRoot[leaf]; //Update S_u of the chain to reflect its new location
+			chain.S_u = pathToRoot[poaId]; //Update S_u of the chain to reflect its new location
 			allChains.insert (chain);
 			if (chain.isRT_Chain) {
-				chainsThatJoinedLeaf[leaf].insert (chainsThatJoinedLeaf[leaf].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
+				chainsThatJoinedLeaf[poaId].insert (chainsThatJoinedLeaf[poaId].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 			}
 			else {
-				chainsThatJoinedLeaf[leaf].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
+				chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 			}
 			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	  }
@@ -316,7 +323,6 @@ void TraceFeeder::readOldChainsLine (string line)
 	
   outFile << "After readOldCHainsLine: ";
   printAllChains ();
-  */
 }
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').

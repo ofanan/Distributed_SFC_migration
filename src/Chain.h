@@ -90,13 +90,12 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chai
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);
 	
-	return true;
 	if (search==setOfChains.end()) {
 		return false;
 	}
 	else {
-		return false;
 		c = *search;
+		return true;
 	}
 }
 
