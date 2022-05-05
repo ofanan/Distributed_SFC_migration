@@ -184,7 +184,10 @@ void TraceFeeder::printAllChains (bool printSu=false, bool printleaf=false, bool
 	outFile << "allChains\n*******************\n";
 	for (auto const & chain : allChains) {
 		outFile << "chain "<< chain.id << ": ";
-		for_each(chain.S_u.begin(), chain.S_u.end(),[](int number){cout << number << ";";});
+		for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+			outFile << *it << ";";
+		}
+//		for_each(chain.S_u.begin(), chain.S_u.end(),[](int number){cout << number << ";";});
 		outFile << endl;
 	}	
 	outFile << endl;
