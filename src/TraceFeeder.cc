@@ -39,8 +39,9 @@ class TraceFeeder : public cSimpleModule
     float  RT_chain_pr = 1.0; // prob' that a new chain is an RT chain
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
-//    unordered_map <int32_t, Chain> allChains; // All the currently active chains. 
-    unordered_map <int16_t, unordered_set<int32_t> > chainsThatLeftDatacenter;//chainsThatLeftDC[i] will hold the list of IDs of chains that left DC i (either towards another leaf, or left the sim').
+
+		//chainsThatLeftDC[i] will hold the list of IDs of chains that left DC i (either towards another leaf, or left the sim').
+    unordered_map <int16_t, unordered_set<int32_t> > chainsThatLeftDatacenter;
     unordered_map <int16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
     vector <vector<int16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
@@ -61,7 +62,7 @@ class TraceFeeder : public cSimpleModule
     void handleMessage (cMessage *msg);
     
     // Functions used for debugging
-		void printChain (const Chain &c);
+		void printChain (ofstream &outFile, const Chain &chain);
     void printAllChains (bool printSu, bool printPoA, bool printCurDatacenter); // print the list of all chains
 		
   public:
@@ -172,10 +173,10 @@ void TraceFeeder::runTrace () {
 }
 
 
-// Print a single chain. Default: print only the chains IDs. 
-void TraceFeeder::printChain (const Chain &chain)
+// Print a data about a single chain to a requested output file.
+void TraceFeeder::printChain (ofstream &outFile, const Chain &chain)
 {
-	outFile << "chain " << chain.id << ": ";
+	outFile << "chain " << chain.id << ": S_u=";
 	for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
 		outFile << *it << ";";
 	}
@@ -241,7 +242,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   		outFile << "b4 erasing chain " << chainId << endl;
 		  printAllChains (true);
 		  outFile << " chain 0 is:\n";
-		  printChain (chain);
+		  printChain (outFile, chain);
   		outFile << "erasing the chain returned " << allChains.erase (chain) << endl;// remove the chain from the list of chains.
   		outFile << "after erasing chain " << chainId << endl;
 		  printAllChains (true);

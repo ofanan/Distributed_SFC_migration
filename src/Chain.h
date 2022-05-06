@@ -85,11 +85,19 @@ struct ChainHash {
   }
 };
 
+/*
+Find a chain (given by its id) in a given set of chains.
+Inputs:
+- The set of chains.
+- Id of the requested chain.
+- Ref' to which the found chain is written.
+Output: true iff the requested chain is found.
+*/
 bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chainId, Chain &c)
 {
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);
-	
+
 	if (search==setOfChains.end()) {
 		return false;
 	}
@@ -98,12 +106,6 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chai
 		return true;
 	}
 }
-
-/*class unorderedSetOfChains {*/
-/*	unordered_set <Chain>	setOfChains;*/
-/*	*/
-/*	*/
-/*};*/
 
 #endif
 
