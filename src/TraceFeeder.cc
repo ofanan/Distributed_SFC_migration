@@ -368,22 +368,6 @@ void TraceFeeder::initAlg () {
 		endSimulation ();
 	}
 }
-//		critAndMovedChainsOfLeaf[leaf].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
-//		critAndMovedChainsOfLeaf[leaf].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.
-//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.	  	
-//  	char_separator<char> slashSlash("//");
-//	  tokenizer<char_separator<char>> tokens(text, sep);
-//    for (const auto& t : tokens) {
-//        outFile << t << "." << endl;
-//    }
-
-//  	outFile << line << endl;
-//stringstream ss("bla bla");
-//string s;
-
-//while (getline(ss, s, ' ')) {
-// cout << s << endl;
-//}
 
 
 void TraceFeeder::handleMessage (cMessage *msg)
@@ -394,27 +378,6 @@ void TraceFeeder::handleMessage (cMessage *msg)
   int32_t id = 0;
   outFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
   }
-
-    // If self.msg:
-    // - Read from the trace the data for a single slot.
-    // - Init the placement alg'
-    // - Schedule an event for the next run
 }
 
-
-//  EV << "sent direct msg\n";
-//  outFile << "Writing this to a file.\n";
-//  outFile.close();
-
-//cModule *targetModule = getParentModule()->getSubmodule("node2");
-//sendDirect(new cMessage("msg"), targetModule, "in");
-
-//sendDirect(cMessage *msg, cModule *mod, int gateId)
-//sendDirect(cMessage *msg, cModule *mod, const char *gateName, int index=-1)
-//sendDirect(cMessage *msg, cGate *gate)
-//cModule *targetModule = getParentModule()->getSubmodule("node2");
-//sendDirect(new cMessage("msg"), targetModule, "in");
-//directMsgsPort
-    // Open the trace input file
-    // Schedule a self-event for beginning reading the trace
 
