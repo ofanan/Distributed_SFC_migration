@@ -41,8 +41,8 @@ class TraceFeeder : public cSimpleModule
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 
-		//chainsThatLeftDC[i] will hold the list of IDs of chains that left DC i (either towards another leaf, or left the sim').
-    unordered_map <int16_t, unordered_set<int32_t> > chainsThatLeftDatacenter;
+		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
+    unordered_map <int16_t, vector<int32_t> > chainsThatLeftDatacenter;
     unordered_map <int16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
     vector <vector<int16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
@@ -239,7 +239,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 			endSimulation();
 	  }
 	  else {
-  		chainsThatLeftDatacenter[chain.curDatacenter].insert (chainId);  //insert the id of the moved chain to the list of chains that left the current datacenter, where the chain is placed.
+  		chainsThatLeftDatacenter[chain.curDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
   		outFile << "b4 erasing chain " << chainId << endl;
 		  printAllChains (true);
 		  outFile << " chain 0 is:\n";
@@ -317,7 +317,7 @@ void TraceFeeder::readOldChainsLine (string line)
 			else {
 				chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 			}
-			chainsThatLeftDatacenter[chain.curDatacenter].insert (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+			chainsThatLeftDatacenter[chain.curDatacenter].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	  }
 	}
 	
@@ -329,19 +329,25 @@ void TraceFeeder::readOldChainsLine (string line)
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 
-		leftChainsMsg* msg;
-	for (auto &datacenter : chainsThatLeftDatacenter)
-	{
-	
+//virtual void setRoute(unsigned k, long route);
+//virtual void setRouteArraySize(unsigned n);
 
-//		// generate a msg
+	leftChainsMsg* msg; 
+	int16_t i;
+	for (auto &chainsLeftThisDc : chainsThatLeftDatacenter)
+	{
+		msg = new leftChainsMsg ();
+		msg -> setLeftChainsArraySize (chainsLeftThisDc.second.size());
+		for (auto & chainId : chainsLeftThisDc.second) {
+			msg -> setLeftChains (i++, chainId);
+		}
+	}
+}
 //		outFile << "Chains that left dc " << item.first << ": ";
 //		for(auto chainId : item.second) {
 //			outFile << chainId << " ";			
 //		}    
 //		outFile << endl;
-	}
-}
   	
 void TraceFeeder::initAlg () {  	
 /*
