@@ -239,7 +239,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 			endSimulation();
 	  }
 	  else {
-	  	if (chain.curDatacenter == -1) {
+	  	if (chain.curDatacenter == notPlacedYet) {
 	  		outFile << "Note: this chain was not placed before leaving\n";
 	  		continue;
 	  	}
@@ -336,51 +336,41 @@ void TraceFeeder::readOldChainsLine (string line)
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 
+	leftChainsMsg* msg;
 	int16_t i;
 	for (auto &item : chainsThatLeftDatacenter)
 	{
-		leftChainsMsg* msg = new leftChainsMsg ();
+		msg = new leftChainsMsg ();
 		msg -> setLeftChainsArraySize (item.second.size());
 		i = 0;
 		for (auto & chainId : item.second) {
 			msg -> setLeftChains (i++, chainId);
 		}
-		outFile << "item.first = " << item.first;
 		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
-		endSimulation ();
-
-		// Add to init: find the gate of each DC.
-    // Discover the input gates of all the datacenters.
-//    directMsgsPort
-//    for (int dc(0); dc < numDatacenters; dc++) {
-//      gateOfDatacenters[dc] = 
-//        cGate *outGate    = gate("port$o", portNum);
-//    }
-
-//		sendDirect(msg, gate)
 	}
 }
-//		outFile << "Chains that left dc " << item.first << ": ";
-//		for(auto chainId : item.second) {
-//			outFile << chainId << " ";			
-//		}    
-//		outFile << endl;
-  	
+
+
 void TraceFeeder::initAlg () {  	
-/*
-	for (auto const& chain : chainsThatJoinedDatacenter)
+
+	initBottomUpMsg* msg;
+	int16_t i;
+	for (auto const& item : chainsThatJoinedLeaf)
 	{
-		outFile << "Chains that joined dc " << chain.first << ": ";
-		for(auto chainId : chain.second) {
-			outFile << chainId << " ";			
+		outFile << "Chains that joined dc " << item.first << ": ";
+		msg = new initBottomUpMsg ();
+		msg -> setNotAssignedArraySize (item.second.size());
+		i = 0;
+		for(auto &chain : item.second) {
+			msg -> setNotAssigned (i++, chain);
 		}    
-		outFile << endl;
+		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
+		endSimulation ();
 	}
-	*/
+}
 //		critAndMovedChainsOfLeaf[leaf].insert (newChain); // insert the new chain to the set of crit' chains of the relevant leaf.
 //		critAndMovedChainsOfLeaf[leaf].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.
-//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.	
-}  	
+//		critAndMovedChainsOfLeaf[curDatacenter].insert (critChain); // insert the moved chain to the set of crit'/moved chains of its new leaf=leaf.	  	
 //  	char_separator<char> slashSlash("//");
 //	  tokenizer<char_separator<char>> tokens(text, sep);
 //    for (const auto& t : tokens) {
