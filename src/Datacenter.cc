@@ -25,11 +25,13 @@ void Datacenter::initialize()
   lvl				  = (int16_t) (par("lvl"));
   id					= (int16_t) (par("id"));
   availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
+        // variables: assigned chains, placedChains
+
   numPorts    = numParents + numChildren;
   isRoot      = (numParents==0);
   isLeaf      = (numChildren==0);
   outputQ.        resize (numPorts);
-  xmtChnl.        resize (numPorts);
+  xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
   endXmtEvents.   resize (numPorts);
   idOfChildren.   resize (numChildren);
   

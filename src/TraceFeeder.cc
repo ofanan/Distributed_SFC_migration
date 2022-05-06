@@ -239,14 +239,18 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 			endSimulation();
 	  }
 	  else {
+	  	if (chain.curDatacenter == -1) {
+	  		outFile << "Note: this chain was not placed before leaving\n";
+	  		continue;
+	  	}
   		chainsThatLeftDatacenter[chain.curDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-  		outFile << "b4 erasing chain " << chainId << endl;
-		  printAllChains (true);
-		  outFile << " chain 0 is:\n";
-		  printChain (outFile, chain);
-  		outFile << "erasing the chain returned " << allChains.erase (chain) << endl;// remove the chain from the list of chains.
-  		outFile << "after erasing chain " << chainId << endl;
-		  printAllChains (true);
+//  		outFile << "b4 erasing chain " << chainId << endl;
+//		  printAllChains (true);
+//		  outFile << " chain 0 is:\n";
+//		  printChain (outFile, chain);
+//  		outFile << "erasing the chain returned " << allChains.erase (chain) << endl;// remove the chain from the list of chains.
+//  		outFile << "after erasing chain " << chainId << endl;
+//		  printAllChains (true);
 	  }
   }
 }
@@ -317,7 +321,10 @@ void TraceFeeder::readOldChainsLine (string line)
 			else {
 				chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 			}
-			chainsThatLeftDatacenter[chain.curDatacenter].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+			
+			if (chain.curDatacenter != notPlacedYet) {
+				chainsThatLeftDatacenter[chain.curDatacenter].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+			}
 	  }
 	}
 	
@@ -329,18 +336,28 @@ void TraceFeeder::readOldChainsLine (string line)
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 
-//virtual void setRoute(unsigned k, long route);
-//virtual void setRouteArraySize(unsigned n);
-
-	leftChainsMsg* msg; 
 	int16_t i;
-	for (auto &chainsLeftThisDc : chainsThatLeftDatacenter)
+	for (auto &item : chainsThatLeftDatacenter)
 	{
-		msg = new leftChainsMsg ();
-		msg -> setLeftChainsArraySize (chainsLeftThisDc.second.size());
-		for (auto & chainId : chainsLeftThisDc.second) {
+		leftChainsMsg* msg = new leftChainsMsg ();
+		msg -> setLeftChainsArraySize (item.second.size());
+		i = 0;
+		for (auto & chainId : item.second) {
 			msg -> setLeftChains (i++, chainId);
 		}
+		outFile << "item.first = " << item.first;
+		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
+		endSimulation ();
+
+		// Add to init: find the gate of each DC.
+    // Discover the input gates of all the datacenters.
+//    directMsgsPort
+//    for (int dc(0); dc < numDatacenters; dc++) {
+//      gateOfDatacenters[dc] = 
+//        cGate *outGate    = gate("port$o", portNum);
+//    }
+
+//		sendDirect(msg, gate)
 	}
 }
 //		outFile << "Chains that left dc " << item.first << ": ";
@@ -399,12 +416,9 @@ void TraceFeeder::handleMessage (cMessage *msg)
 //  outFile << "Writing this to a file.\n";
 //  outFile.close();
 
-    // Discover the input gates of all the datacenters.
-//    directMsgsPort
-//    for (int dc(0); dc < numDatacenters; dc++) {
-//      gateOfDatacenters[dc] = 
-//        cGate *outGate    = gate("port$o", portNum);
-//    }
+//cModule *targetModule = getParentModule()->getSubmodule("node2");
+//sendDirect(new cMessage("msg"), targetModule, "in");
+
 //sendDirect(cMessage *msg, cModule *mod, int gateId)
 //sendDirect(cMessage *msg, cModule *mod, const char *gateName, int index=-1)
 //sendDirect(cMessage *msg, cGate *gate)
