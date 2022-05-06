@@ -20,7 +20,7 @@
 #include "Chain.h"
 #include "Parameters.h"
 #include "initBottomUpMsg_m.h"
-//#include "leftChainsMsg_m.h"
+#include "leftChainsMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -329,7 +329,7 @@ void TraceFeeder::readOldChainsLine (string line)
 void TraceFeeder::rlzRsrcsOfChains ()
 {
 
-//		leftChainsMsg* msg;
+		leftChainsMsg* msg;
 	for (auto &datacenter : chainsThatLeftDatacenter)
 	{
 	
