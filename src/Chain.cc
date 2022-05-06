@@ -24,22 +24,18 @@ Inputs:
 - &foundChain: a reference, to which the found chain (if there exists) will be written.
 Return value: true iff the requested chain was found.
 */
-bool findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain) { 
-	for (auto const& chain : setOfChains) {
-    if (chain.id == id) { // Found the requested chain
-      foundChain = chain;    
-      return true;
-    }
-  }
-  return false;
+bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, int32_t chainId, Chain &c)
+{
+	Chain dummy (chainId, {});
+	auto search = setOfChains.find (dummy);
 
-//  set<Chain>::iterator it;
-//  for(it = setOfChains.begin(); it!=setOfChains.end(); ++it){
-//    if (it -> id == id) { // Found the requested chain
-//      foundChain = *it;    
-//      return true;
-//    }
-//  }
-//  return false;
+	if (search==setOfChains.end()) {
+		return false;
+	}
+	else {
+		c = *search;
+		return true;
+	}
 }
+
 

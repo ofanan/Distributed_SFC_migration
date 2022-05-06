@@ -20,6 +20,7 @@
 #include "Chain.h"
 #include "Parameters.h"
 #include "initBottomUpMsg_m.h"
+//#include "leftChainsMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -248,8 +249,6 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 		  printAllChains (true);
 	  }
   }
-//  outFile << "After reading chains that left: ";
-//  printAllChains (true);
 }
 
 /*
@@ -329,16 +328,19 @@ void TraceFeeder::readOldChainsLine (string line)
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
 void TraceFeeder::rlzRsrcsOfChains ()
 {
-	/*
-	for (auto const& item : chainsThatLeftDatacenter)
+
+//		leftChainsMsg* msg;
+	for (auto &datacenter : chainsThatLeftDatacenter)
 	{
-		outFile << "Chains that left dc " << item.first << ": ";
-		for(auto chainId : item.second) {
-			outFile << chainId << " ";			
-		}    
-		outFile << endl;
+	
+
+//		// generate a msg
+//		outFile << "Chains that left dc " << item.first << ": ";
+//		for(auto chainId : item.second) {
+//			outFile << chainId << " ";			
+//		}    
+//		outFile << endl;
 	}
-	*/
 }
   	
 void TraceFeeder::initAlg () {  	
