@@ -64,12 +64,12 @@ class TraceFeeder : public cSimpleModule
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain);
-    void printAllChains (bool printSu, bool printPoA, bool printCurDatacenter); // print the list of all chains
-		
+    void printAllChains (ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
+				 
   public:
     string traceFileName = "results/poa_files/Tree_short.poa";
- 		string outFileName   = "example.txt";
-    ofstream outFile;
+ 		string LogFileName   = "example.txt";
+    ofstream logFile;
     ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
@@ -114,8 +114,8 @@ void TraceFeeder::initialize (int stage)
 
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
-  outFile.open ("example.txt");
-  outFile << networkName << endl;
+  logFile.open ("example.txt");
+  logFile << networkName << endl;
 }
 
 
@@ -131,7 +131,7 @@ void TraceFeeder::discoverPathsToRoot () {
 		 	dc_id = datacenters[dc_id]->idOfParent;
 		}
 	}
-	outFile << endl;
+	logFile << endl;
 }
 
 void TraceFeeder::runTrace () {
@@ -139,7 +139,7 @@ void TraceFeeder::runTrace () {
 	
   string line;
   if (!traceFile.is_open ()) {
-  	outFile << "poa file was not found -> finishing simulation."; 
+  	logFile << "poa file was not found -> finishing simulation."; 
 		endSimulation();
   }
   while (getline (traceFile, line)) { 
@@ -152,7 +152,7 @@ void TraceFeeder::runTrace () {
   		strcpy (lineAsCharArray, line.c_str());
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
-  		outFile << t << endl;
+  		logFile << "t=" << t << endl;
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));
@@ -170,7 +170,7 @@ void TraceFeeder::runTrace () {
   	}
   }
   traceFile.close ();
-  outFile.close ();
+  logFile.close ();
 }
 
 
@@ -187,7 +187,7 @@ void TraceFeeder::printChain (ofstream &outFile, const Chain &chain)
 
 
 // Print all the chains. Default: print only the chains IDs. 
-void TraceFeeder::printAllChains (bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
+void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
 {
 	outFile << "allChains\n*******************\n";
 	for (auto const & chain : allChains) {
@@ -212,7 +212,7 @@ void TraceFeeder::parseChainPoaToken (string token, int32_t &chainId, int16_t &p
 	getline (newChainToken, numStr, ',');
 	poaId = stoi (numStr);
 	if (poaId > numLeaves) {
-		outFile << "Error at t=" << t << ": poaId is " << poaId << "while the number of leaves in the network is only " << numLeaves << "; EXITING" << endl;
+		logFile << "Error at t=" << t << ": poaId is " << poaId << "while the number of leaves in the network is only " << numLeaves << "; EXITING" << endl;
 		endSimulation();
 	}
 }
@@ -235,22 +235,15 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   for (const auto& token : tokens) {
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
-			outFile << "Error in t=" << t << ": didn't find chain id " << chainId << " that left\n";
+			logFile << "Error in t=" << t << ": didn't find chain id " << chainId << " that left\n";
 			endSimulation();
 	  }
 	  else {
 	  	if (chain.curDatacenter == notPlacedYet) {
-	  		outFile << "Note: this chain was not placed before leaving\n";
+	  		logFile << "Note: this chain was not placed before leaving\n";
 	  		continue;
 	  	}
   		chainsThatLeftDatacenter[chain.curDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-//  		outFile << "b4 erasing chain " << chainId << endl;
-//		  printAllChains (true);
-//		  outFile << " chain 0 is:\n";
-//		  printChain (outFile, chain);
-//  		outFile << "erasing the chain returned " << allChains.erase (chain) << endl;// remove the chain from the list of chains.
-//  		outFile << "after erasing chain " << chainId << endl;
-//		  printAllChains (true);
 	  }
   }
 }
@@ -283,8 +276,8 @@ void TraceFeeder::readNewChainsLine (string line)
 		}
 		allChains.insert (chain);
 	}	
-  outFile << "After readNewCHainsLine: ";
-  printAllChains (true);
+  logFile << "After readNewCHainsLine: ";
+  printAllChains (logFile);
 }
 
 /*
@@ -307,7 +300,7 @@ void TraceFeeder::readOldChainsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
-			outFile << "Error in t=" << t << ": didn't find chain id " << chainId << " in allChains, in readChainsLine (old chains)\n";
+			logFile << "Error in t=" << t << ": didn't find chain id " << chainId << " in allChains, in readChainsLine (old chains)\n";
 			endSimulation();
 	  }
 	  else {
@@ -328,8 +321,8 @@ void TraceFeeder::readOldChainsLine (string line)
 	  }
 	}
 	
-  outFile << "After readOldCHainsLine: ";
-  printAllChains ();
+  logFile << "After readOldCHainsLine: ";
+  printAllChains (logFile);
 }
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
@@ -357,7 +350,7 @@ void TraceFeeder::initAlg () {
 	int16_t i;
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
-		outFile << "Chains that joined dc " << item.first << ": ";
+		logFile << "Chains that joined dc " << item.first << ": ";
 		msg = new initBottomUpMsg ();
 		msg -> setNotAssignedArraySize (item.second.size());
 		i = 0;
@@ -373,10 +366,10 @@ void TraceFeeder::initAlg () {
 void TraceFeeder::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
-    outFile << "rcvd self msg\n"; 
+    logFile << "rcvd self msg\n"; 
   Chain foundChain;
   int32_t id = 0;
-  outFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
+  logFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
   }
 }
 
