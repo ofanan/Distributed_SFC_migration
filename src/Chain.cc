@@ -10,14 +10,13 @@
 #include "Chain.h"
 #include "MyConfig.h"
 
-const vector<uint8_t> RT_Chain::mu_u_vec    = {1, 5, 10};
-const uint8_t RT_Chain::mu_u[]      = {1, 5, 10};
+const vector<uint8_t> RT_Chain::mu_u = {1, 5, 10};
 const uint8_t Non_RT_Chain::mu_u[]  = {1,2,3,4};
 
 const uint8_t RT_Chain	  ::mu_u_len = 3;
 const uint8_t Non_RT_Chain::mu_u_len = 4;
 
-//const int8_t  RT_ChainCpuCostAtLvl = MyConfig::dotProdcut (RT_Chain::mu_u, cpuCostAtLvl);
+const int8_t  RT_ChainCpuCostAtLvl = MyConfig::dotProdcut (RT_Chain::mu_u, cpuCostAtLvl);
 
 
 /* 
