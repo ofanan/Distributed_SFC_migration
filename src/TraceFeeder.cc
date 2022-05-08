@@ -44,6 +44,8 @@ class TraceFeeder : public cSimpleModule
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 
+		uint32_t numMigs; // number of migration performed		
+		
 		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
     unordered_map <int16_t, vector<int32_t> > chainsThatLeftDatacenter;
     unordered_map <int16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
@@ -64,6 +66,7 @@ class TraceFeeder : public cSimpleModule
 		void rlzRsrcsOfChains ();
 		void initAlg ();
     void handleMessage (cMessage *msg);
+		void concludeTimeStep ();
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain);
@@ -139,6 +142,7 @@ void TraceFeeder::discoverPathsToRoot () {
 void TraceFeeder::runTrace () {
 	traceFile = ifstream (traceFileName);
 	
+  numMigs         = 0; // will cnt the # of migrations in the current run
   string line;
   if (!traceFile.is_open ()) {
   	error (".poa file was not found -> finishing simulation"); 
@@ -168,10 +172,27 @@ void TraceFeeder::runTrace () {
   		// place all the new / critical chains.
   		rlzRsrcsOfChains ();
   		initAlg ();
+  		concludeTimeStep ();
   	}
   }
   traceFile.close ();
   logFile.close ();
+}
+
+/*
+- Inc. numMigs for every chain where curDC!=nxtDc.
+- Set for every chain curDc = nxtDc; nxtDc = -1.
+- If running in sync mode: calculate and print the total
+*/
+void TraceFeeder::concludeTimeStep ()
+{
+	for (auto chain : allChains) {
+		if (chain.nxtDatacenter != chain.curDatacenter) {
+			numMigs++;
+			chain.curDatacenter = chain.nxtDatacenter;
+		}
+		chain.nxtDatacenter = -1;
+	}
 }
 
 
@@ -394,8 +415,4 @@ void TraceFeeder::handleMessage (cMessage *msg)
   	}
   }
 }
-
-//$$$
-// 4.9.2: raising errors:
-// error ("rgrgrg", %d);
 
