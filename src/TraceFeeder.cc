@@ -43,8 +43,9 @@ class TraceFeeder : public cSimpleModule
     float  RT_chain_pr = 1.0; // prob' that a new chain is an RT chain
     int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
+    bool mode = SYNC; // either sync, or async
 
-		uint32_t numMigs; // number of migration performed		
+		uint32_t numMigs=0; // number of migration performed		
 		
 		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
     unordered_map <int16_t, vector<int32_t> > chainsThatLeftDatacenter;
@@ -181,18 +182,20 @@ void TraceFeeder::runTrace () {
 
 /*
 - Inc. numMigs for every chain where curDC!=nxtDc.
-- Set for every chain curDc = nxtDc; nxtDc = -1.
-- If running in sync mode: calculate and print the total
+- Set for every chain curDc = nxtDc; nxtDc = UNPLACED.
+- If running in sync mode: calculate and print the total cost
 */
 void TraceFeeder::concludeTimeStep ()
 {
+	int16_t numMigsSinceLastStep = 0;
 	for (auto chain : allChains) {
 		if (chain.nxtDatacenter != chain.curDatacenter) {
-			numMigs++;
+			numMigsSinceLastStep++;
 			chain.curDatacenter = chain.nxtDatacenter;
 		}
-		chain.nxtDatacenter = -1;
+		chain.nxtDatacenter = UNPLACED;
 	}
+	numMigs += numMigsSinceLastStep;
 }
 
 
@@ -259,7 +262,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
-	  	if (chain.curDatacenter == notPlacedYet) {
+	  	if (chain.curDatacenter == UNPLACED) {
 	  		logFile << "Note: this chain was not placed before leaving\n";
 	  		continue;
 	  	}
@@ -291,7 +294,7 @@ void TraceFeeder::readNewChainsLine (string line)
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
-			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len-1)); 
+			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
 			chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 		}
 		allChains.insert (chain);
@@ -336,7 +339,7 @@ void TraceFeeder::readOldChainsLine (string line)
 				chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 			}
 			
-			if (chain.curDatacenter != notPlacedYet) {
+			if (chain.curDatacenter != UNPLACED) {
 				chainsThatLeftDatacenter[chain.curDatacenter].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 			}
 	  }
