@@ -16,7 +16,7 @@ const uint8_t Non_RT_Chain::mu_u[]  = {1,2,3,4};
 const uint8_t RT_Chain	  ::mu_u_len = 3;
 const uint8_t Non_RT_Chain::mu_u_len = 4;
 
-const int8_t  RT_ChainCpuCostAtLvl = MyConfig::dotProdcut (RT_Chain::mu_u, cpuCostAtLvl);
+const vector <uint16_t> RT_Chain::cpuCostAtLvl = MyConfig::dotProdcut (RT_Chain::mu_u, cpuCostAtLvl);
 
 
 /* 

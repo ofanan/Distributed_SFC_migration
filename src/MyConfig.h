@@ -17,13 +17,10 @@ using namespace std;
 class MyConfig {
 	public:
 
-		static int dotProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) { //(vector<uint8_t> vec1, vector<uint16_t> vec2) {
-			if (vec1.size() != vec2.size()) {
-				return -1;
-			}
-			int res = 0;
+		static vector<uint16_t> dotProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) { //(vector<uint8_t> vec1, vector<uint16_t> vec2) {
+			vector <uint16_t> res;
 			for (uint8_t i(0); i<vec1.size(); i++) {
-				res += vec1[i] * vec2[i];
+				res[i] = vec1[i] * vec2[i];
 			}
 			return res;
 		}
