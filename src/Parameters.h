@@ -18,6 +18,6 @@ const int16_t UNPLACED = -1;
 const bool SYNC  = true;
 const bool ASYNC = false;
 
-const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1}; // 
+const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1}; 
 
 
