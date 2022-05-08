@@ -203,7 +203,9 @@ int TraceFeeder::calcCputCost ()
 {
 	int cpuCost = 0;
 	for (auto const chain : allChains) {
-///		cpu_cost += chain
+		if (chain.isRT_Chain) {
+			cpuCost += RT_Chain::cpuCostAtLvl[1];
+		}
 	}
 	return cpuCost;
 }
