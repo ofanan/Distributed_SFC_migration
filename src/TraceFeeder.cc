@@ -141,8 +141,7 @@ void TraceFeeder::runTrace () {
 	
   string line;
   if (!traceFile.is_open ()) {
-  	logFile << "poa file was not found -> finishing simulation."; 
-		endSimulation();
+  	error (".poa file was not found -> finishing simulation"); 
   }
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
@@ -214,8 +213,7 @@ void TraceFeeder::parseChainPoaToken (string token, int32_t &chainId, int16_t &p
 	getline (newChainToken, numStr, ',');
 	poaId = stoi (numStr);
 	if (poaId > numLeaves) {
-		logFile << "Error at t=" << t << ": poaId is " << poaId << "while the number of leaves in the network is only " << numLeaves << "; EXITING" << endl;
-		endSimulation();
+		error ("t=%d. : .poa file includes poa ID %d while the number of leaves in the network is only %d", t, poaId, numLeaves);
 	}
 }
 
@@ -237,8 +235,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
   for (const auto& token : tokens) {
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
-			logFile << "Error in t=" << t << ": didn't find chain id " << chainId << " that left\n";
-			endSimulation();
+			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
 	  	if (chain.curDatacenter == notPlacedYet) {
@@ -304,8 +301,7 @@ void TraceFeeder::readOldChainsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
-			logFile << "Error in t=" << t << ": didn't find chain id " << chainId << " in allChains, in readChainsLine (old chains)\n";
-			endSimulation();
+			error ("t=%d: didn't find chain id %d in allChains, in readOldChainsLine", t, chainId);
 	  }
 	  else {
 			
@@ -381,14 +377,14 @@ void TraceFeeder::handleMessage (cMessage *msg)
   	Chain chain;
   	int16_t datacenterId;
   	int32_t chainId;
-  	//uint16_t numOfChains = (uint16_t) (msg -> getPlacedChainsArraySize);
+
   	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getPlacedChainsArraySize()); i++) {
   		
   		datacenterId 	= msg2handle -> getDatacenterId ();
   		chainId 			= msg2handle -> getPlacedChains (i);
 			if (!(findChainInSet (allChains, chainId, chain))) {
-				logFile << "Error in t=" << t << ": didn't find chain id " << chainId << " that appeared in a placementInfoMsg\n";
-				endSimulation();
+				error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
+
 			}
 			else {
 				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
