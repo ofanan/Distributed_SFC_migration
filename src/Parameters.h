@@ -11,9 +11,7 @@ const int16_t nonAugmentedCpuAtLvl[HEIGHT] = {10,20,30,40,50};
 
 const int16_t chainMigCost = 600;
 
-//const int16_t costOfPlacingChainAtLvl[HEIGHT] = {10,20,30,40,50};
-
-//const int8_t  RT_ChainCpuCostAtLvl = MyConfig::dotProdcut (RT_Chain::mu_u, cpuCostAtLvl);
+const int16_t costOfPlacingChainAtLvl[HEIGHT] = {10,20,30,40,50};
 
 const int16_t UNPLACED = -1;
 

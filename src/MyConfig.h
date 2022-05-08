@@ -16,8 +16,8 @@ using namespace std;
 
 class MyConfig {
 	public:
-/*
-		static int dotProdcut (uint8_t vec1[], uint16_t vec2[]) { //(vector<uint8_t> vec1, vector<uint16_t> vec2) {
+
+		static int dotProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) { //(vector<uint8_t> vec1, vector<uint16_t> vec2) {
 			if (vec1.size() != vec2.size()) {
 				return -1;
 			}
@@ -27,7 +27,19 @@ class MyConfig {
 			}
 			return res;
 		}
-*/	
+
+/*
+		static int dotProdcut (const uint8_t &(vec1[]), const uint16_t &vec2[]) { //(vector<uint8_t> vec1, vector<uint16_t> vec2) {
+			if (vec1.size() != vec2.size()) {
+				return -1;
+			}
+			int res = 0;
+			for (uint8_t i(0); i<vec1.size(); i++) {
+				res += vec1[i] * vec2[i];
+			}
+			return res;
+		}
+	*/
 	/*
 		// Print vector in a formated fashion
 		static void printVec (ofstream &outFile, vector<int16_t> vec) {

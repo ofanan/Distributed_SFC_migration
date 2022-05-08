@@ -57,6 +57,7 @@ class RT_Chain : public Chain
 public:
   static const uint8_t mu_u[]; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
+  static const vector<uint8_t> mu_u_vec;
 	  static const uint16_t cpuCostAtLvl[]; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
   RT_Chain (int32_t id, vector <int16_t> S_u) {
     this->id        = id;
