@@ -21,12 +21,15 @@
 #include "Parameters.h"
 #include "initBottomUpMsg_m.h"
 #include "leftChainsMsg_m.h"
+#include "placementInfoMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
 using namespace boost;
 
 const int16_t root_id = 0;
+const int8_t LOG_LVL = 1;
+
 class TraceFeeder : public cSimpleModule
 {
   private:
@@ -131,7 +134,6 @@ void TraceFeeder::discoverPathsToRoot () {
 		 	dc_id = datacenters[dc_id]->idOfParent;
 		}
 	}
-	logFile << endl;
 }
 
 void TraceFeeder::runTrace () {
@@ -276,8 +278,10 @@ void TraceFeeder::readNewChainsLine (string line)
 		}
 		allChains.insert (chain);
 	}	
-  logFile << "After readNewCHainsLine: ";
-  printAllChains (logFile);
+	if (LOG_LVL==2) {
+	  logFile << "After readNewCHainsLine: ";
+	  printAllChains (logFile);
+	}
 }
 
 /*
@@ -321,8 +325,10 @@ void TraceFeeder::readOldChainsLine (string line)
 	  }
 	}
 	
-  logFile << "After readOldCHainsLine: ";
-  printAllChains (logFile);
+	if (LOG_LVL==2) {
+	  logFile << "After readOldCHainsLine: ";
+  	printAllChains (logFile);
+  }
 }
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
@@ -350,7 +356,10 @@ void TraceFeeder::initAlg () {
 	int16_t i;
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
-		logFile << "Chains that joined dc " << item.first << ": ";
+		if (LOG_LVL==2) {
+			logFile << "Chains that joined dc " << item.first << ": ";
+		}
+		
 		msg = new initBottomUpMsg ();
 		msg -> setNotAssignedArraySize (item.second.size());
 		i = 0;
@@ -366,11 +375,31 @@ void TraceFeeder::initAlg () {
 void TraceFeeder::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
-    logFile << "rcvd self msg\n"; 
-  Chain foundChain;
-  int32_t id = 0;
-  logFile << "nxtDC=" << foundChain.nxtDatacenter << " \n";
+  }
+  else if (dynamic_cast<placementInfoMsg*> (msg)) { 
+  	placementInfoMsg* msg2handle = (placementInfoMsg*) (msg);
+  	Chain chain;
+  	int16_t datacenterId;
+  	int32_t chainId;
+  	//uint16_t numOfChains = (uint16_t) (msg -> getPlacedChainsArraySize);
+  	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getPlacedChainsArraySize()); i++) {
+  		
+  		datacenterId 	= msg2handle -> getDatacenterId ();
+  		chainId 			= msg2handle -> getPlacedChains (i);
+			if (!(findChainInSet (allChains, chainId, chain))) {
+				logFile << "Error in t=" << t << ": didn't find chain id " << chainId << " that appeared in a placementInfoMsg\n";
+				endSimulation();
+			}
+			else {
+				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+				chain.nxtDatacenter = datacenterId;
+				allChains.insert (chain);
+			}
+  	}
   }
 }
 
+//$$$
+// 4.9.2: raising errors:
+// error ("rgrgrg", %d);
 
