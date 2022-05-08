@@ -28,7 +28,7 @@ class Chain
     Chain (int32_t id, vector <int16_t> S_u) {
 		this->id = id;
 		this->S_u = S_u;
-		curDatacenter = nxtDatacenter = -1; //UNPLACED;
+		curDatacenter = nxtDatacenter = -1; 
     };
         
     bool operator== (const Chain &right) const {
