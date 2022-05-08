@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from placementInfoMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/placementInfoMsg.msg.
 //
 
 #ifndef __PLACEMENTINFOMSG_M_H
@@ -23,7 +23,7 @@
 // }}
 
 /**
- * Class generated from <tt>placementInfoMsg.msg:10</tt> by nedtool.
+ * Class generated from <tt>src/placementInfoMsg.msg:10</tt> by nedtool.
  * <pre>
  * message placementInfoMsg
  * {

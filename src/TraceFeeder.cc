@@ -15,7 +15,7 @@
 #include <unordered_set>
 #include <typeinfo>
 
-#include "MyConfig.h"
+//#include "MyConfig.h"
 #include "Datacenter.h"
 #include "Chain.h"
 #include "Parameters.h"
@@ -68,6 +68,7 @@ class TraceFeeder : public cSimpleModule
 		void initAlg ();
     void handleMessage (cMessage *msg);
 		void concludeTimeStep ();
+		int calcCputCost (); // returns the overall CPU cost
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain);
@@ -171,9 +172,9 @@ void TraceFeeder::runTrace () {
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
-  		rlzRsrcsOfChains ();
-  		initAlg ();
-  		concludeTimeStep ();
+//  		rlzRsrcsOfChains ();
+//  		initAlg ();
+//  		concludeTimeStep ();
   	}
   }
   traceFile.close ();
@@ -198,6 +199,14 @@ void TraceFeeder::concludeTimeStep ()
 	numMigs += numMigsSinceLastStep;
 }
 
+int TraceFeeder::calcCputCost () 
+{
+	int cpuCost = 0;
+	for (auto const chain : allChains) {
+///		cpu_cost += chain
+	}
+	return cpuCost;
+}
 
 // Print a data about a single chain to a requested output file.
 void TraceFeeder::printChain (ofstream &outFile, const Chain &chain)
@@ -369,7 +378,7 @@ void TraceFeeder::rlzRsrcsOfChains ()
 	}
 }
 
-
+// Initiate the run of placement alg'l
 void TraceFeeder::initAlg () {  	
 
 	initBottomUpMsg* msg;

@@ -1,3 +1,4 @@
+
 #ifndef CHAIN_H
 #define CHAIN_H
 #include <stdio.h>
@@ -54,8 +55,9 @@ bool findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain);
 class RT_Chain : public Chain
 {
 public:
-  static const uint8_t mu_u[];
+  static const uint8_t mu_u[]; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
+	  static const uint16_t cpuCostAtLvl[]; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
   RT_Chain (int32_t id, vector <int16_t> S_u) {
     this->id        = id;
     this->S_u       = S_u;
@@ -67,8 +69,9 @@ public:
 class Non_RT_Chain: public Chain
 {
   public:
-    static const uint8_t mu_u[];
-	  static const uint8_t mu_u_len;
+    static const uint8_t  mu_u[]; // mu_u[i] will hold the # of cpu units required for placing a non-RT chain on a DC in level i
+	  static const uint8_t  mu_u_len;
+	  static const uint16_t cpuCostAtLvl[]; // cpuCostAtLvl[i] will hold the cost of placing a non-RT chain on a DC in level i
 //    explicit Non_RT_Chain(int x) : Chain(x) {    }
     Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
        this->id       = id;
