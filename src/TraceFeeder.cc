@@ -172,8 +172,8 @@ void TraceFeeder::runTrace () {
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
-//  		rlzRsrcsOfChains ();
-//  		initAlg ();
+  		rlzRsrcsOfChains ();
+  		initAlg ();
 //  		concludeTimeStep ();
   	}
   }

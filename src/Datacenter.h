@@ -31,15 +31,15 @@ class Datacenter : public cSimpleModule
     bool isLeaf;
     int16_t  availCpu;
     int16_t id;
-    set <Chain> potentiallyPlacedChains;
-    set <Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
+    vector<Chain> potentiallyPlacedChains;
+    vector<Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
     Datacenter();
     ~Datacenter();
   	
   private:
     vector <cQueue>     outputQ;
     vector <cChannel*>  xmtChnl;
-    vector <endXmtPkt*> endXmtEvents; // Problem: need to copy each event, and xmt it... and then remove it from the set when the event happens
+    vector <endXmtPkt*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
     virtual void initialize();

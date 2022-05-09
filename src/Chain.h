@@ -18,6 +18,9 @@ using namespace std;
 class Chain
 {
   public:
+		static const vector<uint8_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
+		static const uint8_t mu_u_len;
+		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
     int32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me

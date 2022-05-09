@@ -111,6 +111,9 @@ void Datacenter::handleMessage (cMessage *msg)
     delete (curHandledMsg);
   }
   else if (dynamic_cast<initBottomUpMsg*>(curHandledMsg) != nullptr) {
+		if (!isLeaf) {
+			error ("a non-leaf datacenter received an initBottomUpMsg");
+		}  
     handleInitBottomUpMsg ();
   }
   else
@@ -122,14 +125,13 @@ void Datacenter::handleMessage (cMessage *msg)
 
 void Datacenter::handleInitBottomUpMsg () {
 
-	if (!isLeaf) {
-		error ("a non-leaf datacenter received an initBottomUpMsg");
-	}
-  
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
-	Chain notAssignedChain;
+	Chain chain;
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
-	  notAssignedChain = msg->getNotAssigned (i);
+	  chain = msg->getNotAssigned (i);
+	  if (chain.mu_u[lvl] <= availCpu) {
+	  	
+	  }
 	} 
 
   delete curHandledMsg;
