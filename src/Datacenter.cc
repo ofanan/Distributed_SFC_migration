@@ -16,6 +16,19 @@ using namespace std;
 
 Define_Module(Datacenter);
 
+Datacenter::Datacenter()
+{
+}
+
+Datacenter::~Datacenter()
+{
+  for (int i(0); i < numPorts; i++) {
+    if (endXmtEvents[i] != nullptr) {
+      cancelAndDelete (endXmtEvents[i]);
+    }
+  }
+}
+
 void Datacenter::initialize()
 {
 	network     = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
@@ -54,29 +67,6 @@ void Datacenter::initialize()
   }
 
   fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-  
-  
-//    // For debugging only: gen and xmt a BU pkt
-//    bottomUpPkt *pkt = new bottomUpPkt();
-//    pkt->setNotAssignedArraySize (1);
-//    int32_t chain_id = 7;
-//    vector <int16_t> S_u = {1,2};
-//    RT_Chain chain (chain_id);
-//    pkt->setNotAssigned (0, chain);
-//    sendViaQ (pkt, 0);
-}
-
-Datacenter::Datacenter()
-{
-}
-
-Datacenter::~Datacenter()
-{
-  for (int i(0); i < numPorts; i++) {
-    if (endXmtEvents[i] != nullptr) {
-      cancelAndDelete (endXmtEvents[i]);
-    }
-  }
 }
 
 /*
@@ -94,7 +84,7 @@ void Datacenter::handleSelfMsg ()
         return;
     }
 
-//    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
+    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
     pkt2send = (cPacket*) outputQ[portNum].pop();
     xmt (portNum);
 }
@@ -131,9 +121,17 @@ void Datacenter::handleMessage (cMessage *msg)
 }
 
 void Datacenter::handleInitBottomUpMsg () {
+
+	if (!isLeaf) {
+		error ("a non-leaf datacenter received an initBottomUpMsg");
+	}
+  
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
-  Chain chain0 = msg->getNotAssigned (0);
-  chain0.nxtDatacenter = 7;
+	Chain notAssignedChain;
+	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
+	  notAssignedChain = msg->getNotAssigned (i);
+	} 
+
   delete curHandledMsg;
 }
 
