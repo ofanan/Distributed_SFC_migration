@@ -29,7 +29,7 @@ class Datacenter : public cSimpleModule
     vector <int16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
-    int16_t  availCpu;
+    uint16_t  availCpu;
     int16_t id;
     vector<Chain> potentiallyPlacedChains;
     vector<Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.

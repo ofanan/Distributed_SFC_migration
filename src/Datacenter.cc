@@ -10,6 +10,7 @@
 #include "initBottomUpMsg_m.h"
 #include "pushUpPkt_m.h"
 #include "prepareReshufflePkt_m.h"
+#include "Chain.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -127,11 +128,13 @@ void Datacenter::handleInitBottomUpMsg () {
 
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
 	Chain chain;
+	uint8_t mu_u;
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
 	  chain = msg->getNotAssigned (i);
-	  if (chain.mu_u[lvl] <= availCpu) {
-	  	
-	  }
+//	  mu_u = (chain.isRT_Chain)? RT_Chain::mu_u : Non_RT_Chain::mu_u;
+//	  if (mu_u <= availCpu) {
+//	  	chain.nxtDatacenter = id;
+//	  }
 	} 
 
   delete curHandledMsg;

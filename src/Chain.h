@@ -18,9 +18,9 @@ using namespace std;
 class Chain
 {
   public:
-		static const vector<uint8_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
-		static const uint8_t mu_u_len;
-		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
+/*		static const vector<uint8_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i*/
+/*		static const uint8_t mu_u_len;*/
+/*		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i*/
     int32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
     int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
@@ -34,7 +34,7 @@ class Chain
 		this->S_u = S_u;
 		curDatacenter = nxtDatacenter = -1; 
     };
-        
+            
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
     }
@@ -47,6 +47,7 @@ class Chain
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
     
+/*    uint8_t mu_u() {}*/
 };
 
 /* 
@@ -76,7 +77,7 @@ class Non_RT_Chain: public Chain
 	  static const uint8_t  mu_u_len;
 		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
     Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
-       this->id       = id;
+      this->id       = id;
       this->S_u       = S_u;
       this->isRT_Chain = false;
       curDatacenter   = nxtDatacenter = -1;
