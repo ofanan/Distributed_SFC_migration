@@ -15,7 +15,6 @@
 #include <unordered_set>
 #include <typeinfo>
 
-//#include "MyConfig.h"
 #include "Datacenter.h"
 #include "Chain.h"
 #include "Parameters.h"
@@ -64,14 +63,14 @@ class TraceFeeder : public cSimpleModule
 		void readChainsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void readNewChainsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
 		void readOldChainsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
-		void rlzRsrcsOfChains ();
-		void initAlg ();
+		void rlzRsrcsOfChains (); // Send a direct msg to each DC whose chains left, so that it releases its resources.
+		void initAlg (); // init a placement alg'
     void handleMessage (cMessage *msg);
-		void concludeTimeStep ();
-		int calcCputCost (); // returns the overall CPU cost
+		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
+		int calcSolCpuCost (); // returns the overall CPU cost
     
     // Functions used for debugging
-		void printChain (ofstream &outFile, const Chain &chain);
+		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
     void printAllChains (ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
 				 
   public:
@@ -126,7 +125,8 @@ void TraceFeeder::openFiles () {
   logFile << networkName << endl;
 }
 
-
+// Fill this->pathToRoot.
+// pathToRoot[i] will hold the path from leaf i to the root.
 void TraceFeeder::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
 	int16_t dc_id;
@@ -199,23 +199,25 @@ void TraceFeeder::concludeTimeStep ()
 	numMigs += numMigsSinceLastStep;
 }
 
-int TraceFeeder::calcCputCost () 
+// Return the overall cpu cost at the NEXT cycle (based on the chain.nxtDatacenter).
+int TraceFeeder::calcSolCpuCost () 
 {
 	int cpuCost = 0;
 	for (auto const chain : allChains) {
-		if (chain.isRT_Chain) {
-			cpuCost += RT_Chain::cpuCostAtLvl[1];
-		}
+		cpuCost += (chain.isRT_Chain)? RT_Chain::cpuCostAtLvl[datacenters[chain.nxtDatacenter]->lvl] : Non_RT_Chain::cpuCostAtLvl[datacenters[chain.nxtDatacenter]->lvl];
 	}
 	return cpuCost;
 }
 
 // Print a data about a single chain to a requested output file.
-void TraceFeeder::printChain (ofstream &outFile, const Chain &chain)
+void TraceFeeder::printChain (ofstream &outFile, const Chain &chain, bool printSu=true)
 {
-	outFile << "chain " << chain.id << ": S_u=";
-	for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
-		outFile << *it << ";";
+	outFile << "chain " << chain.id;
+	if (printSu) {
+		outFile << " S_u=";
+		for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+			outFile << *it << ";";
+		}
 	}
 	outFile << endl;
 }
@@ -227,11 +229,12 @@ void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool pr
 {
 	outFile << "allChains\n*******************\n";
 	for (auto const & chain : allChains) {
-		outFile << "chain " << chain.id << ": ";
-		for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
-			outFile << *it << ";";
+		outFile << "chain " << chain.id;
+		if (printSu) {
+			for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+				outFile << *it << ";";
+			}
 		}
-//		for_each(chain.S_u.begin(), chain.S_u.end(),[](int number){cout << number << ";";});
 		outFile << endl;
 	}	
 	outFile << endl;
@@ -427,6 +430,9 @@ void TraceFeeder::handleMessage (cMessage *msg)
 				allChains.insert (chain);
 			}
   	}
+  }
+  else {
+  	error ("Rcvd unknown msg type");
   }
 }
 
