@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdint.h>
-
-#include <vector>
-#include <set>
-#include <algorithm>
-
-#include <omnetpp.h>
-#include "Parameters.h"
 #include "Chain.h"
-#include "MyConfig.h"
 
 const vector<uint8_t> RT_Chain		::mu_u = {1, 5, 10};
 const vector<uint8_t> Non_RT_Chain::mu_u = {1, 5, 10};
@@ -18,6 +8,11 @@ const uint8_t Non_RT_Chain::mu_u_len = 4;
 
 const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain		 ::mu_u, cpuCostAtLvl);
 const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, cpuCostAtLvl);
+
+uint8_t Chain::mu_u_at_lvl (uint8_t lvl)
+{
+	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
+}
 
 
 /* 

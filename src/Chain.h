@@ -1,4 +1,3 @@
-
 #ifndef CHAIN_H
 #define CHAIN_H
 #include <stdio.h>
@@ -47,7 +46,8 @@ class Chain
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
     
-/*    uint8_t mu_u() {}*/
+/*    inline */
+    uint8_t mu_u_at_lvl (uint8_t lvl);
 };
 
 /* 
