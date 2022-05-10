@@ -200,7 +200,7 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
-//	sendViaQ (0); //send the bottomUPpkt to my prnt
+	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
 }
 
 void Datacenter::pushUp ()
@@ -221,7 +221,7 @@ void Datacenter::sendDirect () {
  * If the output port is free, xmt the pkt immediately.
  * Else, queue the pkt until the output port is free, and then xmt it.
  */
-void Datacenter::sendViaQ (int16_t portNum)
+void Datacenter::sendViaQ (int16_t portNum, cPacket* pkt2send)
 {
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (pkt2send);
