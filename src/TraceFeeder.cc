@@ -310,8 +310,7 @@ void TraceFeeder::initAlg () {
 		for(auto &chain : item.second) {
 			msg -> setNotAssigned (i++, chain);
 		}    
-		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
-		endSimulation ();
+		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 	}
 }
 

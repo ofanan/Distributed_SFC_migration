@@ -18,6 +18,6 @@ simple Datacenter
       // variables: avail cpu, assigned chains, ...
   gates:
 	inout port[numParents+numChildren];    
-	inout directMsgsPort;
+	input directMsgsPort;
 }
 

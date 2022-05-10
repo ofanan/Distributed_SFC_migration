@@ -36,6 +36,7 @@ void Datacenter::initialize()
   xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
   endXmtEvents.   resize (numPorts);
   idOfChildren.   resize (numChildren);
+  uint8_t	numBuMsgsRcvd = 0;
   
   // Discover the xmt channels to the neighbors, and the neighbors' id's.
 	for (int portNum (0); portNum < numPorts; portNum++) {
@@ -118,22 +119,25 @@ void Datacenter::handleInitBottomUpMsg ()
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
 	Chain chain;
 	uint8_t mu_u;
+	
+	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
-	  chain = msg->getNotAssigned (i);
-	  mu_u = chain.mu_u_at_lvl(lvl);
-	  if (mu_u <= availCpu) {
-	  	chain.nxtDatacenter = id;
-	  }
+		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
-
   delete curHandledMsg;
+  this -> pushUpVec = {};
+  bottomUp ();
 }
 
 void Datacenter::bottomUp ()
 {
-  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
+//  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
   EV <<"rcvd bottomUpPkt\n";
-  delete (pkt);
+//  delete (pkt);
+//	  mu_u = chain.mu_u_at_lvl(lvl);
+//	  if (mu_u <= availCpu) {
+//	  	chain.nxtDatacenter = id;
+//	  }
 }
 
 void Datacenter::pushUp ()

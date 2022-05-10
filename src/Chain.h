@@ -88,6 +88,11 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chai
 Insert a chain in its correct place to a sorted vector of chains
 */
 void insertSorted (vector <Chain> &vec, const Chain c);
+
+/*
+Rcv a vector of 
+*/
+vector<Chain> MergeSort (const vector <vector <Chain>> &vec_vec_of_chains);
 #endif
 
 /*typedef list<Chain> ChainList;*/

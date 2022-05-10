@@ -19,6 +19,8 @@ using namespace std;
 class Datacenter : public cSimpleModule
 {
   public:
+  
+  	// Static (not changed along a sim')
     cModule* network; // Pointer to the network on which the simulation is running
   	string networkName;
   	int16_t lvl; // level in the tree (leaf's lvl is 0).
@@ -29,10 +31,15 @@ class Datacenter : public cSimpleModule
     vector <int16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
-    uint16_t  availCpu;
     int16_t id;
+    
+    // Dynamic
+    uint16_t  availCpu;
+    vector<Chain> notAssigned, pushUpVec; 
     vector<Chain> potentiallyPlacedChains;
     vector<Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
+		uint8_t numBuMsgsRcvd; 
+		
     Datacenter();
     ~Datacenter();
   	
@@ -47,11 +54,11 @@ class Datacenter : public cSimpleModule
     void handleSelfMsg    ();
     void sendViaQ         (int16_t portNum);
     void xmt              (int16_t portNum);
+    void handleInitBottomUpMsg ();
     void bottomUp         ();
     void pushUp           ();
     void prepareReshuffle ();
     void sendDirect       (); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
-    void handleInitBottomUpMsg ();
 };
 
 #endif
