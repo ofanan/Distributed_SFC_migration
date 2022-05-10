@@ -161,8 +161,11 @@ void Datacenter::handleBottomUpPktSync ()
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		insertSorted (pushUpVec, pkt->getPushUpVec(i));
 	}
-	
 	numBuMsgsRcvd++;
+	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
+		bottomUpAsync ();
+		numBuMsgsRcvd = 0;
+	}
 }
 
 /*
