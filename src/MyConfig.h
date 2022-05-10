@@ -3,14 +3,19 @@
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H
 #include <stdio.h>
-#include <stdint.h>
+#include <string.h>
+#include <omnetpp.h>
+#include <iostream>
+#include <fstream>
+#include <boost/tokenizer.hpp>
+#include <regex>
+#include <utility>
+#include <cstdlib>
 
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <unordered_set>
-
-#include <omnetpp.h>
 
 
 using namespace omnetpp;
@@ -35,10 +40,22 @@ const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1};
 class MyConfig : public cSimpleModule {
 
 	public:
+ 		string LogFileName   = "example.txt";
+    ofstream logFile;
 		const static bool mode=SYNC;
+
+		//Init
+		void initialize();
+
+		//print
+/*		void printToLog (String str)*/
+/*		{*/
+/*			logFile << str;*/
+/*		}*/
 
 		// returns the scalar product of two vectors
 		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);
+		
 
 };
 

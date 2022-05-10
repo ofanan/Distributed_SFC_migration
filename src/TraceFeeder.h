@@ -79,9 +79,9 @@ class TraceFeeder : public cSimpleModule
 				 
   public:
     string traceFileName = "results/poa_files/Tree_short.poa";
+    ifstream traceFile;
  		string LogFileName   = "example.txt";
     ofstream logFile;
-    ifstream traceFile;
     TraceFeeder ();
     ~TraceFeeder ();
     void parseChainPoaToken (string token, int32_t &chainId, int16_t &poaId);
