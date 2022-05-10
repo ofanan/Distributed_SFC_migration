@@ -296,6 +296,19 @@ void TraceFeeder::rlzRsrcsOfChains ()
 // Initiate the run of placement alg'l
 void TraceFeeder::initAlg () {  	
 
+	if (MyConfig::mode==SYNC) {
+		return initAlgSync();
+	}
+	return InitAlgAsync();
+}
+
+void TraceFeeder::InitAlgAsync () 
+{  	
+}
+
+// Initiate the run of placement alg'l
+void TraceFeeder::initAlgSync () {  	
+
 	initBottomUpMsg* msg;
 	int16_t i;
 	for (auto const& item : chainsThatJoinedLeaf)
@@ -313,7 +326,6 @@ void TraceFeeder::initAlg () {
 		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 	}
 }
-
 
 void TraceFeeder::handleMessage (cMessage *msg)
 {

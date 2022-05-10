@@ -67,6 +67,9 @@ class TraceFeeder : public cSimpleModule
 		void readOldChainsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
 		void rlzRsrcsOfChains (); // Send a direct msg to each DC whose chains left, so that it releases its resources.
 		void initAlg (); // init a placement alg'
+  	void initAlgSync ();
+  	void InitAlgAsync ();
+		
     void handleMessage (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost

@@ -32,12 +32,12 @@ const int16_t UNPLACED = -1;
 const bool SYNC  = true;
 const bool ASYNC = false;
 
-const bool mode=SYNC;
-
 const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1}; 
 
 class MyConfig {
 	public:
+
+		const static bool mode=SYNC;
 
 		// returns the scalar product of two vectors
 		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) { 
