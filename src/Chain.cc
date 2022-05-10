@@ -76,3 +76,19 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 	}
 }
 
+/*
+Rcvs 2 sorted vectors of chains. 
+Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
+*/
+void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
+{
+	for (auto const &chain : vec) {
+		if (chain.isRT_Chain) {
+			vec.insert (vec.begin(), chain);
+		}
+		else {
+			vec.push_back (chain);
+		}
+	}
+}
+

@@ -113,6 +113,12 @@ void Datacenter::handleMessage (cMessage *msg)
   }
 }
 
+/*
+Handle a rcvd initBottomUpMsg:
+- Insert all the chains in the msg into this->notAssigned.
+- Empty this->pushUpVec.
+- Call bottomUp, for running the BU alg'.
+*/
 void Datacenter::handleInitBottomUpMsg () 
 {
 
@@ -129,9 +135,13 @@ void Datacenter::handleInitBottomUpMsg ()
   bottomUp ();
 }
 
+/*
+Running the BU alg'. 
+Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, in the correct order.
+*/
 void Datacenter::bottomUp ()
 {
-//  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
+ //  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
   EV <<"rcvd bottomUpPkt\n";
 //  delete (pkt);
 //	  mu_u = chain.mu_u_at_lvl(lvl);

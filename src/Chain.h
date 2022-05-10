@@ -90,9 +90,10 @@ Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c);
 
 /*
-Rcv a vector of 
+Rcvs 2 sorted vectors of chains. 
+Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
 */
-vector<Chain> MergeSort (const vector <vector <Chain>> &vec_vec_of_chains);
+void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 #endif
 
 /*typedef list<Chain> ChainList;*/
