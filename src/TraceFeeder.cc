@@ -293,7 +293,7 @@ void TraceFeeder::rlzRsrcsOfChains ()
 	}
 }
 
-// Initiate the run of placement alg'l
+// Initiate the run of placement alg'
 void TraceFeeder::initAlg () {  	
 
 	if (MyConfig::mode==SYNC) {
@@ -302,11 +302,8 @@ void TraceFeeder::initAlg () {
 	return InitAlgAsync();
 }
 
-void TraceFeeder::InitAlgAsync () 
-{  	
-}
 
-// Initiate the run of placement alg'l
+// Initiate the run of a Sync placement alg'
 void TraceFeeder::initAlgSync () {  	
 
 	initBottomUpMsg* msg;
@@ -325,6 +322,38 @@ void TraceFeeder::initAlgSync () {
 		}    
 		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 	}
+}
+
+// Initiate the run of an Async placement alg'
+void TraceFeeder::InitAlgAsync () 
+{  	
+	initBottomUpMsg* msg;
+	int16_t i;
+	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a initBottomUpMsg to leaf i
+	for (auto const& item : chainsThatJoinedLeaf)
+	{
+		if (LOG_LVL==2) {
+			logFile << "Chains that joined dc " << item.first << ": ";
+		}
+		
+		msg = new initBottomUpMsg ();
+		msg -> setNotAssignedArraySize (item.second.size());
+		i = 0;
+		for(auto &chain : item.second) {
+			msg -> setNotAssigned (i++, chain);
+		}    
+		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
+		sentInitBottomUpMsg[item.first] = true;
+	}
+
+	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
+		if (!(sentInitBottomUpMsg[leafId])) {
+			msg = new initBottomUpMsg ();
+			msg -> setNotAssignedArraySize (0);
+			sendDirect (msg, (cModule*)(leaves[leafId]), "directMsgsPort");
+		}
+	}	
+	delete[] sentInitBottomUpMsg;
 }
 
 void TraceFeeder::handleMessage (cMessage *msg)
