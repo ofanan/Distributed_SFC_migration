@@ -75,8 +75,8 @@ void Datacenter::handleSelfMsg ()
     }
 
     // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
-    pkt2send = (cPacket*) outputQ[portNum].pop();
-    xmt (portNum);
+    cPacket* pkt2send = (cPacket*) outputQ[portNum].pop();
+    xmt (portNum, pkt2send);
 }
 
 
@@ -187,7 +187,7 @@ void Datacenter::bottomUpAsync ()
 
 void Datacenter::sndBottomUpPkt ()
 {
-	pkt2send = new bottomUpPkt;
+	bottomUpPkt* pkt2send = new bottomUpPkt;
 	uint16_t i;
 
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());
@@ -200,7 +200,7 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
-	sendViaQ (0); //send the bottomUPpkt to my prnt
+//	sendViaQ (0); //send the bottomUPpkt to my prnt
 }
 
 void Datacenter::pushUp ()
@@ -227,13 +227,13 @@ void Datacenter::sendViaQ (int16_t portNum)
     outputQ[portNum].insert (pkt2send);
   }
   else {
-    xmt (portNum);
+    xmt (portNum, pkt2send);
   }
 }
     /*
  * Xmt self.pkt2send to the given output port; schedule a self msg for the end of transmission.
  */
-void Datacenter::xmt(int16_t portNum)
+void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
 {
   EV << "Starting transmission of " << pkt2send << endl;
 
