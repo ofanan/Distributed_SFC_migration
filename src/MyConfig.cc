@@ -12,6 +12,11 @@ void MyConfig::initialize()
   logFile.open ("example.txt");
 }
 
+void MyConfig::printToLog (string str)
+{
+	logFile << str;
+}
+
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) 
 { 
 	vector <uint16_t> res;

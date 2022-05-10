@@ -48,10 +48,7 @@ class MyConfig : public cSimpleModule {
 		void initialize();
 
 		//print
-/*		void printToLog (String str)*/
-/*		{*/
-/*			logFile << str;*/
-/*		}*/
+		void printToLog (string str);
 
 		// returns the scalar product of two vectors
 		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);
