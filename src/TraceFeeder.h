@@ -20,7 +20,6 @@
 
 #include "Datacenter.h"
 #include "Chain.h"
-#include "Parameters.h"
 #include "initBottomUpMsg_m.h"
 #include "leftChainsMsg_m.h"
 #include "placementInfoMsg_m.h"

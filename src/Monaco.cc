@@ -7,7 +7,6 @@
 #include <omnetpp.h>
 #include <vector>
 #include <set>
-#include "Parameters.h"
 
 using namespace omnetpp;
 using namespace std;

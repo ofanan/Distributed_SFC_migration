@@ -1,0 +1,6 @@
+package src;
+
+simple MyConfig 
+{
+}
+

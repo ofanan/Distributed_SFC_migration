@@ -2,14 +2,14 @@
 #define CHAIN_H
 #include <stdio.h>
 #include <stdint.h>
+#include <omnetpp.h>
 
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <unordered_set>
 
-#include <omnetpp.h>
-#include "Parameters.h"
+#include "MyConfig.h"
 
 using namespace std;
 

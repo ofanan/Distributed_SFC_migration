@@ -6,7 +6,6 @@
 #include <vector>
 #include <set>
 #include "Datacenter.h"
-#include "Parameters.h"
 #include "endXmtPkt_m.h"
 #include "bottomUpPkt_m.h"
 #include "initBottomUpMsg_m.h"

@@ -141,13 +141,12 @@ Assume that this->notAssigned and this->pushUpVec already contain the relevant c
 */
 void Datacenter::bottomUpSync ()
 {
- //  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
-  EV <<"rcvd bottomUpPkt\n";
 //  delete (pkt);
 //	  mu_u = chain.mu_u_at_lvl(lvl);
 //	  if (mu_u <= availCpu) {
 //	  	chain.nxtDatacenter = id;
 //	  }
+	sndBottomUpPkt ();
 }
 
 void Datacenter::handleBottomUpPktSync ()
@@ -176,7 +175,6 @@ Assume that this->notAssigned and this->pushUpVec already contain the relevant c
 void Datacenter::bottomUpAsync ()
 {
  //  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
-  EV <<"rcvd bottomUpPkt\n";
 //  delete (pkt);
 //	  mu_u = chain.mu_u_at_lvl(lvl);
 //	  if (mu_u <= availCpu) {
