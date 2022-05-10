@@ -20,7 +20,7 @@ Datacenter::~Datacenter()
 
 void Datacenter::initialize()
 {
-	network     = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+	network     = (cModule*) (getParentModule ()); 
 	networkName = (network -> par ("name")).stdstringValue();
   numChildren = (int16_t) (par("numChildren"));
   numParents  = (int16_t) (par("numParents"));
@@ -84,13 +84,12 @@ void Datacenter::handleMessage (cMessage *msg)
 {
   curHandledMsg = msg;
   if (curHandledMsg -> isSelfMessage()) {
-    handleSelfMsg ();
-    return;
+    return handleSelfMsg ();
   }
 
   // Now we know that this is not a self-msg
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
-    bottomUp ();
+  	return (MyConfig::mode==SYNC)? handleBottomUpPktSync () : bottomUpAsync ();
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
     pushUp ();
@@ -132,14 +131,45 @@ void Datacenter::handleInitBottomUpMsg ()
 	} 
   delete curHandledMsg;
   this -> pushUpVec = {};
-  bottomUp ();
+	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
 /*
 Running the BU alg'. 
 Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, in the correct order.
 */
-void Datacenter::bottomUp ()
+void Datacenter::bottomUpSync ()
+{
+ //  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
+  EV <<"rcvd bottomUpPkt\n";
+//  delete (pkt);
+//	  mu_u = chain.mu_u_at_lvl(lvl);
+//	  if (mu_u <= availCpu) {
+//	  	chain.nxtDatacenter = id;
+//	  }
+}
+
+void Datacenter::handleBottomUpPktSync ()
+{
+	bottomUpPkt *pkt = (bottomUpPkt*)(curHandledMsg);
+
+	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
+	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
+		insertSorted (notAssigned, pkt->getNotAssigned(i));
+	}
+	// Add each chain stated in the pkt's pushUpVec field into its (sorted) place in this->notAssigned()
+	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
+		insertSorted (pushUpVec, pkt->getPushUpVec(i));
+	}
+	
+	numBuMsgsRcvd++;
+}
+
+/*
+Running the BU alg'. 
+Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, in the correct order.
+*/
+void Datacenter::bottomUpAsync ()
 {
  //  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
   EV <<"rcvd bottomUpPkt\n";

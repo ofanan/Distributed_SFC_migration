@@ -9,6 +9,6 @@ class noncobject Chain;
 packet bottomUpPkt
 {
     Chain notAssigned[];
-    Chain pushUpList [];
+    Chain pushUpVec  [];
 }
 

@@ -51,11 +51,14 @@ class Datacenter : public cSimpleModule
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
+    
     void handleSelfMsg    ();
     void sendViaQ         (int16_t portNum);
     void xmt              (int16_t portNum);
     void handleInitBottomUpMsg ();
-    void bottomUp         ();
+    void handleBottomUpPktSync ();
+    void bottomUpSync     ();
+    void bottomUpAsync    ();
     void pushUp           ();
     void prepareReshuffle ();
     void sendDirect       (); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
