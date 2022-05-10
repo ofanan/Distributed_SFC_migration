@@ -88,7 +88,14 @@ void Datacenter::handleMessage (cMessage *msg)
   }
 
   // Now we know that this is not a self-msg
+  else if (dynamic_cast<initBottomUpMsg*>(curHandledMsg) != nullptr) {
+		if (!isLeaf) {
+			error ("a non-leaf datacenter received an initBottomUpMsg");
+		}  
+    handleInitBottomUpMsg ();
+  }
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
+  	error ("Hurray! DC \%d rcvd a BU pkt", id);
   	return (MyConfig::mode==SYNC)? handleBottomUpPktSync () : bottomUpAsync ();
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
@@ -98,12 +105,6 @@ void Datacenter::handleMessage (cMessage *msg)
   {
     prepareReshuffle ();
     delete (curHandledMsg);
-  }
-  else if (dynamic_cast<initBottomUpMsg*>(curHandledMsg) != nullptr) {
-		if (!isLeaf) {
-			error ("a non-leaf datacenter received an initBottomUpMsg");
-		}  
-    handleInitBottomUpMsg ();
   }
   else
   {
@@ -181,6 +182,25 @@ void Datacenter::bottomUpAsync ()
 //	  if (mu_u <= availCpu) {
 //	  	chain.nxtDatacenter = id;
 //	  }
+	sndBottomUpPkt ();
+}
+
+void Datacenter::sndBottomUpPkt ()
+{
+	pkt2send = new bottomUpPkt;
+	uint16_t i;
+
+	pkt2send -> setNotAssignedArraySize (notAssigned.size());
+	for (i=0; i<notAssigned.size(); i++) {
+		pkt2send->setNotAssigned (i, notAssigned[i]);
+	}
+
+	pkt2send -> setNotAssignedArraySize (pushUpVec.size());
+	for (i=0; i<pushUpVec.size(); i++) {
+		pkt2send->setPushUpVec (i, pushUpVec[i]);
+	}
+	
+	sendViaQ (0); //send the bottomUPpkt to my prnt
 }
 
 void Datacenter::pushUp ()

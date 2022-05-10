@@ -62,6 +62,7 @@ class Datacenter : public cSimpleModule
     void pushUp           ();
     void prepareReshuffle ();
     void sendDirect       (); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
+    void sndBottomUpPkt		();
 };
 
 #endif
