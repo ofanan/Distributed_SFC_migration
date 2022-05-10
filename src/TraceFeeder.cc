@@ -221,14 +221,13 @@ void TraceFeeder::readNewChainsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
 		if (rand () < RT_chain_rand_int) {
 			chain = RT_Chain (chainId, vector<int16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len-1}); 
-			chainsThatJoinedLeaf[poaId].insert (chainsThatJoinedLeaf[poaId].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
 			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
-			chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
 		}
-		allChains.insert (chain);
+		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
+		allChains.insert (chain); 
 	}	
 	if (LOG_LVL==2) {
 	  logFile << "After readNewCHainsLine: ";
@@ -263,13 +262,7 @@ void TraceFeeder::readOldChainsLine (string line)
 			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
 			chain.S_u = pathToRoot[poaId]; //Update S_u of the chain to reflect its new location
 			allChains.insert (chain);
-			if (chain.isRT_Chain) {
-				chainsThatJoinedLeaf[poaId].insert (chainsThatJoinedLeaf[poaId].begin(), chain); // As this is an RT (highest-priority) chain, insert it to the beginning of the vector
-			}
-			else {
-				chainsThatJoinedLeaf[poaId].push_back (chain); // As this is a Non-RT (lowest-priority) chain, insert it to the end of the vector
-			}
-			
+			insertSorted (chainsThatJoinedLeaf[poaId], chain);			
 			if (chain.curDatacenter != UNPLACED) {
 				chainsThatLeftDatacenter[chain.curDatacenter].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 			}

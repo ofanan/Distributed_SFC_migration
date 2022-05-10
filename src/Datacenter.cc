@@ -112,7 +112,8 @@ void Datacenter::handleMessage (cMessage *msg)
   }
 }
 
-void Datacenter::handleInitBottomUpMsg () {
+void Datacenter::handleInitBottomUpMsg () 
+{
 
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
 	Chain chain;
@@ -120,9 +121,9 @@ void Datacenter::handleInitBottomUpMsg () {
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
 	  chain = msg->getNotAssigned (i);
 	  mu_u = chain.mu_u_at_lvl(lvl);
-//	  if (mu_u <= availCpu) {
-//	  	chain.nxtDatacenter = id;
-//	  }
+	  if (mu_u <= availCpu) {
+	  	chain.nxtDatacenter = id;
+	  }
 	} 
 
   delete curHandledMsg;

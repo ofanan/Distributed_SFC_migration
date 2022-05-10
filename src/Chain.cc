@@ -1,3 +1,4 @@
+#include <vector>
 #include "Chain.h"
 
 const vector<uint8_t> RT_Chain		::mu_u = {1, 5, 10};
@@ -46,4 +47,18 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, int32_t chain
 	}
 }
 
+/*
+Insert a chain to its correct order in the (ordered) vector of chains.
+We currently use only RT, and we assume that the input vector is sorted. 
+Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
+*/
+void insertSorted (vector <Chain> &vec, const Chain c)
+{
+	if (c.isRT_Chain) {
+		vec.insert (vec.begin(), c);
+	}
+	else {
+		vec.push_back (c);
+	}
+}
 

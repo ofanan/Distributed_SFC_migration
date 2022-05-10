@@ -94,6 +94,10 @@ Output: true iff the requested chain is found.
 */
 bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chainId, Chain &c);
 
+/*
+Insert a chain in its correct place to a sorted vector of chains
+*/
+void insertSorted (vector <Chain> &vec, const Chain c);
 #endif
 
 /*typedef list<Chain> ChainList;*/

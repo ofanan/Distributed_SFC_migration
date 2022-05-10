@@ -10,6 +10,5 @@ packet bottomUpPkt
 {
     Chain notAssigned[];
     Chain pushUpList [];
-//    ChainList notAssigned; // Should fix by 6.2.8 in the RTFM.
 }
 

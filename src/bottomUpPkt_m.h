@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/bottomUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from bottomUpPkt.msg.
 //
 
 #ifndef __BOTTOMUPPKT_M_H
@@ -24,7 +24,7 @@
 // }}
 
 /**
- * Class generated from <tt>src/bottomUpPkt.msg:10</tt> by nedtool.
+ * Class generated from <tt>bottomUpPkt.msg:10</tt> by nedtool.
  * <pre>
  * packet bottomUpPkt
  * {
