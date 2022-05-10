@@ -17,6 +17,20 @@ Chain::Chain (int32_t id, vector <int16_t> S_u)
 	curDatacenter = nxtDatacenter = -1; 
 };
 
+RT_Chain::RT_Chain (int32_t id, vector <int16_t> S_u) {
+  this->id        = id;
+  this->S_u       = S_u;
+  this->isRT_Chain = true;
+  curDatacenter   = nxtDatacenter = -1;
+};
+
+Non_RT_Chain::Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
+  this->id       = id;
+  this->S_u       = S_u;
+  this->isRT_Chain = false;
+  curDatacenter   = nxtDatacenter = -1;
+};
+
 
 uint8_t Chain::mu_u_at_lvl (uint8_t lvl)
 {

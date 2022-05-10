@@ -40,7 +40,7 @@ class Chain
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
     
-    uint8_t mu_u_at_lvl (uint8_t lvl);
+    uint8_t mu_u_at_lvl (uint8_t lvl); // returns the amount of cpu required for placing this chain at level lvl
 };
 
 /* 
@@ -55,12 +55,7 @@ public:
   static const vector<uint8_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
 	static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
-  RT_Chain (int32_t id, vector <int16_t> S_u) {
-    this->id        = id;
-    this->S_u       = S_u;
-    this->isRT_Chain = true;
-    curDatacenter   = nxtDatacenter = -1;
-  };
+  RT_Chain (int32_t id, vector <int16_t> S_u);
 };
 
 class Non_RT_Chain: public Chain
@@ -69,12 +64,7 @@ class Non_RT_Chain: public Chain
 	  static const vector<uint8_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const uint8_t  mu_u_len;
 		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
-    Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
-      this->id       = id;
-      this->S_u       = S_u;
-      this->isRT_Chain = false;
-      curDatacenter   = nxtDatacenter = -1;
-    };
+    Non_RT_Chain (int32_t id, vector <int16_t> S_u);
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
