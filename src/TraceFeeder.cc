@@ -84,12 +84,8 @@ void TraceFeeder::runTrace () {
   		uint32_t bufSize = 128;
   		char buf[bufSize];
   		snprintf (buf, bufSize, "t%d=\n", t);
-//  		sprintf_s (buf, bufSize, "t{}=\n", t);
-//  		string str = buf;
-//  		cout << str;`
-//  		cout << fmt::format ("t=\n");
-//  		cout << fmt::format ("t{}=\n", t);
-//  		MyConfig::printToLog (fmt::format ("t{}=\n", t));
+  		string str = buf;
+  		MyConfig::printToLog (str); //(fmt::format ("t{}=\n", t));
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));
