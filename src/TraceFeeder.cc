@@ -38,8 +38,9 @@ void TraceFeeder::initialize (int stage)
 
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
-  logFile.open ("example.txt");
-  logFile << networkName << endl;
+	MyConfig::openFiles ();
+  MyConfig::printToLog ("rgrg");
+  error ("Rgrgr");
 }
 
 // Fill this->pathToRoot.

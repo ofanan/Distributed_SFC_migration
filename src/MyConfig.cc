@@ -11,16 +11,18 @@ using namespace std;
 //string MyConfig::LogFileName = "example.txt";
 //ofstream MyConfig::logFile.open (LogFileName);
 
-int MyConfig::inter;
+string 		MyConfig::LogFileName;
+ofstream 	MyConfig::logFile;
 
-void MyConfig::init()
+void MyConfig::openFiles()
 {
-	inter = 4;
+	LogFileName = "example.txt";
+	logFile.open (LogFileName);
 }
 
 void MyConfig::printToLog (string str)
 {
-//	logFile << str;
+	logFile << str;
 }
 
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) 

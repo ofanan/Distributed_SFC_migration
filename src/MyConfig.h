@@ -40,13 +40,12 @@ const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1};
 class MyConfig { //: public cSimpleModule {
 
 	public:
-		static int inter;
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;
 
 		//Init
-		static void init();
+		static void openFiles();
 /*		void initialize();*/
 
 		//print
