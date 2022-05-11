@@ -21,7 +21,13 @@ void MyConfig::openFiles()
 //	return logFile;
 //}
 
-void MyConfig::printToLog (string str)
+void MyConfig::printToLog (char* buf) 
+{
+//	string str = buf;
+	logFile << buf; //str;
+}
+
+void MyConfig::printToLog (string str) 
 {
 	logFile << str;
 }

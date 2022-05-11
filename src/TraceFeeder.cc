@@ -39,7 +39,6 @@ void TraceFeeder::initialize (int stage)
 // Open input, output, and log files 
 void TraceFeeder::openFiles () {
 	MyConfig::openFiles ();
-  MyConfig::printToLog ("rgrg");
 }
 
 // Fill this->pathToRoot.
@@ -77,15 +76,10 @@ void TraceFeeder::runTrace () {
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
 
-//char  buffer[200], s[] = "computer", c = 'l';
-//   int   i = 35, j;
-//   float fp = 1.7320534f;
-//      j  = sprintf_s( buffer, 200,     "   String:    %s\n", s );  		
   		uint32_t bufSize = 128;
   		char buf[bufSize];
   		snprintf (buf, bufSize, "t%d=\n", t);
-  		string str = buf;
-  		MyConfig::printToLog (str); //(fmt::format ("t{}=\n", t));
+  		MyConfig::printToLog (buf); 
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));
@@ -153,7 +147,7 @@ void TraceFeeder::printChain (ofstream &outFile, const Chain &chain, bool printS
 // Print all the chains. Default: print only the chains IDs. 
 void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
 {
-	outFile << "allChains\n*******************\n";
+	MyConfig::printToLog ("allChains\n*******************\n");
 	for (auto const & chain : allChains) {
 		outFile << "chain " << chain.id;
 		if (printSu) {
@@ -203,7 +197,7 @@ void TraceFeeder::readChainsThatLeftLine (string line)
 	  }
 	  else {
 	  	if (chain.curDatacenter == UNPLACED) {
-	  		logFile << "Note: this chain was not placed before leaving\n";
+				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
 	  		continue;
 	  	}
   		chainsThatLeftDatacenter[chain.curDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
@@ -239,7 +233,7 @@ void TraceFeeder::readNewChainsLine (string line)
 		allChains.insert (chain); 
 	}	
 	if (LOG_LVL==2) {
-	  logFile << "After readNewCHainsLine: ";
+	  MyConfig::printToLog ("After readNewCHainsLine: ");
 	  printAllChains (logFile);
 	}
 }

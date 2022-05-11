@@ -51,6 +51,7 @@ class MyConfig { //: public cSimpleModule {
 /*		void initialize();*/
 
 		//print
+		static void printToLog (char* buf); 
 		static void printToLog (string str);
 
 		// returns the scalar product of two vectors
