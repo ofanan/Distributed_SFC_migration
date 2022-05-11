@@ -168,6 +168,7 @@ void Datacenter::handleBottomUpPktSync ()
 		insertSorted (pushUpVec, pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
+	delete (pkt);
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
 		numBuMsgsRcvd = 0;
