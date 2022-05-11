@@ -37,18 +37,20 @@ const bool ASYNC = false;
 
 const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1}; 
 
-class MyConfig : public cSimpleModule {
+class MyConfig { //: public cSimpleModule {
 
 	public:
- 		string LogFileName   = "example.txt";
-    ofstream logFile;
+		static int inter;
+ 		static string LogFileName;
+    static ofstream logFile;
 		const static bool mode=SYNC;
 
 		//Init
-		void initialize();
+		static void init();
+/*		void initialize();*/
 
 		//print
-		void printToLog (string str);
+		static void printToLog (string str);
 
 		// returns the scalar product of two vectors
 		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);

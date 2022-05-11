@@ -5,16 +5,22 @@
 using namespace omnetpp;
 using namespace std;
 
-Define_Module(MyConfig);
+//Define_Module(MyConfig);
 
-void MyConfig::initialize()
+
+//string MyConfig::LogFileName = "example.txt";
+//ofstream MyConfig::logFile.open (LogFileName);
+
+int MyConfig::inter;
+
+void MyConfig::init()
 {
-  logFile.open ("example.txt");
+	inter = 4;
 }
 
 void MyConfig::printToLog (string str)
 {
-	logFile << str;
+//	logFile << str;
 }
 
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2) 

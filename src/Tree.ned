@@ -22,7 +22,7 @@ network Tree
 
 		trace_feeder 	: TraceFeeder;
 
-		my_config				: MyConfig;
+//		my_config				: MyConfig;
 //		chain_generator : ChainGenerator;
 		
 //		cpu_augmenter 	: CpuAugmenter;
