@@ -46,6 +46,8 @@ class MyConfig { //: public cSimpleModule {
 
 		//Init
 		static void openFiles();
+		
+		static ofstream getLogFile ();
 /*		void initialize();*/
 
 		//print

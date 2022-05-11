@@ -1,3 +1,10 @@
+C++ version used by Omnet
+//////////////////////////
+echo "-std=c++20" >> configure.user
+
+echo "-std=c++20" >> $OMNET_DIR/configure.user
+
+
 Omnet Make:
 ///////////////////////////
 c; opp_makemake -u cmdenv -f -deep; make
@@ -87,4 +94,5 @@ sudo singularity shell omnetpp.img
 
 For binding a directory (may be helpful if calling sinularity as root), use 
 > singularity shell -B /home/ofanan omnetpp.img 
+
 

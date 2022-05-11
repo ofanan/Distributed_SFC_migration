@@ -40,7 +40,6 @@ void TraceFeeder::initialize (int stage)
 void TraceFeeder::openFiles () {
 	MyConfig::openFiles ();
   MyConfig::printToLog ("rgrg");
-  error ("Rgrgr");
 }
 
 // Fill this->pathToRoot.
@@ -77,7 +76,9 @@ void TraceFeeder::runTrace () {
   		strcpy (lineAsCharArray, line.c_str());
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
-  		logFile << "t=" << t << endl;
+  		string str = "abcdefg";
+//  		sprintf (str, "t=%d\n", t);
+  		MyConfig::printToLog (str);
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));

@@ -7,10 +7,6 @@ using namespace std;
 
 //Define_Module(MyConfig);
 
-
-//string MyConfig::LogFileName = "example.txt";
-//ofstream MyConfig::logFile.open (LogFileName);
-
 string 		MyConfig::LogFileName;
 ofstream 	MyConfig::logFile;
 
@@ -19,6 +15,11 @@ void MyConfig::openFiles()
 	LogFileName = "example.txt";
 	logFile.open (LogFileName);
 }
+
+//ofstream MyConfig::getLogFile ()
+//{
+//	return logFile;
+//}
 
 void MyConfig::printToLog (string str)
 {

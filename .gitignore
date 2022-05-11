@@ -11,4 +11,6 @@ simulations/*
 Distributed_SFC_migration*
 *.img
 *.sif
+*sin_runner*
+*sbatch
 
