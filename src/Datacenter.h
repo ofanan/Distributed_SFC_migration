@@ -11,6 +11,7 @@
 #include "initBottomUpMsg_m.h"
 #include "pushUpPkt_m.h"
 #include "prepareReshufflePkt_m.h"
+#include "MyConfig.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -31,6 +32,8 @@ class Datacenter : public cSimpleModule
     bool isRoot;
     bool isLeaf;
     int16_t id;
+		static const uint16_t bufSize = 128;
+		char buf[bufSize];
     
     // Dynamic
     uint16_t  availCpu;

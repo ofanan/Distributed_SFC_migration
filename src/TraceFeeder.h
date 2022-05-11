@@ -67,7 +67,7 @@ class TraceFeeder : public cSimpleModule
 		void rlzRsrcsOfChains (); // Send a direct msg to each DC whose chains left, so that it releases its resources.
 		void initAlg (); // init a placement alg'
   	void initAlgSync (); // init a sync placement alg'
-  	void InitAlgAsync (); // init an async placement alg'
+  	void initAlgAsync (); // init an async placement alg'
 		
     void handleMessage (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
@@ -78,7 +78,7 @@ class TraceFeeder : public cSimpleModule
     void printAllChains (ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
 				 
   public:
-    string traceFileName = "results/poa_files/Tree_short.poa";
+    string traceFileName = "results/poa_files/Tree_shorter.poa";
     ifstream traceFile;
  		string LogFileName   = "example.txt";
     ofstream logFile;

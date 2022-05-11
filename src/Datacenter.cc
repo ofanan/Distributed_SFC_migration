@@ -92,10 +92,13 @@ void Datacenter::handleMessage (cMessage *msg)
 		if (!isLeaf) {
 			error ("a non-leaf datacenter received an initBottomUpMsg");
 		}  
+		snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
+  	MyConfig::printToLog (buf);
     handleInitBottomUpMsg ();
   }
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
-  	error ("Hurray! DC \%d rcvd a BU pkt", id);
+		snprintf (buf, bufSize, "DC \%d rcvd a BU pkt\n", id);
+  	MyConfig::printToLog (buf);
   	return (MyConfig::mode==SYNC)? handleBottomUpPktSync () : bottomUpAsync ();
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
@@ -198,7 +201,13 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
+		snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
+  	MyConfig::printToLog (buf);
+
+		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
+  	MyConfig::printToLog (buf);
 	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
+	
 }
 
 void Datacenter::pushUp ()
