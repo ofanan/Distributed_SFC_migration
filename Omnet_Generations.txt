@@ -4,6 +4,7 @@ echo "-std=c++20" >> configure.user
 
 echo "-std=c++20" >> $OMNET_DIR/configure.user
 
+to use the fmt package (e.g., #include <fmt/core.h>): apt-get innstall -y libfmt-dev
 
 Omnet Make:
 ///////////////////////////

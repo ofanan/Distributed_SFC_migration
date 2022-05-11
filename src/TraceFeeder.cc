@@ -76,9 +76,20 @@ void TraceFeeder::runTrace () {
   		strcpy (lineAsCharArray, line.c_str());
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
-  		string str = "abcdefg";
-//  		sprintf (str, "t=%d\n", t);
-  		MyConfig::printToLog (str);
+
+//char  buffer[200], s[] = "computer", c = 'l';
+//   int   i = 35, j;
+//   float fp = 1.7320534f;
+//      j  = sprintf_s( buffer, 200,     "   String:    %s\n", s );  		
+  		uint32_t bufSize = 128;
+  		char buf[bufSize];
+  		snprintf (buf, bufSize, "t%d=\n", t);
+//  		sprintf_s (buf, bufSize, "t{}=\n", t);
+//  		string str = buf;
+//  		cout << str;`
+//  		cout << fmt::format ("t=\n");
+//  		cout << fmt::format ("t{}=\n", t);
+//  		MyConfig::printToLog (fmt::format ("t{}=\n", t));
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));
