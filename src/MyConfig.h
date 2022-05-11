@@ -57,6 +57,7 @@ class MyConfig { //: public cSimpleModule {
 		// returns the scalar product of two vectors
 		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);
 		
+		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2);
 
 };
 

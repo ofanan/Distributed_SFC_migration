@@ -36,7 +36,7 @@ void Datacenter::initialize()
   xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
   endXmtEvents.   resize (numPorts);
   idOfChildren.   resize (numChildren);
-  uint8_t	numBuMsgsRcvd = 0;
+  numBuMsgsRcvd = 0;
   
   // Discover the xmt channels to the neighbors, and the neighbors' id's.
 	for (int portNum (0); portNum < numPorts; portNum++) {
@@ -57,6 +57,7 @@ void Datacenter::initialize()
   }
 
   fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
+
 }
 
 /*
@@ -97,7 +98,7 @@ void Datacenter::handleMessage (cMessage *msg)
     handleInitBottomUpMsg ();
   }
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
-		snprintf (buf, bufSize, "DC \%d rcvd a BU pkt\n", id);
+		snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
   	MyConfig::printToLog (buf);
   	return (MyConfig::mode==SYNC)? handleBottomUpPktSync () : bottomUpAsync ();
   }
@@ -127,7 +128,7 @@ void Datacenter::handleInitBottomUpMsg ()
 
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
 	Chain chain;
-	uint8_t mu_u;
+	uint16_t mu_u;
 	
 	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
@@ -149,7 +150,9 @@ void Datacenter::bottomUpSync ()
 //	  if (mu_u <= availCpu) {
 //	  	chain.nxtDatacenter = id;
 //	  }
-	sndBottomUpPkt ();
+	if (!(isRoot)) {
+		sndBottomUpPkt ();
+	}
 }
 
 void Datacenter::handleBottomUpPktSync ()
@@ -166,7 +169,7 @@ void Datacenter::handleBottomUpPktSync ()
 	}
 	numBuMsgsRcvd++;
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
-		bottomUpAsync ();
+		bottomUpSync ();
 		numBuMsgsRcvd = 0;
 	}
 }
@@ -201,9 +204,6 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
-		snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
-  	MyConfig::printToLog (buf);
-
 		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
   	MyConfig::printToLog (buf);
 	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt

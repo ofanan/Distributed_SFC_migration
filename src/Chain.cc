@@ -1,8 +1,8 @@
 #include <vector>
 #include "Chain.h"
 
-const vector<uint8_t> RT_Chain		::mu_u = {1, 5, 10};
-const vector<uint8_t> Non_RT_Chain::mu_u = {1, 5, 10};
+const vector<uint16_t> RT_Chain		::mu_u = {1, 5, 10};
+const vector<uint16_t> Non_RT_Chain::mu_u = {1, 5, 10};
 
 const uint8_t RT_Chain	  ::mu_u_len = 3;
 const uint8_t Non_RT_Chain::mu_u_len = 4;
@@ -32,7 +32,7 @@ Non_RT_Chain::Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
 };
 
 
-uint8_t Chain::mu_u_at_lvl (uint8_t lvl)
+uint16_t Chain::mu_u_at_lvl (uint8_t lvl)
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }

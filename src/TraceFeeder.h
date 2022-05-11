@@ -38,7 +38,7 @@ class TraceFeeder : public cSimpleModule
     string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
     int16_t numDatacenters;
     int16_t numLeaves;
-    int16_t height; // height of the tree
+    uint8_t height; // height of the tree
     int     t; //sim time (in seconds)
     uint32_t seed = 42;
     float  RT_chain_pr = 1.0; // prob' that a new chain is an RT chain

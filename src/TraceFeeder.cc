@@ -15,7 +15,7 @@ void TraceFeeder::initialize (int stage)
 		networkName 		= (network -> par ("name")).stdstringValue();
 		numDatacenters  = (int16_t) (network -> par ("numDatacenters"));
 		numLeaves       = (int16_t) (network -> par ("numLeaves"));
-		height       		= (int16_t) (network -> par ("height"));
+		height       		= (uint8_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		return;
 	}
