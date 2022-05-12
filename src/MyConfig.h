@@ -54,6 +54,9 @@ class MyConfig { //: public cSimpleModule {
 		//print
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
+		static void printToLog (int d); // print "d,", where d is the integer, to the log file
+		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
+		static void printToLog (vector <uint32_t> vec); // print a vec of integers to the log file
 
 		// returns the scalar product of two vectors
 		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);

@@ -63,6 +63,21 @@ void Datacenter::initialize()
 
 }
 
+// Print the chains placed / pot-placed in this DC.
+void Datacenter::print ()
+{
+	snprintf (buf, bufSize, "DC %d, lvl=%d. placed chains: ", id, lvl);
+	MyConfig::printToLog (buf);
+
+	for (const Chain chain : placedChains) {
+			MyConfig::printToLog (chain.id);		
+	}
+	
+	MyConfig::printToLog ("pot. placed chains: ");
+	MyConfig::printToLog (potPlacedChainsIds);
+	
+	MyConfig::printToLog ("\n");
+}
 /*
  * Currently, the only self-message is the one indicating the end of the transmission of a pkt.
  * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
@@ -162,7 +177,7 @@ void Datacenter::bottomUpSync ()
 				newlyPlacedChains.push_back (chainPtr->id);
 			}
 			else {
-				potPlacedChainsIDs.push_back (chainPtr->id);
+				potPlacedChainsIds.push_back (chainPtr->id);
 				insertSorted (pushUpVec, *chainPtr);
 			}
 		}
@@ -173,6 +188,7 @@ void Datacenter::bottomUpSync ()
 	}
 
 	sndPlacementInfoMsg (newlyPlacedChains);
+	this -> print ();
 
   return (isRoot)? sndPushUpPkt() : sndBottomUpPkt ();
 }

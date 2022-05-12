@@ -40,12 +40,15 @@ class Datacenter : public cSimpleModule
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
     vector<Chain> placedChains; 
-    vector<uint32_t> potPlacedChainsIDs; //IDs of chains that are potentially-placed on me
+    vector<uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
 		uint8_t numBuMsgsRcvd; 
 		
     Datacenter();
     ~Datacenter();
   	
+    // Log / debug funcs
+    void print ();
+    
   private:
     vector <cQueue>     outputQ;
     vector <cChannel*>  xmtChnl;

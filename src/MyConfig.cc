@@ -31,6 +31,25 @@ void MyConfig::printToLog (string str)
 	logFile << str;
 }
 
+void MyConfig::printToLog (int d) 
+{
+	logFile << d << ",";
+}
+
+void MyConfig::printToLog (vector <uint16_t> vec) 
+{
+	for (const auto i : vec) {
+		logFile << i << ",";
+	}
+}
+
+void MyConfig::printToLog (vector <uint32_t> vec) 
+{
+	for (const auto i : vec) {
+		logFile << i << ",";
+	}
+}
+
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 
 { 
 	vector <uint16_t> res;
