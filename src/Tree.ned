@@ -20,7 +20,7 @@ network Tree
 
   submodules:
 
-		trace_feeder 	: TraceFeeder;
+//		trace_feeder 	: TraceFeeder;
 
 //		my_config				: MyConfig;
 //		chain_generator : ChainGenerator;

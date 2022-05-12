@@ -1,13 +1,13 @@
-#include "TraceFeeder.h"
+#include "SimController.h"
 
-Define_Module(TraceFeeder);
+Define_Module(SimController);
 
-TraceFeeder::TraceFeeder() {
+SimController::SimController() {
 }
 
-TraceFeeder::~TraceFeeder() {}
+SimController::~SimController() {}
 
-void TraceFeeder::initialize (int stage)
+void SimController::initialize (int stage)
 {
 
   if (stage==0) {
@@ -37,13 +37,13 @@ void TraceFeeder::initialize (int stage)
 }
 
 // Open input, output, and log files 
-void TraceFeeder::openFiles () {
+void SimController::openFiles () {
 	MyConfig::openFiles ();
 }
 
 // Fill this->pathToRoot.
 // pathToRoot[i] will hold the path from leaf i to the root.
-void TraceFeeder::discoverPathsToRoot () {
+void SimController::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
 	uint16_t dc_id;
 	for (uint16_t leafId(0) ; leafId < numLeaves; leafId++)  {
@@ -57,7 +57,7 @@ void TraceFeeder::discoverPathsToRoot () {
 	}
 }
 
-void TraceFeeder::runTrace () {
+void SimController::runTrace () {
 	traceFile = ifstream (traceFileName);
 	
   numMigs         = 0; // will cnt the # of migrations in the current run
@@ -106,7 +106,7 @@ void TraceFeeder::runTrace () {
 - Set for every chain curDc = nxtDc; nxtDc = UNPLACED.
 - If running in sync mode: calculate and print the total cost
 */
-void TraceFeeder::concludeTimeStep ()
+void SimController::concludeTimeStep ()
 {
 //	uint16_t numMigsSinceLastStep = 0;
 //	numMigs += numMigsSinceLastStep;
@@ -115,7 +115,7 @@ void TraceFeeder::concludeTimeStep ()
 }
 
 // Return the overall cpu cost at the NEXT cycle (based on the chain.curDatacenter).
-int TraceFeeder::calcSolCpuCost () 
+int SimController::calcSolCpuCost () 
 {
 	int cpuCost = 0;
 	for (auto const chain : allChains) {
@@ -125,7 +125,7 @@ int TraceFeeder::calcSolCpuCost ()
 }
 
 // Print a data about a single chain to a requested output file.
-void TraceFeeder::printChain (ofstream &outFile, const Chain &chain, bool printSu=true)
+void SimController::printChain (ofstream &outFile, const Chain &chain, bool printSu=true)
 {
 	outFile << "chain " << chain.id;
 	if (printSu) {
@@ -140,7 +140,7 @@ void TraceFeeder::printChain (ofstream &outFile, const Chain &chain, bool printS
 
 
 // Print all the chains. Default: print only the chains IDs. 
-void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
+void SimController::printAllChains (ofstream &outFile, bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
 {
 	MyConfig::printToLog ("allChains\n*******************\n");
 	for (auto const & chain : allChains) {
@@ -157,7 +157,7 @@ void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool pr
 
   	
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
-void TraceFeeder::parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId)
+void SimController::parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId)
 {
 	istringstream newChainToken(token); 
   string numStr; 
@@ -177,7 +177,7 @@ The function inserts all the IDs of chains that left some datacenter dc to chain
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 */
-void TraceFeeder::readChainsThatLeftLine (string line)
+void SimController::readChainsThatLeftLine (string line)
 {
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -207,7 +207,7 @@ Also, add the new generated chain to chainsThatJoinedLeaf[leaf], where leaf is t
 Inputs: 
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated PoA of chain c_i.
 */
-void TraceFeeder::readNewChainsLine (string line)
+void SimController::readNewChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -241,7 +241,7 @@ Inputs:
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated leaf of chain c_i.
 */
 // parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new leaf (to place that chain).
-void TraceFeeder::readOldChainsLine (string line)
+void SimController::readOldChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -274,7 +274,7 @@ void TraceFeeder::readOldChainsLine (string line)
 }
 
 // Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
-void TraceFeeder::rlzRsrcsOfChains ()
+void SimController::rlzRsrcsOfChains ()
 {
 
 	leftChainsMsg* msg;
@@ -292,14 +292,14 @@ void TraceFeeder::rlzRsrcsOfChains ()
 }
 
 // Initiate the run of placement alg'
-void TraceFeeder::initAlg () {  	
+void SimController::initAlg () {  	
 
 	return (MyConfig::mode==SYNC)? initAlgSync() : initAlgAsync();
 }
 
 
 // Initiate the run of an Sync placement alg'
-void TraceFeeder::initAlgSync () 
+void SimController::initAlgSync () 
 {  	
 	initBottomUpMsg* msg;
 	uint16_t i;
@@ -331,7 +331,7 @@ void TraceFeeder::initAlgSync ()
 }
 
 // Initiate the run of a Async placement alg'
-void TraceFeeder::initAlgAsync () {  	
+void SimController::initAlgAsync () {  	
 
 	initBottomUpMsg* msg;
 	uint16_t i;
@@ -351,7 +351,7 @@ void TraceFeeder::initAlgAsync () {
 	}
 }
 
-void TraceFeeder::handleMessage (cMessage *msg)
+void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
   }

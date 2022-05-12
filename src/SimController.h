@@ -31,7 +31,7 @@ using namespace boost;
 const int16_t root_id = 0;
 const int8_t LOG_LVL = 1;
 
-class TraceFeeder : public cSimpleModule
+class SimController : public cSimpleModule
 {
   private:
     cModule* network; // Pointer to the network on which the simulation is running
@@ -82,8 +82,8 @@ class TraceFeeder : public cSimpleModule
     ifstream traceFile;
  		string LogFileName   = "example.txt";
     ofstream logFile;
-    TraceFeeder ();
-    ~TraceFeeder ();
+    SimController ();
+    ~SimController ();
     void parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId);
 };
 
