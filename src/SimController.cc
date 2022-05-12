@@ -66,6 +66,7 @@ Run a single time step. Such a time step is supposed to include (at most) a sing
 */
 void SimController::runTimeStep () 
 {
+  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
   string line;
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
@@ -96,7 +97,6 @@ void SimController::runTimeStep ()
   		// place all the new / critical chains.
   		rlzRsrcsOfChains ();
   		initAlg ();
-  		concludeTimeStep ();
   		// Schedule a self-event for reading the handling the next time-step
   		scheduleAt (simTime() + 1.0, new cMessage);
   	}
@@ -117,6 +117,7 @@ void SimController::runTrace () {
 void SimController::finish () 
 {
   traceFile.close ();
+//  concludeTimeStep (); 
   MyConfig::printToLog ("finished sim\n");
 }
 
@@ -130,6 +131,15 @@ void SimController::concludeTimeStep ()
 //	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
+	printAllDatacenters 					 ();
+}
+
+void SimController::printAllDatacenters ()
+{
+	for (const auto datacenter : datacenters) {
+		datacenter -> print ();
+	}
+
 }
 
 // Return the overall cpu cost at the NEXT cycle (based on the chain.curDatacenter).

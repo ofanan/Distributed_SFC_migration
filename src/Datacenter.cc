@@ -121,7 +121,12 @@ void Datacenter::handleMessage (cMessage *msg)
   	return (MyConfig::mode==SYNC)? handleBottomUpPktSync () : bottomUpAsync ();
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
-    pushUp ();
+  	if (MyConfig::mode==SYNC) {
+	    pushUpSync ();
+  	}
+  	else {
+  		pushUpAsync ();
+  	}
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
   {
@@ -155,6 +160,27 @@ void Datacenter::handleInitBottomUpMsg ()
   delete curHandledMsg;
   this -> pushUpVec = {};
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
+}
+
+/*
+Running the PU alg'. 
+Assume that this->pushUpVec already contains the relevant chains.
+*/
+void Datacenter::pushUpSync ()
+{
+    pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
+    delete (pkt);
+}
+
+
+/*
+Running the PU alg'. 
+Assume that this->pushUpVec already contains the relevant chains.
+*/
+void Datacenter::pushUpAsync ()
+{
+    pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
+    delete (pkt);
 }
 
 /*
@@ -296,12 +322,6 @@ void Datacenter::sndBottomUpPkt ()
 		sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
 
-void Datacenter::pushUp ()
-{
-    pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
-    delete (pkt);
-}
-
 void Datacenter::prepareReshuffleSync () 
 {
 }
@@ -334,4 +354,5 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
+
 

@@ -4,8 +4,8 @@
 const vector<uint16_t> RT_Chain		 ::mu_u = {1, 5, 10};
 const vector<uint16_t> Non_RT_Chain::mu_u = {1, 5, 10};
 
-const uint8_t RT_Chain	  ::mu_u_len = 1;
-const uint8_t Non_RT_Chain::mu_u_len = 1;
+const uint8_t RT_Chain	  ::mu_u_len = 2;
+const uint8_t Non_RT_Chain::mu_u_len = 2;
 
 const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain		 ::mu_u, cpuCostAtLvl);
 const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, cpuCostAtLvl);

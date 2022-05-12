@@ -65,7 +65,8 @@ class Datacenter : public cSimpleModule
     void handleBottomUpPktSync 	();
     void bottomUpSync     			();
     void bottomUpAsync  			  ();
-    void pushUp           			();
+    void pushUpSync        			();
+    void pushUpAsync       			();
     void prepareReshuffleSync 	();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();

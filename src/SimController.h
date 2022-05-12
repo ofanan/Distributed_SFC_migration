@@ -79,6 +79,7 @@ class SimController : public cSimpleModule
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
+		void printAllDatacenters ();
     void printAllChains (ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
 				 
   public:
