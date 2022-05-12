@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/pushUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from pushUpPkt.msg.
 //
 
 #ifndef __PUSHUPPKT_M_H
@@ -24,7 +24,7 @@
 // }}
 
 /**
- * Class generated from <tt>src/pushUpPkt.msg:9</tt> by nedtool.
+ * Class generated from <tt>pushUpPkt.msg:9</tt> by nedtool.
  * <pre>
  * packet pushUpPkt
  * {

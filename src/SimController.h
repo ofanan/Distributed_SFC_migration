@@ -1,5 +1,5 @@
-#ifndef TRACE_FEEDER_H
-#define TRACE_FEEDER_H
+#ifndef SIM_CONTROLLER_H
+#define SIM_CONTROLLER_H
 
 #include <stdio.h>
 #include <string.h>

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/endXmtPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from endXmtPkt.msg.
 //
 
 #ifndef __ENDXMTPKT_M_H
@@ -19,7 +19,7 @@
 
 
 /**
- * Class generated from <tt>src/endXmtPkt.msg:3</tt> by nedtool.
+ * Class generated from <tt>endXmtPkt.msg:3</tt> by nedtool.
  * <pre>
  * // indicates the end of xmting a pkt to a given port number
  * message endXmtPkt

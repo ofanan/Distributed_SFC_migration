@@ -23,7 +23,8 @@ Datacenter::~Datacenter()
 void Datacenter::initialize()
 {
 	network     	= (cModule*) (getParentModule ()); 
-	simController = (cModule*) (getParentModule ()); 
+//	simController = (SimController*) network->getSubmodule("sim_controller");
+//								//	(Datacenter*) network->getSubmodule("datacenters", dc);
 	networkName = (network -> par ("name")).stdstringValue();
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));

@@ -5,7 +5,6 @@
 #include <omnetpp.h>
 #include <vector>
 #include <set>
-#include "Datacenter.h"
 #include "endXmtPkt_m.h"
 #include "bottomUpPkt_m.h"
 #include "initBottomUpMsg_m.h"
@@ -13,6 +12,7 @@
 #include "pushUpPkt_m.h"
 #include "prepareReshufflePkt_m.h"
 #include "MyConfig.h"
+/*#include "SimController.h"*/
 
 using namespace omnetpp;
 using namespace std;
@@ -22,7 +22,8 @@ class Datacenter : public cSimpleModule
   public:
   
   	// Static (not changed along a sim')
-    cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController
+    cModule *network;
+/*    , *simController; // Pointer to the network on which the simulation is running, and to the simController*/
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
     uint8_t 	numChildren;
