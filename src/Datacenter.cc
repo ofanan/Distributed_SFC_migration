@@ -23,8 +23,7 @@ Datacenter::~Datacenter()
 void Datacenter::initialize()
 {
 	network     	= (cModule*) (getParentModule ()); 
-//	simController = (SimController*) network->getSubmodule("sim_controller");
-//								//	(Datacenter*) network->getSubmodule("datacenters", dc);
+	simController = (cModule*) network->getSubmodule("sim_controller");
 	networkName = (network -> par ("name")).stdstringValue();
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));
@@ -193,7 +192,7 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 
 		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
   	MyConfig::printToLog (buf);
-		//sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
+		sendDirect (msg, simController, "directMsgsPort");
 
 }
 

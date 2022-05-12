@@ -11,5 +11,5 @@ simple SimController
     double RT_prob = 0; // prob' that a new chain is an RT chain
     double decisionPariod @unit(s) = default(1s);
 //	port:
-//	input directMsgsPort;
+//		input directMsgsPort;
 }
