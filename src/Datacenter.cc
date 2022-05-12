@@ -141,19 +141,36 @@ void Datacenter::handleInitBottomUpMsg ()
 
 /*
 Running the BU alg'. 
-Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, in the correct order.
+Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, and are sorted.
 */
 void Datacenter::bottomUpSync ()
 {
-//  delete (pkt);
+//	for (auto chain : notAssigned) {
 //	  mu_u = chain.mu_u_at_lvl(lvl);
+//		if (availCpu >= mu_u) {
+//			notAssigned.remove
+//		}
+//	
+//	}
+
 //	  if (mu_u <= availCpu) {
 //	  	chain.nxtDatacenter = id;
 //	  }
-	if (!(isRoot)) {
+
+ 	if (isRoot) {
+ 		sndPushUpPkt();
+ 	}
+	else {
 		sndBottomUpPkt ();
 	}
 }
+
+/*
+Handle a bottomUP pkt, when running in sync' mode.
+- add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") databases.
+- delete the pkt.
+- If already rcvd a bottomUp pkt from all the children, call the sync' mode of the bottom-up (BU) alg'.
+*/
 
 void Datacenter::handleBottomUpPktSync ()
 {
@@ -190,6 +207,27 @@ void Datacenter::bottomUpAsync ()
 	sndBottomUpPkt ();
 }
 
+void Datacenter::sndPushUpPkt () 
+{
+//	uint16_t i;
+//	bottomUpPkt* pkt2send;
+//	for (auto const childId : idOfChildren) {
+//		//find the relevant chains for each child
+//		
+//		//Only if the number of relevant chains > 0...
+//		pkt2send = new pushUpPkt;
+//		pkt2send -> setPushUpVecArraySize (pushUpVec.size());
+//		for (i=0; i<pushUpVec.size(); i++) {
+//			pkt2send->setPushUpVec (i, pushUpVec[i]);
+//		}
+//	
+//	}
+//	
+//	snprintf (buf, bufSize, "DC \%d sending a PU pkt to child\n", id);
+//	MyConfig::printToLog (buf);
+//	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
+}
+
 void Datacenter::sndBottomUpPkt ()
 {
 	bottomUpPkt* pkt2send = new bottomUpPkt;
@@ -200,15 +238,14 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
-	pkt2send -> setNotAssignedArraySize (pushUpVec.size());
+	pkt2send -> setPushUpVecArraySize (pushUpVec.size());
 	for (i=0; i<pushUpVec.size(); i++) {
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
 		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
   	MyConfig::printToLog (buf);
-	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
-	
+		sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
 
 void Datacenter::pushUp ()

@@ -108,23 +108,18 @@ void TraceFeeder::runTrace () {
 */
 void TraceFeeder::concludeTimeStep ()
 {
-	int16_t numMigsSinceLastStep = 0;
-	for (auto chain : allChains) {
-		if (chain.nxtDatacenter != chain.curDatacenter) {
-			numMigsSinceLastStep++;
-			chain.curDatacenter = chain.nxtDatacenter;
-		}
-		chain.nxtDatacenter = UNPLACED;
-	}
-	numMigs += numMigsSinceLastStep;
+//	int16_t numMigsSinceLastStep = 0;
+//	numMigs += numMigsSinceLastStep;
+	chainsThatJoinedLeaf.    clear ();
+	chainsThatLeftDatacenter.clear ();
 }
 
-// Return the overall cpu cost at the NEXT cycle (based on the chain.nxtDatacenter).
+// Return the overall cpu cost at the NEXT cycle (based on the chain.curDatacenter).
 int TraceFeeder::calcSolCpuCost () 
 {
 	int cpuCost = 0;
 	for (auto const chain : allChains) {
-		cpuCost += (chain.isRT_Chain)? RT_Chain::cpuCostAtLvl[datacenters[chain.nxtDatacenter]->lvl] : Non_RT_Chain::cpuCostAtLvl[datacenters[chain.nxtDatacenter]->lvl];
+		cpuCost += (chain.isRT_Chain)? RT_Chain::cpuCostAtLvl[datacenters[chain.curDatacenter]->lvl] : Non_RT_Chain::cpuCostAtLvl[datacenters[chain.curDatacenter]->lvl];
 	}
 	return cpuCost;
 }
@@ -375,8 +370,11 @@ void TraceFeeder::handleMessage (cMessage *msg)
 
 			}
 			else {
+				if (chain.curDatacenter!=UNPLACED) { // was it an old chain that migrated?
+					numMigs++;				
+				}
 				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-				chain.nxtDatacenter = datacenterId;
+				chain.curDatacenter = datacenterId;
 				allChains.insert (chain);
 			}
   	}
