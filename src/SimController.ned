@@ -10,6 +10,6 @@ simple SimController
     @display("i=misc/node_vs,gold");
     double RT_prob = 0; // prob' that a new chain is an RT chain
     double decisionPariod @unit(s) = default(1s);
-//	port:
-//		input directMsgsPort;
+	gates:
+		input directMsgsPort;
 }
