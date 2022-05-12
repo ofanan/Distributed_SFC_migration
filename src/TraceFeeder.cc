@@ -361,23 +361,23 @@ void TraceFeeder::handleMessage (cMessage *msg)
   	int16_t  datacenterId;
   	uint32_t chainId;
 
-//  	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getNewlyPlacedChainsArraySize()); i++) {
-//  		
-//  		datacenterId 	= msg2handle -> getDatacenterId ();
-//  		chainId 			= msg2handle -> getNewlyPlacedChains (i);
-//			if (!(findChainInSet (allChains, chainId, chain))) {
-//				error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
+  	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getNewlyPlacedChainsArraySize()); i++) {
+  		
+  		datacenterId 	= msg2handle -> getDatacenterId ();
+  		chainId 			= msg2handle -> getNewlyPlacedChains (i);
+			if (!(findChainInSet (allChains, chainId, chain))) {
+				error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
 
-//			}
-//			else {
-//				if (chain.curDatacenter!=UNPLACED) { // was it an old chain that migrated?
-//					numMigs++;				
-//				}
-//				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-//				chain.curDatacenter = datacenterId;
-//				allChains.insert (chain);
-//			}
-//  	}
+			}
+			else {
+				if (chain.curDatacenter!=UNPLACED) { // was it an old chain that migrated?
+					numMigs++;				
+				}
+				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+				chain.curDatacenter = datacenterId;
+				allChains.insert (chain);
+			}
+  	}
   }
   else {
   	error ("Rcvd unknown msg type");
