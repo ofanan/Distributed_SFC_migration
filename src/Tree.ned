@@ -20,7 +20,7 @@ network Tree
 
   submodules:
 
-//		trace_feeder 	: TraceFeeder;
+		sim_controller 	: SimController;
 
 //		my_config				: MyConfig;
 //		chain_generator : ChainGenerator;

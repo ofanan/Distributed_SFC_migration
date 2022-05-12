@@ -19,7 +19,7 @@ network Monaco
 
   submodules:
 
-		trace_feeder 	: TraceFeeder;
+		sim_controller 	: SimController;
 
 //		chain_generator : ChainGenerator;
 		
