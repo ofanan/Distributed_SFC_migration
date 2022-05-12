@@ -371,6 +371,7 @@ void SimController::initAlgAsync () {
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
+  	runTimeStep ();
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
   	placementInfoMsg* msg2handle = (placementInfoMsg*) (msg);
