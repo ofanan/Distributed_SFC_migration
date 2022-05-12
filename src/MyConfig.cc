@@ -23,8 +23,7 @@ void MyConfig::openFiles()
 
 void MyConfig::printToLog (char* buf) 
 {
-//	string str = buf;
-	logFile << buf; //str;
+	logFile << buf; 
 }
 
 void MyConfig::printToLog (string str) 
@@ -41,3 +40,7 @@ vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const ve
 	return res;
 }
 
+void MyConfig::finish ()
+{
+  logFile.close ();
+}

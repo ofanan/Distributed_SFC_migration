@@ -57,14 +57,16 @@ void SimController::discoverPathsToRoot () {
 	}
 }
 
-void SimController::runTrace () {
-	traceFile = ifstream (traceFileName);
-	
-  numMigs         = 0; // will cnt the # of migrations in the current run
+/*
+Run a single time step. Such a time step is supposed to include (at most) a single occurence of:
+- A "t = " line.
+- A "usr_that_left" line.
+- A "new_usrs" line
+- An "old_usrs" line.
+*/
+void SimController::runTimeStep () 
+{
   string line;
-  if (!traceFile.is_open ()) {
-  	error (".poa file was not found -> finishing simulation"); 
-  }
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
   	}
@@ -94,11 +96,26 @@ void SimController::runTrace () {
   		// place all the new / critical chains.
   		rlzRsrcsOfChains ();
   		initAlg ();
-//  		concludeTimeStep ();
+  		concludeTimeStep ();
+  		// Schedule a self-event for reading the handling the next time-step
+  		scheduleAt (simTime() + 1.0, new cMessage);
   	}
   }
+}
+
+
+void SimController::runTrace () {
+	traceFile = ifstream (traceFileName);
+	
+  numMigs         = 0; // will cnt the # of migrations in the current run
+  if (!traceFile.is_open ()) {
+  	error (".poa file was not found -> finishing simulation"); 
+  }
+}
+
+void SimController::finish () 
+{
   traceFile.close ();
-  logFile.close ();
 }
 
 /*

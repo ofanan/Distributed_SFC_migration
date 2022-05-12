@@ -59,8 +59,12 @@ class SimController : public cSimpleModule
 		void openFiles ();
 		void discoverPathsToRoot ();
 
+		// Termination functions
+		void finish ();
+
 		// Other Functions
 		void runTrace  ();
+		void runTimeStep ();
 		void readChainsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void readNewChainsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
 		void readOldChainsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.

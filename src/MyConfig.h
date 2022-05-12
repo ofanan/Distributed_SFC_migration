@@ -45,7 +45,8 @@ class MyConfig { //: public cSimpleModule {
 		const static bool mode=SYNC;
 
 		//Init
-		static void openFiles();
+		static void openFiles ();
+		static void finish    ();
 		
 		static ofstream getLogFile ();
 /*		void initialize();*/
