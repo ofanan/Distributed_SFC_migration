@@ -17,16 +17,15 @@ using namespace std;
 class Chain
 {
   public:
-    int32_t id;
+    uint32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
-    int16_t nxtDatacenter; // Id of the datacenter scheduled to host me
-    vector <int16_t> S_u;         // List of delay-feasible servers
+    vector <uint16_t> S_u;         // List of delay-feasible servers
     bool isRT_Chain;
 		/*    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?*/
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
     Chain () {};
 
-    Chain (int32_t id, vector <int16_t> S_u);
+    Chain (uint32_t id, vector <uint16_t> S_u);
             
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
@@ -47,7 +46,7 @@ class Chain
 * Accessory function, for finding a chain within a given list of chains.
 * We assume that a chain is inequivocally identified by its id.
 */
-bool findChainInSet (set<Chain> setOfChains, int32_t id, Chain& foundChain);
+bool findChainInSet (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
 
 class RT_Chain : public Chain
 {
@@ -55,7 +54,7 @@ public:
   static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
 	static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
-  RT_Chain (int32_t id, vector <int16_t> S_u);
+  RT_Chain (uint32_t id, vector <uint16_t> S_u);
 };
 
 class Non_RT_Chain: public Chain
@@ -64,7 +63,7 @@ class Non_RT_Chain: public Chain
 	  static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const uint8_t  mu_u_len;
 		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
-    Non_RT_Chain (int32_t id, vector <int16_t> S_u);
+    Non_RT_Chain (uint32_t id, vector <uint16_t> S_u);
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
@@ -82,7 +81,7 @@ Inputs:
 - Ref' to which the found chain is written.
 Output: true iff the requested chain is found.
 */
-bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , int32_t chainId, Chain &c);
+bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , uint32_t chainId, Chain &c);
 
 /*
 Insert a chain in its correct place to a sorted vector of chains

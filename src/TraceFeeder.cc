@@ -13,8 +13,8 @@ void TraceFeeder::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
-		numDatacenters  = (int16_t) (network -> par ("numDatacenters"));
-		numLeaves       = (int16_t) (network -> par ("numLeaves"));
+		numDatacenters  = (uint16_t) (network -> par ("numDatacenters"));
+		numLeaves       = (uint16_t) (network -> par ("numLeaves"));
 		height       		= (uint8_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		return;
@@ -45,8 +45,8 @@ void TraceFeeder::openFiles () {
 // pathToRoot[i] will hold the path from leaf i to the root.
 void TraceFeeder::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
-	int16_t dc_id;
-	for (int16_t leafId(0) ; leafId < numLeaves; leafId++)  {
+	uint16_t dc_id;
+	for (uint16_t leafId(0) ; leafId < numLeaves; leafId++)  {
 		pathToRoot[leafId].resize (height);
 		dc_id = leaves[leafId]->id;
 	  int height = 0;
@@ -108,7 +108,7 @@ void TraceFeeder::runTrace () {
 */
 void TraceFeeder::concludeTimeStep ()
 {
-//	int16_t numMigsSinceLastStep = 0;
+//	uint16_t numMigsSinceLastStep = 0;
 //	numMigs += numMigsSinceLastStep;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
@@ -130,7 +130,7 @@ void TraceFeeder::printChain (ofstream &outFile, const Chain &chain, bool printS
 	outFile << "chain " << chain.id;
 	if (printSu) {
 		outFile << " S_u=";
-		for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+		for (auto it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
 			outFile << *it << ";";
 		}
 	}
@@ -146,7 +146,7 @@ void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool pr
 	for (auto const & chain : allChains) {
 		outFile << "chain " << chain.id;
 		if (printSu) {
-			for (vector <int16_t>::const_iterator it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
+			for (auto it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
 				outFile << *it << ";";
 			}
 		}
@@ -157,7 +157,7 @@ void TraceFeeder::printAllChains (ofstream &outFile, bool printSu=false, bool pr
 
   	
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
-void TraceFeeder::parseChainPoaToken (string token, int32_t &chainId, int16_t &poaId)
+void TraceFeeder::parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId)
 {
 	istringstream newChainToken(token); 
   string numStr; 
@@ -211,18 +211,18 @@ void TraceFeeder::readNewChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t chainId;
-  int16_t poaId; 
+  uint32_t chainId;
+  uint16_t poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
   
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		if (rand () < RT_chain_rand_int) {
-			chain = RT_Chain (chainId, vector<int16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len-1}); 
+			chain = RT_Chain (chainId, vector<uint16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len-1}); 
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
-			chain = Non_RT_Chain (chainId, vector<int16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
+			chain = Non_RT_Chain (chainId, vector<uint16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
 		}
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
 		allChains.insert (chain); 
@@ -245,8 +245,8 @@ void TraceFeeder::readOldChainsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  int32_t chainId;
-  int16_t poaId;
+  uint32_t chainId;
+  uint16_t poaId;
 	Chain chain; // will hold the new chain to be inserted each time
 
 	for (const auto& token : tokens) {
@@ -278,7 +278,7 @@ void TraceFeeder::rlzRsrcsOfChains ()
 {
 
 	leftChainsMsg* msg;
-	int16_t i;
+	uint16_t i;
 	for (auto &item : chainsThatLeftDatacenter)
 	{
 		msg = new leftChainsMsg ();
@@ -302,7 +302,7 @@ void TraceFeeder::initAlg () {
 void TraceFeeder::initAlgSync () 
 {  	
 	initBottomUpMsg* msg;
-	int16_t i;
+	uint16_t i;
 	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a initBottomUpMsg to leaf i
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
@@ -334,7 +334,7 @@ void TraceFeeder::initAlgSync ()
 void TraceFeeder::initAlgAsync () {  	
 
 	initBottomUpMsg* msg;
-	int16_t i;
+	uint16_t i;
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
@@ -358,8 +358,8 @@ void TraceFeeder::handleMessage (cMessage *msg)
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
   	placementInfoMsg* msg2handle = (placementInfoMsg*) (msg);
   	Chain chain;
-  	int16_t datacenterId;
-  	int32_t chainId;
+  	int16_t  datacenterId;
+  	uint32_t chainId;
 
   	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getPlacedChainsArraySize()); i++) {
   		

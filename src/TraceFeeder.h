@@ -36,22 +36,22 @@ class TraceFeeder : public cSimpleModule
   private:
     cModule* network; // Pointer to the network on which the simulation is running
     string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
-    int16_t numDatacenters;
-    int16_t numLeaves;
-    uint8_t height; // height of the tree
-    int     t; //sim time (in seconds)
+    uint16_t numDatacenters;
+    uint16_t numLeaves;
+    uint8_t  height; // height of the tree
+    uint32_t t; //sim time (in seconds)
     uint32_t seed = 42;
-    float  RT_chain_pr = 1.0; // prob' that a new chain is an RT chain
-    int    RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
+    float  	 RT_chain_pr = 1.0; // prob' that a new chain is an RT chain
+    int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 
 		uint32_t numMigs=0; // number of migration performed		
 		
 		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
-    unordered_map <int16_t, vector<int32_t> > chainsThatLeftDatacenter;
-    unordered_map <int16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
+    unordered_map <uint16_t, vector<int32_t> > chainsThatLeftDatacenter;
+    unordered_map <uint16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
-    vector <vector<int16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
+    vector <vector<uint16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
 
 		// Init Functions
     void initialize(int stage);
@@ -84,7 +84,7 @@ class TraceFeeder : public cSimpleModule
     ofstream logFile;
     TraceFeeder ();
     ~TraceFeeder ();
-    void parseChainPoaToken (string token, int32_t &chainId, int16_t &poaId);
+    void parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId);
 };
 
 #endif

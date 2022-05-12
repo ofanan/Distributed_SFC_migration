@@ -10,25 +10,25 @@ const uint8_t Non_RT_Chain::mu_u_len = 4;
 const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain		 ::mu_u, cpuCostAtLvl);
 const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, cpuCostAtLvl);
 
-Chain::Chain (int32_t id, vector <int16_t> S_u) 
+Chain::Chain (uint32_t id, vector <uint16_t> S_u) 
 {
 	this->id = id;
 	this->S_u = S_u;
-	curDatacenter = nxtDatacenter = -1; 
+	curDatacenter = UNPLACED; 
 };
 
-RT_Chain::RT_Chain (int32_t id, vector <int16_t> S_u) {
+RT_Chain::RT_Chain (uint32_t id, vector <uint16_t> S_u) {
   this->id        = id;
   this->S_u       = S_u;
   this->isRT_Chain = true;
-  curDatacenter   = nxtDatacenter = -1;
+	curDatacenter = UNPLACED; 
 };
 
-Non_RT_Chain::Non_RT_Chain (int32_t id, vector <int16_t> S_u) {
+Non_RT_Chain::Non_RT_Chain (uint32_t id, vector <uint16_t> S_u) {
   this->id       = id;
   this->S_u       = S_u;
   this->isRT_Chain = false;
-  curDatacenter   = nxtDatacenter = -1;
+	curDatacenter = UNPLACED; 
 };
 
 
@@ -47,7 +47,7 @@ Inputs:
 - &foundChain: a reference, to which the found chain (if there exists) will be written.
 Return value: true iff the requested chain was found.
 */
-bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, int32_t chainId, Chain &c)
+bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chainId, Chain &c)
 {
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);
