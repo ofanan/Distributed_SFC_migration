@@ -149,7 +149,7 @@ Assume that this->notAssigned and this->pushUpVec already contain the relevant c
 void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
-	vector <Chain> newlyPlacedChains;
+	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); chainPtr++) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
@@ -158,7 +158,7 @@ void Datacenter::bottomUpSync ()
 			chainPtr -> curDatacenter = id;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				insertSorted (placedChains, *chainPtr);
-				newlyPlacedChains.push_back (*chainPtr);
+				newlyPlacedChains.push_back (chainPtr->id);
 			}
 			else {
 				insertSorted (potPlacedChains, *chainPtr);
@@ -176,27 +176,23 @@ void Datacenter::bottomUpSync ()
   return (isRoot)? sndPushUpPkt() : sndBottomUpPkt ();
 }
 
-void Datacenter::sndPlacementInfoMsg (vector<Chain>  &newlyPlacedChains)
+void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 {
 
 	uint16_t numOfNewlyPlacedChains = newlyPlacedChains.size ();
-//	placementInfoMsg* msg = new placementInfoMsg;
-//	uint16_t i;
+	if (numOfNewlyPlacedChains==0) {
+		return; // no new chains were placed during the last run
+	}
+	placementInfoMsg* msg = new placementInfoMsg;
 
-//	msg2send -> setNotAssignedArraySize (notAssigned.size());
-//	for (i=0; i<notAssigned.size(); i++) {
-//		pkt2send->setNotAssigned (i, notAssigned[i]);
-//	}
+	msg -> setNewlyPlacedChainsArraySize (numOfNewlyPlacedChains);
+	for (uint16_t i=0; i<numOfNewlyPlacedChains; i++) {
+		msg->setNewlyPlacedChains (i, newlyPlacedChains[i]);
+	}
 
-//	pkt2send -> setPushUpVecArraySize (pushUpVec.size());
-//	for (i=0; i<pushUpVec.size(); i++) {
-//		pkt2send->setPushUpVec (i, pushUpVec[i]);
-//	}
-//	
-//		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
-//  	MyConfig::printToLog (buf);
-//		sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
-
+		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
+  	MyConfig::printToLog (buf);
+//		sendDirect (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
 
 /*

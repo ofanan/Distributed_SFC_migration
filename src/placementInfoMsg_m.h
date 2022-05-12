@@ -28,7 +28,7 @@
  * message placementInfoMsg
  * {
  *     int16_t datacenterId;   // Id of the reporting datacenter
- *     int32_t placedChains[]; // A list of chains that the sending datacenter has just placed.
+ *     uint16_t newlyPlacedChains[]; // A list of chains that the sending datacenter has just placed.
  * }
  * </pre>
  */
@@ -36,8 +36,8 @@ class placementInfoMsg : public ::omnetpp::cMessage
 {
   protected:
     int16_t datacenterId;
-    int32_t *placedChains; // array ptr
-    unsigned int placedChains_arraysize;
+    uint16_t *newlyPlacedChains; // array ptr
+    unsigned int newlyPlacedChains_arraysize;
 
   private:
     void copy(const placementInfoMsg& other);
@@ -58,10 +58,10 @@ class placementInfoMsg : public ::omnetpp::cMessage
     // field getter/setter methods
     virtual int16_t getDatacenterId() const;
     virtual void setDatacenterId(int16_t datacenterId);
-    virtual void setPlacedChainsArraySize(unsigned int size);
-    virtual unsigned int getPlacedChainsArraySize() const;
-    virtual int32_t getPlacedChains(unsigned int k) const;
-    virtual void setPlacedChains(unsigned int k, int32_t placedChains);
+    virtual void setNewlyPlacedChainsArraySize(unsigned int size);
+    virtual unsigned int getNewlyPlacedChainsArraySize() const;
+    virtual uint16_t getNewlyPlacedChains(unsigned int k) const;
+    virtual void setNewlyPlacedChains(unsigned int k, uint16_t newlyPlacedChains);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const placementInfoMsg& obj) {obj.parsimPack(b);}

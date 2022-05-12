@@ -66,7 +66,7 @@ class Datacenter : public cSimpleModule
     void sndDirect       				(); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
-    void sndPlacementInfoMsg 		(vector<Chain>  &newlyPlacedChains);
+    void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
     inline bool CannotPlaceThisChainHigher (Chain chain);
 };
 
