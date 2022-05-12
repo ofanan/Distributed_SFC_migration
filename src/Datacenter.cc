@@ -22,10 +22,10 @@ void Datacenter::initialize()
 {
 	network     = (cModule*) (getParentModule ()); 
 	networkName = (network -> par ("name")).stdstringValue();
-  numChildren = (int16_t) (par("numChildren"));
-  numParents  = (int16_t) (par("numParents"));
-  lvl				  = (int16_t) (par("lvl"));
-  id					= (int16_t) (par("id"));
+  numChildren = (uint8_t)  (par("numChildren"));
+  numParents  = (uint8_t)  (par("numParents"));
+  lvl				  = (uint8_t)  (par("lvl"));
+  id					= (uint16_t) (par("id"));
   availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
         // variables: assigned chains, placedChains
 
@@ -48,10 +48,10 @@ void Datacenter::initialize()
 	  }
 	  else {
 	    if (portNum==0) { // port 0 is towards the parents
-	      idOfParent = int16_t (nghbr -> par ("id"));
+	      idOfParent = uint16_t (nghbr -> par ("id"));
 	    }
 	    else { // ports 1...numChildren are towards the children
-	      idOfChildren[portNum-1] = int16_t (nghbr -> par ("id"));
+	      idOfChildren[portNum-1] = uint16_t (nghbr -> par ("id"));
 	    }
   	}       
   }
@@ -150,6 +150,8 @@ void Datacenter::bottomUpSync ()
 	  mu_u = it->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
 			notAssigned.erase(it);
+			availCpu -= mu_u;
+//			if (it->mu_u_len)
 		}
 	
 	}

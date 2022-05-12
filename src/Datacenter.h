@@ -23,12 +23,12 @@ class Datacenter : public cSimpleModule
   	// Static (not changed along a sim')
     cModule* network; // Pointer to the network on which the simulation is running
   	string networkName;
-  	int16_t lvl; // level in the tree (leaf's lvl is 0).
-    int16_t numChildren;
-    int16_t numParents;
-    int16_t numPorts;
-    int16_t idOfParent;
-    vector <int16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
+  	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
+    uint8_t 	numChildren;
+    uint8_t 	numParents;
+    uint8_t 	numPorts;
+    uint16_t idOfParent;
+    vector <uint16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
     int16_t id;
