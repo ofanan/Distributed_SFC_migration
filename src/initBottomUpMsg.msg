@@ -1,4 +1,4 @@
-// A message directly-sent from the traceFeeder to leaf datacenters, to initiate a run of our alg'.
+// A message directly-sent from the sim_controller to leaf datacenters, to initiate a run of our alg'.
 
 cplusplus {{
 #pragma once

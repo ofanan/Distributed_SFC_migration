@@ -288,7 +288,7 @@ void Datacenter::prepareReshuffleSync ()
 {
 }
 
-// Send a direct message, e.g. to the traceFeeder, to inform about the placement of a pkt.
+// Send a direct message, e.g. to the SimController, to inform about the placement of a pkt.
 void Datacenter::sndDirect () 
 {
 }

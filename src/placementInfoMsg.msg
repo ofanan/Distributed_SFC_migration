@@ -1,4 +1,4 @@
-// A message directly-sent from a datacenter, to the traceFeeder, to inform about a chain's placement. 
+// A message directly-sent from a datacenter, to the SimController, to inform about a chain's placement. 
 
 cplusplus {{
 #pragma once
