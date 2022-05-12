@@ -145,13 +145,14 @@ Assume that this->notAssigned and this->pushUpVec already contain the relevant c
 */
 void Datacenter::bottomUpSync ()
 {
-//	for (auto chain : notAssigned) {
-//	  mu_u = chain.mu_u_at_lvl(lvl);
-//		if (availCpu >= mu_u) {
-//			notAssigned.remove
-//		}
-//	
-//	}
+	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
+	for (auto it=notAssigned.begin(); it<notAssigned.end(); it++) {
+	  mu_u = it->mu_u_at_lvl(lvl);
+		if (availCpu >= mu_u) {
+			notAssigned.erase(it);
+		}
+	
+	}
 
 //	  if (mu_u <= availCpu) {
 //	  	chain.nxtDatacenter = id;
