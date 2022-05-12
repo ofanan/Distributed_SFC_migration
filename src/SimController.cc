@@ -90,12 +90,13 @@ void SimController::runTimeStep ()
   		readNewChainsLine (line.substr(9)); 
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
+  		MyConfig::printToLog ("In old usrs\n");
   		readOldChainsLine (line.substr(9));
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
   		rlzRsrcsOfChains ();
-  		initAlg ();
+//  		initAlg ();
   		concludeTimeStep ();
   		// Schedule a self-event for reading the handling the next time-step
   		scheduleAt (simTime() + 1.0, new cMessage);
@@ -111,6 +112,7 @@ void SimController::runTrace () {
   if (!traceFile.is_open ()) {
   	error (".poa file was not found -> finishing simulation"); 
   }
+	runTimeStep ();
 }
 
 void SimController::finish () 
@@ -371,6 +373,7 @@ void SimController::initAlgAsync () {
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
+  	MyConfig::printToLog ("rcvd self msg\n");
   	runTimeStep ();
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
