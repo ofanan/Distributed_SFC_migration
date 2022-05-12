@@ -363,7 +363,6 @@ void SimController::handleMessage (cMessage *msg)
 
   	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getNewlyPlacedChainsArraySize()); i++) {
   		
-//  		Datacenter *sndr	= (Datacenter*)msg->getSenderModule(); //msg2handle -> getDatacenterId ();
   		datacenterId = ((Datacenter*)msg->getSenderModule())->id; 
   		chainId 			= msg2handle -> getNewlyPlacedChains (i);
 			if (!(findChainInSet (allChains, chainId, chain))) {
@@ -379,6 +378,7 @@ void SimController::handleMessage (cMessage *msg)
 				allChains.insert (chain);
 			}
   	}
+  	delete (msg);
   }
   else {
   	error ("Rcvd unknown msg type");

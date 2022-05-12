@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from placementInfoMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/placementInfoMsg.msg.
 //
 
 #ifndef __PLACEMENTINFOMSG_M_H
@@ -23,20 +23,18 @@
 // }}
 
 /**
- * Class generated from <tt>placementInfoMsg.msg:10</tt> by nedtool.
+ * Class generated from <tt>src/placementInfoMsg.msg:10</tt> by nedtool.
  * <pre>
  * message placementInfoMsg
  * {
- *     int16_t datacenterId;   // Id of the reporting datacenter
- *     uint16_t newlyPlacedChains[]; // A list of chains that the sending datacenter has just placed.
+ *     uint32_t newlyPlacedChains[]; // A list of chains that the sending datacenter has just placed.
  * }
  * </pre>
  */
 class placementInfoMsg : public ::omnetpp::cMessage
 {
   protected:
-    int16_t datacenterId;
-    uint16_t *newlyPlacedChains; // array ptr
+    uint32_t *newlyPlacedChains; // array ptr
     unsigned int newlyPlacedChains_arraysize;
 
   private:
@@ -56,12 +54,10 @@ class placementInfoMsg : public ::omnetpp::cMessage
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual int16_t getDatacenterId() const;
-    virtual void setDatacenterId(int16_t datacenterId);
     virtual void setNewlyPlacedChainsArraySize(unsigned int size);
     virtual unsigned int getNewlyPlacedChainsArraySize() const;
-    virtual uint16_t getNewlyPlacedChains(unsigned int k) const;
-    virtual void setNewlyPlacedChains(unsigned int k, uint16_t newlyPlacedChains);
+    virtual uint32_t getNewlyPlacedChains(unsigned int k) const;
+    virtual void setNewlyPlacedChains(unsigned int k, uint32_t newlyPlacedChains);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const placementInfoMsg& obj) {obj.parsimPack(b);}

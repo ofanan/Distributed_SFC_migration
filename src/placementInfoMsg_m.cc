@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from placementInfoMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/placementInfoMsg.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -181,7 +181,6 @@ Register_Class(placementInfoMsg)
 
 placementInfoMsg::placementInfoMsg(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
 {
-    this->datacenterId = 0;
     newlyPlacedChains_arraysize = 0;
     this->newlyPlacedChains = 0;
 }
@@ -208,9 +207,8 @@ placementInfoMsg& placementInfoMsg::operator=(const placementInfoMsg& other)
 
 void placementInfoMsg::copy(const placementInfoMsg& other)
 {
-    this->datacenterId = other.datacenterId;
     delete [] this->newlyPlacedChains;
-    this->newlyPlacedChains = (other.newlyPlacedChains_arraysize==0) ? nullptr : new uint16_t[other.newlyPlacedChains_arraysize];
+    this->newlyPlacedChains = (other.newlyPlacedChains_arraysize==0) ? nullptr : new uint32_t[other.newlyPlacedChains_arraysize];
     newlyPlacedChains_arraysize = other.newlyPlacedChains_arraysize;
     for (unsigned int i=0; i<newlyPlacedChains_arraysize; i++)
         this->newlyPlacedChains[i] = other.newlyPlacedChains[i];
@@ -219,7 +217,6 @@ void placementInfoMsg::copy(const placementInfoMsg& other)
 void placementInfoMsg::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
-    doParsimPacking(b,this->datacenterId);
     b->pack(newlyPlacedChains_arraysize);
     doParsimArrayPacking(b,this->newlyPlacedChains,newlyPlacedChains_arraysize);
 }
@@ -227,30 +224,19 @@ void placementInfoMsg::parsimPack(omnetpp::cCommBuffer *b) const
 void placementInfoMsg::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
-    doParsimUnpacking(b,this->datacenterId);
     delete [] this->newlyPlacedChains;
     b->unpack(newlyPlacedChains_arraysize);
     if (newlyPlacedChains_arraysize==0) {
         this->newlyPlacedChains = 0;
     } else {
-        this->newlyPlacedChains = new uint16_t[newlyPlacedChains_arraysize];
+        this->newlyPlacedChains = new uint32_t[newlyPlacedChains_arraysize];
         doParsimArrayUnpacking(b,this->newlyPlacedChains,newlyPlacedChains_arraysize);
     }
 }
 
-int16_t placementInfoMsg::getDatacenterId() const
-{
-    return this->datacenterId;
-}
-
-void placementInfoMsg::setDatacenterId(int16_t datacenterId)
-{
-    this->datacenterId = datacenterId;
-}
-
 void placementInfoMsg::setNewlyPlacedChainsArraySize(unsigned int size)
 {
-    uint16_t *newlyPlacedChains2 = (size==0) ? nullptr : new uint16_t[size];
+    uint32_t *newlyPlacedChains2 = (size==0) ? nullptr : new uint32_t[size];
     unsigned int sz = newlyPlacedChains_arraysize < size ? newlyPlacedChains_arraysize : size;
     for (unsigned int i=0; i<sz; i++)
         newlyPlacedChains2[i] = this->newlyPlacedChains[i];
@@ -266,13 +252,13 @@ unsigned int placementInfoMsg::getNewlyPlacedChainsArraySize() const
     return newlyPlacedChains_arraysize;
 }
 
-uint16_t placementInfoMsg::getNewlyPlacedChains(unsigned int k) const
+uint32_t placementInfoMsg::getNewlyPlacedChains(unsigned int k) const
 {
     if (k>=newlyPlacedChains_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", newlyPlacedChains_arraysize, k);
     return this->newlyPlacedChains[k];
 }
 
-void placementInfoMsg::setNewlyPlacedChains(unsigned int k, uint16_t newlyPlacedChains)
+void placementInfoMsg::setNewlyPlacedChains(unsigned int k, uint32_t newlyPlacedChains)
 {
     if (k>=newlyPlacedChains_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", newlyPlacedChains_arraysize, k);
     this->newlyPlacedChains[k] = newlyPlacedChains;
@@ -343,7 +329,7 @@ const char *placementInfoMsgDescriptor::getProperty(const char *propertyname) co
 int placementInfoMsgDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount() : 2;
+    return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
 unsigned int placementInfoMsgDescriptor::getFieldTypeFlags(int field) const
@@ -355,10 +341,9 @@ unsigned int placementInfoMsgDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
         FD_ISARRAY | FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
 
 const char *placementInfoMsgDescriptor::getFieldName(int field) const
@@ -370,18 +355,16 @@ const char *placementInfoMsgDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "datacenterId",
         "newlyPlacedChains",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
 
 int placementInfoMsgDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='d' && strcmp(fieldName, "datacenterId")==0) return base+0;
-    if (fieldName[0]=='n' && strcmp(fieldName, "newlyPlacedChains")==0) return base+1;
+    if (fieldName[0]=='n' && strcmp(fieldName, "newlyPlacedChains")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -394,10 +377,9 @@ const char *placementInfoMsgDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int16_t",
-        "uint16_t",
+        "uint32_t",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **placementInfoMsgDescriptor::getFieldPropertyNames(int field) const
@@ -436,7 +418,7 @@ int placementInfoMsgDescriptor::getFieldArraySize(void *object, int field) const
     }
     placementInfoMsg *pp = (placementInfoMsg *)object; (void)pp;
     switch (field) {
-        case 1: return pp->getNewlyPlacedChainsArraySize();
+        case 0: return pp->getNewlyPlacedChainsArraySize();
         default: return 0;
     }
 }
@@ -465,8 +447,7 @@ std::string placementInfoMsgDescriptor::getFieldValueAsString(void *object, int 
     }
     placementInfoMsg *pp = (placementInfoMsg *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getDatacenterId());
-        case 1: return ulong2string(pp->getNewlyPlacedChains(i));
+        case 0: return ulong2string(pp->getNewlyPlacedChains(i));
         default: return "";
     }
 }
@@ -481,8 +462,7 @@ bool placementInfoMsgDescriptor::setFieldValueAsString(void *object, int field, 
     }
     placementInfoMsg *pp = (placementInfoMsg *)object; (void)pp;
     switch (field) {
-        case 0: pp->setDatacenterId(string2long(value)); return true;
-        case 1: pp->setNewlyPlacedChains(i,string2ulong(value)); return true;
+        case 0: pp->setNewlyPlacedChains(i,string2ulong(value)); return true;
         default: return false;
     }
 }
