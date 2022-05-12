@@ -17,10 +17,8 @@
 #include <algorithm>
 #include <unordered_set>
 
-
 using namespace omnetpp;
 using namespace std;
-
 
 const int HEIGHT=5;
 
