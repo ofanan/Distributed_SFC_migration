@@ -38,8 +38,7 @@ class Datacenter : public cSimpleModule
     // Dynamic
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
-    vector<Chain> potentiallyPlacedChains;
-    vector<Chain> placedChains; // For some reason, uncommenting this line makes a build-netw. error.
+    vector<Chain> potPlacedChains, placedChains; 
 		uint8_t numBuMsgsRcvd; 
 		
     Datacenter();

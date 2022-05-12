@@ -152,18 +152,19 @@ void Datacenter::bottomUpSync ()
 		if (availCpu >= mu_u) {
 			notAssigned.erase(chainPtr);
 			availCpu -= mu_u;
-			if (chainPtr->mu_u_len() == lvl+1) {
+			chainPtr -> curDatacenter = id;
+			if (chainPtr->mu_u_len() == lvl+1) { // Am I the highest delay-feasible DC of this chain?
 				insertSorted (placedChains, *chainPtr);
 				newlyPlacedChains.push_back (*chainPtr);
-				// Should inform traceFreeder about this0
+			}
+			else {
+				insertSorted (potPlacedChains, *chainPtr);
 			}
 		}
 	
 	}
 
-//	  if (mu_u <= availCpu) {
-//	  	chain.nxtDatacenter = id;
-//	  }
+		// $$$ Should inform traceFreeder about assignments
 
  	if (isRoot) {
  		sndPushUpPkt();
