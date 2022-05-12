@@ -5,6 +5,8 @@ using namespace std;
 
 Define_Module(Datacenter);
 
+inline bool Datacenter::CannotPlaceThisChainHigher (Chain chain) {return chain.mu_u_len() == this->lvl+1;}
+
 Datacenter::Datacenter()
 {
 }
@@ -17,6 +19,7 @@ Datacenter::~Datacenter()
     }
   }
 }
+
 
 void Datacenter::initialize()
 {
@@ -153,14 +156,16 @@ void Datacenter::bottomUpSync ()
 			notAssigned.erase(chainPtr);
 			availCpu -= mu_u;
 			chainPtr -> curDatacenter = id;
-			if (chainPtr->mu_u_len() == lvl+1) { // Am I the highest delay-feasible DC of this chain?
+			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				insertSorted (placedChains, *chainPtr);
 				newlyPlacedChains.push_back (*chainPtr);
 			}
 			else {
 				insertSorted (potPlacedChains, *chainPtr);
+				insertSorted (pushUpVec, *chainPtr);
 			}
 		}
+//		else if 
 	
 	}
 
