@@ -171,17 +171,19 @@ void Datacenter::bottomUpSync ()
 	
 	}
 
-	sndPlacementInfoMsg ();
+	sndPlacementInfoMsg (newlyPlacedChains);
 
   return (isRoot)? sndPushUpPkt() : sndBottomUpPkt ();
 }
 
-void Datacenter::sndPlacementInfoMsg ()
+void Datacenter::sndPlacementInfoMsg (vector<Chain>  &newlyPlacedChains)
 {
-	placementInfoMsg* msg = new placementInfoMsg;
-	uint16_t i;
 
-//	pkt2send -> setNotAssignedArraySize (notAssigned.size());
+	uint16_t numOfNewlyPlacedChains = newlyPlacedChains.size ();
+//	placementInfoMsg* msg = new placementInfoMsg;
+//	uint16_t i;
+
+//	msg2send -> setNotAssignedArraySize (notAssigned.size());
 //	for (i=0; i<notAssigned.size(); i++) {
 //		pkt2send->setNotAssigned (i, notAssigned[i]);
 //	}
