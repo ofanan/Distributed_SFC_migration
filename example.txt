@@ -1,3 +1,35 @@
-t30540=
-In old usrs
-rcvd self msg
+t=30540
+DC 6 rcvd a initBU msg
+DC 6 sending a BU pkt to prnt
+DC 5 rcvd a initBU msg
+DC 5 sending a BU pkt to prnt
+DC 4 rcvd a initBU msg
+DC 4 sending a BU pkt to prnt
+DC 7 rcvd a initBU msg
+DC 7 sending a BU pkt to prnt
+DC 8 rcvd a initBU msg
+DC 8 sending a BU pkt to prnt
+DC 9 rcvd a initBU msg
+DC 9 sending a BU pkt to prnt
+DC 10 rcvd a initBU msg
+DC 10 sending a BU pkt to prnt
+DC 11 rcvd a initBU msg
+DC 11 sending a BU pkt to prnt
+DC 12 rcvd a initBU msg
+DC 12 sending a BU pkt to prnt
+DC 1 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 1 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 1 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 1 sending a BU pkt to prnt
+DC 2 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 2 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 2 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 2 sending a BU pkt to prnt
+DC 3 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 3 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 3 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 3 sending a BU pkt to prnt
+DC 0 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+finished sim

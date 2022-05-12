@@ -80,7 +80,7 @@ void SimController::runTimeStep ()
 
   		uint32_t bufSize = 128;
   		char buf[bufSize];
-  		snprintf (buf, bufSize, "t%d=\n", t);
+  		snprintf (buf, bufSize, "t=%d\n", t);
   		MyConfig::printToLog (buf); 
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
@@ -90,13 +90,12 @@ void SimController::runTimeStep ()
   		readNewChainsLine (line.substr(9)); 
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		MyConfig::printToLog ("In old usrs\n");
   		readOldChainsLine (line.substr(9));
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
   		rlzRsrcsOfChains ();
-//  		initAlg ();
+  		initAlg ();
   		concludeTimeStep ();
   		// Schedule a self-event for reading the handling the next time-step
   		scheduleAt (simTime() + 1.0, new cMessage);
@@ -118,6 +117,7 @@ void SimController::runTrace () {
 void SimController::finish () 
 {
   traceFile.close ();
+  MyConfig::printToLog ("finished sim\n");
 }
 
 /*
@@ -128,7 +128,6 @@ void SimController::finish ()
 void SimController::concludeTimeStep ()
 {
 //	uint16_t numMigsSinceLastStep = 0;
-//	numMigs += numMigsSinceLastStep;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
 }
@@ -373,7 +372,6 @@ void SimController::initAlgAsync () {
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
-  	MyConfig::printToLog ("rcvd self msg\n");
   	runTimeStep ();
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
@@ -399,10 +397,10 @@ void SimController::handleMessage (cMessage *msg)
 				allChains.insert (chain);
 			}
   	}
-  	delete (msg);
   }
   else {
   	error ("Rcvd unknown msg type");
   }
+  delete (msg);
 }
 
