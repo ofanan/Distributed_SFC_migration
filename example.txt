@@ -1,9 +1,12 @@
 t30540=
 DC 6 rcvd a initBU msg
+DC 6 sending placementInfoMsg
 DC 6 sending a BU pkt to prnt
 DC 5 rcvd a initBU msg
+DC 5 sending placementInfoMsg
 DC 5 sending a BU pkt to prnt
 DC 4 rcvd a initBU msg
+DC 4 sending placementInfoMsg
 DC 4 sending a BU pkt to prnt
 DC 7 rcvd a initBU msg
 DC 7 sending a BU pkt to prnt

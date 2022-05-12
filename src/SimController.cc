@@ -363,16 +363,16 @@ void SimController::handleMessage (cMessage *msg)
 
   	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getNewlyPlacedChainsArraySize()); i++) {
   		
-  		datacenterId 	= msg2handle -> getDatacenterId ();
+//  		Datacenter *sndr	= (Datacenter*)msg->getSenderModule(); //msg2handle -> getDatacenterId ();
+  		datacenterId = ((Datacenter*)msg->getSenderModule())->id; 
   		chainId 			= msg2handle -> getNewlyPlacedChains (i);
 			if (!(findChainInSet (allChains, chainId, chain))) {
 				error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
 
 			}
 			else {
-				MyConfig::printToLog ("Hurray! simCtrlr rcvd placement Info Msg");
 				if (chain.curDatacenter!=UNPLACED) { // was it an old chain that migrated?
-					numMigs++;				
+					numMigs++; // Yep --> inc. the mig. cntr.
 				}
 				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
 				chain.curDatacenter = datacenterId;
