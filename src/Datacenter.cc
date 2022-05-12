@@ -150,6 +150,7 @@ void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
+
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); chainPtr++) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
@@ -161,7 +162,7 @@ void Datacenter::bottomUpSync ()
 				newlyPlacedChains.push_back (chainPtr->id);
 			}
 			else {
-				insertSorted (potPlacedChains, *chainPtr);
+				potPlacedChainsIDs.push_back (chainPtr->id);
 				insertSorted (pushUpVec, *chainPtr);
 			}
 		}
@@ -190,9 +191,9 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 		msg->setNewlyPlacedChains (i, newlyPlacedChains[i]);
 	}
 
-		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
-  	MyConfig::printToLog (buf);
-		sendDirect (msg, simController, "directMsgsPort");
+	snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
+	MyConfig::printToLog (buf);
+	sendDirect (msg, simController, "directMsgsPort");
 
 }
 

@@ -370,6 +370,7 @@ void SimController::handleMessage (cMessage *msg)
 
 			}
 			else {
+				MyConfig::printToLog ("Hurray! simCtrlr rcvd placement Info Msg");
 				if (chain.curDatacenter!=UNPLACED) { // was it an old chain that migrated?
 					numMigs++;				
 				}

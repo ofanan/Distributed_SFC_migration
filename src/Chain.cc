@@ -1,7 +1,7 @@
 #include <vector>
 #include "Chain.h"
 
-const vector<uint16_t> RT_Chain		::mu_u = {1, 5, 10};
+const vector<uint16_t> RT_Chain		 ::mu_u = {1, 5, 10};
 const vector<uint16_t> Non_RT_Chain::mu_u = {1, 5, 10};
 
 const uint8_t RT_Chain	  ::mu_u_len = 3;

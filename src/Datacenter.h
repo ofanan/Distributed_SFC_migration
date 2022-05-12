@@ -39,7 +39,8 @@ class Datacenter : public cSimpleModule
     // Dynamic
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
-    vector<Chain> potPlacedChains, placedChains; 
+    vector<Chain> placedChains; 
+    vector<uint32_t> potPlacedChainsIDs; //IDs of chains that are potentially-placed on me
 		uint8_t numBuMsgsRcvd; 
 		
     Datacenter();
