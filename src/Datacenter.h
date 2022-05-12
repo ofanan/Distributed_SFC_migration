@@ -22,7 +22,7 @@ class Datacenter : public cSimpleModule
   public:
   
   	// Static (not changed along a sim')
-    cModule* network; // Pointer to the network on which the simulation is running
+    cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
     uint8_t 	numChildren;
@@ -63,7 +63,6 @@ class Datacenter : public cSimpleModule
     void bottomUpAsync  			  ();
     void pushUp           			();
     void prepareReshuffleSync 	();
-    void sndDirect       				(); // send direct msgs (currently, such msgs are sent only to the SimController, to inform it about chains' placement.
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);

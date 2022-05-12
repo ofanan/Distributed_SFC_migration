@@ -20,10 +20,10 @@ Datacenter::~Datacenter()
   }
 }
 
-
 void Datacenter::initialize()
 {
-	network     = (cModule*) (getParentModule ()); 
+	network     	= (cModule*) (getParentModule ()); 
+	simController = (cModule*) (getParentModule ()); 
 	networkName = (network -> par ("name")).stdstringValue();
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));
@@ -192,7 +192,8 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 
 		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
   	MyConfig::printToLog (buf);
-//		sendDirect (0, pkt2send); //send the bottomUPpkt to my prnt	
+		//sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
+
 }
 
 /*
@@ -285,11 +286,6 @@ void Datacenter::pushUp ()
 }
 
 void Datacenter::prepareReshuffleSync () 
-{
-}
-
-// Send a direct message, e.g. to the SimController, to inform about the placement of a pkt.
-void Datacenter::sndDirect () 
 {
 }
 
