@@ -31,6 +31,11 @@ Non_RT_Chain::Non_RT_Chain (uint32_t id, vector <uint16_t> S_u) {
 	curDatacenter = UNPLACED; 
 };
 
+uint16_t Chain::mu_u_len ()
+{
+	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
+}
+
 
 uint16_t Chain::mu_u_at_lvl (uint8_t lvl)
 {

@@ -40,6 +40,7 @@ class Chain
     }
     
     uint16_t mu_u_at_lvl (uint8_t lvl); // returns the amount of cpu required for placing this chain at level lvl
+    uint16_t mu_u_len ();
 };
 
 /* 

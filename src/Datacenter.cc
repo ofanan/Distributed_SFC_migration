@@ -146,12 +146,17 @@ Assume that this->notAssigned and this->pushUpVec already contain the relevant c
 void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
-	for (auto it=notAssigned.begin(); it<notAssigned.end(); it++) {
-	  mu_u = it->mu_u_at_lvl(lvl);
+	vector <Chain> newlyPlacedChains;
+	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); chainPtr++) {
+	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
-			notAssigned.erase(it);
+			notAssigned.erase(chainPtr);
 			availCpu -= mu_u;
-//			if (it->mu_u_len)
+			if (chainPtr->mu_u_len() == lvl+1) {
+				insertSorted (placedChains, *chainPtr);
+				newlyPlacedChains.push_back (*chainPtr);
+				// Should inform traceFreeder about this0
+			}
 		}
 	
 	}
