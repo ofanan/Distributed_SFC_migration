@@ -110,7 +110,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
   {
-    prepareReshuffle ();
+    prepareReshuffleSync ();
     delete (curHandledMsg);
   }
   else
@@ -165,18 +165,36 @@ void Datacenter::bottomUpSync ()
 				insertSorted (pushUpVec, *chainPtr);
 			}
 		}
-//		else if 
+		else if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+			prepareReshuffleSync ();
+		}
 	
 	}
 
-		// $$$ Should inform traceFreeder about assignments
+	sndPlacementInfoMsg ();
 
- 	if (isRoot) {
- 		sndPushUpPkt();
- 	}
-	else {
-		sndBottomUpPkt ();
-	}
+  return (isRoot)? sndPushUpPkt() : sndBottomUpPkt ();
+}
+
+void Datacenter::sndPlacementInfoMsg ()
+{
+	placementInfoMsg* msg = new placementInfoMsg;
+	uint16_t i;
+
+//	pkt2send -> setNotAssignedArraySize (notAssigned.size());
+//	for (i=0; i<notAssigned.size(); i++) {
+//		pkt2send->setNotAssigned (i, notAssigned[i]);
+//	}
+
+//	pkt2send -> setPushUpVecArraySize (pushUpVec.size());
+//	for (i=0; i<pushUpVec.size(); i++) {
+//		pkt2send->setPushUpVec (i, pushUpVec[i]);
+//	}
+//	
+//		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
+//  	MyConfig::printToLog (buf);
+//		sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+
 }
 
 /*
@@ -268,11 +286,13 @@ void Datacenter::pushUp ()
     delete (pkt);
 }
 
-void Datacenter::prepareReshuffle () {
+void Datacenter::prepareReshuffleSync () 
+{
 }
 
 // Send a direct message, e.g. to the traceFeeder, to inform about the placement of a pkt.
-void Datacenter::sendDirect () {
+void Datacenter::sndDirect () 
+{
 }
 
 /*

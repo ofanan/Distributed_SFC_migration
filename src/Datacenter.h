@@ -9,6 +9,7 @@
 #include "endXmtPkt_m.h"
 #include "bottomUpPkt_m.h"
 #include "initBottomUpMsg_m.h"
+#include "placementInfoMsg_m.h"
 #include "pushUpPkt_m.h"
 #include "prepareReshufflePkt_m.h"
 #include "MyConfig.h"
@@ -56,15 +57,16 @@ class Datacenter : public cSimpleModule
     void handleSelfMsg    ();
     void sendViaQ         (int16_t portNum, cPacket* pkt2send);
     void xmt              (int16_t portNum, cPacket *pkt2send);
-    void handleInitBottomUpMsg ();
-    void handleBottomUpPktSync ();
-    void bottomUpSync     ();
-    void bottomUpAsync    ();
-    void pushUp           ();
-    void prepareReshuffle ();
-    void sendDirect       (); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
-    void sndBottomUpPkt		();
-    void sndPushUpPkt			();
+    void handleInitBottomUpMsg 	();
+    void handleBottomUpPktSync 	();
+    void bottomUpSync     			();
+    void bottomUpAsync  			  ();
+    void pushUp           			();
+    void prepareReshuffleSync 	();
+    void sndDirect       				(); // send direct msgs (currently, such msgs are sent only to the traceFeeder, to inform it about chains' placement.
+    void sndBottomUpPkt					();
+    void sndPushUpPkt						();
+    void sndPlacementInfoMsg 		();
     inline bool CannotPlaceThisChainHigher (Chain chain);
 };
 
