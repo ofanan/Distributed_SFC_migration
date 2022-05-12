@@ -87,8 +87,6 @@ void Datacenter::handleSelfMsg ()
     endXmtPkt *end_xmt_pkt = (endXmtPkt*) curHandledMsg;
     int16_t portNum = end_xmt_pkt -> getPortNum();
     endXmtEvents[portNum] = nullptr;
-    delete (curHandledMsg);
-    EV << "Rcvd self msg. portNum = " << portNum;
     if (outputQ[portNum].isEmpty()) {
         return;
     }
@@ -103,7 +101,7 @@ void Datacenter::handleMessage (cMessage *msg)
 {
   curHandledMsg = msg;
   if (curHandledMsg -> isSelfMessage()) {
-    return handleSelfMsg ();
+    handleSelfMsg ();
   }
 
   // Now we know that this is not a self-msg
@@ -118,26 +116,20 @@ void Datacenter::handleMessage (cMessage *msg)
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
 		snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
   	MyConfig::printToLog (buf);
-  	return (MyConfig::mode==SYNC)? handleBottomUpPktSync () : bottomUpAsync ();
+  	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
-  	if (MyConfig::mode==SYNC) {
-	    pushUpSync ();
-  	}
-  	else {
-  		pushUpAsync ();
-  	}
+  	if (MyConfig::mode==SYNC) {pushUpSync ();} else {pushUpAsync ();}
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
   {
     prepareReshuffleSync ();
-    delete (curHandledMsg);
   }
   else
   {
     EV <<"BU rcvd a pkt  of an unknown type\n";
-    delete (curHandledMsg);
   }
+  delete (curHandledMsg);
 }
 
 /*
@@ -157,7 +149,6 @@ void Datacenter::handleInitBottomUpMsg ()
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
-  delete curHandledMsg;
   this -> pushUpVec = {};
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
@@ -169,7 +160,6 @@ Assume that this->pushUpVec already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
     pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
-    delete (pkt);
 }
 
 
@@ -180,7 +170,6 @@ Assume that this->pushUpVec already contains the relevant chains.
 void Datacenter::pushUpAsync ()
 {
     pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
-    delete (pkt);
 }
 
 /*
@@ -259,7 +248,6 @@ void Datacenter::handleBottomUpPktSync ()
 		insertSorted (pushUpVec, pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
-	delete (pkt);
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
 		numBuMsgsRcvd = 0;
@@ -317,9 +305,9 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
-		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
-  	MyConfig::printToLog (buf);
-		sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+	snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
+	MyConfig::printToLog (buf);
+	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
 
 void Datacenter::prepareReshuffleSync () 
