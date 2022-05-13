@@ -119,6 +119,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
+  	error ("rcvd push up pkt\n");
   	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
@@ -184,7 +185,7 @@ void Datacenter::pushUpSync ()
 		auto search = potPlacedChainsIds.find (chain.id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) {
-			error ("didn't find chain %d in pushUpSync\n", chain.id);
+			continue; // this chain wasn't pot-placed by me, but by another DC.
 		}
 		
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
