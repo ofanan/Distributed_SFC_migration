@@ -164,7 +164,7 @@ int SimController::calcSolCpuCost ()
 {
 	int cpuCost = 0;
 	for (auto const chain : allChains) {
-		cpuCost += chain.cpuCost ();
+		cpuCost += chain.getCpuCost ();
 	}
 	return cpuCost;
 }

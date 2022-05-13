@@ -73,7 +73,7 @@ int16_t Chain::getCurDatacenter () const
 	return (curLvl==UNPLACED_)? UNPLACED : S_u[curLvl];
 } 
 
-uint16_t Chain::cpuCost () const
+uint16_t Chain::getCpuCost () const
 {
 	return (isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl];
 }

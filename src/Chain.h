@@ -31,8 +31,10 @@ class Chain
       return (this->id == right.id);
     }
 
-		int16_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
-    uint16_t cpuCost () const;
+		// Getters
+		int16_t 	getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
+    uint16_t 	getCpuCost () const;
+    
 		/* 
 		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 
 		rsrcs required for locating the chain at a certain lvl.
