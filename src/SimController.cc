@@ -39,17 +39,20 @@ void SimController::initialize (int stage)
 
 void SimController::checkParams ()
 {
-//const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain		 ::mu_u, cpuCostAtLvl);
-//const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, cpuCostAtLvl);
-
-// 	snprintf (buf, bufSize, "sizeOf (mu_u) =%d, sizeOf (cpuCostAtLvl)=%d,  sizeof RT_Chain::cpuCostAtLvl=%d\n", 
-//													(int) RT_Chain::mu_u.size(), (int)MyConfig::cpuCostAtLvl.size(), (int) RT_Chain::cpuCostAtLvl.size());
 	MyConfig::printToLog (buf);
-	for (auto costPtr=RT_Chain::cpuCostAtLvl.begin(); costPtr<(RT_Chain::cpuCostAtLvl).end(); costPtr++) {
-		snprintf (buf, bufSize, "%d |", *costPtr);
-		MyConfig::printToLog (buf);
+
+	for (uint16_t lvl(0); lvl < RT_Chain::cpuCostAtLvl.size()-1; lvl++) {
+		if ((int)(RT_Chain::cpuCostAtLvl[lvl]) <= (int)(RT_Chain::cpuCostAtLvl[lvl+1])) {
+			error ("RT_Chain::cpuCostAtLvl[] should be decreasing. However, RT_Chain::cpuCostAtLvl[%d]=%d, RT_Chain::cpuCostAtLvl[%d]=%d\n", 
+							lvl, RT_Chain::cpuCostAtLvl[lvl], lvl+1, RT_Chain::cpuCostAtLvl[lvl+1]);
+		}
 	}
-	endSimulation ();
+	for (uint16_t lvl(0); lvl < RT_Chain::cpuCostAtLvl.size()-1; lvl++) {
+		if ((int)(Non_RT_Chain::cpuCostAtLvl[lvl]) <= (int)(Non_RT_Chain::cpuCostAtLvl[lvl+1])) {
+			error ("Non_RT_Chain::cpuCostAtLvl[] should be decreasing. However, Non_RT_Chain::cpuCostAtLvl[%d]=%d, Non_RT_Chain::cpuCostAtLvl[%d]=%d\n", 
+							lvl, Non_RT_Chain::cpuCostAtLvl[lvl], lvl+1, Non_RT_Chain::cpuCostAtLvl[lvl+1]);
+		}
+	}
 }
 
 

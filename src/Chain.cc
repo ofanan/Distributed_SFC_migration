@@ -1,10 +1,10 @@
 #include <vector>
 #include "Chain.h"
 
-const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {3, 2, 1};
+const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
-const vector<uint16_t> RT_Chain		 ::mu_u = {1, 5, 10};
-const vector<uint16_t> Non_RT_Chain::mu_u = {1, 5, 10};
+const vector<uint16_t> RT_Chain		 ::mu_u = {3, 4, 5};
+const vector<uint16_t> Non_RT_Chain::mu_u = {10,11,12};
 
 const uint8_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
 const uint8_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
