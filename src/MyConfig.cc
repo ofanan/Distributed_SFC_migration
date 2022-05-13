@@ -5,12 +5,6 @@
 using namespace omnetpp;
 using namespace std;
 
-//const vector<uint16_t> MyConfig::costOfCpuUnitAtLvl = {5,4,3,2,1}; 
-
-//const vector<uint16_t> MyConfig::cpuCostAtLvl = {5,4,3,2,1}; 
-
-//Define_Module(MyConfig);
-
 string 		MyConfig::LogFileName;
 ofstream 	MyConfig::logFile;
 

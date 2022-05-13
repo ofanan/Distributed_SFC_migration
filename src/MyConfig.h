@@ -39,7 +39,6 @@ class MyConfig { //: public cSimpleModule {
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;
-/*		const static vector<uint16_t> costOfCpuUnitAtLvl; */
 
 		//Init
 		static void openFiles ();

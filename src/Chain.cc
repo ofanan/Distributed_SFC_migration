@@ -1,15 +1,17 @@
 #include <vector>
 #include "Chain.h"
 
+const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {3, 2, 1};
+
 const vector<uint16_t> RT_Chain		 ::mu_u = {1, 5, 10};
 const vector<uint16_t> Non_RT_Chain::mu_u = {1, 5, 10};
 
-const uint8_t RT_Chain	  ::mu_u_len = 2; //$$$$
-const uint8_t Non_RT_Chain::mu_u_len = 2;//$$$$
+const uint8_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
+const uint8_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
-const vector<uint16_t> Chain::costOfCpuUnitAtLvl = {1,2}; 
-vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); //{5,4,3,2,1}); //(RT_Chain		::mu_u, cpuCostAtLvl);
-const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl ={1}; // MyConfig::scalarProdcut (Non_RT_Chain::mu_u, cpuCostAtLvl);
+
+const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
+const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
 
 Chain::Chain (uint32_t id, vector <uint16_t> S_u) 
 {
