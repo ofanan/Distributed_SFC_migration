@@ -145,6 +145,13 @@ void SimController::finish ()
 */
 void SimController::concludeTimeStep ()
 {
+	if (MyConfig::DEBUG_LVL>0) {
+		for (auto const chain : allChains) {
+			if (chain.curLvl==UNPLACED_) {
+				error ("t=$d: chain %d is unplaced at the end of cycle\n", t, chain.id);
+			}
+		}
+	}
 //	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
