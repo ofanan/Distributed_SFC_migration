@@ -119,7 +119,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
-  	if (MyConfig::mode==SYNC) {pushUpSync ();} else {pushUpAsync ();}
+  	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
   {
@@ -154,12 +154,50 @@ void Datacenter::handleInitBottomUpMsg ()
 }
 
 /*
+Handle a rcvd pushUpPkt:
+- Read the data from the pkt to this->pushUpVec.
+- Call pushUpSync() | pushUpAsync(), for running the PU alg'.
+*/
+void Datacenter::handlePushUpPkt () 
+{
+
+  pushUpPkt *pkt = (pushUpPkt*) this->curHandledMsg;
+	Chain chain;
+	uint16_t mu_u;
+	
+	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
+	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
+		insertSorted (this->pushUpVec, pkt->getPushUpVec (i));
+	} 
+	return (MyConfig::mode==SYNC)? pushUpSync () : pushUpAsync ();
+}
+
+/*
 Running the PU alg'. 
 Assume that this->pushUpVec already contains the relevant chains.
 */
 void Datacenter::pushUpSync ()
 {
-    pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
+	reshuffled = true;
+	Chain chain;
+	for (auto chain : pushUpVec) { // for each chain in the pushUpVec
+		auto search = potPlacedChainsIds.find (chain.id); // Look for this chain's id in my pot-placed chains 
+
+		if (search==potPlacedChainsIds.end()) {
+			error ("didn't find chain %d in pushUpSync\n", chain.id);
+		}
+		
+		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
+		
+		if (chain.curDatacenter==id) { // this chain wasn't pushed-up; need to place it here
+			chain.curDatacenter=this->id;
+			insertSorted (placedChains, chain);
+		}
+		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
+			availCpu += chain.mu_u_at_lvl (lvl); 
+		}
+
+	}	
 }
 
 
@@ -192,7 +230,7 @@ void Datacenter::bottomUpSync ()
 				newlyPlacedChains.push_back (chainPtr->id);
 			}
 			else {
-				potPlacedChainsIds.push_back (chainPtr->id);
+				potPlacedChainsIds.insert (chainPtr->id);
 				insertSorted (pushUpVec, *chainPtr);
 			}
 		}
@@ -205,7 +243,7 @@ void Datacenter::bottomUpSync ()
 	sndPlacementInfoMsg (newlyPlacedChains);
 	this -> print ();
 
-  return (isRoot)? sndPushUpPkt() : sndBottomUpPkt ();
+  return (isRoot)? pushUpSync () : sndBottomUpPkt ();
 }
 
 void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from pushUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/pushUpPkt.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -181,20 +181,20 @@ Register_Class(pushUpPkt)
 
 pushUpPkt::pushUpPkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
-    pushUpList_arraysize = 0;
-    this->pushUpList = 0;
+    pushUpVec_arraysize = 0;
+    this->pushUpVec = 0;
 }
 
 pushUpPkt::pushUpPkt(const pushUpPkt& other) : ::omnetpp::cPacket(other)
 {
-    pushUpList_arraysize = 0;
-    this->pushUpList = 0;
+    pushUpVec_arraysize = 0;
+    this->pushUpVec = 0;
     copy(other);
 }
 
 pushUpPkt::~pushUpPkt()
 {
-    delete [] this->pushUpList;
+    delete [] this->pushUpVec;
 }
 
 pushUpPkt& pushUpPkt::operator=(const pushUpPkt& other)
@@ -207,59 +207,59 @@ pushUpPkt& pushUpPkt::operator=(const pushUpPkt& other)
 
 void pushUpPkt::copy(const pushUpPkt& other)
 {
-    delete [] this->pushUpList;
-    this->pushUpList = (other.pushUpList_arraysize==0) ? nullptr : new Chain[other.pushUpList_arraysize];
-    pushUpList_arraysize = other.pushUpList_arraysize;
-    for (unsigned int i=0; i<pushUpList_arraysize; i++)
-        this->pushUpList[i] = other.pushUpList[i];
+    delete [] this->pushUpVec;
+    this->pushUpVec = (other.pushUpVec_arraysize==0) ? nullptr : new Chain[other.pushUpVec_arraysize];
+    pushUpVec_arraysize = other.pushUpVec_arraysize;
+    for (unsigned int i=0; i<pushUpVec_arraysize; i++)
+        this->pushUpVec[i] = other.pushUpVec[i];
 }
 
 void pushUpPkt::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
-    b->pack(pushUpList_arraysize);
-    doParsimArrayPacking(b,this->pushUpList,pushUpList_arraysize);
+    b->pack(pushUpVec_arraysize);
+    doParsimArrayPacking(b,this->pushUpVec,pushUpVec_arraysize);
 }
 
 void pushUpPkt::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
-    delete [] this->pushUpList;
-    b->unpack(pushUpList_arraysize);
-    if (pushUpList_arraysize==0) {
-        this->pushUpList = 0;
+    delete [] this->pushUpVec;
+    b->unpack(pushUpVec_arraysize);
+    if (pushUpVec_arraysize==0) {
+        this->pushUpVec = 0;
     } else {
-        this->pushUpList = new Chain[pushUpList_arraysize];
-        doParsimArrayUnpacking(b,this->pushUpList,pushUpList_arraysize);
+        this->pushUpVec = new Chain[pushUpVec_arraysize];
+        doParsimArrayUnpacking(b,this->pushUpVec,pushUpVec_arraysize);
     }
 }
 
-void pushUpPkt::setPushUpListArraySize(unsigned int size)
+void pushUpPkt::setPushUpVecArraySize(unsigned int size)
 {
-    Chain *pushUpList2 = (size==0) ? nullptr : new Chain[size];
-    unsigned int sz = pushUpList_arraysize < size ? pushUpList_arraysize : size;
+    Chain *pushUpVec2 = (size==0) ? nullptr : new Chain[size];
+    unsigned int sz = pushUpVec_arraysize < size ? pushUpVec_arraysize : size;
     for (unsigned int i=0; i<sz; i++)
-        pushUpList2[i] = this->pushUpList[i];
-    pushUpList_arraysize = size;
-    delete [] this->pushUpList;
-    this->pushUpList = pushUpList2;
+        pushUpVec2[i] = this->pushUpVec[i];
+    pushUpVec_arraysize = size;
+    delete [] this->pushUpVec;
+    this->pushUpVec = pushUpVec2;
 }
 
-unsigned int pushUpPkt::getPushUpListArraySize() const
+unsigned int pushUpPkt::getPushUpVecArraySize() const
 {
-    return pushUpList_arraysize;
+    return pushUpVec_arraysize;
 }
 
-Chain& pushUpPkt::getPushUpList(unsigned int k)
+Chain& pushUpPkt::getPushUpVec(unsigned int k)
 {
-    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
-    return this->pushUpList[k];
+    if (k>=pushUpVec_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpVec_arraysize, k);
+    return this->pushUpVec[k];
 }
 
-void pushUpPkt::setPushUpList(unsigned int k, const Chain& pushUpList)
+void pushUpPkt::setPushUpVec(unsigned int k, const Chain& pushUpVec)
 {
-    if (k>=pushUpList_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpList_arraysize, k);
-    this->pushUpList[k] = pushUpList;
+    if (k>=pushUpVec_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpVec_arraysize, k);
+    this->pushUpVec[k] = pushUpVec;
 }
 
 class pushUpPktDescriptor : public omnetpp::cClassDescriptor
@@ -353,7 +353,7 @@ const char *pushUpPktDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "pushUpList",
+        "pushUpVec",
     };
     return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
@@ -362,7 +362,7 @@ int pushUpPktDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='p' && strcmp(fieldName, "pushUpList")==0) return base+0;
+    if (fieldName[0]=='p' && strcmp(fieldName, "pushUpVec")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -416,7 +416,7 @@ int pushUpPktDescriptor::getFieldArraySize(void *object, int field) const
     }
     pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
     switch (field) {
-        case 0: return pp->getPushUpListArraySize();
+        case 0: return pp->getPushUpVecArraySize();
         default: return 0;
     }
 }
@@ -445,7 +445,7 @@ std::string pushUpPktDescriptor::getFieldValueAsString(void *object, int field, 
     }
     pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getPushUpList(i); return out.str();}
+        case 0: {std::stringstream out; out << pp->getPushUpVec(i); return out.str();}
         default: return "";
     }
 }
@@ -488,7 +488,7 @@ void *pushUpPktDescriptor::getFieldStructValuePointer(void *object, int field, i
     }
     pushUpPkt *pp = (pushUpPkt *)object; (void)pp;
     switch (field) {
-        case 0: return (void *)(&pp->getPushUpList(i)); break;
+        case 0: return (void *)(&pp->getPushUpVec(i)); break;
         default: return nullptr;
     }
 }

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from pushUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/pushUpPkt.msg.
 //
 
 #ifndef __PUSHUPPKT_M_H
@@ -24,19 +24,19 @@
 // }}
 
 /**
- * Class generated from <tt>pushUpPkt.msg:9</tt> by nedtool.
+ * Class generated from <tt>src/pushUpPkt.msg:9</tt> by nedtool.
  * <pre>
  * packet pushUpPkt
  * {
- *     Chain pushUpList[];
+ *     Chain pushUpVec[];
  * }
  * </pre>
  */
 class pushUpPkt : public ::omnetpp::cPacket
 {
   protected:
-    Chain *pushUpList; // array ptr
-    unsigned int pushUpList_arraysize;
+    Chain *pushUpVec; // array ptr
+    unsigned int pushUpVec_arraysize;
 
   private:
     void copy(const pushUpPkt& other);
@@ -55,11 +55,11 @@ class pushUpPkt : public ::omnetpp::cPacket
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual void setPushUpListArraySize(unsigned int size);
-    virtual unsigned int getPushUpListArraySize() const;
-    virtual Chain& getPushUpList(unsigned int k);
-    virtual const Chain& getPushUpList(unsigned int k) const {return const_cast<pushUpPkt*>(this)->getPushUpList(k);}
-    virtual void setPushUpList(unsigned int k, const Chain& pushUpList);
+    virtual void setPushUpVecArraySize(unsigned int size);
+    virtual unsigned int getPushUpVecArraySize() const;
+    virtual Chain& getPushUpVec(unsigned int k);
+    virtual const Chain& getPushUpVec(unsigned int k) const {return const_cast<pushUpPkt*>(this)->getPushUpVec(k);}
+    virtual void setPushUpVec(unsigned int k, const Chain& pushUpVec);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const pushUpPkt& obj) {obj.parsimPack(b);}

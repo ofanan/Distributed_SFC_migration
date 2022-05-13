@@ -40,7 +40,8 @@ class Datacenter : public cSimpleModule
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
     vector<Chain> placedChains; 
-    vector<uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
+/*    vector <uint32_t> */
+    unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
 		uint8_t numBuMsgsRcvd; 
 		
     Datacenter();
@@ -50,6 +51,7 @@ class Datacenter : public cSimpleModule
     void print ();
     
   private:
+  	bool 							reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     vector <cQueue>     outputQ;
     vector <cChannel*>  xmtChnl;
     vector <endXmtPkt*> endXmtEvents; 
@@ -63,6 +65,7 @@ class Datacenter : public cSimpleModule
     void xmt              (int16_t portNum, cPacket *pkt2send);
     void handleInitBottomUpMsg 	();
     void handleBottomUpPktSync 	();
+    void handlePushUpPkt			 	();
     void bottomUpSync     			();
     void bottomUpAsync  			  ();
     void pushUpSync        			();
