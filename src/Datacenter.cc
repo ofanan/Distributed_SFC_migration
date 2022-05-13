@@ -200,8 +200,8 @@ void Datacenter::pushUpSync ()
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		pushUpVec.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		
-		if (chainPtr->curDatacenter==id) { // this chain wasn't pushed-up; need to place it here
-			chainPtr->curDatacenter=this->id;
+		if (chainPtr->curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
+			chainPtr->curLvl=this->lvl;
 			insertSorted (placedChains, chain);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
@@ -239,7 +239,7 @@ void Datacenter::bottomUpSync ()
 		if (availCpu >= mu_u) {
 			notAssigned.erase(chainPtr);
 			availCpu -= mu_u;
-			chainPtr -> curDatacenter = id;
+			chainPtr -> curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				insertSorted (placedChains, *chainPtr);
 				newlyPlacedChains.push_back (chainPtr->id);
