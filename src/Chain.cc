@@ -18,6 +18,7 @@ Chain::Chain (uint32_t id, vector <uint16_t> S_u)
 	this->id = id;
 	this->S_u = S_u;
 	curDatacenter = UNPLACED; 
+	curLvl = UNPLACED_;
 };
 
 RT_Chain::RT_Chain (uint32_t id, vector <uint16_t> S_u) {
@@ -67,6 +68,11 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chai
 		c = *search;
 		return true;
 	}
+}
+
+uint16_t Chain::cpuCost () const
+{
+	return (isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl];
 }
 
 /*

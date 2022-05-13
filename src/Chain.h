@@ -1,4 +1,3 @@
-
 #ifndef CHAIN_H
 #define CHAIN_H
 #include <stdio.h>
@@ -20,10 +19,10 @@ class Chain
   public:
     uint32_t id;
     int16_t curDatacenter; // Id of the datacenter currently hosting me
-    vector <uint16_t> S_u;         // List of delay-feasible servers
+    vector <uint16_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
 		const static vector<uint16_t> costOfCpuUnitAtLvl; 
-		/*    int16_t curLvl;        // Level of the datacenter currently hosting me // Do we really need this?*/
+		int8_t curLvl;        // Level of the datacenter currently hosting me 
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
     Chain () {};
 
@@ -32,15 +31,20 @@ class Chain
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
     }
+    
+    uint16_t cpuCost () const;
 		/* 
 		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 
 		rsrcs required for locating the chain at a certain lvl.
 		However, in our current sim settings, all of this is degenerated to the fast and efficient rule that an RT chain has higher priority (==smaller #), over a non-RT chain.
-		*/
     bool operator< (const Chain &right) const {
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
-    
+		*/
+	/*    bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) const {    	*/
+	/*    }*/
+
+		
     uint16_t mu_u_at_lvl (uint8_t lvl); // returns the amount of cpu required for placing this chain at level lvl
     uint16_t mu_u_len ();
 };

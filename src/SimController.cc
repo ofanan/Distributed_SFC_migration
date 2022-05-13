@@ -55,9 +55,6 @@ void SimController::checkParams ()
 	}
 }
 
-
-
-
 // Open input, output, and log files 
 void SimController::openFiles () {
 	MyConfig::openFiles ();
@@ -162,12 +159,12 @@ void SimController::printAllDatacenters ()
 
 }
 
-// Return the overall cpu cost at the NEXT cycle (based on the chain.curDatacenter).
+// Returns the overall cpu cost at its current location.
 int SimController::calcSolCpuCost () 
 {
 	int cpuCost = 0;
 	for (auto const chain : allChains) {
-		cpuCost += (chain.isRT_Chain)? RT_Chain::cpuCostAtLvl[datacenters[chain.curDatacenter]->lvl] : Non_RT_Chain::cpuCostAtLvl[datacenters[chain.curDatacenter]->lvl];
+		cpuCost += chain.cpuCost ();
 	}
 	return cpuCost;
 }
@@ -239,7 +236,7 @@ void SimController::readChainsThatLeftLine (string line)
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
-	  	if (chain.curDatacenter == UNPLACED) {
+	  	if (chain.curLvl == UNPLACED_) {
 				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
 	  		continue;
 	  	}

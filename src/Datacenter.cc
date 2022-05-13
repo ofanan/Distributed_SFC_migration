@@ -119,7 +119,6 @@ void Datacenter::handleMessage (cMessage *msg)
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
-  	error ("rcvd push up pkt\n");
   	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
@@ -170,7 +169,13 @@ void Datacenter::handlePushUpPkt ()
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		insertSorted (this->pushUpVec, pkt->getPushUpVec (i));
 	} 
-	return (MyConfig::mode==SYNC)? pushUpSync () : pushUpAsync ();
+	if (MyConfig::mode==SYNC){ 
+//		sort pushUpVec ();
+		pushUpSync ();
+	}
+	else {
+		pushUpAsync ();
+	}
 }
 
 /*
@@ -286,14 +291,14 @@ Handle a bottomUP pkt, when running in sync' mode.
 void Datacenter::handleBottomUpPktSync ()
 {
 	bottomUpPkt *pkt = (bottomUpPkt*)(curHandledMsg);
-
+	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
 	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
 	}
 	// Add each chain stated in the pkt's pushUpVec field into its (sorted) place in this->notAssigned()
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-		insertSorted (pushUpVec, pkt->getPushUpVec(i));
+		pushUpVec.push_back (pkt->getPushUpVec(i)); // no need and no use to keep the push-up vector sorted for now; 
 	}
 	numBuMsgsRcvd++;
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
