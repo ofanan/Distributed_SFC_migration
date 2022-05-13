@@ -18,7 +18,6 @@ class Chain
 {
   public:
     uint32_t id;
-    int16_t curDatacenter; // Id of the datacenter currently hosting me
     vector <uint16_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
 		const static vector<uint16_t> costOfCpuUnitAtLvl; 
@@ -32,7 +31,7 @@ class Chain
       return (this->id == right.id);
     }
 
-		int16_t curDatacenter_ () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
+		int16_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
     uint16_t cpuCost () const;
 		/* 
 		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 

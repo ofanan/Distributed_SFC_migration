@@ -17,22 +17,19 @@ Chain::Chain (uint32_t id, vector <uint16_t> S_u)
 {
 	this->id = id;
 	this->S_u = S_u;
-	curDatacenter = UNPLACED; 
 	curLvl = UNPLACED_;
 };
 
 RT_Chain::RT_Chain (uint32_t id, vector <uint16_t> S_u) {
-  this->id        = id;
-  this->S_u       = S_u;
-  this->isRT_Chain = true;
-	curDatacenter = UNPLACED; 
+  this->id        	= id;
+  this->S_u       	= S_u;
+  this->isRT_Chain 	= true;
 };
 
 Non_RT_Chain::Non_RT_Chain (uint32_t id, vector <uint16_t> S_u) {
-  this->id       = id;
-  this->S_u       = S_u;
-  this->isRT_Chain = false;
-	curDatacenter = UNPLACED; 
+  this->id       		= id;
+  this->S_u      	 	= S_u;
+  this->isRT_Chain 	= false;
 };
 
 uint16_t Chain::mu_u_len ()
@@ -71,7 +68,7 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chai
 }
 
 // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
-int16_t Chain::curDatacenter_ () const 
+int16_t Chain::getCurDatacenter () const 
 {
 	return (curLvl==UNPLACED_)? UNPLACED : S_u[curLvl];
 } 

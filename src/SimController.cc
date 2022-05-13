@@ -240,7 +240,7 @@ void SimController::readChainsThatLeftLine (string line)
 				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
 	  		continue;
 	  	}
-  		chainsThatLeftDatacenter[chain.curDatacenter_()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+  		chainsThatLeftDatacenter[chain.getCurDatacenter()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
 	  }
   }
 }
@@ -307,7 +307,7 @@ void SimController::readOldChainsLine (string line)
 			allChains.insert (chain);
 			insertSorted (chainsThatJoinedLeaf[poaId], chain);			
 			if (chain.curLvl != UNPLACED_) {
-				chainsThatLeftDatacenter[chain.curDatacenter_ ()].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+				chainsThatLeftDatacenter[chain.getCurDatacenter ()].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 			}
 	  }
 	}
@@ -416,7 +416,7 @@ void SimController::handleMessage (cMessage *msg)
 
 			}
 			else {
-				if (chain.curDatacenter_()!=UNPLACED) { // was it an old chain that migrated?
+				if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
 					numMigs++; // Yep --> inc. the mig. cntr.
 				}
 				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
