@@ -162,8 +162,9 @@ void SimController::printAllDatacenters ()
 // Returns the overall cpu cost at its current location.
 int SimController::calcSolCpuCost () 
 {
+	
 	int cpuCost = 0;
-	for (auto const chain : allChains) {
+	for (auto const chain : allChains) {	
 		cpuCost += chain.getCpuCost ();
 	}
 	return cpuCost;

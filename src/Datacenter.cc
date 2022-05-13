@@ -210,10 +210,11 @@ void Datacenter::pushUpSync ()
 		}
 
 	}
-	
-//	for (auto chain : pushUpVec) {
-//		if (chain.mu_u_at_lvl(lvl) <= availCpu)  && chain.cpuCostAtLvl (lvl) <= chain.cpuCostAt
-//	}
+//	std::sort(customers.begin(), customers.end(), &customer_sorter);
+	for (auto chain : pushUpVec) {
+		if (chain.mu_u_at_lvl(lvl) <= availCpu) {
+		}
+	}
 }
 
 
