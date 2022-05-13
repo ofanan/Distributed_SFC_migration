@@ -33,14 +33,13 @@ const int16_t UNPLACED = -1;
 const bool SYNC  = true;
 const bool ASYNC = false;
 
-const vector<uint16_t> cpuCostAtLvl = {5,4,3,2,1}; 
-
 class MyConfig { //: public cSimpleModule {
 
 	public:
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;
+/*		const static vector<uint16_t> costOfCpuUnitAtLvl; */
 
 		//Init
 		static void openFiles ();
@@ -58,7 +57,7 @@ class MyConfig { //: public cSimpleModule {
 		static void printToLog (unordered_set <uint32_t> set2print);
 
 		// returns the scalar product of two vectors
-		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);
+/*		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);*/
 		
 		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2);
 

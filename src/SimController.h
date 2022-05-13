@@ -86,10 +86,13 @@ class SimController : public cSimpleModule
     string traceFileName = "results/poa_files/Tree_shorter.poa";
     ifstream traceFile;
  		string LogFileName   = "example.txt";
-    ofstream logFile;
+		static const uint16_t bufSize = 128;
+		char buf[bufSize];
+		ofstream logFile;
     SimController ();
     ~SimController ();
     void parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId);
+    void checkParams (); // Sanity checks for various parameters
 };
 
 #endif

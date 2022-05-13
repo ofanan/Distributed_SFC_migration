@@ -22,6 +22,7 @@ void SimController::initialize (int stage)
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	openFiles ();
+	checkParams ();
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
@@ -35,6 +36,24 @@ void SimController::initialize (int stage)
 	discoverPathsToRoot ();
 	runTrace ();	  
 }
+
+void SimController::checkParams ()
+{
+//const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain		 ::mu_u, cpuCostAtLvl);
+//const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, cpuCostAtLvl);
+
+// 	snprintf (buf, bufSize, "sizeOf (mu_u) =%d, sizeOf (cpuCostAtLvl)=%d,  sizeof RT_Chain::cpuCostAtLvl=%d\n", 
+//													(int) RT_Chain::mu_u.size(), (int)MyConfig::cpuCostAtLvl.size(), (int) RT_Chain::cpuCostAtLvl.size());
+	MyConfig::printToLog (buf);
+	for (auto costPtr=RT_Chain::cpuCostAtLvl.begin(); costPtr<(RT_Chain::cpuCostAtLvl).end(); costPtr++) {
+		snprintf (buf, bufSize, "%d |", *costPtr);
+		MyConfig::printToLog (buf);
+	}
+	endSimulation ();
+}
+
+
+
 
 // Open input, output, and log files 
 void SimController::openFiles () {
@@ -79,8 +98,6 @@ void SimController::runTimeStep ()
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
 
-  		uint32_t bufSize = 128;
-  		char buf[bufSize];
   		snprintf (buf, bufSize, "t=%d\n", t);
   		MyConfig::printToLog (buf); 
   	}

@@ -181,24 +181,33 @@ void Datacenter::pushUpSync ()
 {
 	reshuffled = true;
 	Chain chain;
-	for (auto chain : pushUpVec) { // for each chain in the pushUpVec
-		auto search = potPlacedChainsIds.find (chain.id); // Look for this chain's id in my pot-placed chains 
+	for (auto chainPtr=pushUpVec.begin(); chainPtr<pushUpVec.end(); chainPtr++) {
+
+		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
+			break;
+		}
+		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) {
 			continue; // this chain wasn't pot-placed by me, but by another DC.
 		}
 		
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
+		pushUpVec.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		
-		if (chain.curDatacenter==id) { // this chain wasn't pushed-up; need to place it here
-			chain.curDatacenter=this->id;
+		if (chainPtr->curDatacenter==id) { // this chain wasn't pushed-up; need to place it here
+			chainPtr->curDatacenter=this->id;
 			insertSorted (placedChains, chain);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
-			availCpu += chain.mu_u_at_lvl (lvl); 
+			availCpu += chainPtr->mu_u_at_lvl (lvl); 
 		}
 
-	}	
+	}
+	
+//	for (auto chain : pushUpVec) {
+//		if (chain.mu_u_at_lvl(lvl) <= availCpu)  && chain.cpuCostAtLvl (lvl) <= chain.cpuCostAt
+//	}
 }
 
 

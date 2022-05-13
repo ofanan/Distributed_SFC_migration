@@ -5,6 +5,10 @@
 using namespace omnetpp;
 using namespace std;
 
+//const vector<uint16_t> MyConfig::costOfCpuUnitAtLvl = {5,4,3,2,1}; 
+
+//const vector<uint16_t> MyConfig::cpuCostAtLvl = {5,4,3,2,1}; 
+
 //Define_Module(MyConfig);
 
 string 		MyConfig::LogFileName;
@@ -58,10 +62,12 @@ void MyConfig::printToLog (unordered_set <uint32_t> set2print)
 }
 
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 
-{ 
-	vector <uint16_t> res;
-	for (uint8_t i(0); i<vec1.size(); i++) {
-		res[i] = vec1[i] * vec2[i];
+{
+
+	uint8_t size = min (vec1.size(), vec2.size()); 
+	vector <uint16_t> res; // = {size};
+	for (uint8_t i(0); i<size; i++) {
+		res.insert(res.begin()+i, vec1[i] * vec2[i]);
 	}
 	return res;
 }
