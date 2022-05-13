@@ -70,6 +70,12 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chai
 	}
 }
 
+// returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
+int16_t Chain::curDatacenter_ () const 
+{
+	return (curLvl==UNPLACED_)? UNPLACED : S_u[curLvl];
+} 
+
 uint16_t Chain::cpuCost () const
 {
 	return (isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl];

@@ -240,7 +240,7 @@ void SimController::readChainsThatLeftLine (string line)
 				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
 	  		continue;
 	  	}
-  		chainsThatLeftDatacenter[chain.curDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+  		chainsThatLeftDatacenter[chain.curDatacenter_()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
 	  }
   }
 }
@@ -306,8 +306,8 @@ void SimController::readOldChainsLine (string line)
 			chain.S_u = pathToRoot[poaId]; //Update S_u of the chain to reflect its new location
 			allChains.insert (chain);
 			insertSorted (chainsThatJoinedLeaf[poaId], chain);			
-			if (chain.curDatacenter != UNPLACED) {
-				chainsThatLeftDatacenter[chain.curDatacenter].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+			if (chain.curLvl != UNPLACED_) {
+				chainsThatLeftDatacenter[chain.curDatacenter_ ()].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 			}
 	  }
 	}
@@ -404,23 +404,23 @@ void SimController::handleMessage (cMessage *msg)
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
   	placementInfoMsg* msg2handle = (placementInfoMsg*) (msg);
   	Chain chain;
-  	int16_t  datacenterId;
+  	int16_t  curLvl;
   	uint32_t chainId;
 
   	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getNewlyPlacedChainsArraySize()); i++) {
   		
-  		datacenterId = ((Datacenter*)msg->getSenderModule())->id; 
+  		curLvl = ((Datacenter*)msg->getSenderModule())->lvl; 
   		chainId 			= msg2handle -> getNewlyPlacedChains (i);
 			if (!(findChainInSet (allChains, chainId, chain))) {
 				error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
 
 			}
 			else {
-				if (chain.curDatacenter!=UNPLACED) { // was it an old chain that migrated?
+				if (chain.curDatacenter_()!=UNPLACED) { // was it an old chain that migrated?
 					numMigs++; // Yep --> inc. the mig. cntr.
 				}
 				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-				chain.curDatacenter = datacenterId;
+				chain.curLvl = curLvl;
 				allChains.insert (chain);
 			}
   	}

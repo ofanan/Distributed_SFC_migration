@@ -31,7 +31,8 @@ class Chain
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
     }
-    
+
+		int16_t curDatacenter_ () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
     uint16_t cpuCost () const;
 		/* 
 		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 
