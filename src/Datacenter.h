@@ -61,7 +61,7 @@ class Datacenter : public cSimpleModule
     virtual void handleMessage (cMessage *msg);
     
     void handleSelfMsg    ();
-    void sendViaQ         (int16_t portNum, cPacket* pkt2send);
+    void sndViaQ         (int16_t portNum, cPacket* pkt2send);
     void xmt              (int16_t portNum, cPacket *pkt2send);
     void handleInitBottomUpMsg 	();
     void handleBottomUpPktSync 	();
@@ -75,8 +75,10 @@ class Datacenter : public cSimpleModule
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
     void genNsndPushUpPktsToChildren ();
-    inline bool CannotPlaceThisChainHigher (const Chain chain) const;
+    inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
+		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
+    
 };
 
 #endif

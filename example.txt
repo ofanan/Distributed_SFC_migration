@@ -46,3 +46,7 @@ DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
 DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 0, lvl=2. placed chains: pot. placed chains: 
 DC 0 sending placementInfoMsg
+DC 1 rcvd PU pkt
+DC 2 rcvd PU pkt
+DC 3 rcvd PU pkt
+DC 6 rcvd PU pkt

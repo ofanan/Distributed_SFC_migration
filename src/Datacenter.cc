@@ -10,6 +10,9 @@ inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) cons
 
 inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
+// Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
+inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
+
 Datacenter::Datacenter()
 {
 }
@@ -238,6 +241,7 @@ void Datacenter::pushUpSync ()
 
 	if (isLeaf) {
 		// $$ Add checks; at this stage, pushUpVec should be empty
+		error ("arrived back to leaf");
 		return; // finished; this actually concluded the run of the alg'
 	}
 	genNsndPushUpPktsToChildren ();
@@ -275,10 +279,9 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			}		
 		}
 		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
-			sendViaQ (child, pkt); //send the bottomUPpkt to my prnt	
+			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
 		}
 	}
-	error ("finished sending to all children");
 }
 
 /*
@@ -411,7 +414,7 @@ void Datacenter::sndPushUpPkt ()
 //	
 //	snprintf (buf, bufSize, "DC \%d sending a PU pkt to child\n", id);
 //	MyConfig::printToLog (buf);
-//	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
+//	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
 }
 
 void Datacenter::sndBottomUpPkt ()
@@ -433,7 +436,7 @@ void Datacenter::sndBottomUpPkt ()
 		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
 		MyConfig::printToLog (buf);
 	}
-	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
 
 void Datacenter::prepareReshuffleSync () 
@@ -445,7 +448,7 @@ void Datacenter::prepareReshuffleSync ()
  * If the output port is free, xmt the pkt immediately.
  * Else, queue the pkt until the output port is free, and then xmt it.
  */
-void Datacenter::sendViaQ (int16_t portNum, cPacket* pkt2send)
+void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
 {
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (pkt2send);
