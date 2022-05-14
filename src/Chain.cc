@@ -86,11 +86,6 @@ uint16_t Chain::getCpu () const
 	return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
 }
 
-bool Chain::sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) const
-{
-	return (lhs.getCpu() < rhs.getCpu());
-}
-
 /*
 Insert a chain to its correct order in the (ordered) vector of chains.
 We currently use only RT, and we assume that the input vector is sorted. 

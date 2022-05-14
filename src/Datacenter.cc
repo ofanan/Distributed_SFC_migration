@@ -21,6 +21,10 @@ Datacenter::~Datacenter()
   }
 }
 
+inline bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {
+	return (lhs.getCpu() < rhs.getCpu());
+}
+
 void Datacenter::initialize()
 {
 	network     	= (cModule*) (getParentModule ()); 
@@ -214,11 +218,13 @@ void Datacenter::pushUpSync ()
 		}
 
 	}
+	
+	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
 //	std::sort(customers.begin(), customers.end(), &customer_sorter);
-	for (auto chain : pushUpVec) {
-		if (chain.mu_u_at_lvl(lvl) <= availCpu) {
-		}
-	}
+//	for (auto chain : pushUpVec) {
+//		if (chain.mu_u_at_lvl(lvl) <= availCpu) {
+//		}
+//	}
 }
 
 
