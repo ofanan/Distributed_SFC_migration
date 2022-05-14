@@ -73,7 +73,8 @@ class Datacenter : public cSimpleModule
     void prepareReshuffleSync 	();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
-    void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
+    void sndPlacementInfoMsg 		(vector<uint16_t>  &newly
+    PlacedChains);
     inline bool CannotPlaceThisChainHigher (Chain chain);
 };
 
