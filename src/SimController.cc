@@ -84,15 +84,18 @@ Run a single time step. Such a time step is supposed to include (at most) a sing
 */
 void SimController::runTimeStep () 
 {
+	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
 	  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
 	}
+	
   string line;
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
   	}
   	else if ( (line.substr(0,4)).compare("t = ")==0) {
   	
+  		isLastPeriod = false;
   		// extract the t (time) from the traceFile, and update this->t accordingly.
   		char lineAsCharArray[line.length()+1];
   		strcpy (lineAsCharArray, line.c_str());
@@ -414,7 +417,9 @@ void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
 		isFirstPeriod = false;
-  	runTimeStep ();
+		if (!isLastPeriod) {
+			runTimeStep ();
+		}
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
   	placementInfoMsg* msg2handle = (placementInfoMsg*) (msg);

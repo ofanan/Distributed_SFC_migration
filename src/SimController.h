@@ -40,7 +40,8 @@ class SimController : public cSimpleModule
     uint16_t numLeaves;
     uint8_t  height; // height of the tree
     uint32_t t; //sim time (in seconds)
-    bool isFirstPeriod; 
+    bool isFirstPeriod = true; 
+    bool isLastPeriod = false;
     uint32_t seed = 42;
     float  	 RT_chain_pr = 1.0; // prob' that a new chain is an RT chain
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
