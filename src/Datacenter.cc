@@ -224,13 +224,13 @@ void Datacenter::pushUpSync ()
 	
 	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
 	uint16_t mu_u;
-	for (auto chain : pushUpVec) {
-		mu_u = chain.mu_u_at_lvl(lvl);
+	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
+		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
-			chain.curLvl = lvl;
-			placedChains.insert (chain);
-			newlyPlacedChains.push_back (chain.id);
+			chainPtr->curLvl = lvl;
+			placedChains.insert (*chainPtr);
+			newlyPlacedChains.push_back (chainPtr->id);
 		}
 		
 	}
