@@ -39,7 +39,6 @@ void SimController::initialize (int stage)
 
 void SimController::checkParams ()
 {
-	MyConfig::printToLog (buf);
 
 	for (uint16_t lvl(0); lvl < RT_Chain::cpuCostAtLvl.size()-1; lvl++) {
 		if ((int)(RT_Chain::cpuCostAtLvl[lvl]) <= (int)(RT_Chain::cpuCostAtLvl[lvl+1])) {
@@ -98,8 +97,10 @@ void SimController::runTimeStep ()
   		strtok (lineAsCharArray, " = ");
   		t = atoi (strtok (NULL, " = "));
 
-  		snprintf (buf, bufSize, "t=%d\n", t);
-  		MyConfig::printToLog (buf); 
+			if (MyConfig::LOG_LVL>0) {
+				snprintf (buf, bufSize, "t=%d\n", t);
+				MyConfig::printToLog (buf); 
+			}
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
   		readChainsThatLeftLine (line.substr(15));
