@@ -247,6 +247,7 @@ void Datacenter::pushUpSync ()
 			for (uint8_t child(0); child<numChildren; child++) {
 		if (chain.S_u[lvl-1]==idOfChildren[child])   { /// find to which child this user belongs. Add a func' for that?
 			pushUpPktToChild[child].setPushUpVecArraySize (++pushUpVecArraySize[child]);
+			pushUpPktToChild[child].setPushUpVec (pushUpVecArraySize[child]-1, chain);
 			break; // found a child to associate this chain with
 		}		
 		error ("couldn't associate chain %d with any child\n", chain.id); 
