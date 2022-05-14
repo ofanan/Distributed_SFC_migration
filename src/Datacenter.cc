@@ -169,13 +169,18 @@ Handle a rcvd pushUpPkt:
 void Datacenter::handlePushUpPkt () 
 {
 
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "DC %d rcvd PU pkt\n", id);
+		MyConfig::printToLog (buf);
+	}
   pushUpPkt *pkt = (pushUpPkt*) this->curHandledMsg;
 	Chain chain;
 	uint16_t mu_u;
 	
-	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
+	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpVec.
+	this->pushUpVec = {};
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		insertSorted (this->pushUpVec, pkt->getPushUpVec (i));
+		this->pushUpVec.push_back (pkt->getPushUpVec (i));
 	} 
 	if (MyConfig::mode==SYNC){ 
 //		sort pushUpVec ();
@@ -257,7 +262,7 @@ void Datacenter::pushUpSync ()
 
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
-	pushUpPkt* pkt;	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
+	pushUpPkt* pkt;	 // the packet to be sent 
 	uint16_t pushUpVecArraySize;
 	Chain chain;
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
@@ -273,7 +278,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			sendViaQ (child, pkt); //send the bottomUPpkt to my prnt	
 		}
 	}
-
+	error ("finished sending to all children");
 }
 
 /*

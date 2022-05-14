@@ -46,7 +46,3 @@ DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
 DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 0, lvl=2. placed chains: pot. placed chains: 
 DC 0 sending placementInfoMsg
-DC 1 sending placementInfoMsg
-DC 6 sending placementInfoMsg
-DC 4 sending placementInfoMsg
-finished sim

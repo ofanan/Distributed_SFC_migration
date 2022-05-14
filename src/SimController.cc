@@ -164,11 +164,15 @@ void SimController::concludeTimeStep ()
 //	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
-	printAllDatacenters 					 ();
+	
+	if (MyConfig::LOG_LVL > 1) {
+		printAllDatacenters 					 ();
+	}
 }
 
 void SimController::printAllDatacenters ()
 {
+	MyConfig::printToLog ("in SimController::printAllDatacenters"); 
 	for (const auto datacenter : datacenters) {
 		datacenter -> print ();
 	}
