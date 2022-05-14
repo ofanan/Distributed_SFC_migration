@@ -13,7 +13,6 @@
 
 using namespace std;
 
-
 class Chain
 {
   public:
@@ -45,8 +44,8 @@ class Chain
     }
 		*/
 		
-    uint16_t mu_u_at_lvl (uint8_t lvl); // returns the amount of cpu required for placing this chain at level lvl
-    uint16_t mu_u_len ();
+    uint16_t mu_u_at_lvl (uint8_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
+    uint16_t mu_u_len () const;
 };
 
 /* 
@@ -76,7 +75,7 @@ class Non_RT_Chain: public Chain
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
 struct ChainHash {
 	size_t operator()(const Chain& c) const {
-  	return hash<int>()(c.id);
+  	return hash<uint32_t>()(c.id);
   }
 };
 
@@ -100,8 +99,11 @@ Rcvs 2 sorted vectors of chains.
 Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
 */
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
+
+typedef unordered_set <Chain, ChainHash> SetOfChains;
+
+/*void modifyCurLvl (SetOfChains &setOfChins, const Chain chain, const int8_t curLvl);*/
+/*void SetOfChains::modifyCurLvl (const Chain chain, const int8_t curLvl);*/
 #endif
 
-/*typedef list<Chain> ChainList;*/
-//typedef Chain[] ChainArray;
 

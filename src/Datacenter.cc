@@ -6,7 +6,9 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-inline bool Datacenter::CannotPlaceThisChainHigher (Chain chain) {return chain.mu_u_len() == this->lvl+1;}
+inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) const {return chain.mu_u_len() == this->lvl+1;}
+
+inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 Datacenter::Datacenter()
 {
@@ -35,7 +37,6 @@ void Datacenter::initialize()
   lvl				  = (uint8_t)  (par("lvl"));
   id					= (uint16_t) (par("id"));
   availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
-        // variables: assigned chains, placedChains
 
   numPorts    = numParents + numChildren;
   isRoot      = (numParents==0);
@@ -195,6 +196,7 @@ void Datacenter::pushUpSync ()
 {
 	reshuffled = true;
 	Chain chain;
+	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
 	for (auto chainPtr=pushUpVec.begin(); chainPtr<pushUpVec.end(); chainPtr++) {
 
 		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
@@ -211,20 +213,24 @@ void Datacenter::pushUpSync ()
 		
 		if (chainPtr->curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
 			chainPtr->curLvl=this->lvl;
-			insertSorted (placedChains, chain);
+			placedChains.insert (chain);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
 			availCpu += chainPtr->mu_u_at_lvl (lvl); 
 		}
 
+
 	}
 	
 	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
+	uint16_t mu_u;
 	for (auto chain : pushUpVec) {
-		if (chain.mu_u_at_lvl(lvl) <= availCpu) {
+		mu_u = chain.mu_u_at_lvl(lvl);
+		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
 			chain.curLvl = lvl;
-			insertSorted (placedChains, chain);
+			placedChains.insert (chain);
+			newlyPlacedChains.push_back (chain.id);
 		}
 		
 	}
@@ -256,7 +262,7 @@ void Datacenter::bottomUpSync ()
 			availCpu -= mu_u;
 			chainPtr -> curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				insertSorted (placedChains, *chainPtr);
+				placedChains.insert (*chainPtr);
 				newlyPlacedChains.push_back (chainPtr->id);
 			}
 			else {

@@ -32,13 +32,13 @@ Non_RT_Chain::Non_RT_Chain (uint32_t id, vector <uint16_t> S_u) {
   this->isRT_Chain 	= false;
 };
 
-uint16_t Chain::mu_u_len ()
+uint16_t Chain::mu_u_len () const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
 }
 
 
-uint16_t Chain::mu_u_at_lvl (uint8_t lvl)
+uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }

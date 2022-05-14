@@ -39,7 +39,7 @@ class Datacenter : public cSimpleModule
     // Dynamic
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
-    vector<Chain> placedChains; 
+    SetOfChains placedChains; 
 /*    vector <uint32_t> */
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
 		uint8_t numBuMsgsRcvd; 
@@ -73,9 +73,9 @@ class Datacenter : public cSimpleModule
     void prepareReshuffleSync 	();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
-    void sndPlacementInfoMsg 		(vector<uint16_t>  &newly
-    PlacedChains);
-    inline bool CannotPlaceThisChainHigher (Chain chain);
+    void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
+    inline bool CannotPlaceThisChainHigher (const Chain chain) const;
+    inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 };
 
 #endif
