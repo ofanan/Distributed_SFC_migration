@@ -42,7 +42,7 @@ class MyConfig { //: public cSimpleModule {
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;
-		static const int DEBUG_LVL=0, LOG_LVL=1;
+		static const int DEBUG_LVL=1, LOG_LVL=VERY_DETAILED_LOG;
 
 		//Init
 		static void openFiles ();

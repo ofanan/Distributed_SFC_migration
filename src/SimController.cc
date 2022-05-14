@@ -84,7 +84,9 @@ Run a single time step. Such a time step is supposed to include (at most) a sing
 */
 void SimController::runTimeStep () 
 {
-  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
+	if (!isFirstPeriod) {
+	  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
+	}
   string line;
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
@@ -124,6 +126,7 @@ void SimController::runTimeStep ()
 
 void SimController::runTrace () {
 	traceFile = ifstream (traceFileName);
+	isFirstPeriod = true;
 	
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
@@ -410,6 +413,7 @@ void SimController::initAlgAsync () {
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
+		isFirstPeriod = false;
   	runTimeStep ();
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 

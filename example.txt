@@ -1,28 +1,4 @@
-DC 0, lvl=2. placed chains: pot. placed chains: 
-DC 1, lvl=1. placed chains: pot. placed chains: 
-DC 2, lvl=1. placed chains: pot. placed chains: 
-DC 3, lvl=1. placed chains: pot. placed chains: 
-DC 4, lvl=0. placed chains: pot. placed chains: 
-DC 5, lvl=0. placed chains: pot. placed chains: 
-DC 6, lvl=0. placed chains: pot. placed chains: 
-DC 7, lvl=0. placed chains: pot. placed chains: 
-DC 8, lvl=0. placed chains: pot. placed chains: 
-DC 9, lvl=0. placed chains: pot. placed chains: 
-DC 10, lvl=0. placed chains: pot. placed chains: 
-DC 11, lvl=0. placed chains: pot. placed chains: 
-DC 12, lvl=0. placed chains: pot. placed chains: 
 t=30540
-DC 0, lvl=2. placed chains: pot. placed chains: 
-DC 1, lvl=1. placed chains: pot. placed chains: 
-DC 2, lvl=1. placed chains: pot. placed chains: 
-DC 3, lvl=1. placed chains: pot. placed chains: 
-DC 4, lvl=0. placed chains: pot. placed chains: 
-DC 5, lvl=0. placed chains: pot. placed chains: 
-DC 6, lvl=0. placed chains: pot. placed chains: 
-DC 7, lvl=0. placed chains: pot. placed chains: 
-DC 8, lvl=0. placed chains: pot. placed chains: 
-DC 9, lvl=0. placed chains: pot. placed chains: 
-DC 10, lvl=0. placed chains: pot. placed chains: 
-DC 11, lvl=0. placed chains: pot. placed chains: 
-DC 12, lvl=0. placed chains: pot. placed chains: 
+DC 6 rcvd a initBU msg
+DC 6, lvl=0. placed chains: pot. placed chains: 2,
 finished sim

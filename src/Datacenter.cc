@@ -152,8 +152,6 @@ void Datacenter::handleInitBottomUpMsg ()
 {
 
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
-	Chain chain;
-	uint16_t mu_u;
 	
 	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
@@ -320,6 +318,7 @@ void Datacenter::bottomUpSync ()
 	sndPlacementInfoMsg (newlyPlacedChains);
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		this -> print ();
+		endSimulation (); //$$$
 	}
 
   return (isRoot)? pushUpSync () : sndBottomUpPkt ();
