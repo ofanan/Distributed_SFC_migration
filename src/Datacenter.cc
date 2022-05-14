@@ -216,7 +216,7 @@ void Datacenter::pushUpSync ()
 			placedChains.insert (chain);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
-			availCpu += chainPtr->mu_u_at_lvl (lvl); 
+			availCpu += requiredCpuToLocallyPlaceChain (*chainPtr); 
 		}
 
 
