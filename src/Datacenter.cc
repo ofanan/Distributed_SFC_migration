@@ -220,11 +220,14 @@ void Datacenter::pushUpSync ()
 	}
 	
 	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
-//	std::sort(customers.begin(), customers.end(), &customer_sorter);
-//	for (auto chain : pushUpVec) {
-//		if (chain.mu_u_at_lvl(lvl) <= availCpu) {
-//		}
-//	}
+	for (auto chain : pushUpVec) {
+		if (chain.mu_u_at_lvl(lvl) <= availCpu) {
+			availCpu -= mu_u;
+			chain.curLvl = lvl;
+			insertSorted (placedChains, chain);
+		}
+		
+	}
 }
 
 
@@ -413,5 +416,6 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
+
 
 
