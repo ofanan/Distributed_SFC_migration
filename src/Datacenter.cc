@@ -236,6 +236,7 @@ void Datacenter::pushUpSync ()
 		return; // finished; this actually concluded the run of the alg'
 	}
 	genNsndPushUpPktsToChildren ();
+	pushUpVec = {};
 //	pushUpPkt pushUpPktToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
 //	uint16_t pushUpVecArraySize[numChildren];
 //	for (uint8_t child (0); child<numChildren; child++) {pushUpVecArraySize[child]=0;} //reset the array
@@ -267,7 +268,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
 				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
 			}		
-			error ("couldn't associate chain %d with any child\n", chain.id); 
 		}
 		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
 			sendViaQ (child, pkt); //send the bottomUPpkt to my prnt	
