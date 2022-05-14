@@ -195,7 +195,6 @@ Assume that this->pushUpVec already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 	reshuffled = true;
-	Chain chain;
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
 	for (auto chainPtr=pushUpVec.begin(); chainPtr<pushUpVec.end(); chainPtr++) {
 
@@ -212,27 +211,25 @@ void Datacenter::pushUpSync ()
 		pushUpVec.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		
 		if (chainPtr->curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
-			chainPtr->curLvl=this->lvl;
-			placedChains.insert (chain);
+			placedChains.insert (*chainPtr);
+			newlyPlacedChains.push_back (chainPtr->id);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
 			availCpu += requiredCpuToLocallyPlaceChain (*chainPtr); 
 		}
-
-
 	}
 	
 	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
 	uint16_t mu_u;
-	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
-		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
+//	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
+	for (uint8_t i(0); i < pushUpVec.size(); i++) {
+		mu_u = requiredCpuToLocallyPlaceChain (pushUpVec[i]);
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
-			chainPtr->curLvl = lvl;
-			placedChains.insert (*chainPtr);
-			newlyPlacedChains.push_back (chainPtr->id);
+			pushUpVec[i].curLvl = lvl;
+			placedChains.insert (pushUpVec[i]);
+			newlyPlacedChains.push_back (pushUpVec[i].id);
 		}
-		
 	}
 }
 
