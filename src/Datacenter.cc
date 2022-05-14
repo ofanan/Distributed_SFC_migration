@@ -231,32 +231,52 @@ void Datacenter::pushUpSync ()
 		}
 	}
 
+	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
+
 	if (isLeaf) {
 		// $$ Add checks; at this stage, pushUpVec should be empty
 		return; // finished; this actually concluded the run of the alg'
 	}
+	genNsndPushUpPktsToChildren ();
+//	pushUpPkt pushUpPktToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
+//	uint16_t pushUpVecArraySize[numChildren];
+//	for (uint8_t child (0); child<numChildren; child++) {pushUpVecArraySize[child]=0;} //reset the array
+//	Chain chain;
+//	for (uint8_t i(0); i < pushUpVec.size(); i++) {
+//		chain = pushUpVec[i];
+//			for (uint8_t child(0); child<numChildren; child++) {
+//		if (chain.S_u[lvl-1]==idOfChildren[child])   { /// find to which child this user belongs. Add a func' for that?
+//			pushUpPktToChild[child].setPushUpVecArraySize (++pushUpVecArraySize[child]);
+//			pushUpPktToChild[child].setPushUpVec (pushUpVecArraySize[child]-1, chain);
+//			break; // found a child to associate this chain with
+//		}		
+//		error ("couldn't associate chain %d with any child\n", chain.id); 
+//		}
+//	}
 	
-	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
-
-	pushUpPkt pushUpPktToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
-	uint16_t pushUpVecArraySize[numChildren];
-	for (uint8_t child (0); child<numChildren; child++) {pushUpVecArraySize[child]=0;} //reset the array
-	Chain chain;
-	for (uint8_t i(0); i < pushUpVec.size(); i++) {
-		chain = pushUpVec[i];
-			for (uint8_t child(0); child<numChildren; child++) {
-		if (chain.S_u[lvl-1]==idOfChildren[child])   { /// find to which child this user belongs. Add a func' for that?
-			pushUpPktToChild[child].setPushUpVecArraySize (++pushUpVecArraySize[child]);
-			pushUpPktToChild[child].setPushUpVec (pushUpVecArraySize[child]-1, chain);
-			break; // found a child to associate this chain with
-		}		
-		error ("couldn't associate chain %d with any child\n", chain.id); 
-		}
-	}
-	
-
 }
 
+void Datacenter::genNsndPushUpPktsToChildren ()
+{
+	pushUpPkt* pkt;	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
+	uint16_t pushUpVecArraySize;
+	Chain chain;
+	for (uint8_t child(0); child<numChildren; child++) { // for each child...
+		pushUpVecArraySize=0;
+		pkt = new pushUpPkt;
+		for (uint8_t i(0); i < pushUpVec.size(); i++) {	// consider all the chains in pushUpVec
+			if (pushUpVec[i].S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
+				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
+				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
+			}		
+			error ("couldn't associate chain %d with any child\n", chain.id); 
+		}
+		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+			sendViaQ (child, pkt); //send the bottomUPpkt to my prnt	
+		}
+	}
+
+}
 
 /*
 Running the PU alg'. 

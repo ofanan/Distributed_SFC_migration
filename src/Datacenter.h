@@ -74,6 +74,7 @@ class Datacenter : public cSimpleModule
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
+    void genNsndPushUpPktsToChildren ();
     inline bool CannotPlaceThisChainHigher (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 };
