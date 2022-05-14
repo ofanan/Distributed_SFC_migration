@@ -315,10 +315,11 @@ void Datacenter::bottomUpSync ()
 	
 	}
 
-	sndPlacementInfoMsg (newlyPlacedChains);
+	if (newlyPlacedChains.size()>0) {
+		sndPlacementInfoMsg (newlyPlacedChains);
+	}
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		this -> print ();
-		endSimulation (); //$$$
 	}
 
   return (isRoot)? pushUpSync () : sndBottomUpPkt ();
