@@ -238,15 +238,15 @@ void Datacenter::pushUpSync ()
 	
 	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
 
-	pushUpPkt pushUpPktsToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
+	pushUpPkt pushUpPktToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
 	uint16_t pushUpVecArraySize[numChildren];
 	for (uint8_t child (0); child<numChildren; child++) {pushUpVecArraySize[child]=0;} //reset the array
 	Chain chain;
 	for (uint8_t i(0); i < pushUpVec.size(); i++) {
 		chain = pushUpVec[i];
-		for (uint8_t child(0); child<numChildren; child++) {
+			for (uint8_t child(0); child<numChildren; child++) {
 		if (chain.S_u[lvl-1]==idOfChildren[child])   { /// find to which child this user belongs. Add a func' for that?
-			
+			pushUpPktToChild[child].setPushUpVecArraySize (++pushUpVecArraySize[child]);
 			break; // found a child to associate this chain with
 		}		
 		error ("couldn't associate chain %d with any child\n", chain.id); 
