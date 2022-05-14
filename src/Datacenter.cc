@@ -140,7 +140,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else
   {
-    EV <<"BU rcvd a pkt  of an unknown type\n";
+    error ("rcvd a pkt  of an unknown type");
   }
   delete (curHandledMsg);
 }
@@ -227,21 +227,49 @@ void Datacenter::pushUpSync ()
 	
 	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
 	uint16_t mu_u;
-	for (uint8_t i(0); i < pushUpVec.size(); i++) {
-		mu_u = requiredCpuToLocallyPlaceChain (pushUpVec[i]);
+	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
+		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
-			pushUpVec[i].curLvl = lvl;
-			placedChains.insert (pushUpVec[i]);
-			newlyPlacedChains.push_back (pushUpVec[i].id);
+			chainPtr->curLvl = lvl;
+			placedChains.insert (*chainPtr);
+			newlyPlacedChains.push_back (chainPtr->id);
+			snprintf (buf, bufSize, "DC %d placed chain %d\n", id, (int)(chainPtr->id));
+			MyConfig::printToLog (buf);
+			pushUpVec.erase (chainPtr);
+//			snprintf (buf, bufSize, "after erasing, pushUpVec is: ", id, (int)(chainPtr->id));
+			MyConfig::printToLog ("after erasing, pushUpVec is: ");
+			MyConfig::printToLog (pushUpVec);
 		}
+	}
+	vector <uint8_t> indicesToErase;
+	
+//	for (uint8_t i(0); i < pushUpVec.size(); i++) {
+//		mu_u = requiredCpuToLocallyPlaceChain (pushUpVec[i]);
+//		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
+//			availCpu -= mu_u;
+//			pushUpVec[i].curLvl = lvl;
+//			placedChains.insert (pushUpVec[i]);
+//			newlyPlacedChains.push_back (pushUpVec[i].id);
+//			indicesToErase.push_back (i);
+////			pushUpVec.erase (pushUpVec.begin() + i);
+//		}
+//	}
+
+////	for (uint8_t i(0); i<indicesToErase.size(); i++) {
+////		pushUpVec.erase (pushUpVec.begin() + i);
+////	}
+	
+	if (isRoot) {
+		print ();
 	}
 
 	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
 
 	if (isLeaf) {
+//		endSimulation ();
 		// $$ Add checks; at this stage, pushUpVec should be empty
-		error ("arrived back to leaf");
+//		error ("arrived back to leaf");
 		return; // finished; this actually concluded the run of the alg'
 	}
 	genNsndPushUpPktsToChildren ();
@@ -314,7 +342,7 @@ void Datacenter::bottomUpSync ()
 			}
 			else {
 				potPlacedChainsIds.insert (chainPtr->id);
-				insertSorted (pushUpVec, *chainPtr);
+				pushUpVec.push_back (*chainPtr);
 			}
 		}
 		else if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
@@ -330,7 +358,12 @@ void Datacenter::bottomUpSync ()
 		this -> print ();
 	}
 
-  return (isRoot)? pushUpSync () : sndBottomUpPkt ();
+  if (isRoot) { 
+  	pushUpSync ();
+  }
+  else {
+  	sndBottomUpPkt ();
+  }
 }
 
 void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)

@@ -12,7 +12,6 @@
 #include "pushUpPkt_m.h"
 #include "prepareReshufflePkt_m.h"
 #include "MyConfig.h"
-/*#include "SimController.h"*/
 
 using namespace omnetpp;
 using namespace std;

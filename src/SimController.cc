@@ -172,7 +172,6 @@ void SimController::concludeTimeStep ()
 
 void SimController::printAllDatacenters ()
 {
-	MyConfig::printToLog ("in SimController::printAllDatacenters"); 
 	for (const auto datacenter : datacenters) {
 		datacenter -> print ();
 	}

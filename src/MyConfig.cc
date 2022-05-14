@@ -34,6 +34,13 @@ void MyConfig::printToLog (int d)
 	logFile << d << ",";
 }
 
+void MyConfig::printToLog (vector <Chain> vec) 
+{
+	for (const auto chain : vec) {
+		logFile << chain.id << ",";
+	}
+}
+
 void MyConfig::printToLog (vector <uint16_t> vec) 
 {
 	for (const auto i : vec) {

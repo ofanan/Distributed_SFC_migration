@@ -12,10 +12,12 @@
 #include <utility>
 #include <cstdlib>
 
+#include "Chain.h"
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <unordered_set>
+
 
 using namespace omnetpp;
 using namespace std;
@@ -55,6 +57,7 @@ class MyConfig { //: public cSimpleModule {
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
 		static void printToLog (int d); // print "d,", where d is the integer, to the log file
+		static void printToLog (vector <Chain> vec); // print all the IDs of the chains in the vec.
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <uint32_t> vec); // print a vec of integers to the log file
 		static void printToLog (unordered_set <uint32_t> set2print);
