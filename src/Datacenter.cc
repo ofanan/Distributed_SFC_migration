@@ -221,7 +221,6 @@ void Datacenter::pushUpSync ()
 	
 	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
 	uint16_t mu_u;
-//	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
 	for (uint8_t i(0); i < pushUpVec.size(); i++) {
 		mu_u = requiredCpuToLocallyPlaceChain (pushUpVec[i]);
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
@@ -231,6 +230,23 @@ void Datacenter::pushUpSync ()
 			newlyPlacedChains.push_back (pushUpVec[i].id);
 		}
 	}
+
+	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
+
+	if (isLeaf) {
+		// $$ Add checks; at this stage, pushUpVec should be empty
+		return; // finished; this actually concluded the run of the alg'
+	}
+	for (uint8_t i(0); i < pushUpVec.size(); i++) {
+		if (pushUpVec[i].S_u[lvl-1]==idOfChildren[child]   { /// find to which child this user belongs
+		}
+	}
+	
+	pushUpPkt pushUpPktsToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
+
+//	for (uint8_t child(0); child<numOfChildren; chil++) {
+//	
+//	}
 }
 
 
@@ -273,8 +289,8 @@ void Datacenter::bottomUpSync ()
 	
 	}
 
+	sndPlacementInfoMsg (newlyPlacedChains);
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		sndPlacementInfoMsg (newlyPlacedChains);
 		this -> print ();
 	}
 
