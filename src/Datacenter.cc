@@ -110,13 +110,17 @@ void Datacenter::handleMessage (cMessage *msg)
 		if (!isLeaf) {
 			error ("a non-leaf datacenter received an initBottomUpMsg");
 		}  
-		snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
-  	MyConfig::printToLog (buf);
-    handleInitBottomUpMsg ();
+		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
+			MyConfig::printToLog (buf);
+		  handleInitBottomUpMsg ();
+		}
   }
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
-		snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
-  	MyConfig::printToLog (buf);
+		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
+			MyConfig::printToLog (buf);
+		}
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
@@ -257,8 +261,10 @@ void Datacenter::bottomUpSync ()
 	
 	}
 
-	sndPlacementInfoMsg (newlyPlacedChains);
-	this -> print ();
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		sndPlacementInfoMsg (newlyPlacedChains);
+		this -> print ();
+	}
 
   return (isRoot)? pushUpSync () : sndBottomUpPkt ();
 }
@@ -277,8 +283,10 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 		msg->setNewlyPlacedChains (i, newlyPlacedChains[i]);
 	}
 
-	snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
-	MyConfig::printToLog (buf);
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
+		MyConfig::printToLog (buf);
+	}
 	sendDirect (msg, simController, "directMsgsPort");
 
 }
@@ -360,8 +368,10 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setPushUpVec (i, pushUpVec[i]);
 	}
 	
-	snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
-	MyConfig::printToLog (buf);
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
+		MyConfig::printToLog (buf);
+	}
 	sendViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
 

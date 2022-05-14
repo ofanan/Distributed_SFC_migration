@@ -136,7 +136,9 @@ void SimController::finish ()
 {
   traceFile.close ();
 //  concludeTimeStep (); 
-  MyConfig::printToLog ("finished sim\n");
+	if (MyConfig::LOG_LVL>0) {
+  	MyConfig::printToLog ("finished sim\n");
+  }
 }
 
 /*
@@ -281,7 +283,7 @@ void SimController::readNewChainsLine (string line)
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
 		allChains.insert (chain); 
 	}	
-	if (LOG_LVL==2) {
+	if (LOG_LVL>1) {
 	  MyConfig::printToLog ("After readNewCHainsLine: ");
 	  printAllChains (logFile);
 	}

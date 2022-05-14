@@ -34,6 +34,8 @@ const int8_t  UNPLACED_ = -1;
 const bool SYNC  = true;
 const bool ASYNC = false;
 
+const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
+
 class MyConfig { //: public cSimpleModule {
 
 	public:
