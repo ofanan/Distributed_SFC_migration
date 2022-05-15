@@ -46,15 +46,38 @@ DC 12, lvl=0. placed chains: pot. placed chains:
 DC 12 sending a BU pkt to prnt
 DC 1 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
 DC 1. rcvd 1 BU pkts. src=6. pushUpVec[0]=2. pushUpSetSize=1. pushUpSet=2,
-unordered pushUpSet size=1
 DC 1 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
 DC 1. rcvd 2 BU pkts. src=5. pushUpVec[0]=1. pushUpSetSize=2. pushUpSet=1,2,
-unordered pushUpSet size=2
 DC 1 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 1. rcvd 3 BU pkts. src=4. pushUpVec[0]=0. pushUpSetSize=3. pushUpSet=0,1,2,
-unordered pushUpSet size=3
 DC 1, lvl=1. placed chains: pot. placed chains: 
 
 DC 1 sending a BU pkt to prnt
 DC 1. sending a BU pkt. pushUpVec[0]=0. pushUpSet=0,1,2,
 DC 2 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 2 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 2 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 2, lvl=1. placed chains: pot. placed chains: 
+
+DC 2 sending a BU pkt to prnt
+DC 3 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 3 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 3 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 3, lvl=1. placed chains: pot. placed chains: 
+
+DC 3 sending a BU pkt to prnt
+DC 0 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 0. rcvd 1 BU pkts. src=1. pushUpVec[0]=0. pushUpSetSize=3. pushUpSet=2,1,0,
+DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 0, lvl=2. placed chains: pot. placed chains: 
+
+beginning PU. pushUpSet=2,1,0,
+potPlacedChainsIds.size()=0sizeOf pushUpSet=3
+B4 erasing, pushUpSet is: 2,1,0,
+DC 0 placed chain 2
+after erasing, pushUpSet is: 1,0,
+sizeOf pushUpSet=2
+B4 erasing, pushUpSet is: 1,0,
+DC 0 placed chain 0
+after erasing, pushUpSet is: 0,

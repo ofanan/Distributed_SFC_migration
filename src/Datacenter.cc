@@ -203,9 +203,15 @@ void Datacenter::pushUpSync ()
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
 
+
+		snprintf (buf, bufSize, "potPlacedChainsIds.size()=%d", (int)potPlacedChainsIds.size());
+		MyConfig::printToLog(buf);
 		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
 			break;
 		}
+		return;
+		snprintf (buf, bufSize, "chainPtr->id=%d", chainPtr->id);
+		MyConfig::printToLog(buf);
 		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) {
@@ -230,6 +236,7 @@ void Datacenter::pushUpSync ()
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
 			Chain gamad;
+			Should add here a copy C'tor to copy the chain, and re-insert it into the set.
 			gamad.curLvl = lvl;
 			snprintf (buf, bufSize, "sizeOf pushUpSet=%d\n", (int)pushUpSet.size());
 			MyConfig::printToLog(buf);
@@ -243,7 +250,8 @@ void Datacenter::pushUpSync ()
 			MyConfig::printToLog (buf);
 			MyConfig::printToLog ("after erasing, pushUpSet is: ");
 			MyConfig::printToLog (pushUpSet);
-			if (pushUpSet.size()==0) { 
+			if (pushUpSet.size()==0) {
+				MyConfig::printToLog ("breaking\n");
 				break;
 			}
 		}
@@ -302,7 +310,6 @@ void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
-
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); chainPtr++) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
@@ -326,7 +333,6 @@ void Datacenter::bottomUpSync ()
 		}
 	
 	}
-
 	if (newlyPlacedChains.size()>0) {
 		sndPlacementInfoMsg (newlyPlacedChains);
 	}
@@ -386,14 +392,16 @@ void Datacenter::handleBottomUpPktSync ()
 	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
-		unorderedPushUpSet.insert (pkt->getPushUpVec(i));
+//		unorderedPushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
-	snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
-	MyConfig::printToLog (buf);
-	MyConfig::printToLog (pushUpSet);
-	snprintf (buf, bufSize, "unordered pushUpSet size=%d\n", (int)unorderedPushUpSet.size());
-	MyConfig::printToLog(buf);
+	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {
+		snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
+		MyConfig::printToLog (buf);
+		MyConfig::printToLog (pushUpSet);
+	}
+//	snprintf (buf, bufSize, "unordered pushUpSet size=%d\n", (int)unorderedPushUpSet.size());
+//	MyConfig::printToLog(buf);
 //	MyConfig::printToLog(unorderedPushUpSet);
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
