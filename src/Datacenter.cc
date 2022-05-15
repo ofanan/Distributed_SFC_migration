@@ -183,15 +183,15 @@ void Datacenter::handlePushUpPkt ()
 //	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
 	pushUpSet.clear ();
 	pushUpSet.insert (chain);	
-//	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-//		pushUpSet.insert (pkt->getPushUpVec (i));
-//	} 
-//	if (MyConfig::mode==SYNC){ 
-//		pushUpSync ();
-//	}
-//	else {
-//		pushUpAsync ();
-//	}
+	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
+		pushUpSet.insert (pkt->getPushUpVec (i));
+	} 
+	if (MyConfig::mode==SYNC){ 
+		pushUpSync ();
+	}
+	else {
+		pushUpAsync ();
+	}
 }
 
 /*
