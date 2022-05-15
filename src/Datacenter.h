@@ -20,8 +20,7 @@ class Datacenter : public cSimpleModule
 {
   public:
   
-		SetOfChainsOrderedByCpuUsage pushUpSet;
-
+		UnorderedSetOfChains unorderedPushUpSet;
     cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController*/
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
@@ -57,9 +56,10 @@ class Datacenter : public cSimpleModule
     vector <endXmtPkt*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
+		SetOfChainsOrderedByCpuUsage pushUpSet;
+
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
-
     
     void handleSelfMsg    ();
     void sndViaQ         (int16_t portNum, cPacket* pkt2send);

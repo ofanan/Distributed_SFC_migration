@@ -316,6 +316,9 @@ void Datacenter::bottomUpSync ()
 			else {
 				potPlacedChainsIds.insert (chainPtr->id);
 				pushUpSet.insert (*chainPtr);
+				snprintf (buf, bufSize, "DC %d inserting chain %d to pushUpSet\n", id, chainPtr->id);
+				MyConfig::printToLog (buf);
+				MyConfig::printToLog(pushUpSet);
 			}
 		}
 		else if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
@@ -372,6 +375,8 @@ Handle a bottomUP pkt, when running in sync' mode.
 
 void Datacenter::handleBottomUpPktSync ()
 {
+	uint16_t src = ((Datacenter*) curHandledMsg->getSenderModule())->id;
+	
 	bottomUpPkt *pkt = (bottomUpPkt*)(curHandledMsg);
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
@@ -381,8 +386,15 @@ void Datacenter::handleBottomUpPktSync ()
 	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
+		unorderedPushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
+	snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
+	MyConfig::printToLog (buf);
+	MyConfig::printToLog (pushUpSet);
+	snprintf (buf, bufSize, "unordered pushUpSet size=%d\n", (int)unorderedPushUpSet.size());
+	MyConfig::printToLog(buf);
+//	MyConfig::printToLog(unorderedPushUpSet);
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
 		numBuMsgsRcvd = 0;
@@ -426,6 +438,12 @@ void Datacenter::sndBottomUpPkt ()
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
 		MyConfig::printToLog (buf);
+	}
+//	snprintf (buf, bufSize, "DC %d. sending BU pkts. pushUpVec[0]=%d  pushUpSet=", id, pkt2send->getPushUpVec(0).id);
+	if (pushUpSet.size() > 0) {
+		snprintf (buf, bufSize, "DC %d. sending a BU pkt. pushUpVec[0]=%d. pushUpSet=", id, pkt2send->getPushUpVec(0).id);
+		MyConfig::printToLog (buf);
+		MyConfig::printToLog (pushUpSet);
 	}
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 }
