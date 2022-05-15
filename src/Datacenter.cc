@@ -6,15 +6,15 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {
-	return (lhs.getCpu() < rhs.getCpu());
-}
-
 //auto sortChainsByCpuUsage = [](const Chain lhs, const Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };
 
 //inline bool Datacenter::sortChainsByCpuUsage (Chain lhs, Chain rhs) {
 //    return lhs.getCpu() < rhs.getCpu();
 //}
+
+inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {
+    return lhs.getCpu() < rhs.getCpu();
+}
 
 inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) const {return chain.mu_u_len() == this->lvl+1;}
 
@@ -167,7 +167,11 @@ void Datacenter::handleInitBottomUpMsg ()
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage);
+	set <Chain, sortTwoChainsByCpuUsage> gamad;
+	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
+//	set<Chain, decltype(&sortChainsByCpuUsage)> s(&sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
+//	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // Does NOT work, when sortChainsByCpuUsage is defined in MyConfig.h, not as a class member.
+//	set<Chain, decltype(&sortChainsByCpuUsage)> s(&sortChainsByCpuUsage); // Does NOT work, when sortChainsByCpuUsage is defined in this file, not as a class member.
 
 //	std::set<int, decltype(cmp)> s(cmp);
 	

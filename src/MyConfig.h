@@ -22,6 +22,10 @@
 using namespace omnetpp;
 using namespace std;
 
+/*bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {*/
+/*	return (lhs.getCpu() < rhs.getCpu());*/
+/*}*/
+
 const int HEIGHT=5;
 
 const int16_t nonAugmentedCpuAtLvl[HEIGHT] = {10,20,30,40,50};

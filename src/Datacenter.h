@@ -22,8 +22,8 @@ class Datacenter : public cSimpleModule
 {
   public:
   
-/*		set<Chain, decltype(sortChainsByCpuUsage)> s(sortChainsByCpuUsage);*/
-  	// Static (not changed along a sim')
+/*		bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs);*/
+/*		set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage);*/
     cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController*/
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
@@ -81,9 +81,6 @@ class Datacenter : public cSimpleModule
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
-/*		inline static bool 		sortChainsByCpuUsage					(Chain lhs, Chain rhs);*/
-
-/*    inline bool 		sortChainsByCpuUsage 					 (const Chain &lhs, const Chain &rhs);*/
 };
 
 #endif

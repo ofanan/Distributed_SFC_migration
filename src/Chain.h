@@ -102,6 +102,13 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 typedef unordered_set <Chain, ChainHash> SetOfChains;
 
+struct sortTwoChainsByCpuUsage {
+	bool operator () (const Chain lhs, const Chain rhs) const {
+		return (lhs.getCpu() < rhs.getCpu());	
+	} 
+};
+
+
 /*void modifyCurLvl (SetOfChains &setOfChins, const Chain chain, const int8_t curLvl);*/
 /*void SetOfChains::modifyCurLvl (const Chain chain, const int8_t curLvl);*/
 #endif
