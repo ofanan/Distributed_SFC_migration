@@ -288,7 +288,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 
 /*
 Running the PU alg'. 
-Assume that this->pushUpVec already contains the relevant chains.
+Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpAsync ()
 {
@@ -297,7 +297,7 @@ void Datacenter::pushUpAsync ()
 
 /*
 Running the BU alg'. 
-Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, and are sorted.
+Assume that this->notAssigned and this->pushUpSet already contain the relevant chains, and are sorted.
 */
 void Datacenter::bottomUpSync ()
 {
@@ -316,7 +316,6 @@ void Datacenter::bottomUpSync ()
 			}
 			else {
 				potPlacedChainsIds.insert (chainPtr->id);
-				pushUpVec.push_back (*chainPtr);
 				pushUpSet.insert (*chainPtr);
 			}
 		}
@@ -380,7 +379,6 @@ void Datacenter::handleBottomUpPktSync ()
 	}
 	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-		pushUpVec.push_back (pkt->getPushUpVec(i)); // no need and no use to keep the push-up vector sorted for now; 
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
@@ -407,23 +405,6 @@ void Datacenter::bottomUpAsync ()
 
 void Datacenter::sndPushUpPkt () 
 {
-//	uint16_t i;
-//	bottomUpPkt* pkt2send;
-//	for (auto const childId : idOfChildren) {
-//		//find the relevant chains for each child
-//		
-//		//Only if the number of relevant chains > 0...
-//		pkt2send = new pushUpPkt;
-//		pkt2send -> setPushUpVecArraySize (pushUpVec.size());
-//		for (i=0; i<pushUpVec.size(); i++) {
-//			pkt2send->setPushUpVec (i, pushUpVec[i]);
-//		}
-//	
-//	}
-//	
-//	snprintf (buf, bufSize, "DC \%d sending a PU pkt to child\n", id);
-//	MyConfig::printToLog (buf);
-//	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt
 }
 
 void Datacenter::sndBottomUpPkt ()
@@ -436,7 +417,7 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
-	pkt2send -> setPushUpVecArraySize (pushUpVec.size());
+	pkt2send -> setPushUpVecArraySize (pushUpSet.size());
 	for (auto chain : pushUpSet) {
 		pkt2send->setPushUpVec (i++, chain);
 	}
