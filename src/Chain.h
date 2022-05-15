@@ -22,8 +22,10 @@ class Chain
 		const static vector<uint16_t> costOfCpuUnitAtLvl; 
 		int8_t curLvl;        // Level of the datacenter currently hosting me 
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
-    Chain () {};
 
+		// C'tors
+    Chain () {};
+		Chain (const Chain &c);
     Chain (uint32_t id, vector <uint16_t> S_u);
             
     bool operator== (const Chain &right) const {
@@ -42,8 +44,7 @@ class Chain
     bool operator< (const Chain &right) const {
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
-		*/
-		
+		*/		
     uint16_t mu_u_at_lvl (uint8_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     uint16_t mu_u_len () const;
 };

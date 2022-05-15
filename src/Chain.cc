@@ -21,6 +21,14 @@ Chain::Chain (uint32_t id, vector <uint16_t> S_u)
 	curLvl = UNPLACED_;
 };
 
+Chain::Chain (const Chain &c) {
+	this->id 					= c.id;
+  this->S_u 				= c.S_u;
+  this->isRT_Chain 	= c.isRT_Chain;
+  this->curLvl			= c.curLvl;
+}
+
+
 RT_Chain::RT_Chain (uint32_t id, vector <uint16_t> S_u) {
   this->id        	= id;
   this->S_u       	= S_u;

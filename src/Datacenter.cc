@@ -231,31 +231,51 @@ void Datacenter::pushUpSync ()
 	}
 	
 	uint16_t mu_u;
-	for (auto chainPtr=pushUpSet.begin(); chainPtr != pushUpSet.end(); chainPtr++) {
-		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
-			availCpu -= mu_u;
-			Chain gamad;
-			Should add here a copy C'tor to copy the chain, and re-insert it into the set.
-			gamad.curLvl = lvl;
-			snprintf (buf, bufSize, "sizeOf pushUpSet=%d\n", (int)pushUpSet.size());
-			MyConfig::printToLog(buf);
-//			pushUpSet.erase (chainPtr);
-			placedChains.insert (*chainPtr);
-			newlyPlacedChains.push_back (chainPtr->id);
-			MyConfig::printToLog ("B4 erasing, pushUpSet is: ");
-			MyConfig::printToLog (pushUpSet);
-			pushUpSet.erase (pushUpSet.begin());
-			snprintf (buf, bufSize, "DC %d placed chain %d\n", id, (int)(chainPtr->id));
-			MyConfig::printToLog (buf);
-			MyConfig::printToLog ("after erasing, pushUpSet is: ");
-			MyConfig::printToLog (pushUpSet);
-			if (pushUpSet.size()==0) {
-				MyConfig::printToLog ("breaking\n");
-				break;
-			}
+	for (auto chainToPushUp : pushUpSet) {
+	mu_u = requiredCpuToLocallyPlaceChain (chainToPushUp);
+	if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
+		availCpu -= mu_u;
+		Chain pushedUpChain = chainToPushUp;
+		pushedUpChain.curLvl = lvl;
+		placedChains.insert (pushedUpChain);
+		newlyPlacedChains.push_back (pushedUpChain.id);
+		pushUpSet.erase (chainToPushUp);
+
+
+		if (pushUpSet.size()==0) {
+			MyConfig::printToLog ("breaking\n");
+			break;
 		}
 	}
+}
+
+//	for (auto chainPtr=pushUpSet.begin(); chainPtr != pushUpSet.end(); chainPtr++) {
+//		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
+//		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
+//			availCpu -= mu_u;
+//			Chain modifiedChain = *chainPtr;
+//			modifiedChain.curLvl = lvl;
+////			placedChains.insert (modifiedChain);
+////			newlyPlacedChains.push_back (modifiedChain.id);
+//			pushUpSet.erase (chainPtr);
+
+
+////			Should add here a copy C'tor to copy the chain, and re-insert it into the set.
+////			snprintf (buf, bufSize, "sizeOf pushUpSet=%d\n", (int)pushUpSet.size());
+////			MyConfig::printToLog(buf);
+
+////			MyConfig::printToLog ("B4 erasing, pushUpSet is: ");
+////			MyConfig::printToLog (pushUpSet);
+////			snprintf (buf, bufSize, "DC %d placed chain %d\n", id, (int)(chainPtr->id));
+////			MyConfig::printToLog (buf);
+////			MyConfig::printToLog ("after erasing, pushUpSet is: ");
+////			MyConfig::printToLog (pushUpSet);
+//			if (pushUpSet.size()==0) {
+//				MyConfig::printToLog ("breaking\n");
+//				break;
+//			}
+//		}
+//	}
 
 	if (isRoot) {
 		print ();
