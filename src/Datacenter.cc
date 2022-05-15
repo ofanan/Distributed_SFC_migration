@@ -6,6 +6,10 @@ using namespace std;
 
 Define_Module(Datacenter);
 
+inline bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {
+	return (lhs.getCpu() < rhs.getCpu());
+}
+
 inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) const {return chain.mu_u_len() == this->lvl+1;}
 
 inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
@@ -24,10 +28,6 @@ Datacenter::~Datacenter()
       cancelAndDelete (endXmtEvents[i]);
     }
   }
-}
-
-inline bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {
-	return (lhs.getCpu() < rhs.getCpu());
 }
 
 void Datacenter::initialize()
@@ -160,6 +160,12 @@ void Datacenter::handleInitBottomUpMsg ()
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
+
+	auto cmp = [](Chain lhs, Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };
+	set<Chain, decltype(cmp)> s(cmp);
+
+//	std::set<int, decltype(cmp)> s(cmp);
+	
   this -> pushUpVec = {};
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
@@ -225,7 +231,7 @@ void Datacenter::pushUpSync ()
 		}
 	}
 	
-	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage);
+//	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage); //$$$$
 	uint16_t mu_u;
 	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
 		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
@@ -234,11 +240,13 @@ void Datacenter::pushUpSync ()
 			chainPtr->curLvl = lvl;
 			placedChains.insert (*chainPtr);
 			newlyPlacedChains.push_back (chainPtr->id);
-			snprintf (buf, bufSize, "DC %d placed chain %d\n", id, (int)(chainPtr->id));
+			MyConfig::printToLog ("\nB4 erasing, pushUpVec is: ");
+			MyConfig::printToLog (pushUpVec);
+			snprintf (buf, bufSize, "\nDC %d placed chain %d\n", id, (int)(chainPtr->id));
 			MyConfig::printToLog (buf);
 			pushUpVec.erase (chainPtr);
 //			snprintf (buf, bufSize, "after erasing, pushUpVec is: ", id, (int)(chainPtr->id));
-			MyConfig::printToLog ("after erasing, pushUpVec is: ");
+			MyConfig::printToLog ("\nafter erasing, pushUpVec is: ");
 			MyConfig::printToLog (pushUpVec);
 		}
 	}

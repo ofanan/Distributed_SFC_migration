@@ -45,9 +45,15 @@ DC 0 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
 DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
 DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 0, lvl=2. placed chains: pot. placed chains: 
+
+B4 erasing, pushUpVec is: 2,1,0,
 DC 0 placed chain 2
+
+after erasing, pushUpVec is: 1,0,
+B4 erasing, pushUpVec is: 1,0,
 DC 0 placed chain 0
-DC 0, lvl=2. placed chains: 0,2,pot. placed chains: 
+
+after erasing, pushUpVec is: 1,DC 0, lvl=2. placed chains: 0,2,pot. placed chains: 
 DC 0 sending placementInfoMsg
 DC 1 rcvd PU pkt
 DC 2 rcvd PU pkt

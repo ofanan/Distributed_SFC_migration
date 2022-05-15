@@ -77,7 +77,7 @@ class Datacenter : public cSimpleModule
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
-    
+/*    inline bool 		sortChainsByCpuUsage 					 (const Chain &lhs, const Chain &rhs);*/
 };
 
 #endif
