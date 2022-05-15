@@ -160,13 +160,13 @@ void Datacenter::handleInitBottomUpMsg ()
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-  pushUpSet.clear (); // = {};
+  pushUpSet.clear (); 
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
 /*
 Handle a rcvd pushUpPkt:
-- Read the data from the pkt to this->pushUpVec.
+- Read the data from the pkt to this->pushUpSet.
 - Call pushUpSync() | pushUpAsync(), for running the PU alg'.
 */
 void Datacenter::handlePushUpPkt () 
@@ -180,18 +180,18 @@ void Datacenter::handlePushUpPkt ()
 	Chain chain;
 	uint16_t mu_u;
 	
-	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpVec.
-	this->pushUpVec = {};
-	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		this->pushUpVec.push_back (pkt->getPushUpVec (i));
-	} 
-	if (MyConfig::mode==SYNC){ 
-//		sort pushUpVec ();
-		pushUpSync ();
-	}
-	else {
-		pushUpAsync ();
-	}
+//	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
+	pushUpSet.clear ();
+	pushUpSet.insert (chain);	
+//	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
+//		pushUpSet.insert (pkt->getPushUpVec (i));
+//	} 
+//	if (MyConfig::mode==SYNC){ 
+//		pushUpSync ();
+//	}
+//	else {
+//		pushUpAsync ();
+//	}
 }
 
 /*

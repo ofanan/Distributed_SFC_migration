@@ -101,8 +101,12 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 struct sortTwoChainsByCpuUsage {
-	inline bool operator () (const Chain lhs, const Chain rhs) const {
-		return (lhs.getCpu() < rhs.getCpu());	
+	bool operator () (const Chain lhs, const Chain rhs) const {
+		if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return true
+			return true;
+		}
+	  uint8_t lhsCpu = (lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl];
+	  return true;
 	} 
 };
 
