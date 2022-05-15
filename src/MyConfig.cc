@@ -24,7 +24,7 @@ void MyConfig::printToLog (SetOfChainsOrderedByCpuUsage set2print)
 	for (auto chain : set2print) {
 		logFile << chain.id << ",";
 	}
-
+	logFile << endl;
 }
 
 void MyConfig::printToLog (char* buf) 
@@ -47,6 +47,7 @@ void MyConfig::printToLog (vector <Chain> vec)
 	for (const auto chain : vec) {
 		logFile << chain.id << ",";
 	}
+	logFile << endl;
 }
 
 void MyConfig::printToLog (vector <uint16_t> vec) 
@@ -54,6 +55,7 @@ void MyConfig::printToLog (vector <uint16_t> vec)
 	for (const auto i : vec) {
 		logFile << i << ",";
 	}
+	logFile << endl;
 }
 
 void MyConfig::printToLog (vector <uint32_t> vec) 
@@ -61,6 +63,7 @@ void MyConfig::printToLog (vector <uint32_t> vec)
 	for (const auto i : vec) {
 		logFile << i << ",";
 	}
+	logFile << endl;
 }
 
 void MyConfig::printToLog (unordered_set <uint32_t> set2print) 
@@ -68,6 +71,7 @@ void MyConfig::printToLog (unordered_set <uint32_t> set2print)
 	for (const auto i : set2print) {
 		logFile << i << ",";
 	}
+	logFile << endl;
 }
 
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 

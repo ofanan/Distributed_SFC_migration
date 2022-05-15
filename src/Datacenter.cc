@@ -237,12 +237,12 @@ void Datacenter::pushUpSync ()
 //			pushUpSet.erase (chainPtr);
 			placedChains.insert (*chainPtr);
 			newlyPlacedChains.push_back (chainPtr->id);
-			MyConfig::printToLog ("\nB4 erasing, pushUpSet is: ");
+			MyConfig::printToLog ("B4 erasing, pushUpSet is: ");
 			MyConfig::printToLog (pushUpSet);
 			pushUpSet.erase (pushUpSet.begin());
-			snprintf (buf, bufSize, "\nDC %d placed chain %d\n", id, (int)(chainPtr->id));
+			snprintf (buf, bufSize, "DC %d placed chain %d\n", id, (int)(chainPtr->id));
 			MyConfig::printToLog (buf);
-			MyConfig::printToLog ("\nafter erasing, pushUpSet is: ");
+			MyConfig::printToLog ("after erasing, pushUpSet is: ");
 			MyConfig::printToLog (pushUpSet);
 			if (pushUpSet.size()==0) { 
 				break;
