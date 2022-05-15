@@ -1,4 +1,3 @@
-
 #include "Datacenter.h"
 
 using namespace omnetpp;
@@ -148,7 +147,7 @@ void Datacenter::handleMessage (cMessage *msg)
 /*
 Handle a rcvd initBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
-- Empty this->pushUpVec.
+- Empty this->pushUpSet.
 - Call bottomUp, for running the BU alg'.
 */
 void Datacenter::handleInitBottomUpMsg () 
@@ -161,7 +160,7 @@ void Datacenter::handleInitBottomUpMsg ()
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-  this -> pushUpVec = {};
+  pushUpSet.clear (); // = {};
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
