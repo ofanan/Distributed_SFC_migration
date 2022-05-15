@@ -100,13 +100,15 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 */
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
-typedef unordered_set <Chain, ChainHash> SetOfChains;
-
 struct sortTwoChainsByCpuUsage {
 	bool operator () (const Chain lhs, const Chain rhs) const {
 		return (lhs.getCpu() < rhs.getCpu());	
 	} 
 };
+
+typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
+typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
+
 
 
 /*void modifyCurLvl (SetOfChains &setOfChins, const Chain chain, const int8_t curLvl);*/

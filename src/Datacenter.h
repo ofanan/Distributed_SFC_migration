@@ -24,6 +24,8 @@ class Datacenter : public cSimpleModule
   
 /*		bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs);*/
 /*		set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage);*/
+		SetOfChainsOrderedByCpuUsage pushUpSet;
+
     cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController*/
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
@@ -41,7 +43,7 @@ class Datacenter : public cSimpleModule
     // Dynamic
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
-    SetOfChains placedChains; 
+    UnorderedSetOfChains placedChains; 
 /*    vector <uint32_t> */
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
 		uint8_t numBuMsgsRcvd; 

@@ -167,8 +167,8 @@ void Datacenter::handleInitBottomUpMsg ()
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-	set <Chain, sortTwoChainsByCpuUsage> gamad;
-	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
+//	set <Chain, sortTwoChainsByCpuUsage> gamad;
+//	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
 //	set<Chain, decltype(&sortChainsByCpuUsage)> s(&sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
 //	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // Does NOT work, when sortChainsByCpuUsage is defined in MyConfig.h, not as a class member.
 //	set<Chain, decltype(&sortChainsByCpuUsage)> s(&sortChainsByCpuUsage); // Does NOT work, when sortChainsByCpuUsage is defined in this file, not as a class member.
