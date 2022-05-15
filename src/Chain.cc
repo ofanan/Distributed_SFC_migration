@@ -79,12 +79,14 @@ uint16_t Chain::getCpuCost () const
 	return (isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl];
 }
 
-uint16_t Chain::getCpu () const
+inline uint16_t Chain::getCpu () const
 {
 	if (curLvl==UNPLACED_) {
 		return -1;
 	}
-	return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
+	else {
+	  return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
+	}
 }
 
 /*
