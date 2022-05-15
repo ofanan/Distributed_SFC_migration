@@ -196,33 +196,33 @@ void Datacenter::handlePushUpPkt ()
 
 /*
 Running the PU alg'. 
-Assume that this->pushUpVec already contains the relevant chains.
+Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpSync ()
 {
 	reshuffled = true;
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
-	for (auto chainPtr=pushUpVec.begin(); chainPtr<pushUpVec.end(); chainPtr++) {
+	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
 
-		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
-			break;
-		}
-		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
+//		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
+//			break;
+//		}
+//		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
-		if (search==potPlacedChainsIds.end()) {
-			continue; // this chain wasn't pot-placed by me, but by another DC.
-		}
-		
-		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
-		pushUpVec.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
-		
-		if (chainPtr->curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
-			placedChains.insert (*chainPtr);
-			newlyPlacedChains.push_back (chainPtr->id);
-		}
-		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
-			availCpu += requiredCpuToLocallyPlaceChain (*chainPtr); 
-		}
+//		if (search==potPlacedChainsIds.end()) {
+//			continue; // this chain wasn't pot-placed by me, but by another DC.
+//		}
+//		
+//		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
+//		pushUpVec.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
+//		
+//		if (chainPtr->curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
+//			placedChains.insert (*chainPtr);
+//			newlyPlacedChains.push_back (chainPtr->id);
+//		}
+//		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
+//			availCpu += requiredCpuToLocallyPlaceChain (*chainPtr); 
+//		}
 	}
 	
 //	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage); //$$$$
