@@ -16,10 +16,13 @@
 using namespace omnetpp;
 using namespace std;
 
+/*bool sortChainsByCpuUsage = [](const Chain lhs, const Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };*/
+
 class Datacenter : public cSimpleModule
 {
   public:
   
+/*		set<Chain, decltype(sortChainsByCpuUsage)> s(sortChainsByCpuUsage);*/
   	// Static (not changed along a sim')
     cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController*/
   	string networkName;
@@ -58,6 +61,7 @@ class Datacenter : public cSimpleModule
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
+
     
     void handleSelfMsg    ();
     void sndViaQ         (int16_t portNum, cPacket* pkt2send);
@@ -77,6 +81,8 @@ class Datacenter : public cSimpleModule
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
+		static bool cm (Chain lhs, Chain rhs);
+
 /*    inline bool 		sortChainsByCpuUsage 					 (const Chain &lhs, const Chain &rhs);*/
 };
 

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from prepareReshufflePkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/prepareReshufflePkt.msg.
 //
 
 #ifndef __PREPARERESHUFFLEPKT_M_H
@@ -19,7 +19,7 @@
 
 
 /**
- * Class generated from <tt>prepareReshufflePkt.msg:1</tt> by nedtool.
+ * Class generated from <tt>src/prepareReshufflePkt.msg:1</tt> by nedtool.
  * <pre>
  * packet PrepareReshufflePkt
  * {
