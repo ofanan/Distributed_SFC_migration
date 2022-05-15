@@ -47,13 +47,13 @@ DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 0, lvl=2. placed chains: pot. placed chains: 
 sizeOf pushUpSet=2
 
-B4 erasing, pushUpSet is: 2,29078000,
+B4 erasing, pushUpSet is: 2,17072624,
 DC 0 placed chain 2
 
-after erasing, pushUpSet is: 29078000,sizeOf pushUpSet=1
+after erasing, pushUpSet is: 17072624,sizeOf pushUpSet=1
 
-B4 erasing, pushUpSet is: 29078000,
-DC 0 placed chain 29078000
+B4 erasing, pushUpSet is: 17072624,
+DC 0 placed chain 17072624
 
-after erasing, pushUpSet is: DC 0, lvl=2. placed chains: 29078000,2,pot. placed chains: 
+after erasing, pushUpSet is: DC 0, lvl=2. placed chains: 17072624,2,pot. placed chains: 
 DC 0 sending placementInfoMsg

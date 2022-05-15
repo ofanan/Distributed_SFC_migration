@@ -267,12 +267,12 @@ void Datacenter::pushUpSync ()
 
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
-//	pushUpPkt* pkt;	 // the packet to be sent 
-//	uint16_t pushUpVecArraySize;
-//	Chain chain;
-//	for (uint8_t child(0); child<numChildren; child++) { // for each child...
-//		pushUpVecArraySize=0;
-//		pkt = new pushUpPkt;
+	pushUpPkt* pkt;	 // the packet to be sent 
+	uint16_t pushUpVecArraySize;
+	Chain chain;
+	for (uint8_t child(0); child<numChildren; child++) { // for each child...
+		pushUpVecArraySize=0;
+		pkt = new pushUpPkt;
 //		for (uint8_t i(0); i < pushUpVec.size(); i++) {	// consider all the chains in pushUpVec
 //			if (pushUpVec[i].S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 //				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
@@ -282,7 +282,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 //		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
 //			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
 //		}
-//	}
+	}
 }
 
 /*
