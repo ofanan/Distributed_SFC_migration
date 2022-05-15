@@ -230,16 +230,23 @@ void Datacenter::pushUpSync ()
 		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
-			pushUpSet.erase (chainPtr);
-//			chainPtr->curLvl = lvl;
+			Chain gamad;
+			gamad.curLvl = lvl;
+			snprintf (buf, bufSize, "sizeOf pushUpSet=%d\n", (int)pushUpSet.size());
+			MyConfig::printToLog(buf);
+//			pushUpSet.erase (chainPtr);
 			placedChains.insert (*chainPtr);
 			newlyPlacedChains.push_back (chainPtr->id);
-			MyConfig::printToLog ("\nB4 erasing, pushUpVec is: ");
+			MyConfig::printToLog ("\nB4 erasing, pushUpSet is: ");
 			MyConfig::printToLog (pushUpSet);
+			pushUpSet.erase (pushUpSet.begin());
 			snprintf (buf, bufSize, "\nDC %d placed chain %d\n", id, (int)(chainPtr->id));
 			MyConfig::printToLog (buf);
-			MyConfig::printToLog ("\nafter erasing, pushUpVec is: ");
+			MyConfig::printToLog ("\nafter erasing, pushUpSet is: ");
 			MyConfig::printToLog (pushUpSet);
+			if (pushUpSet.size()==0) { 
+				break;
+			}
 		}
 	}
 
@@ -256,42 +263,26 @@ void Datacenter::pushUpSync ()
 	}
 	genNsndPushUpPktsToChildren ();
 	pushUpSet.clear();
-//	pushUpPkt pushUpPktToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
-//	uint16_t pushUpVecArraySize[numChildren];
-//	for (uint8_t child (0); child<numChildren; child++) {pushUpVecArraySize[child]=0;} //reset the array
-//	Chain chain;
-//	for (uint8_t i(0); i < pushUpVec.size(); i++) {
-//		chain = pushUpVec[i];
-//			for (uint8_t child(0); child<numChildren; child++) {
-//		if (chain.S_u[lvl-1]==idOfChildren[child])   { /// find to which child this user belongs. Add a func' for that?
-//			pushUpPktToChild[child].setPushUpVecArraySize (++pushUpVecArraySize[child]);
-//			pushUpPktToChild[child].setPushUpVec (pushUpVecArraySize[child]-1, chain);
-//			break; // found a child to associate this chain with
-//		}		
-//		error ("couldn't associate chain %d with any child\n", chain.id); 
-//		}
-//	}
-	
 }
 
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
-	pushUpPkt* pkt;	 // the packet to be sent 
-	uint16_t pushUpVecArraySize;
-	Chain chain;
-	for (uint8_t child(0); child<numChildren; child++) { // for each child...
-		pushUpVecArraySize=0;
-		pkt = new pushUpPkt;
-		for (uint8_t i(0); i < pushUpVec.size(); i++) {	// consider all the chains in pushUpVec
-			if (pushUpVec[i].S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
-				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
-				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
-			}		
-		}
-		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
-			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
-		}
-	}
+//	pushUpPkt* pkt;	 // the packet to be sent 
+//	uint16_t pushUpVecArraySize;
+//	Chain chain;
+//	for (uint8_t child(0); child<numChildren; child++) { // for each child...
+//		pushUpVecArraySize=0;
+//		pkt = new pushUpPkt;
+//		for (uint8_t i(0); i < pushUpVec.size(); i++) {	// consider all the chains in pushUpVec
+//			if (pushUpVec[i].S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
+//				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
+//				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
+//			}		
+//		}
+//		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+//			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
+//		}
+//	}
 }
 
 /*
@@ -325,6 +316,7 @@ void Datacenter::bottomUpSync ()
 			else {
 				potPlacedChainsIds.insert (chainPtr->id);
 				pushUpVec.push_back (*chainPtr);
+				pushUpSet.insert (*chainPtr);
 			}
 		}
 		else if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
@@ -385,9 +377,10 @@ void Datacenter::handleBottomUpPktSync ()
 	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
 	}
-	// Add each chain stated in the pkt's pushUpVec field into its (sorted) place in this->notAssigned()
+	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpVec.push_back (pkt->getPushUpVec(i)); // no need and no use to keep the push-up vector sorted for now; 
+		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
@@ -398,7 +391,7 @@ void Datacenter::handleBottomUpPktSync ()
 
 /*
 Running the BU alg'. 
-Assume that this->notAssigned and this->pushUpVec already contain the relevant chains, in the correct order.
+Assume that this->notAssigned and this->pushUpSet already contain the relevant chains, in the correct order.
 */
 void Datacenter::bottomUpAsync ()
 {
@@ -443,8 +436,8 @@ void Datacenter::sndBottomUpPkt ()
 	}
 
 	pkt2send -> setPushUpVecArraySize (pushUpVec.size());
-	for (i=0; i<pushUpVec.size(); i++) {
-		pkt2send->setPushUpVec (i, pushUpVec[i]);
+	for (auto chain : pushUpSet) {
+		pkt2send->setPushUpVec (i++, chain);
 	}
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
