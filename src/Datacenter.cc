@@ -225,43 +225,24 @@ void Datacenter::pushUpSync ()
 		}
 	}
 	
-//	sort (pushUpVec.begin(), pushUpVec.end(), & sortChainsByCpuUsage); //$$$$
 	uint16_t mu_u;
-	for (auto chainPtr=pushUpVec.begin(); chainPtr < pushUpVec.end(); chainPtr++) {
+	for (auto chainPtr=pushUpSet.begin(); chainPtr != pushUpSet.end(); chainPtr++) {
 		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
 			availCpu -= mu_u;
-			chainPtr->curLvl = lvl;
+			pushUpSet.erase (chainPtr);
+//			chainPtr->curLvl = lvl;
 			placedChains.insert (*chainPtr);
 			newlyPlacedChains.push_back (chainPtr->id);
 			MyConfig::printToLog ("\nB4 erasing, pushUpVec is: ");
-			MyConfig::printToLog (pushUpVec);
+			MyConfig::printToLog (pushUpSet);
 			snprintf (buf, bufSize, "\nDC %d placed chain %d\n", id, (int)(chainPtr->id));
 			MyConfig::printToLog (buf);
-			pushUpVec.erase (chainPtr);
-//			snprintf (buf, bufSize, "after erasing, pushUpVec is: ", id, (int)(chainPtr->id));
 			MyConfig::printToLog ("\nafter erasing, pushUpVec is: ");
-			MyConfig::printToLog (pushUpVec);
+			MyConfig::printToLog (pushUpSet);
 		}
 	}
-	vector <uint8_t> indicesToErase;
-	
-//	for (uint8_t i(0); i < pushUpVec.size(); i++) {
-//		mu_u = requiredCpuToLocallyPlaceChain (pushUpVec[i]);
-//		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
-//			availCpu -= mu_u;
-//			pushUpVec[i].curLvl = lvl;
-//			placedChains.insert (pushUpVec[i]);
-//			newlyPlacedChains.push_back (pushUpVec[i].id);
-//			indicesToErase.push_back (i);
-////			pushUpVec.erase (pushUpVec.begin() + i);
-//		}
-//	}
 
-////	for (uint8_t i(0); i<indicesToErase.size(); i++) {
-////		pushUpVec.erase (pushUpVec.begin() + i);
-////	}
-	
 	if (isRoot) {
 		print ();
 	}
@@ -269,13 +250,12 @@ void Datacenter::pushUpSync ()
 	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
 
 	if (isLeaf) {
-//		endSimulation ();
 		// $$ Add checks; at this stage, pushUpVec should be empty
 //		error ("arrived back to leaf");
 		return; // finished; this actually concluded the run of the alg'
 	}
 	genNsndPushUpPktsToChildren ();
-	pushUpVec = {};
+	pushUpSet.clear();
 //	pushUpPkt pushUpPktToChild[numChildren];	 //pushUpPktsToChild[c] will hold the packet to be sent to child c
 //	uint16_t pushUpVecArraySize[numChildren];
 //	for (uint8_t child (0); child<numChildren; child++) {pushUpVecArraySize[child]=0;} //reset the array
