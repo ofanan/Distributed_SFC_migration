@@ -12,7 +12,7 @@ Define_Module(Datacenter);
 
 //auto sortChainsByCpuUsage = [](const Chain lhs, const Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };
 
-bool Datacenter::cm (Chain lhs, Chain rhs) {
+bool Datacenter::sortChainsByCpuUsage (Chain lhs, Chain rhs) {
     return lhs.getCpu() < rhs.getCpu();
 }
 
