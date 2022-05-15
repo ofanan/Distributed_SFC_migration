@@ -101,7 +101,7 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 struct sortTwoChainsByCpuUsage {
-	bool operator () (const Chain lhs, const Chain rhs) const {
+	inline bool operator () (const Chain lhs, const Chain rhs) const {
 		return (lhs.getCpu() < rhs.getCpu());	
 	} 
 };

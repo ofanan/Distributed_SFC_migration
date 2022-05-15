@@ -16,14 +16,10 @@
 using namespace omnetpp;
 using namespace std;
 
-/*bool sortChainsByCpuUsage = [](const Chain lhs, const Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };*/
-
 class Datacenter : public cSimpleModule
 {
   public:
   
-/*		bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs);*/
-/*		set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage);*/
 		SetOfChainsOrderedByCpuUsage pushUpSet;
 
     cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController*/

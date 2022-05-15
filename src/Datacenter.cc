@@ -6,12 +6,6 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-//auto sortChainsByCpuUsage = [](const Chain lhs, const Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };
-
-//inline bool Datacenter::sortChainsByCpuUsage (Chain lhs, Chain rhs) {
-//    return lhs.getCpu() < rhs.getCpu();
-//}
-
 inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {
     return lhs.getCpu() < rhs.getCpu();
 }
@@ -167,14 +161,6 @@ void Datacenter::handleInitBottomUpMsg ()
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-//	set <Chain, sortTwoChainsByCpuUsage> gamad;
-//	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
-//	set<Chain, decltype(&sortChainsByCpuUsage)> s(&sortChainsByCpuUsage); // works, when sortChainsByCpuUsage is defined in this file, not as a class member.
-//	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage); // Does NOT work, when sortChainsByCpuUsage is defined in MyConfig.h, not as a class member.
-//	set<Chain, decltype(&sortChainsByCpuUsage)> s(&sortChainsByCpuUsage); // Does NOT work, when sortChainsByCpuUsage is defined in this file, not as a class member.
-
-//	std::set<int, decltype(cmp)> s(cmp);
-	
   this -> pushUpVec = {};
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
