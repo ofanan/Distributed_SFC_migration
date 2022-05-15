@@ -6,15 +6,15 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-//inline bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {
-//	return (lhs.getCpu() < rhs.getCpu());
-//}
+bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {
+	return (lhs.getCpu() < rhs.getCpu());
+}
 
 //auto sortChainsByCpuUsage = [](const Chain lhs, const Chain rhs) { return lhs.getCpu() < rhs.getCpu(); };
 
-bool Datacenter::sortChainsByCpuUsage (Chain lhs, Chain rhs) {
-    return lhs.getCpu() < rhs.getCpu();
-}
+//inline bool Datacenter::sortChainsByCpuUsage (Chain lhs, Chain rhs) {
+//    return lhs.getCpu() < rhs.getCpu();
+//}
 
 inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) const {return chain.mu_u_len() == this->lvl+1;}
 
@@ -167,7 +167,7 @@ void Datacenter::handleInitBottomUpMsg ()
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-//	set<Chain, decltype(sortChainsByCpuUsage)> s(sortChainsByCpuUsage);
+	set<Chain, decltype(sortChainsByCpuUsage)*> s(sortChainsByCpuUsage);
 
 //	std::set<int, decltype(cmp)> s(cmp);
 	
