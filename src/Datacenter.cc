@@ -248,7 +248,9 @@ void Datacenter::pushUpSync ()
 		print ();
 	}
 
-	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
+	if (isLeaf || newlyPlacedChains.size()>0) {  // If there are new chains placement to report to the sim ctrlr; or, M I a leaf (which should inform the sim' ctlr in any case)? 
+		sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
+	}
 
 	if (isLeaf) {
 		if (MyConfig::DEBUG_LVL > 0) {
@@ -348,9 +350,6 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 {
 
 	uint16_t numOfNewlyPlacedChains = newlyPlacedChains.size ();
-	if (numOfNewlyPlacedChains==0) {
-		return; // no new chains were placed during the last run
-	}
 	placementInfoMsg* msg = new placementInfoMsg;
 
 	msg -> setNewlyPlacedChainsArraySize (numOfNewlyPlacedChains);

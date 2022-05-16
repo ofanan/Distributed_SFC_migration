@@ -80,14 +80,23 @@ DC 1 rcvd PU pkt
 DC 2 rcvd PU pkt
 DC 3 rcvd PU pkt
 DC 6 rcvd PU pkt
+DC 6 sending placementInfoMsg
 DC 4 rcvd PU pkt
+DC 4 sending placementInfoMsg
 DC 5 rcvd PU pkt
+DC 5 sending placementInfoMsg
 DC 9 rcvd PU pkt
+DC 9 sending placementInfoMsg
 DC 7 rcvd PU pkt
+DC 7 sending placementInfoMsg
 DC 8 rcvd PU pkt
+DC 8 sending placementInfoMsg
 DC 12 rcvd PU pkt
+DC 12 sending placementInfoMsg
 DC 10 rcvd PU pkt
+DC 10 sending placementInfoMsg
 DC 11 rcvd PU pkt
+DC 11 sending placementInfoMsg
 DC 0, lvl=2. placed chains: 0,1,2,
 pot. placed chains: 
 DC 1, lvl=1. placed chains: 

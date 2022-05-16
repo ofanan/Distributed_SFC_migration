@@ -24,6 +24,8 @@ void SimController::initialize (int stage)
 	openFiles ();
 	checkParams ();
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
+	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
+	rcvdFinishedAlgMsgFromLeaves = {false};
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
 	int leafId = 0;
