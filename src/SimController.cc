@@ -467,6 +467,9 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("rcvd fin alg msg from all leaves ******************\n");
+//			for (auto datacenter : datacenters) {
+//				datacenter -> print ();
+//			}
 		}
 	}
 }

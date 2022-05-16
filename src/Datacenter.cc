@@ -183,8 +183,11 @@ void Datacenter::handlePushUpPkt ()
 	
 //	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
 	pushUpSet.clear ();
+	snprintf (buf, bufSize, "pkt->getPushUpVecArraySize()=%d\n", pkt->getPushUpVecArraySize());
+	printBufToLog ();
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
+		error ("within loop");
 	} 
 	if (MyConfig::mode==SYNC){ 
 		pushUpSync ();
@@ -209,11 +212,17 @@ void Datacenter::pushUpSync ()
 		}
 		return;
 
+		snprintf (buf, bufSize, "in pushUpSync: chain id =%d\n", chainPtr->id);
+		printBufToLog();
+		endSimulation ();
 		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) {
 			continue; // this chain wasn't pot-placed by me, but by another DC.
 		}
+		
+		snprintf (buf, bufSize, "after erasing, potPlacedChainsIds.size=%d\n", (int)potPlacedChainsIds.size());
+		printBufToLog();
 		
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
@@ -244,8 +253,10 @@ void Datacenter::pushUpSync ()
 	}
 }
 
-	if (isRoot) {
-		print ();
+	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+		if (isRoot) {
+			print ();
+		}
 	}
 
 	if (newlyPlacedChains.size()>0) {  // If there are new chains placement to report to the sim ctrlr; or, M I a leaf (which should inform the sim' ctlr in any case)? 
@@ -262,6 +273,7 @@ void Datacenter::pushUpSync ()
 			}
 		}
 		return; // finished; this actually concluded the run of the alg'
+	
 	}
 	genNsndPushUpPktsToChildren ();
 	pushUpSet.clear();
@@ -272,6 +284,18 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 	pushUpPkt* pkt;	 // the packet to be sent 
 	uint16_t pushUpVecArraySize;
 	Chain chain;
+	snprintf (buf, bufSize, "From root: Id of childrens are %d, %d, %d\n", idOfChildren[0], idOfChildren[1], idOfChildren[2]);
+	printBufToLog();
+	for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
+		MyConfig::printToLog ("S_u of this chain is\n");
+		MyConfig::printToLog (chain.S_u);
+	}
+	
+	endSimulation ();
+	
+//	snprintf (buf, bufSize, "b4 sending to children: pushUpSet.size()=%d\n", (int)pushUpSet.size());
+//	printBufToLog();
+//	endSimulation ();
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pushUpVecArraySize=0;
 		pkt = new pushUpPkt;
@@ -306,9 +330,21 @@ void Datacenter::bottomUpSync ()
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); chainPtr++) {
+		snprintf (buf, bufSize, "chain %d: ", chainPtr->id);
+		printBufToLog(); 
+		MyConfig::printToLog ("S_u of this chain is\n");
+		MyConfig::printToLog (chainPtr->S_u);
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
+				snprintf (buf, bufSize, "b4 erasing: chain %d: ", chainPtr->id);
+				printBufToLog(); 
+				MyConfig::printToLog ("S_u of this chain is\n");
+				MyConfig::printToLog (chainPtr->S_u);
 			notAssigned.erase(chainPtr);
+				snprintf (buf, bufSize, "after erasing: chain %d: ", chainPtr->id);
+				printBufToLog(); 
+				MyConfig::printToLog ("S_u of this chain is\n");
+				MyConfig::printToLog (chainPtr->S_u);
 			availCpu -= mu_u;
 			chainPtr -> curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
@@ -317,7 +353,17 @@ void Datacenter::bottomUpSync ()
 			}
 			else {
 				potPlacedChainsIds.insert (chainPtr->id);
+				Chain chainCopy = *chainPtr;
+				snprintf (buf, bufSize, "b4 inserting: chain %d: ", chainPtr->id);
+				printBufToLog(); 
+				MyConfig::printToLog ("S_u of this chain is\n");
+				MyConfig::printToLog (chainPtr->S_u);
 				pushUpSet.insert (*chainPtr);
+				snprintf (buf, bufSize, "after inserting: chain %d: ", chainPtr->id);
+				printBufToLog(); 
+				MyConfig::printToLog ("S_u of this chain is\n");
+				MyConfig::printToLog (chainPtr->S_u);
+				endSimulation ();
 				if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 					snprintf (buf, bufSize, "DC %d inserting chain %d to pushUpSet\n", id, chainPtr->id);
 					printBufToLog ();
