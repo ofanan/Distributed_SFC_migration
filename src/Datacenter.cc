@@ -85,8 +85,8 @@ void Datacenter::print ()
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChainsIds);
 	
-	MyConfig::printToLog ("\n");
 }
+
 /*
  * Currently, the only self-message is the one indicating the end of the transmission of a pkt.
  * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
@@ -120,14 +120,14 @@ void Datacenter::handleMessage (cMessage *msg)
 		}  
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
-			MyConfig::printToLog (buf);
-		  handleInitBottomUpMsg ();
+			printBufToLog ();
 		}
+		handleInitBottomUpMsg ();
   }
   else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
-			MyConfig::printToLog (buf);
+			printBufToLog ();
 		}
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
@@ -136,7 +136,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
   {
-    prepareReshuffleSync ();
+    if (MyConfig::mode==SYNC) { prepareReshuffleSync ();} {reshuffleAsync();}
   }
   else
   {
@@ -175,7 +175,7 @@ void Datacenter::handlePushUpPkt ()
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "DC %d rcvd PU pkt\n", id);
-		MyConfig::printToLog (buf);
+		printBufToLog ();
 	}
   pushUpPkt *pkt = (pushUpPkt*) this->curHandledMsg;
 	Chain chain;
@@ -204,15 +204,11 @@ void Datacenter::pushUpSync ()
 	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
 
-
-		snprintf (buf, bufSize, "potPlacedChainsIds.size()=%d", (int)potPlacedChainsIds.size());
-		MyConfig::printToLog(buf);
 		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
 			break;
 		}
 		return;
-		snprintf (buf, bufSize, "chainPtr->id=%d", chainPtr->id);
-		MyConfig::printToLog(buf);
+
 		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) {
@@ -288,7 +284,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 }
 
 /*
-Running the PU alg'. 
+Running the PU Async' alg'. 
 Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpAsync ()
@@ -317,9 +313,11 @@ void Datacenter::bottomUpSync ()
 			else {
 				potPlacedChainsIds.insert (chainPtr->id);
 				pushUpSet.insert (*chainPtr);
-				snprintf (buf, bufSize, "DC %d inserting chain %d to pushUpSet\n", id, chainPtr->id);
-				MyConfig::printToLog (buf);
-				MyConfig::printToLog(pushUpSet);
+				if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+					snprintf (buf, bufSize, "DC %d inserting chain %d to pushUpSet\n", id, chainPtr->id);
+					printBufToLog ();
+					MyConfig::printToLog(pushUpSet);
+				}
 			}
 		}
 		else if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
@@ -335,8 +333,10 @@ void Datacenter::bottomUpSync ()
 	}
 
   if (isRoot) { 
-  	MyConfig::printToLog ("beginning PU. pushUpSet=");
-  	MyConfig::printToLog (pushUpSet);
+		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+			MyConfig::printToLog ("beginning PU. pushUpSet=");
+			MyConfig::printToLog (pushUpSet);
+		}
   	pushUpSync ();
   }
   else {
@@ -360,10 +360,9 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
-		MyConfig::printToLog (buf);
+		printBufToLog ();
 	}
 	sendDirect (msg, simController, "directMsgsPort");
-
 }
 
 /*
@@ -390,13 +389,12 @@ void Datacenter::handleBottomUpPktSync ()
 	}
 	numBuMsgsRcvd++;
 	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {
-		snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
-		MyConfig::printToLog (buf);
-		MyConfig::printToLog (pushUpSet);
+		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
+			MyConfig::printToLog (buf);
+			MyConfig::printToLog (pushUpSet);
+		}
 	}
-//	snprintf (buf, bufSize, "unordered pushUpSet size=%d\n", (int)unorderedPushUpSet.size());
-//	MyConfig::printToLog(buf);
-//	MyConfig::printToLog(unorderedPushUpSet);
 	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
 		numBuMsgsRcvd = 0;
@@ -440,14 +438,18 @@ void Datacenter::sndBottomUpPkt ()
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
 		MyConfig::printToLog (buf);
+		if (pushUpSet.size() > 0) {
+			snprintf (buf, bufSize, "DC %d. sending a BU pkt. pushUpVec[0]=%d. pushUpSet=", id, pkt2send->getPushUpVec(0).id);
+			MyConfig::printToLog (buf);
+			MyConfig::printToLog (pushUpSet);
+		}
 	}
-//	snprintf (buf, bufSize, "DC %d. sending BU pkts. pushUpVec[0]=%d  pushUpSet=", id, pkt2send->getPushUpVec(0).id);
-	if (pushUpSet.size() > 0) {
-		snprintf (buf, bufSize, "DC %d. sending a BU pkt. pushUpVec[0]=%d. pushUpSet=", id, pkt2send->getPushUpVec(0).id);
-		MyConfig::printToLog (buf);
-		MyConfig::printToLog (pushUpSet);
-	}
+
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+}
+
+void Datacenter::reshuffleAsync ()
+{
 }
 
 void Datacenter::prepareReshuffleSync () 

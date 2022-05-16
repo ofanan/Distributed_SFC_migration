@@ -72,6 +72,7 @@ class Datacenter : public cSimpleModule
     void pushUpSync        			();
     void pushUpAsync       			();
     void prepareReshuffleSync 	();
+		void reshuffleAsync					();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
