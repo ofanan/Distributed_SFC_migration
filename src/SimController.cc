@@ -447,6 +447,7 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 
 void SimController::handleFinishedAlgMsg (cMessage *msg)
 {
+	uint16_t src = ((Datacenter*) msg->getSenderModule())->id;
 }
 
 void SimController::handleMessage (cMessage *msg)
