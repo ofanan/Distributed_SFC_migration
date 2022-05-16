@@ -76,6 +76,7 @@ class Datacenter : public cSimpleModule
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
     void genNsndPushUpPktsToChildren ();
+    inline void     printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 

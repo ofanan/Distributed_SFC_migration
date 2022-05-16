@@ -75,11 +75,12 @@ void Datacenter::initialize()
 void Datacenter::print ()
 {
 	snprintf (buf, bufSize, "DC %d, lvl=%d. placed chains: ", id, lvl);
-	MyConfig::printToLog (buf);
-
-	for (const Chain chain : placedChains) {
-			MyConfig::printToLog (chain.id);		
-	}
+	printBufToLog ();
+	MyConfig::printToLog (placedChains);
+	
+//	for (const Chain chain : placedChains) {
+//			MyConfig::printToLog (chain.id);		
+//	}
 	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChainsIds);
@@ -92,16 +93,16 @@ void Datacenter::print ()
  */
 void Datacenter::handleSelfMsg ()
 {
-    endXmtPkt *end_xmt_pkt = (endXmtPkt*) curHandledMsg;
-    int16_t portNum = end_xmt_pkt -> getPortNum();
-    endXmtEvents[portNum] = nullptr;
-    if (outputQ[portNum].isEmpty()) {
-        return;
-    }
+  endXmtPkt *end_xmt_pkt = (endXmtPkt*) curHandledMsg;
+  int16_t portNum = end_xmt_pkt -> getPortNum();
+  endXmtEvents[portNum] = nullptr;
+  if (outputQ[portNum].isEmpty()) {
+      return;
+  }
 
-    // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
-    cPacket* pkt2send = (cPacket*) outputQ[portNum].pop();
-    xmt (portNum, pkt2send);
+  // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
+  cPacket* pkt2send = (cPacket*) outputQ[portNum].pop();
+  xmt (portNum, pkt2send);
 }
 
 
@@ -194,7 +195,7 @@ void Datacenter::handlePushUpPkt ()
 }
 
 /*
-Running the PU alg'. 
+Run the PU Sync alg'. 
 Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpSync ()
@@ -233,49 +234,19 @@ void Datacenter::pushUpSync ()
 	uint16_t mu_u;
 	for (auto chainToPushUp : pushUpSet) {
 	mu_u = requiredCpuToLocallyPlaceChain (chainToPushUp);
-	if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
+	if (mu_u <= availCpu) { // If "this" has enough place for this chain, then push-it up to me, and locally place it
 		availCpu -= mu_u;
-		Chain pushedUpChain = chainToPushUp;
+		Chain pushedUpChain = chainToPushUp; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
 		pushedUpChain.curLvl = lvl;
 		placedChains.insert (pushedUpChain);
 		newlyPlacedChains.push_back (pushedUpChain.id);
-		pushUpSet.erase (chainToPushUp);
+		pushUpSet.erase (chainToPushUp); // remove the push-upped chain from the set of potentially pushed-up chains
 
-
-		if (pushUpSet.size()==0) {
-			MyConfig::printToLog ("breaking\n");
+		if (pushUpSet.size()==0) { // No more potentially pushed-up chains to consider
 			break;
 		}
 	}
 }
-
-//	for (auto chainPtr=pushUpSet.begin(); chainPtr != pushUpSet.end(); chainPtr++) {
-//		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
-//		if (mu_u <= availCpu) { // If I've enough place for this chain, then push-it up to me, and locally place it
-//			availCpu -= mu_u;
-//			Chain modifiedChain = *chainPtr;
-//			modifiedChain.curLvl = lvl;
-////			placedChains.insert (modifiedChain);
-////			newlyPlacedChains.push_back (modifiedChain.id);
-//			pushUpSet.erase (chainPtr);
-
-
-////			Should add here a copy C'tor to copy the chain, and re-insert it into the set.
-////			snprintf (buf, bufSize, "sizeOf pushUpSet=%d\n", (int)pushUpSet.size());
-////			MyConfig::printToLog(buf);
-
-////			MyConfig::printToLog ("B4 erasing, pushUpSet is: ");
-////			MyConfig::printToLog (pushUpSet);
-////			snprintf (buf, bufSize, "DC %d placed chain %d\n", id, (int)(chainPtr->id));
-////			MyConfig::printToLog (buf);
-////			MyConfig::printToLog ("after erasing, pushUpSet is: ");
-////			MyConfig::printToLog (pushUpSet);
-//			if (pushUpSet.size()==0) {
-//				MyConfig::printToLog ("breaking\n");
-//				break;
-//			}
-//		}
-//	}
 
 	if (isRoot) {
 		print ();
@@ -284,8 +255,11 @@ void Datacenter::pushUpSync ()
 	sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
 
 	if (isLeaf) {
-		// $$ Add checks; at this stage, pushUpVec should be empty
-//		error ("arrived back to leaf");
+		if (MyConfig::DEBUG_LVL > 0) {
+			if (!pushUpSet.empty()) {
+				error ("pushUpSet isn't empty after running pushUp() on a leaf");
+			}
+		}
 		return; // finished; this actually concluded the run of the alg'
 	}
 	genNsndPushUpPktsToChildren ();

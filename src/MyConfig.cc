@@ -19,6 +19,14 @@ void MyConfig::openFiles()
 //	return logFile;
 //}
 
+void MyConfig::printToLog (UnorderedSetOfChains set2print)
+{
+	for (auto chain : set2print) {
+		logFile << chain.id << ",";
+	}
+	logFile << endl;
+}
+
 void MyConfig::printToLog (SetOfChainsOrderedByCpuUsage set2print)
 {
 	for (auto chain : set2print) {
