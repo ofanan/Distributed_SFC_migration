@@ -23,6 +23,7 @@
 #include "initBottomUpMsg_m.h"
 #include "leftChainsMsg_m.h"
 #include "placementInfoMsg_m.h"
+#include "finishedAlgMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -79,6 +80,7 @@ class SimController : public cSimpleModule
 		
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
+		void handleFinishedAlgMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
     

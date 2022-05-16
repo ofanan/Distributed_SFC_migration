@@ -426,10 +426,6 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 	int16_t  curLvl;
 	uint32_t chainId;
 
-//	if (getNewlyPlacedChainsArraySize()==0) { // This is actually an empty msg, informing that the BU prot' arrived back to a leaf
-//	}
-//rcvdFinishedAlgMsg
-
 	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsArraySize()); i++) {
 		
 		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
@@ -449,6 +445,10 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 	}
 }
 
+void SimController::handleFinishedAlgMsg (cMessage *msg)
+{
+}
+
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
@@ -459,6 +459,9 @@ void SimController::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
   	handlePlacementInfoMsg (msg);
+  }
+  else if (dynamic_cast<finishedAlgMsg*> (msg)) { 
+  	handleFinishedAlgMsg (msg);
   }
   else {
   	error ("Rcvd unknown msg type");

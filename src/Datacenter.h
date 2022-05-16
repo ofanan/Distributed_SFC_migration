@@ -5,13 +5,15 @@
 #include <omnetpp.h>
 #include <vector>
 #include <set>
+
+#include "MyConfig.h"
 #include "endXmtPkt_m.h"
 #include "bottomUpPkt_m.h"
 #include "initBottomUpMsg_m.h"
 #include "placementInfoMsg_m.h"
 #include "pushUpPkt_m.h"
 #include "prepareReshufflePkt_m.h"
-#include "MyConfig.h"
+#include "finishedAlgMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;

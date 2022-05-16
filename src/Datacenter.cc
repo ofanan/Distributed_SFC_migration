@@ -253,7 +253,9 @@ void Datacenter::pushUpSync ()
 	}
 
 	if (isLeaf) {
-		cMessage *finishedAlgMsg;
+		finishedAlgMsg *msg2send = new finishedAlgMsg;
+		sendDirect (msg2send, simController, "directMsgsPort");
+		
 		if (MyConfig::DEBUG_LVL > 0) {
 			if (!pushUpSet.empty()) {
 				error ("pushUpSet isn't empty after running pushUp() on a leaf");
@@ -292,7 +294,7 @@ Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpAsync ()
 {
-    pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
+  pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
 }
 
 /*
