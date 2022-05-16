@@ -1,3 +1,4 @@
+alias k=kill
 alias .='pwd'
 alias so='source'
 alias c='clear'

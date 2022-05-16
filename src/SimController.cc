@@ -28,11 +28,15 @@ void SimController::initialize (int stage)
 	rcvdFinishedAlgMsgFromLeaves = {false};
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
-	int leafId = 0;
+	uint16_t leafId = 0;
 	for (int dc(0); dc<numDatacenters; dc++) {
 	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
 	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
-	    leaves[leafId++] = datacenters[dc];
+	    leaves[leafId] = datacenters[dc];
+	    datacenters[dc]->leafId = leafId;
+	    snprintf (buf, bufSize, "leafId = %d\n", leafId);
+	    printBufToLog ();
+	    leafId++;
 	  }
 	}
 	discoverPathsToRoot ();
@@ -447,7 +451,24 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 
 void SimController::handleFinishedAlgMsg (cMessage *msg)
 {
-	uint16_t src = ((Datacenter*) msg->getSenderModule())->id;
+	uint16_t leafId = ((Datacenter*) (msg->getSenderModule()) )->leafId;
+	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "rcvd fin alg msg from DC %d leaf %d\n", ((Datacenter*) (msg->getSenderModule()) )->id, leafId);
+		MyConfig::printToLog (buf);
+	}
+	
+	bool rcvdFinishedAlgMsgFromAllLeaves = true;
+	for (uint16_t i(0); i < numLeaves; i++) {
+		if (!rcvdFinishedAlgMsgFromLeaves[i]) {
+			rcvdFinishedAlgMsgFromAllLeaves = false;
+		}
+	}
+	if (rcvdFinishedAlgMsgFromAllLeaves) {
+		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+			MyConfig::printToLog ("rcvd fin alg msg from all leaves ******************\n");
+		}
+	}
 }
 
 void SimController::handleMessage (cMessage *msg)

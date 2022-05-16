@@ -34,6 +34,7 @@ class Datacenter : public cSimpleModule
     bool isRoot;
     bool isLeaf;
     int16_t id;
+    int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1
 		static const uint16_t bufSize = 128;
 		char buf[bufSize];
     
