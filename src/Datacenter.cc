@@ -248,11 +248,12 @@ void Datacenter::pushUpSync ()
 		print ();
 	}
 
-	if (isLeaf || newlyPlacedChains.size()>0) {  // If there are new chains placement to report to the sim ctrlr; or, M I a leaf (which should inform the sim' ctlr in any case)? 
+	if (newlyPlacedChains.size()>0) {  // If there are new chains placement to report to the sim ctrlr; or, M I a leaf (which should inform the sim' ctlr in any case)? 
 		sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
 	}
 
 	if (isLeaf) {
+		cMessage *finishedAlgMsg;
 		if (MyConfig::DEBUG_LVL > 0) {
 			if (!pushUpSet.empty()) {
 				error ("pushUpSet isn't empty after running pushUp() on a leaf");

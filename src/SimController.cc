@@ -166,6 +166,7 @@ void SimController::concludeTimeStep ()
 //	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
+	rcvdFinishedAlgMsgFromLeaves = {false};
 	
 	if (MyConfig::LOG_LVL > 1) {
 		printAllDatacenters 					 ();
@@ -418,6 +419,36 @@ void SimController::initAlgAsync () {
 	}
 }
 
+void SimController::handlePlacementInfoMsg (cMessage *msg)
+{
+	placementInfoMsg* curHandledMsg = (placementInfoMsg*) (msg);
+	Chain chain;
+	int16_t  curLvl;
+	uint32_t chainId;
+
+//	if (getNewlyPlacedChainsArraySize()==0) { // This is actually an empty msg, informing that the BU prot' arrived back to a leaf
+//	}
+//rcvdFinishedAlgMsg
+
+	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsArraySize()); i++) {
+		
+		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
+		chainId 			= curHandledMsg -> getNewlyPlacedChains (i);
+		if (!(findChainInSet (allChains, chainId, chain))) {
+			error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
+
+		}
+		else {
+			if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
+				numMigs++; // Yep --> inc. the mig. cntr.
+			}
+			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+			chain.curLvl = curLvl;
+			allChains.insert (chain);
+		}
+	}
+}
+
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
@@ -427,28 +458,7 @@ void SimController::handleMessage (cMessage *msg)
 		}
   }
   else if (dynamic_cast<placementInfoMsg*> (msg)) { 
-  	placementInfoMsg* msg2handle = (placementInfoMsg*) (msg);
-  	Chain chain;
-  	int16_t  curLvl;
-  	uint32_t chainId;
-
-  	for (uint16_t i(0); i< (uint16_t) (msg2handle -> getNewlyPlacedChainsArraySize()); i++) {
-  		
-  		curLvl = ((Datacenter*)msg->getSenderModule())->lvl; 
-  		chainId 			= msg2handle -> getNewlyPlacedChains (i);
-			if (!(findChainInSet (allChains, chainId, chain))) {
-				error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
-
-			}
-			else {
-				if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
-					numMigs++; // Yep --> inc. the mig. cntr.
-				}
-				allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-				chain.curLvl = curLvl;
-				allChains.insert (chain);
-			}
-  	}
+  	handlePlacementInfoMsg (msg);
   }
   else {
   	error ("Rcvd unknown msg type");
