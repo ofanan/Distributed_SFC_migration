@@ -183,11 +183,8 @@ void Datacenter::handlePushUpPkt ()
 	
 //	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
 	pushUpSet.clear ();
-	snprintf (buf, bufSize, "pkt->getPushUpVecArraySize()=%d\n", pkt->getPushUpVecArraySize());
-	printBufToLog ();
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
-		error ("within loop");
 	} 
 	if (MyConfig::mode==SYNC){ 
 		pushUpSync ();
@@ -204,7 +201,7 @@ Assume that this->pushUpSet already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 	reshuffled = true;
-	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
+	vector <uint16_t> newlyPlacedChainsIds; // will hold the IDs of all the chains that this
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
 
 		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
@@ -225,7 +222,7 @@ void Datacenter::pushUpSync ()
 		
 		if (modifiedChain.curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
 			placedChains.insert (modifiedChain);
-			newlyPlacedChains.push_back (modifiedChain.id);
+			newlyPlacedChainsIds.push_back (modifiedChain.id);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
 		}
@@ -239,7 +236,7 @@ void Datacenter::pushUpSync ()
 		Chain pushedUpChain = chainToPushUp; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
 		pushedUpChain.curLvl = lvl;
 		placedChains.insert (pushedUpChain);
-		newlyPlacedChains.push_back (pushedUpChain.id);
+		newlyPlacedChainsIds.push_back (pushedUpChain.id);
 		pushUpSet.erase (chainToPushUp); // remove the push-upped chain from the set of potentially pushed-up chains
 
 		if (pushUpSet.size()==0) { // No more potentially pushed-up chains to consider
@@ -254,8 +251,8 @@ void Datacenter::pushUpSync ()
 		}
 	}
 
-	if (newlyPlacedChains.size()>0) {  // If there are new chains placement to report to the sim ctrlr; or, M I a leaf (which should inform the sim' ctlr in any case)? 
-		sndPlacementInfoMsg (newlyPlacedChains); // inform the centrl ctrlr about the newly-placed chains
+	if (newlyPlacedChainsIds.size()>0) {  // If there are new chains placement to report to the sim ctrlr; or, M I a leaf (which should inform the sim' ctlr in any case)? 
+		sndPlacementInfoMsg (newlyPlacedChainsIds); // inform the centrl ctrlr about the newly-placed chains
 	}
 
 	if (isLeaf) {
@@ -320,7 +317,7 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
-	vector <uint16_t> newlyPlacedChains; // will hold the IDs of all the chains that this
+	vector <uint16_t> newlyPlacedChainsIds; // will hold the IDs of all the chains that this
 	Chain modifiedChain; // the modified chain, to be pushed to datastructures
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); chainPtr++) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
@@ -331,7 +328,7 @@ void Datacenter::bottomUpSync ()
 				modifiedChain.curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				placedChains.insert (modifiedChain);
-				newlyPlacedChains.push_back (modifiedChain.id);
+				newlyPlacedChainsIds.push_back (modifiedChain.id);
 			}
 			else {
 				potPlacedChainsIds.insert (modifiedChain.id);
@@ -343,8 +340,8 @@ void Datacenter::bottomUpSync ()
 		}
 	
 	}
-	if (newlyPlacedChains.size()>0) {
-		sndPlacementInfoMsg (newlyPlacedChains);
+	if (newlyPlacedChainsIds.size()>0) {
+		sndPlacementInfoMsg (newlyPlacedChainsIds);
 	}
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		this -> print ();
@@ -362,15 +359,15 @@ void Datacenter::bottomUpSync ()
   }
 }
 
-void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChains)
+void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChainsIds)
 {
 
-	uint16_t numOfNewlyPlacedChains = newlyPlacedChains.size ();
+	uint16_t numOfNewlyPlacedChains = newlyPlacedChainsIds.size ();
 	placementInfoMsg* msg = new placementInfoMsg;
 
-	msg -> setNewlyPlacedChainsArraySize (numOfNewlyPlacedChains);
+	msg -> setNewlyPlacedChainsIdsArraySize (numOfNewlyPlacedChains);
 	for (uint16_t i=0; i<numOfNewlyPlacedChains; i++) {
-		msg->setNewlyPlacedChains (i, newlyPlacedChains[i]);
+		msg->setNewlyPlacedChainsIds (i, newlyPlacedChainsIds[i]);
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -400,7 +397,6 @@ void Datacenter::handleBottomUpPktSync ()
 	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
-//		unorderedPushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	numBuMsgsRcvd++;
 	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {

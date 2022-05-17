@@ -430,10 +430,10 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 	int16_t  curLvl;
 	uint32_t chainId;
 
-	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsArraySize()); i++) {
+	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsIdsArraySize()); i++) {
 		
 		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
-		chainId 			= curHandledMsg -> getNewlyPlacedChains (i);
+		chainId 			= curHandledMsg -> getNewlyPlacedChainsIds (i);
 		if (!(findChainInSet (allChains, chainId, chain))) {
 			error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
 

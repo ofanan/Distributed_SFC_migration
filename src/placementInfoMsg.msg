@@ -8,7 +8,6 @@ class noncobject Chain;
 
 message placementInfoMsg
 {
-  uint32_t newlyPlacedChains[]; // A list of chains that the sending datacenter has just placed.
+  uint32_t newlyPlacedChainsIds[]; // A list of chains that the sending datacenter has just placed.
 }
-
 

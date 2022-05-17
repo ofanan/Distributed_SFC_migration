@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/placementInfoMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from placementInfoMsg.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -181,20 +181,20 @@ Register_Class(placementInfoMsg)
 
 placementInfoMsg::placementInfoMsg(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
 {
-    newlyPlacedChains_arraysize = 0;
-    this->newlyPlacedChains = 0;
+    newlyPlacedChainsIds_arraysize = 0;
+    this->newlyPlacedChainsIds = 0;
 }
 
 placementInfoMsg::placementInfoMsg(const placementInfoMsg& other) : ::omnetpp::cMessage(other)
 {
-    newlyPlacedChains_arraysize = 0;
-    this->newlyPlacedChains = 0;
+    newlyPlacedChainsIds_arraysize = 0;
+    this->newlyPlacedChainsIds = 0;
     copy(other);
 }
 
 placementInfoMsg::~placementInfoMsg()
 {
-    delete [] this->newlyPlacedChains;
+    delete [] this->newlyPlacedChainsIds;
 }
 
 placementInfoMsg& placementInfoMsg::operator=(const placementInfoMsg& other)
@@ -207,61 +207,61 @@ placementInfoMsg& placementInfoMsg::operator=(const placementInfoMsg& other)
 
 void placementInfoMsg::copy(const placementInfoMsg& other)
 {
-    delete [] this->newlyPlacedChains;
-    this->newlyPlacedChains = (other.newlyPlacedChains_arraysize==0) ? nullptr : new uint32_t[other.newlyPlacedChains_arraysize];
-    newlyPlacedChains_arraysize = other.newlyPlacedChains_arraysize;
-    for (unsigned int i=0; i<newlyPlacedChains_arraysize; i++)
-        this->newlyPlacedChains[i] = other.newlyPlacedChains[i];
+    delete [] this->newlyPlacedChainsIds;
+    this->newlyPlacedChainsIds = (other.newlyPlacedChainsIds_arraysize==0) ? nullptr : new uint32_t[other.newlyPlacedChainsIds_arraysize];
+    newlyPlacedChainsIds_arraysize = other.newlyPlacedChainsIds_arraysize;
+    for (unsigned int i=0; i<newlyPlacedChainsIds_arraysize; i++)
+        this->newlyPlacedChainsIds[i] = other.newlyPlacedChainsIds[i];
 }
 
 void placementInfoMsg::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
-    b->pack(newlyPlacedChains_arraysize);
-    doParsimArrayPacking(b,this->newlyPlacedChains,newlyPlacedChains_arraysize);
+    b->pack(newlyPlacedChainsIds_arraysize);
+    doParsimArrayPacking(b,this->newlyPlacedChainsIds,newlyPlacedChainsIds_arraysize);
 }
 
 void placementInfoMsg::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
-    delete [] this->newlyPlacedChains;
-    b->unpack(newlyPlacedChains_arraysize);
-    if (newlyPlacedChains_arraysize==0) {
-        this->newlyPlacedChains = 0;
+    delete [] this->newlyPlacedChainsIds;
+    b->unpack(newlyPlacedChainsIds_arraysize);
+    if (newlyPlacedChainsIds_arraysize==0) {
+        this->newlyPlacedChainsIds = 0;
     } else {
-        this->newlyPlacedChains = new uint32_t[newlyPlacedChains_arraysize];
-        doParsimArrayUnpacking(b,this->newlyPlacedChains,newlyPlacedChains_arraysize);
+        this->newlyPlacedChainsIds = new uint32_t[newlyPlacedChainsIds_arraysize];
+        doParsimArrayUnpacking(b,this->newlyPlacedChainsIds,newlyPlacedChainsIds_arraysize);
     }
 }
 
-void placementInfoMsg::setNewlyPlacedChainsArraySize(unsigned int size)
+void placementInfoMsg::setNewlyPlacedChainsIdsArraySize(unsigned int size)
 {
-    uint32_t *newlyPlacedChains2 = (size==0) ? nullptr : new uint32_t[size];
-    unsigned int sz = newlyPlacedChains_arraysize < size ? newlyPlacedChains_arraysize : size;
+    uint32_t *newlyPlacedChainsIds2 = (size==0) ? nullptr : new uint32_t[size];
+    unsigned int sz = newlyPlacedChainsIds_arraysize < size ? newlyPlacedChainsIds_arraysize : size;
     for (unsigned int i=0; i<sz; i++)
-        newlyPlacedChains2[i] = this->newlyPlacedChains[i];
+        newlyPlacedChainsIds2[i] = this->newlyPlacedChainsIds[i];
     for (unsigned int i=sz; i<size; i++)
-        newlyPlacedChains2[i] = 0;
-    newlyPlacedChains_arraysize = size;
-    delete [] this->newlyPlacedChains;
-    this->newlyPlacedChains = newlyPlacedChains2;
+        newlyPlacedChainsIds2[i] = 0;
+    newlyPlacedChainsIds_arraysize = size;
+    delete [] this->newlyPlacedChainsIds;
+    this->newlyPlacedChainsIds = newlyPlacedChainsIds2;
 }
 
-unsigned int placementInfoMsg::getNewlyPlacedChainsArraySize() const
+unsigned int placementInfoMsg::getNewlyPlacedChainsIdsArraySize() const
 {
-    return newlyPlacedChains_arraysize;
+    return newlyPlacedChainsIds_arraysize;
 }
 
-uint32_t placementInfoMsg::getNewlyPlacedChains(unsigned int k) const
+uint32_t placementInfoMsg::getNewlyPlacedChainsIds(unsigned int k) const
 {
-    if (k>=newlyPlacedChains_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", newlyPlacedChains_arraysize, k);
-    return this->newlyPlacedChains[k];
+    if (k>=newlyPlacedChainsIds_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", newlyPlacedChainsIds_arraysize, k);
+    return this->newlyPlacedChainsIds[k];
 }
 
-void placementInfoMsg::setNewlyPlacedChains(unsigned int k, uint32_t newlyPlacedChains)
+void placementInfoMsg::setNewlyPlacedChainsIds(unsigned int k, uint32_t newlyPlacedChainsIds)
 {
-    if (k>=newlyPlacedChains_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", newlyPlacedChains_arraysize, k);
-    this->newlyPlacedChains[k] = newlyPlacedChains;
+    if (k>=newlyPlacedChainsIds_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", newlyPlacedChainsIds_arraysize, k);
+    this->newlyPlacedChainsIds[k] = newlyPlacedChainsIds;
 }
 
 class placementInfoMsgDescriptor : public omnetpp::cClassDescriptor
@@ -355,7 +355,7 @@ const char *placementInfoMsgDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "newlyPlacedChains",
+        "newlyPlacedChainsIds",
     };
     return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
@@ -364,7 +364,7 @@ int placementInfoMsgDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='n' && strcmp(fieldName, "newlyPlacedChains")==0) return base+0;
+    if (fieldName[0]=='n' && strcmp(fieldName, "newlyPlacedChainsIds")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -418,7 +418,7 @@ int placementInfoMsgDescriptor::getFieldArraySize(void *object, int field) const
     }
     placementInfoMsg *pp = (placementInfoMsg *)object; (void)pp;
     switch (field) {
-        case 0: return pp->getNewlyPlacedChainsArraySize();
+        case 0: return pp->getNewlyPlacedChainsIdsArraySize();
         default: return 0;
     }
 }
@@ -447,7 +447,7 @@ std::string placementInfoMsgDescriptor::getFieldValueAsString(void *object, int 
     }
     placementInfoMsg *pp = (placementInfoMsg *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getNewlyPlacedChains(i));
+        case 0: return ulong2string(pp->getNewlyPlacedChainsIds(i));
         default: return "";
     }
 }
@@ -462,7 +462,7 @@ bool placementInfoMsgDescriptor::setFieldValueAsString(void *object, int field, 
     }
     placementInfoMsg *pp = (placementInfoMsg *)object; (void)pp;
     switch (field) {
-        case 0: pp->setNewlyPlacedChains(i,string2ulong(value)); return true;
+        case 0: pp->setNewlyPlacedChainsIds(i,string2ulong(value)); return true;
         default: return false;
     }
 }
