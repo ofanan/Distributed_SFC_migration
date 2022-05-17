@@ -228,6 +228,12 @@ void Datacenter::pushUpSync ()
 		}
 	}
 	
+	if (isRoot) {
+		snprintf (buf, bufSize, "currently, pushUpSetSize=%d\n", (int)pushUpSet.size());
+		printBufToLog();
+		endSimulation();
+	}
+	
 	uint16_t mu_u;
 	for (auto chainToPushUp : pushUpSet) {
 	mu_u = requiredCpuToLocallyPlaceChain (chainToPushUp);
@@ -276,14 +282,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 	pushUpPkt* pkt;	 // the packet to be sent 
 	uint16_t pushUpVecArraySize;
 	Chain chain;
-	snprintf (buf, bufSize, "From root: Id of childrens are %d, %d, %d\n", idOfChildren[0], idOfChildren[1], idOfChildren[2]);
-	printBufToLog();
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
-			MyConfig::printToLog ("S_u of this chain is\n");
-			MyConfig::printToLog (chain.S_u);
-		}
-	}
 	
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pushUpVecArraySize=0;
@@ -302,7 +300,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 }
 
 /*
-Running the PU Async' alg'. 
+Run the PU Async' alg'. 
 Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpAsync ()
@@ -418,12 +416,6 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 */
 void Datacenter::bottomUpAsync ()
 {
- //  bottomUpPkt *pkt = (bottomUpPkt*)curHandledMsg;
-//  delete (pkt);
-//	  mu_u = chain.mu_u_at_lvl(lvl);
-//	  if (mu_u <= availCpu) {
-//	  	chain.nxtDatacenter = id;
-//	  }
 	sndBottomUpPkt ();
 }
 
