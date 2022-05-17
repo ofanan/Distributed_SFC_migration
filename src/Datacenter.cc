@@ -202,7 +202,7 @@ void Datacenter::pushUpSync ()
 {
 	reshuffled = true;
 	vector <uint16_t> newlyPlacedChainsIds; // will hold the IDs of all the chains that this
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
+	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 
 		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
 			break;
@@ -213,13 +213,13 @@ void Datacenter::pushUpSync ()
 		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) {
+			chainPtr++;
 			continue; // this chain wasn't pot-placed by me, but by another DC.
 		}
 		
 		modifiedChain = *chainPtr;
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
-		pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
-		
+		chainPtr = pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		if (modifiedChain.curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
 			placedChains.insert (modifiedChain);
 			newlyPlacedChainsIds.push_back (modifiedChain.id);
@@ -228,28 +228,22 @@ void Datacenter::pushUpSync ()
 		}
 	}
 	
-	if (isRoot) {
-		snprintf (buf, bufSize, "currently, pushUpSetSize=%d\n", (int)pushUpSet.size());
-		printBufToLog();
-		endSimulation();
-	}
-	
 	uint16_t mu_u;
-	for (auto chainToPushUp : pushUpSet) {
-	mu_u = requiredCpuToLocallyPlaceChain (chainToPushUp);
-	if (mu_u <= availCpu) { // If "this" has enough place for this chain, then push-it up to me, and locally place it
-		availCpu -= mu_u;
-		Chain pushedUpChain = chainToPushUp; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
-		pushedUpChain.curLvl = lvl;
-		placedChains.insert (pushedUpChain);
-		newlyPlacedChainsIds.push_back (pushedUpChain.id);
-		pushUpSet.erase (chainToPushUp); // remove the push-upped chain from the set of potentially pushed-up chains
+	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
+		if (mu_u <= availCpu) { // If "this" has enough place for this chain, then push-it up to me, and locally place it
+			availCpu -= mu_u;
+			Chain pushedUpChain = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
+			pushedUpChain.curLvl = lvl;
+			placedChains.insert (pushedUpChain);
+			newlyPlacedChainsIds.push_back (pushedUpChain.id);
+			chainPtr = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains
 
-		if (pushUpSet.size()==0) { // No more potentially pushed-up chains to consider
-			break;
+			if (pushUpSet.empty()) { // No more potentially pushed-up chains to consider
+				break;
+			}
 		}
 	}
-}
 
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		if (isRoot) {

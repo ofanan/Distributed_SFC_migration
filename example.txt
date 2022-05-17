@@ -76,5 +76,61 @@ DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 0, lvl=2. placed chains: 
 pot. placed chains: 
 beginning PU. pushUpSet=2,1,0,
-currently, pushUpSetSize=3
+id=0: b4 erasing, pushUpSetSize=3
+id=0: after erasing, pushUpSetSize=2
+id=0: b4 erasing, pushUpSetSize=2
+id=0: after erasing, pushUpSetSize=1
+id=0: b4 erasing, pushUpSetSize=1
+id=0: after erasing, pushUpSetSize=0
+DC 0, lvl=2. placed chains: 0,1,2,
+pot. placed chains: 
+DC 0 sending placementInfoMsg
+DC 1 rcvd PU pkt
+DC 2 rcvd PU pkt
+DC 3 rcvd PU pkt
+DC 6 rcvd PU pkt
+DC 4 rcvd PU pkt
+DC 5 rcvd PU pkt
+DC 9 rcvd PU pkt
+DC 7 rcvd PU pkt
+DC 8 rcvd PU pkt
+DC 12 rcvd PU pkt
+DC 10 rcvd PU pkt
+DC 11 rcvd PU pkt
+rcvd fin alg msg from DC 0 leaf 2
+rcvd fin alg msg from DC 0 leaf 0
+rcvd fin alg msg from DC 0 leaf 1
+rcvd fin alg msg from DC 0 leaf 5
+rcvd fin alg msg from DC 0 leaf 3
+rcvd fin alg msg from DC 0 leaf 4
+rcvd fin alg msg from DC 0 leaf 8
+rcvd fin alg msg from DC 0 leaf 6
+rcvd fin alg msg from DC 0 leaf 7
+rcvd fin alg msg from all leaves ******************
+DC 0, lvl=2. placed chains: 0,1,2,
+pot. placed chains: 
+DC 1, lvl=1. placed chains: 
+pot. placed chains: 
+DC 2, lvl=1. placed chains: 
+pot. placed chains: 
+DC 3, lvl=1. placed chains: 
+pot. placed chains: 
+DC 4, lvl=0. placed chains: 
+pot. placed chains: 0,
+DC 5, lvl=0. placed chains: 
+pot. placed chains: 1,
+DC 6, lvl=0. placed chains: 
+pot. placed chains: 2,
+DC 7, lvl=0. placed chains: 
+pot. placed chains: 
+DC 8, lvl=0. placed chains: 
+pot. placed chains: 
+DC 9, lvl=0. placed chains: 
+pot. placed chains: 
+DC 10, lvl=0. placed chains: 
+pot. placed chains: 
+DC 11, lvl=0. placed chains: 
+pot. placed chains: 
+DC 12, lvl=0. placed chains: 
+pot. placed chains: 
 finished sim
