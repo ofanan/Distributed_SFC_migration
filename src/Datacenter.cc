@@ -76,15 +76,9 @@ void Datacenter::print ()
 {
 	snprintf (buf, bufSize, "DC %d, lvl=%d. placed chains: ", id, lvl);
 	printBufToLog ();
-	MyConfig::printToLog (placedChains);
-	
-//	for (const Chain chain : placedChains) {
-//			MyConfig::printToLog (chain.id);		
-//	}
-	
+	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChainsIds);
-	
 }
 
 /*
@@ -223,9 +217,6 @@ void Datacenter::pushUpSync ()
 			continue; 
 		}
 		
-//		snprintf (buf, bufSize, "chainPtr->S_u=\n");
-//		printBufToLog();
-//		MyConfig::printToLog (chainPtr->S_u);
 		modifiedChain = *chainPtr;
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		chainPtr = pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
@@ -252,26 +243,10 @@ void Datacenter::pushUpSync ()
 			pushedUpChain.curLvl = lvl;
 			placedChains.insert (pushedUpChain);
 			newlyPlacedChainsIds.push_back (pushedUpChain.id);
-//			snprintf (buf, bufSize, "chainPtr->S_u=\n");
-//			printBufToLog();
-//			MyConfig::printToLog (chainPtr->S_u);
 			chainPtr = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains
 			pushUpSet.insert (pushedUpChain);
 		}
 	}
-
-//	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-//		if (isRoot) {
-//			snprintf (buf, bufSize, "current size of pushUpSet=%d\n", (int)pushUpSet.size());
-//			printBufToLog ();
-//			for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
-//				snprintf (buf, bufSize, "dc %d: chain.S_u=\n", id);
-//				printBufToLog();
-//				MyConfig::printToLog (chain.S_u);
-//			}
-//			print ();
-//		}
-//	}
 
 	if (isLeaf) {
 		finishedAlgMsg *msg2send = new finishedAlgMsg;
@@ -309,11 +284,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			}		
 		}
 		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
-//			if (idOfChildren[child]==1) {
-//				snprintf (buf, bufSize, "sending to 1 pushUpVec size=%d\n", (int)pushUpVecArraySize);
-//				printBufToLog ();
-//				endSimulation ();
-//			}
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
 		}
 	}
@@ -341,9 +311,6 @@ void Datacenter::bottomUpSync ()
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
 				modifiedChain = *chainPtr;
-//				snprintf (buf, bufSize, "In bottomUpSync. modifiedChain.S_u=\n");
-//				printBufToLog();
-//				MyConfig::printToLog (modifiedChain.S_u);
 				chainPtr = notAssigned.erase(chainPtr);
 				availCpu -= mu_u;
 				modifiedChain.curLvl = lvl;
@@ -518,6 +485,5 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
-
 
 
