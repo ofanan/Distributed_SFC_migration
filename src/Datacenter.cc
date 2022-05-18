@@ -128,15 +128,32 @@ void Datacenter::handleMessage (cMessage *msg)
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
-  else if (dynamic_cast<PrepareReshufflePkt*>(curHandledMsg) != nullptr)
+  else if (dynamic_cast<PrepareReshUpSyncPkt*>(curHandledMsg) != nullptr)
   {
-    if (MyConfig::mode==SYNC) { prepareReshuffleSync ();} {reshuffleAsync();}
+  	if (isRoot) {
+//  		prepareReshDwn ();
+  	}
+  	else { // merely redirect the prepare resh req to parent
+  		prepareReshUpSync ();
+  	}
+  	
   }
   else
   {
     error ("rcvd a pkt  of an unknown type");
   }
   delete (curHandledMsg);
+}
+
+
+void Datacenter::prepareReshUpSync ()
+{
+	PrepareReshUpSyncPkt* pkt;
+	sndViaQ (portToPrnt, pkt);
+}
+
+void Datacenter::prepareReshDwnSync ()
+{
 }
 
 /*
@@ -149,13 +166,15 @@ void Datacenter::handleInitBottomUpMsg ()
 {
 
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
+
+  pushUpSet.	clear (); 
+  notAssigned.clear ();
 	
 	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
-  pushUpSet.clear (); 
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
@@ -175,8 +194,9 @@ void Datacenter::handlePushUpPkt ()
 	Chain chain;
 	uint16_t mu_u;
 	
-//	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
-	pushUpSet.clear ();
+	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
+	pushUpSet.	clear ();
+	notAssigned.clear (); // As we're already in the push-up phase, no need to keep anymore the "notAssigned" set.
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
 	} 
@@ -281,7 +301,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			}		
 		}
 		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
-			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
+			sndViaQ (portOfChild(child), pkt); //send the PU pkt to that child
 		}
 	}
 }
@@ -322,7 +342,7 @@ void Datacenter::bottomUpSync ()
 		}
 		else { 
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				prepareReshuffleSync ();
+				prepareReshUpSync ();
 			}
 			else {
 				chainPtr++;
@@ -444,9 +464,6 @@ void Datacenter::reshuffleAsync ()
 {
 }
 
-void Datacenter::prepareReshuffleSync () 
-{
-}
 
 /*
  * Send the given packet.

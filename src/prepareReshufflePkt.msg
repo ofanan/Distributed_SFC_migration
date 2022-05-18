@@ -1,2 +1,0 @@
-packet PrepareReshufflePkt {
-}

@@ -12,7 +12,8 @@
 #include "initBottomUpMsg_m.h"
 #include "placementInfoMsg_m.h"
 #include "pushUpPkt_m.h"
-#include "prepareReshufflePkt_m.h"
+#include "prepareReshUpSyncPkt_m.h"
+#include "prepareReshDownSyncPkt_m.h"
 #include "finishedAlgMsg_m.h"
 
 using namespace omnetpp;
@@ -52,6 +53,7 @@ class Datacenter : public cSimpleModule
     void print ();
     
   private:
+  	static const uint8_t portToPrnt=0;
   	bool 							reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     vector <cQueue>     outputQ;
     vector <cChannel*>  xmtChnl;
@@ -73,7 +75,8 @@ class Datacenter : public cSimpleModule
     void bottomUpAsync  			  ();
     void pushUpSync        			();
     void pushUpAsync       			();
-    void prepareReshuffleSync 	();
+    void prepareReshUpSync		 	();
+    void prepareReshDwnSync		 	();
 		void reshuffleAsync					();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();

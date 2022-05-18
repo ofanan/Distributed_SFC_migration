@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/prepareReshufflePkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from prepareReshDownSyncPkt.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "prepareReshufflePkt_m.h"
+#include "prepareReshDownSyncPkt_m.h"
 
 namespace omnetpp {
 
@@ -177,22 +177,27 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
     return out;
 }
 
-Register_Class(PrepareReshufflePkt)
+Register_Class(prepareReshSyncDownPkt)
 
-PrepareReshufflePkt::PrepareReshufflePkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
+prepareReshSyncDownPkt::prepareReshSyncDownPkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
+    notAssigned_arraysize = 0;
+    this->notAssigned = 0;
 }
 
-PrepareReshufflePkt::PrepareReshufflePkt(const PrepareReshufflePkt& other) : ::omnetpp::cPacket(other)
+prepareReshSyncDownPkt::prepareReshSyncDownPkt(const prepareReshSyncDownPkt& other) : ::omnetpp::cPacket(other)
 {
+    notAssigned_arraysize = 0;
+    this->notAssigned = 0;
     copy(other);
 }
 
-PrepareReshufflePkt::~PrepareReshufflePkt()
+prepareReshSyncDownPkt::~prepareReshSyncDownPkt()
 {
+    delete [] this->notAssigned;
 }
 
-PrepareReshufflePkt& PrepareReshufflePkt::operator=(const PrepareReshufflePkt& other)
+prepareReshSyncDownPkt& prepareReshSyncDownPkt::operator=(const prepareReshSyncDownPkt& other)
 {
     if (this==&other) return *this;
     ::omnetpp::cPacket::operator=(other);
@@ -200,27 +205,70 @@ PrepareReshufflePkt& PrepareReshufflePkt::operator=(const PrepareReshufflePkt& o
     return *this;
 }
 
-void PrepareReshufflePkt::copy(const PrepareReshufflePkt& other)
+void prepareReshSyncDownPkt::copy(const prepareReshSyncDownPkt& other)
 {
+    delete [] this->notAssigned;
+    this->notAssigned = (other.notAssigned_arraysize==0) ? nullptr : new Chain[other.notAssigned_arraysize];
+    notAssigned_arraysize = other.notAssigned_arraysize;
+    for (unsigned int i=0; i<notAssigned_arraysize; i++)
+        this->notAssigned[i] = other.notAssigned[i];
 }
 
-void PrepareReshufflePkt::parsimPack(omnetpp::cCommBuffer *b) const
+void prepareReshSyncDownPkt::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
+    b->pack(notAssigned_arraysize);
+    doParsimArrayPacking(b,this->notAssigned,notAssigned_arraysize);
 }
 
-void PrepareReshufflePkt::parsimUnpack(omnetpp::cCommBuffer *b)
+void prepareReshSyncDownPkt::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
+    delete [] this->notAssigned;
+    b->unpack(notAssigned_arraysize);
+    if (notAssigned_arraysize==0) {
+        this->notAssigned = 0;
+    } else {
+        this->notAssigned = new Chain[notAssigned_arraysize];
+        doParsimArrayUnpacking(b,this->notAssigned,notAssigned_arraysize);
+    }
 }
 
-class PrepareReshufflePktDescriptor : public omnetpp::cClassDescriptor
+void prepareReshSyncDownPkt::setNotAssignedArraySize(unsigned int size)
+{
+    Chain *notAssigned2 = (size==0) ? nullptr : new Chain[size];
+    unsigned int sz = notAssigned_arraysize < size ? notAssigned_arraysize : size;
+    for (unsigned int i=0; i<sz; i++)
+        notAssigned2[i] = this->notAssigned[i];
+    notAssigned_arraysize = size;
+    delete [] this->notAssigned;
+    this->notAssigned = notAssigned2;
+}
+
+unsigned int prepareReshSyncDownPkt::getNotAssignedArraySize() const
+{
+    return notAssigned_arraysize;
+}
+
+Chain& prepareReshSyncDownPkt::getNotAssigned(unsigned int k)
+{
+    if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
+    return this->notAssigned[k];
+}
+
+void prepareReshSyncDownPkt::setNotAssigned(unsigned int k, const Chain& notAssigned)
+{
+    if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
+    this->notAssigned[k] = notAssigned;
+}
+
+class prepareReshSyncDownPktDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
   public:
-    PrepareReshufflePktDescriptor();
-    virtual ~PrepareReshufflePktDescriptor();
+    prepareReshSyncDownPktDescriptor();
+    virtual ~prepareReshSyncDownPktDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -242,24 +290,24 @@ class PrepareReshufflePktDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(PrepareReshufflePktDescriptor)
+Register_ClassDescriptor(prepareReshSyncDownPktDescriptor)
 
-PrepareReshufflePktDescriptor::PrepareReshufflePktDescriptor() : omnetpp::cClassDescriptor("PrepareReshufflePkt", "omnetpp::cPacket")
+prepareReshSyncDownPktDescriptor::prepareReshSyncDownPktDescriptor() : omnetpp::cClassDescriptor("prepareReshSyncDownPkt", "omnetpp::cPacket")
 {
     propertynames = nullptr;
 }
 
-PrepareReshufflePktDescriptor::~PrepareReshufflePktDescriptor()
+prepareReshSyncDownPktDescriptor::~prepareReshSyncDownPktDescriptor()
 {
     delete[] propertynames;
 }
 
-bool PrepareReshufflePktDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool prepareReshSyncDownPktDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<PrepareReshufflePkt *>(obj)!=nullptr;
+    return dynamic_cast<prepareReshSyncDownPkt *>(obj)!=nullptr;
 }
 
-const char **PrepareReshufflePktDescriptor::getPropertyNames() const
+const char **prepareReshSyncDownPktDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -270,19 +318,19 @@ const char **PrepareReshufflePktDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *PrepareReshufflePktDescriptor::getProperty(const char *propertyname) const
+const char *prepareReshSyncDownPktDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int PrepareReshufflePktDescriptor::getFieldCount() const
+int prepareReshSyncDownPktDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 0+basedesc->getFieldCount() : 0;
+    return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int PrepareReshufflePktDescriptor::getFieldTypeFlags(int field) const
+unsigned int prepareReshSyncDownPktDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -290,10 +338,13 @@ unsigned int PrepareReshufflePktDescriptor::getFieldTypeFlags(int field) const
             return basedesc->getFieldTypeFlags(field);
         field -= basedesc->getFieldCount();
     }
-    return 0;
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISARRAY | FD_ISCOMPOUND,
+    };
+    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *PrepareReshufflePktDescriptor::getFieldName(int field) const
+const char *prepareReshSyncDownPktDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -301,16 +352,21 @@ const char *PrepareReshufflePktDescriptor::getFieldName(int field) const
             return basedesc->getFieldName(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    static const char *fieldNames[] = {
+        "notAssigned",
+    };
+    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
 
-int PrepareReshufflePktDescriptor::findField(const char *fieldName) const
+int prepareReshSyncDownPktDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount() : 0;
+    if (fieldName[0]=='n' && strcmp(fieldName, "notAssigned")==0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *PrepareReshufflePktDescriptor::getFieldTypeString(int field) const
+const char *prepareReshSyncDownPktDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -318,10 +374,13 @@ const char *PrepareReshufflePktDescriptor::getFieldTypeString(int field) const
             return basedesc->getFieldTypeString(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    static const char *fieldTypeStrings[] = {
+        "Chain",
+    };
+    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **PrepareReshufflePktDescriptor::getFieldPropertyNames(int field) const
+const char **prepareReshSyncDownPktDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -334,7 +393,7 @@ const char **PrepareReshufflePktDescriptor::getFieldPropertyNames(int field) con
     }
 }
 
-const char *PrepareReshufflePktDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *prepareReshSyncDownPktDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -347,7 +406,7 @@ const char *PrepareReshufflePktDescriptor::getFieldProperty(int field, const cha
     }
 }
 
-int PrepareReshufflePktDescriptor::getFieldArraySize(void *object, int field) const
+int prepareReshSyncDownPktDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -355,13 +414,14 @@ int PrepareReshufflePktDescriptor::getFieldArraySize(void *object, int field) co
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
+    prepareReshSyncDownPkt *pp = (prepareReshSyncDownPkt *)object; (void)pp;
     switch (field) {
+        case 0: return pp->getNotAssignedArraySize();
         default: return 0;
     }
 }
 
-const char *PrepareReshufflePktDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *prepareReshSyncDownPktDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -369,13 +429,13 @@ const char *PrepareReshufflePktDescriptor::getFieldDynamicTypeString(void *objec
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
+    prepareReshSyncDownPkt *pp = (prepareReshSyncDownPkt *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string PrepareReshufflePktDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string prepareReshSyncDownPktDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -383,13 +443,14 @@ std::string PrepareReshufflePktDescriptor::getFieldValueAsString(void *object, i
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
+    prepareReshSyncDownPkt *pp = (prepareReshSyncDownPkt *)object; (void)pp;
     switch (field) {
+        case 0: {std::stringstream out; out << pp->getNotAssigned(i); return out.str();}
         default: return "";
     }
 }
 
-bool PrepareReshufflePktDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool prepareReshSyncDownPktDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -397,13 +458,13 @@ bool PrepareReshufflePktDescriptor::setFieldValueAsString(void *object, int fiel
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
+    prepareReshSyncDownPkt *pp = (prepareReshSyncDownPkt *)object; (void)pp;
     switch (field) {
         default: return false;
     }
 }
 
-const char *PrepareReshufflePktDescriptor::getFieldStructName(int field) const
+const char *prepareReshSyncDownPktDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -411,10 +472,13 @@ const char *PrepareReshufflePktDescriptor::getFieldStructName(int field) const
             return basedesc->getFieldStructName(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    switch (field) {
+        case 0: return omnetpp::opp_typename(typeid(Chain));
+        default: return nullptr;
+    };
 }
 
-void *PrepareReshufflePktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *prepareReshSyncDownPktDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -422,8 +486,9 @@ void *PrepareReshufflePktDescriptor::getFieldStructValuePointer(void *object, in
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    PrepareReshufflePkt *pp = (PrepareReshufflePkt *)object; (void)pp;
+    prepareReshSyncDownPkt *pp = (prepareReshSyncDownPkt *)object; (void)pp;
     switch (field) {
+        case 0: return (void *)(&pp->getNotAssigned(i)); break;
         default: return nullptr;
     }
 }
