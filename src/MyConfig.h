@@ -65,8 +65,9 @@ class MyConfig { //: public cSimpleModule {
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <uint32_t> vec); // print a vec of integers to the log file
 		static void printToLog (unordered_set <uint32_t> set2print);
-		static void printToLog (SetOfChainsOrderedByCpuUsage set2print);
+		static void printToLog (SetOfChainsOrderedByCpuUsage setOfChains, bool printS_u=true);
 		static void printToLog (UnorderedSetOfChains set2print);
+		static void printSuToLog (Chain chain);
 		// returns the scalar product of two vectors
 /*		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);*/
 		

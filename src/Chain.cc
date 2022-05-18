@@ -41,6 +41,21 @@ Non_RT_Chain::Non_RT_Chain (uint32_t id, vector <uint16_t> S_u) {
   this->isRT_Chain 	= false;
 };
 
+void Chain::print (bool printS_u)
+{
+	uint8_t bufSize = 128;
+	char buf[bufSize];
+	snprintf (buf, bufSize, "chain %d", id);
+	MyConfig::printToLog (buf);
+	if (printS_u) {
+		MyConfig::printToLog (": S_u=");
+		MyConfig::printToLog (S_u);
+	}
+	else {
+		MyConfig::printToLog ("\n");	
+	}
+}
+
 uint16_t Chain::mu_u_len () const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;

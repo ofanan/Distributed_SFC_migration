@@ -196,20 +196,6 @@ int SimController::calcSolCpuCost ()
 	return cpuCost;
 }
 
-// Print a data about a single chain to a requested output file.
-void SimController::printChain (ofstream &outFile, const Chain &chain, bool printSu=true)
-{
-	outFile << "chain " << chain.id;
-	if (printSu) {
-		outFile << " S_u=";
-		for (auto it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
-			outFile << *it << ";";
-		}
-	}
-	outFile << endl;
-}
-
-
 
 // Print all the chains. Default: print only the chains IDs. 
 void SimController::printAllChains (ofstream &outFile, bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
@@ -290,7 +276,7 @@ void SimController::readNewChainsLine (string line)
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		if (rand () < RT_chain_rand_int) {
-			chain = RT_Chain (chainId, vector<uint16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len-1}); 
+			chain = RT_Chain (chainId, vector<uint16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len}); 
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
@@ -319,7 +305,7 @@ void SimController::readOldChainsLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   uint32_t chainId;
   uint16_t poaId;
-	Chain chain; // will hold the new chain to be inserted each time
+	Chain chain; // will hold the chain found in this->allChains
 
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
@@ -328,13 +314,14 @@ void SimController::readOldChainsLine (string line)
 			error ("t=%d: didn't find chain id %d in allChains, in readOldChainsLine", t, chainId);
 	  }
 	  else {
-			
+			vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
+			Chain modifiedChain (chain.id, S_u); // will hold the modified chain to be inserted each time
 			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-			chain.S_u = pathToRoot[poaId]; //Update S_u of the chain to reflect its new location
-			allChains.insert (chain);
-			insertSorted (chainsThatJoinedLeaf[poaId], chain);			
+			allChains.insert (modifiedChain);
+			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain);			
 			if (chain.curLvl != UNPLACED_) {
-				chainsThatLeftDatacenter[chain.getCurDatacenter ()].push_back (chain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+				// insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
+				chainsThatLeftDatacenter[chain.getCurDatacenter ()].push_back (modifiedChain.id); 
 			}
 	  }
 	}
@@ -376,6 +363,8 @@ void SimController::initAlgSync ()
 	initBottomUpMsg* msg;
 	uint16_t i;
 	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a initBottomUpMsg to leaf i
+	
+	// First, send initBottomUpMsg to all the leaves to which new chains have joined.
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
@@ -392,6 +381,7 @@ void SimController::initAlgSync ()
 		sentInitBottomUpMsg[item.first] = true;
 	}
 
+	// Next, send (empty) initBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
 	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
 		if (!(sentInitBottomUpMsg[leafId])) {
 			msg = new initBottomUpMsg ();

@@ -31,7 +31,9 @@ class Chain
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
     }
-
+	
+		void print (bool printS_u = true);	
+	
 		// Getters
 		int16_t 	getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
     uint16_t 	getCpuCost () const;
@@ -113,7 +115,6 @@ struct sortTwoChainsByCpuUsage {
 
 typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
-
 
 
 /*void modifyCurLvl (SetOfChains &setOfChins, const Chain chain, const int8_t curLvl);*/
