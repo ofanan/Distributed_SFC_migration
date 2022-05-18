@@ -131,7 +131,7 @@ void Datacenter::handleMessage (cMessage *msg)
   else if (dynamic_cast<PrepareReshUpSyncPkt*>(curHandledMsg) != nullptr)
   {
   	if (isRoot) {
-//  		prepareReshDwn ();
+  		prepareReshDwnSync ();
   	}
   	else { // merely redirect the prepare resh req to parent
   		prepareReshUpSync ();
@@ -145,6 +145,10 @@ void Datacenter::handleMessage (cMessage *msg)
   delete (curHandledMsg);
 }
 
+/*********************************************************************************
+ Prepare a sync' reshuffle:
+ - send a pkt of prepare reshuffle to the parent (will do that up to the root).
+*********************************************************************************/
 
 void Datacenter::prepareReshUpSync ()
 {
@@ -156,12 +160,12 @@ void Datacenter::prepareReshDwnSync ()
 {
 }
 
-/*
+/*********************************************************************************
 Handle a rcvd initBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
 - Empty this->pushUpSet.
 - Call bottomUp, for running the BU alg'.
-*/
+*********************************************************************************/
 void Datacenter::handleInitBottomUpMsg () 
 {
 
