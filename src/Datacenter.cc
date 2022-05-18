@@ -201,8 +201,9 @@ Assume that this->pushUpSet already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "dc %d begins PU. pushUpSet=\n", id);
+		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
-		endSimulation();
 	}
 	reshuffled = true;
 	vector <uint16_t> newlyPlacedChainsIds; // will hold the IDs of all the chains that this
@@ -241,7 +242,11 @@ void Datacenter::pushUpSync ()
 	uint16_t mu_u;
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (mu_u <= availCpu) { // If "this" has enough place for this chain, then push-it up to me, and locally place it
+		if (chainPtr->curLvl >= lvl || mu_u > availCpu) { // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor; or because not enough avail' cpu for pushing-up 
+			chainPtr++;
+			continue;
+		}
+		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
 			availCpu -= mu_u;
 			Chain pushedUpChain = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
 			pushedUpChain.curLvl = lvl;
@@ -252,9 +257,6 @@ void Datacenter::pushUpSync ()
 //			MyConfig::printToLog (chainPtr->S_u);
 			chainPtr = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains
 			pushUpSet.insert (pushedUpChain);
-		}
-		else {
-			chainPtr++;
 		}
 	}
 
@@ -372,10 +374,6 @@ void Datacenter::bottomUpSync ()
 	}
 
   if (isRoot) { 
-		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			MyConfig::printToLog ("beginning PU. pushUpSet=");
-			MyConfig::printToLog (pushUpSet);
-		}
   	pushUpSync ();
   }
   else {
