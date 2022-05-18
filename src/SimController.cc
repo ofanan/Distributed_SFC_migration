@@ -34,8 +34,6 @@ void SimController::initialize (int stage)
 	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
 	    leaves[leafId] = datacenters[dc];
 	    datacenters[dc]->leafId = leafId;
-	    snprintf (buf, bufSize, "leafId = %d\n", leafId);
-	    printBufToLog ();
 	    leafId++;
 	  }
 	}
@@ -285,9 +283,9 @@ void SimController::readNewChainsLine (string line)
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
 		allChains.insert (chain); 
 	}	
-	if (LOG_LVL>1) {
+	if (LOG_LVL>=DETAILED_LOG) {
 	  MyConfig::printToLog ("After readNewCHainsLine: ");
-	  printAllChains (logFile);
+	  MyConfig::printToLog (allChains);
 	}
 }
 
@@ -326,9 +324,9 @@ void SimController::readOldChainsLine (string line)
 	  }
 	}
 	
-	if (LOG_LVL==2) {
+	if (LOG_LVL>=DETAILED_LOG) {
 	  logFile << "After readOldCHainsLine: ";
-  	printAllChains (logFile);
+	  MyConfig::printToLog (allChains);
   }
 }
 
