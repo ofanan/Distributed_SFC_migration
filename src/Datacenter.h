@@ -43,6 +43,7 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned, pushUpVec; 
     UnorderedSetOfChains placedChains; 
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
+    vector<uint16_t>  newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
 		uint8_t numBuMsgsRcvd; 
 		
     Datacenter();
@@ -78,7 +79,7 @@ class Datacenter : public cSimpleModule
 		void reshuffleAsync					();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
-    void sndPlacementInfoMsg 		(vector<uint16_t>  &newlyPlacedChains);
+    void sndPlacementInfoMsg 		();
     void genNsndPushUpPktsToChildren ();
     inline void     printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;

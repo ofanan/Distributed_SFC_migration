@@ -81,10 +81,10 @@ void Datacenter::print ()
 	MyConfig::printToLog (potPlacedChainsIds);
 }
 
-/*
- * Currently, the only self-message is the one indicating the end of the transmission of a pkt.
+/*************************************************************************************************************************************************
+ * Handle an aririving set message. Currently, the only self-message is the one indicating the end of the transmission of a pkt.
  * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
- */
+*************************************************************************************************************************************************/
 void Datacenter::handleSelfMsg ()
 {
   EndXmtPkt *end_xmt_pkt = (EndXmtPkt*) curHandledMsg;
@@ -139,12 +139,12 @@ void Datacenter::handleMessage (cMessage *msg)
   delete (curHandledMsg);
 }
 
-/*
+/*************************************************************************************************************************************************
 Handle a rcvd InitBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
 - Empty this->pushUpSet.
 - Call bottomUp, for running the BU alg'.
-*/
+*************************************************************************************************************************************************/
 void Datacenter::handleInitBottomUpMsg () 
 {
 
@@ -159,11 +159,11 @@ void Datacenter::handleInitBottomUpMsg ()
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
-/*
+/*************************************************************************************************************************************************
 Handle a rcvd PushUpPkt:
 - Read the data from the pkt to this->pushUpSet.
 - Call pushUpSync() | pushUpAsync(), for running the PU alg'.
-*/
+*************************************************************************************************************************************************/
 void Datacenter::handlePushUpPkt () 
 {
 
@@ -188,10 +188,10 @@ void Datacenter::handlePushUpPkt ()
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 Run the PU Sync alg'. 
 Assume that this->pushUpSet already contains the relevant chains.
-*/
+*************************************************************************************************************************************************/
 void Datacenter::pushUpSync ()
 {
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -200,7 +200,6 @@ void Datacenter::pushUpSync ()
 		MyConfig::printToLog (pushUpSet);
 	}
 	reshuffled = true;
-	vector <uint16_t> newlyPlacedChainsIds; // will hold the IDs of all the chains that this
 	
 	// First, find for each pot-placed of mine whether it was pushed-up by an ancestor, and react correspondigly
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
@@ -260,6 +259,9 @@ void Datacenter::pushUpSync ()
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
 	
 	}
+	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
+		sndPlacementInfoMsg ();
+	}
 	genNsndPushUpPktsToChildren ();
 	pushUpSet.clear();
 }
@@ -295,14 +297,13 @@ void Datacenter::pushUpAsync ()
   PushUpPkt *pkt = (PushUpPkt*)curHandledMsg;
 }
 
-/*
+/************************************************************************************************************************************************
 Running the BU alg'. 
 Assume that this->notAssigned and this->pushUpSet already contain the relevant chains, and are sorted.
-*/
+*************************************************************************************************************************************************/
 void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
-	vector <uint16_t> newlyPlacedChainsIds; // will hold the IDs of all the chains that this
 	Chain modifiedChain; // the modified chain, to be pushed to datastructures
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
@@ -330,9 +331,7 @@ void Datacenter::bottomUpSync ()
 		}
 	
 	}
-	if (newlyPlacedChainsIds.size()>0) {
-		sndPlacementInfoMsg (newlyPlacedChainsIds);
-	}
+
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		this -> print ();
 	}
@@ -345,7 +344,7 @@ void Datacenter::bottomUpSync ()
   }
 }
 
-void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChainsIds)
+void Datacenter::sndPlacementInfoMsg ()
 {
 
 	uint16_t numOfNewlyPlacedChains = newlyPlacedChainsIds.size ();
@@ -363,13 +362,12 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChainsIds)
 	sendDirect (msg, simController, "directMsgsPort");
 }
 
-/*
+/*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in sync' mode.
 - add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") databases.
 - delete the pkt.
 - If already rcvd a bottomUp pkt from all the children, call the sync' mode of the bottom-up (BU) alg'.
-*/
-
+*************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktSync ()
 {
 	uint16_t src = ((Datacenter*) curHandledMsg->getSenderModule())->id;
@@ -399,10 +397,10 @@ void Datacenter::handleBottomUpPktSync ()
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 Running the BU alg'. 
 Assume that this->notAssigned and this->pushUpSet already contain the relevant chains, in the correct order.
-*/
+*************************************************************************************************************************************************/
 void Datacenter::bottomUpAsync ()
 {
 	sndBottomUpPkt ();
