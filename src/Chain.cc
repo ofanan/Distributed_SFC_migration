@@ -72,7 +72,7 @@ uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 /*************************************************************************************************************************************************
 * Given a set of chains and a poa, return all the chains in the set associated with this poa.
 **************************************************************************************************************************************************/
-vector<Chain> findChainsByPoa (set<Chain> setOfChains, uint16_t poa)
+vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, uint16_t poa)
 {
 	vector<Chain> res;
 	

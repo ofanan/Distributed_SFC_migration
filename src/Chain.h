@@ -52,7 +52,6 @@ class Chain
 };
 
 bool findChainInSet (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
-vector<Chain> findChainsByPoa (set<Chain> setOfChains, uint16_t poa);
 
 class RT_Chain : public Chain
 {
@@ -108,6 +107,7 @@ struct sortTwoChainsByCpuUsage {
 typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
 
+vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, uint16_t poa);
 
 #endif
 

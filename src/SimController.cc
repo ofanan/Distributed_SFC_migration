@@ -473,7 +473,7 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 
 void SimController::handleAskReshSyncMsg (cMessage *msg)
 {
-	
+	vector <Chain> ChainsToMigrate = findChainsByPoa (allChains, ((Datacenter*) (msg->getSenderModule()) )->id);
 }
 
 void SimController::handleMessage (cMessage *msg)
