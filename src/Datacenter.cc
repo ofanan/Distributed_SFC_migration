@@ -299,6 +299,9 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt = new pushUpPkt;
 		uint16_t i(0);
 		for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
+			snprintf (buf, bufSize, "dc %d: chain.S_u=\n", id);
+			printBufToLog();
+			MyConfig::printToLog (chain.S_u);
 			if (chain.S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
 				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
@@ -402,9 +405,15 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
 	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
+		MyConfig::printToLog ("In HandleBottomUpPktSync.\n");
+		endSimulation ();
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
+						snprintf (buf, bufSize, "In HandleBottomUpPktSync2. chain.S_u=\n");
+				printBufToLog();
+				MyConfig::printToLog (pkt->getNotAssigned(i).S_u);
+				endSimulation ();
+
 	}
-	
 	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
@@ -412,8 +421,8 @@ void Datacenter::handleBottomUpPktSync ()
 	numBuMsgsRcvd++;
 	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {
 		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0] id=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
-			printBufToLog ();
+			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
+			MyConfig::printToLog (buf);
 			MyConfig::printToLog (pushUpSet);
 		}
 	}

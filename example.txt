@@ -1,4 +1,166 @@
+leafId = 0
+leafId = 1
+leafId = 2
+leafId = 3
+leafId = 4
+leafId = 5
+leafId = 6
+leafId = 7
+leafId = 8
 t=30540
+DC 6 rcvd a initBU msg
+DC 6, lvl=0. placed chains: 
+pot. placed chains: 2,
+DC 6 sending a BU pkt to prnt
+DC 6. sending a BU pkt. pushUpVec[0]=2. pushUpSet=chain 2: S_u=6,1,0,
+DC 5 rcvd a initBU msg
+DC 5, lvl=0. placed chains: 
+pot. placed chains: 1,
+DC 5 sending a BU pkt to prnt
+DC 5. sending a BU pkt. pushUpVec[0]=1. pushUpSet=chain 1: S_u=5,1,0,
+DC 4 rcvd a initBU msg
+DC 4, lvl=0. placed chains: 
+pot. placed chains: 0,
+DC 4 sending a BU pkt to prnt
+DC 4. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=4,1,0,
+DC 7 rcvd a initBU msg
+DC 7, lvl=0. placed chains: 
+pot. placed chains: 
+DC 7 sending a BU pkt to prnt
+DC 8 rcvd a initBU msg
+DC 8, lvl=0. placed chains: 
+pot. placed chains: 
+DC 8 sending a BU pkt to prnt
+DC 9 rcvd a initBU msg
+DC 9, lvl=0. placed chains: 
+pot. placed chains: 
+DC 9 sending a BU pkt to prnt
+DC 10 rcvd a initBU msg
+DC 10, lvl=0. placed chains: 
+pot. placed chains: 
+DC 10 sending a BU pkt to prnt
+DC 11 rcvd a initBU msg
+DC 11, lvl=0. placed chains: 
+pot. placed chains: 
+DC 11 sending a BU pkt to prnt
+DC 12 rcvd a initBU msg
+DC 12, lvl=0. placed chains: 
+pot. placed chains: 
+DC 12 sending a BU pkt to prnt
+DC 1 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 1. rcvd 1 BU pkts. src=6. pushUpVec[0]=2. pushUpSetSize=1. pushUpSet=chain 2: S_u=6,1,0,
+DC 1 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 1. rcvd 2 BU pkts. src=5. pushUpVec[0]=1. pushUpSetSize=2. pushUpSet=chain 1: S_u=5,1,0,
+chain 2: S_u=6,1,0,
+DC 1 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 1. rcvd 3 BU pkts. src=4. pushUpVec[0]=0. pushUpSetSize=3. pushUpSet=chain 0: S_u=4,1,0,
+chain 1: S_u=5,1,0,
+chain 2: S_u=6,1,0,
+DC 1, lvl=1. placed chains: 
+pot. placed chains: 
+DC 1 sending a BU pkt to prnt
+DC 1. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=4,1,0,
+chain 1: S_u=5,1,0,
+chain 2: S_u=6,1,0,
+DC 2 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 2 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 2 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 2, lvl=1. placed chains: 
+pot. placed chains: 
+DC 2 sending a BU pkt to prnt
+DC 3 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 3 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 3 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 3, lvl=1. placed chains: 
+pot. placed chains: 
+DC 3 sending a BU pkt to prnt
+DC 0 rcvd a BU pkt. num BU pkt rcvd=0, numChildren=3
+DC 0. rcvd 1 BU pkts. src=1. pushUpVec[0]=0. pushUpSetSize=3. pushUpSet=chain 2: S_u=6,1,0,
+chain 1: S_u=5,1,0,
+chain 0: S_u=4,1,0,
+DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 0, lvl=2. placed chains: 
+pot. placed chains: 
+dc 0 begins PU. pushUpSet=
+chain 2: S_u=6,1,0,
+chain 1: S_u=5,1,0,
+chain 0: S_u=4,1,0,
+dc 0: chain.S_u=
+4,1,0,
+dc 0: chain.S_u=
+5,1,0,
+dc 0: chain.S_u=
+6,1,0,
+dc 0: chain.S_u=
+4,1,0,
+dc 0: chain.S_u=
+5,1,0,
+dc 0: chain.S_u=
+6,1,0,
+dc 0: chain.S_u=
+4,1,0,
+dc 0: chain.S_u=
+5,1,0,
+dc 0: chain.S_u=
+6,1,0,
+DC 1 rcvd PU pkt
+dc 1 begins PU. pushUpSet=
+chain 2: S_u=6,1,0,
+chain 1: S_u=5,1,0,
+chain 0: S_u=4,1,0,
+dc 1: chain.S_u=
+6,1,0,
+dc 1: chain.S_u=
+5,1,0,
+dc 1: chain.S_u=
+4,1,0,
+dc 1: chain.S_u=
+6,1,0,
+dc 1: chain.S_u=
+5,1,0,
+dc 1: chain.S_u=
+4,1,0,
+dc 1: chain.S_u=
+6,1,0,
+dc 1: chain.S_u=
+5,1,0,
+dc 1: chain.S_u=
+4,1,0,
+DC 2 rcvd PU pkt
+dc 2 begins PU. pushUpSet=
+DC 3 rcvd PU pkt
+dc 3 begins PU. pushUpSet=
+DC 6 rcvd PU pkt
+dc 6 begins PU. pushUpSet=
+chain 2: S_u=6,1,0,
+DC 4 rcvd PU pkt
+dc 4 begins PU. pushUpSet=
+chain 0: S_u=4,1,0,
+DC 5 rcvd PU pkt
+dc 5 begins PU. pushUpSet=
+chain 1: S_u=5,1,0,
+DC 9 rcvd PU pkt
+dc 9 begins PU. pushUpSet=
+DC 7 rcvd PU pkt
+dc 7 begins PU. pushUpSet=
+DC 8 rcvd PU pkt
+dc 8 begins PU. pushUpSet=
+DC 12 rcvd PU pkt
+dc 12 begins PU. pushUpSet=
+DC 10 rcvd PU pkt
+dc 10 begins PU. pushUpSet=
+DC 11 rcvd PU pkt
+dc 11 begins PU. pushUpSet=
+rcvd fin alg msg from DC 6 leaf 2
+rcvd fin alg msg from DC 4 leaf 0
+rcvd fin alg msg from DC 5 leaf 1
+rcvd fin alg msg from DC 9 leaf 5
+rcvd fin alg msg from DC 7 leaf 3
+rcvd fin alg msg from DC 8 leaf 4
+rcvd fin alg msg from DC 12 leaf 8
+rcvd fin alg msg from DC 10 leaf 6
+rcvd fin alg msg from DC 11 leaf 7
 rcvd fin alg msg from all leaves ******************
 DC 0, lvl=2. placed chains: 0,1,2,
 pot. placed chains: 
