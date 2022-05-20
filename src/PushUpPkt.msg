@@ -5,7 +5,7 @@ cplusplus {{
 
 class noncobject Chain; 
 
-packet pushUpPkt
+packet PushUpPkt
 {
     Chain pushUpVec [];
 }

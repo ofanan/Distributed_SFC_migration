@@ -118,14 +118,14 @@ void Datacenter::handleMessage (cMessage *msg)
 		}
 		handleInitBottomUpMsg ();
   }
-  else if (dynamic_cast<bottomUpPkt*>(curHandledMsg) != nullptr) {
+  else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
 			printBufToLog ();
 		}
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
-  else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
+  else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
@@ -160,7 +160,7 @@ void Datacenter::handleInitBottomUpMsg ()
 }
 
 /*
-Handle a rcvd pushUpPkt:
+Handle a rcvd PushUpPkt:
 - Read the data from the pkt to this->pushUpSet.
 - Call pushUpSync() | pushUpAsync(), for running the PU alg'.
 */
@@ -171,7 +171,7 @@ void Datacenter::handlePushUpPkt ()
 		snprintf (buf, bufSize, "DC %d rcvd PU pkt\n", id);
 		printBufToLog ();
 	}
-  pushUpPkt *pkt = (pushUpPkt*) this->curHandledMsg;
+  PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	Chain chain;
 	uint16_t mu_u;
 	
@@ -266,13 +266,13 @@ void Datacenter::pushUpSync ()
 
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
-	pushUpPkt* pkt;	 // the packet to be sent 
+	PushUpPkt* pkt;	 // the packet to be sent 
 	uint16_t pushUpVecArraySize;
 	Chain chain;
 	
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pushUpVecArraySize=0;
-		pkt = new pushUpPkt;
+		pkt = new PushUpPkt;
 		uint16_t i(0);
 		for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
 			if (chain.S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
@@ -292,7 +292,7 @@ Assume that this->pushUpSet already contains the relevant chains.
 */
 void Datacenter::pushUpAsync ()
 {
-  pushUpPkt *pkt = (pushUpPkt*)curHandledMsg;
+  PushUpPkt *pkt = (PushUpPkt*)curHandledMsg;
 }
 
 /*
@@ -374,7 +374,7 @@ void Datacenter::handleBottomUpPktSync ()
 {
 	uint16_t src = ((Datacenter*) curHandledMsg->getSenderModule())->id;
 	
-	bottomUpPkt *pkt = (bottomUpPkt*)(curHandledMsg);
+	BottomUpPkt *pkt = (BottomUpPkt*)(curHandledMsg);
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
 	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
@@ -414,7 +414,7 @@ void Datacenter::sndPushUpPkt ()
 
 void Datacenter::sndBottomUpPkt ()
 {
-	bottomUpPkt* pkt2send = new bottomUpPkt;
+	BottomUpPkt* pkt2send = new BottomUpPkt;
 	uint16_t i;
 
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());

@@ -6,7 +6,7 @@ cplusplus {{
 class noncobject Chain; 
 //class noncobject ChainList; 
 
-packet bottomUpPkt
+packet BottomUpPkt
 {
     Chain notAssigned[];
     Chain pushUpVec  [];
