@@ -7,13 +7,14 @@
 #include <set>
 
 #include "MyConfig.h"
-#include "endXmtPkt_m.h"
+#include "EndXmtPkt_m.h"
 #include "BottomUpPkt_m.h"
 #include "InitBottomUpMsg_m.h"
-#include "placementInfoMsg_m.h"
+#include "PlacementInfoMsg_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
-#include "finishedAlgMsg_m.h"
+#include "FinishedAlgMsg_m.h"
+#include "LeftChainsMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -55,7 +56,7 @@ class Datacenter : public cSimpleModule
   	bool 							reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     vector <cQueue>     outputQ;
     vector <cChannel*>  xmtChnl;
-    vector <endXmtPkt*> endXmtEvents; 
+    vector <EndXmtPkt*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
 		SetOfChainsOrderedByCpuUsage pushUpSet;

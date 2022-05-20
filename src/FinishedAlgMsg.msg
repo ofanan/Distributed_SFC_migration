@@ -6,7 +6,7 @@ cplusplus {{
 
 class noncobject Chain; 
 
-message finishedAlgMsg
+message FinishedAlgMsg
 {
 }
 

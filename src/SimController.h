@@ -27,9 +27,9 @@ Controller of the simulation:
 #include "Datacenter.h"
 #include "Chain.h"
 #include "InitBottomUpMsg_m.h"
-#include "leftChainsMsg_m.h"
-#include "placementInfoMsg_m.h"
-#include "finishedAlgMsg_m.h"
+#include "LeftChainsMsg_m.h"
+#include "PlacementInfoMsg_m.h"
+#include "FinishedAlgMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;

@@ -6,7 +6,7 @@ cplusplus {{
 
 class noncobject Chain; 
 
-message placementInfoMsg
+message PlacementInfoMsg
 {
   uint32_t newlyPlacedChainsIds[]; // A list of chains that the sending datacenter has just placed.
 }

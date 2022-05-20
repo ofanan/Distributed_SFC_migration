@@ -87,7 +87,7 @@ void Datacenter::print ()
  */
 void Datacenter::handleSelfMsg ()
 {
-  endXmtPkt *end_xmt_pkt = (endXmtPkt*) curHandledMsg;
+  EndXmtPkt *end_xmt_pkt = (EndXmtPkt*) curHandledMsg;
   int16_t portNum = end_xmt_pkt -> getPortNum();
   endXmtEvents[portNum] = nullptr;
   if (outputQ[portNum].isEmpty()) {
@@ -249,7 +249,7 @@ void Datacenter::pushUpSync ()
 	}
 
 	if (isLeaf) {
-		finishedAlgMsg *msg2send = new finishedAlgMsg;
+		FinishedAlgMsg *msg2send = new FinishedAlgMsg;
 		sendDirect (msg2send, simController, "directMsgsPort");
 		
 		if (MyConfig::DEBUG_LVL > 0) {
@@ -349,7 +349,7 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChainsIds)
 {
 
 	uint16_t numOfNewlyPlacedChains = newlyPlacedChainsIds.size ();
-	placementInfoMsg* msg = new placementInfoMsg;
+	PlacementInfoMsg* msg = new PlacementInfoMsg;
 
 	msg -> setNewlyPlacedChainsIdsArraySize (numOfNewlyPlacedChains);
 	for (uint16_t i=0; i<numOfNewlyPlacedChains; i++) {
@@ -357,7 +357,7 @@ void Datacenter::sndPlacementInfoMsg (vector<uint16_t>  &newlyPlacedChainsIds)
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "DC \%d sending placementInfoMsg\n", id);
+		snprintf (buf, bufSize, "DC \%d sending PlacementInfoMsg\n", id);
 		printBufToLog ();
 	}
 	sendDirect (msg, simController, "directMsgsPort");
@@ -472,7 +472,7 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   send(pkt2send, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
-  endXmtEvents[portNum] = new endXmtPkt ("");
+  endXmtEvents[portNum] = new EndXmtPkt ("");
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }

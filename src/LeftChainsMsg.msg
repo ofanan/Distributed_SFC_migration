@@ -7,7 +7,7 @@ cplusplus {{
 
 class noncobject Chain; 
 
-message leftChainsMsg
+message LeftChainsMsg
 {
 	int32_t leftChains[];
 }

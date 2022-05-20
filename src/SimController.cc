@@ -341,11 +341,11 @@ void SimController::readOldChainsLine (string line)
 void SimController::rlzRsrcsOfChains ()
 {
 
-	leftChainsMsg* msg;
+	LeftChainsMsg* msg;
 	uint16_t i;
 	for (auto &item : chainsThatLeftDatacenter)
 	{
-		msg = new leftChainsMsg ();
+		msg = new LeftChainsMsg ();
 		msg -> setLeftChainsArraySize (item.second.size());
 		i = 0;
 		for (auto & chainId : item.second) {
@@ -420,7 +420,7 @@ void SimController::initAlgAsync () {
 
 void SimController::handlePlacementInfoMsg (cMessage *msg)
 {
-	placementInfoMsg* curHandledMsg = (placementInfoMsg*) (msg);
+	PlacementInfoMsg* curHandledMsg = (PlacementInfoMsg*) (msg);
 	Chain chain;
 	int16_t  curLvl;
 	uint32_t chainId;
@@ -430,7 +430,7 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
 		chainId 			= curHandledMsg -> getNewlyPlacedChainsIds (i);
 		if (!(findChainInSet (allChains, chainId, chain))) {
-			error ("t=%d: didn't find chain id %d that appeared in a placementInfoMsg", t, chainId);
+			error ("t=%d: didn't find chain id %d that appeared in a PlacementInfoMsg", t, chainId);
 
 		}
 		else {
@@ -477,10 +477,10 @@ void SimController::handleMessage (cMessage *msg)
 			runTimeStep ();
 		}
   }
-  else if (dynamic_cast<placementInfoMsg*> (msg)) { 
+  else if (dynamic_cast<PlacementInfoMsg*> (msg)) { 
   	handlePlacementInfoMsg (msg);
   }
-  else if (dynamic_cast<finishedAlgMsg*> (msg)) { 
+  else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
   	handleFinishedAlgMsg (msg);
   }
   else {
