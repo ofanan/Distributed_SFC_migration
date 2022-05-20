@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from PrepareReshSyncPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/PrepareReshSyncPkt.msg.
 //
 
 #ifndef __PREPARERESHSYNCPKT_M_H
@@ -19,7 +19,7 @@
 
 
 /**
- * Class generated from <tt>PrepareReshSyncPkt.msg:3</tt> by nedtool.
+ * Class generated from <tt>src/PrepareReshSyncPkt.msg:3</tt> by nedtool.
  * <pre>
  * packet PrepareReshSyncPkt
  * {

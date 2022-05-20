@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from LeftChainsMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/LeftChainsMsg.msg.
 //
 
 #ifndef __LEFTCHAINSMSG_M_H
@@ -24,7 +24,7 @@
 // }}
 
 /**
- * Class generated from <tt>LeftChainsMsg.msg:11</tt> by nedtool.
+ * Class generated from <tt>src/LeftChainsMsg.msg:11</tt> by nedtool.
  * <pre>
  * message LeftChainsMsg
  * {

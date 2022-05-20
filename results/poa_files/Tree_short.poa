@@ -9,7 +9,7 @@ t = 30540
 usrs_that_left: 
 new_usrs: (0,0)(1,1)(2,2)
 old_usrs: 
-t = 30548
+t = 3054
 usrs_that_left: 0  
 new_usrs: (61,2)
 old_usrs: (1,2)(2,1)

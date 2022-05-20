@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from AskReshSyncMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/AskReshSyncMsg.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:

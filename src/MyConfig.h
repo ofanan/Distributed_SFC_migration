@@ -24,11 +24,9 @@ using namespace std;
 
 const int HEIGHT=5;
 
-const int16_t nonAugmentedCpuAtLvl[HEIGHT] = {10,20,30,40,50};
+const int16_t nonAugmentedCpuAtLvl[HEIGHT] = {1,1,1};
 
 const int16_t chainMigCost = 600;
-
-const int16_t costOfPlacingChainAtLvl[HEIGHT] = {10,20,30,40,50};
 
 const int16_t UNPLACED  = -1;
 const int8_t  UNPLACED_ = -1;
@@ -37,6 +35,8 @@ const bool SYNC  = true;
 const bool ASYNC = false;
 
 const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
+
+const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
 class MyConfig { 
 
@@ -69,4 +69,5 @@ class MyConfig {
 };
 
 #endif
+
 

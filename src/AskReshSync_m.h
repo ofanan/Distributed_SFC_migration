@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from AskReshSync.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/AskReshSync.msg.
 //
 
 #ifndef __ASKRESHSYNC_M_H
@@ -23,7 +23,7 @@
 // }}
 
 /**
- * Class generated from <tt>AskReshSync.msg:10</tt> by nedtool.
+ * Class generated from <tt>src/AskReshSync.msg:10</tt> by nedtool.
  * <pre>
  * message AskReshSyncMsg
  * {
