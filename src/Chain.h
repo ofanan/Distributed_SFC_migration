@@ -78,14 +78,7 @@ struct ChainHash {
   }
 };
 
-/*************************************************************************************************************************************************
-Find a chain (given by its id) in a given set of chains.
-**************************************************************************************************************************************************/
-bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , uint32_t chainId, Chain &c);
-
-/*
-Insert a chain in its correct place to a sorted vector of chains
-*/
+// Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c);
 
 /*************************************************************************************************************************************************
@@ -107,6 +100,10 @@ struct sortTwoChainsByCpuUsage {
 typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
 
+/*************************************************************************************************************************************************
+Find a chain (given by its id) in a given set of chains.
+**************************************************************************************************************************************************/
+bool 					findChainInSet  (UnorderedSetOfChains setOfChains , uint32_t chainId, Chain &c);
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, uint16_t poa);
 
 #endif
