@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/initBottomUpMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from InitBottomUpMsg.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "initBottomUpMsg_m.h"
+#include "InitBottomUpMsg_m.h"
 
 namespace omnetpp {
 
@@ -177,27 +177,27 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
     return out;
 }
 
-Register_Class(initBottomUpMsg)
+Register_Class(InitBottomUpMsg)
 
-initBottomUpMsg::initBottomUpMsg(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
+InitBottomUpMsg::InitBottomUpMsg(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
 {
     notAssigned_arraysize = 0;
     this->notAssigned = 0;
 }
 
-initBottomUpMsg::initBottomUpMsg(const initBottomUpMsg& other) : ::omnetpp::cMessage(other)
+InitBottomUpMsg::InitBottomUpMsg(const InitBottomUpMsg& other) : ::omnetpp::cMessage(other)
 {
     notAssigned_arraysize = 0;
     this->notAssigned = 0;
     copy(other);
 }
 
-initBottomUpMsg::~initBottomUpMsg()
+InitBottomUpMsg::~InitBottomUpMsg()
 {
     delete [] this->notAssigned;
 }
 
-initBottomUpMsg& initBottomUpMsg::operator=(const initBottomUpMsg& other)
+InitBottomUpMsg& InitBottomUpMsg::operator=(const InitBottomUpMsg& other)
 {
     if (this==&other) return *this;
     ::omnetpp::cMessage::operator=(other);
@@ -205,7 +205,7 @@ initBottomUpMsg& initBottomUpMsg::operator=(const initBottomUpMsg& other)
     return *this;
 }
 
-void initBottomUpMsg::copy(const initBottomUpMsg& other)
+void InitBottomUpMsg::copy(const InitBottomUpMsg& other)
 {
     delete [] this->notAssigned;
     this->notAssigned = (other.notAssigned_arraysize==0) ? nullptr : new Chain[other.notAssigned_arraysize];
@@ -214,14 +214,14 @@ void initBottomUpMsg::copy(const initBottomUpMsg& other)
         this->notAssigned[i] = other.notAssigned[i];
 }
 
-void initBottomUpMsg::parsimPack(omnetpp::cCommBuffer *b) const
+void InitBottomUpMsg::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
     b->pack(notAssigned_arraysize);
     doParsimArrayPacking(b,this->notAssigned,notAssigned_arraysize);
 }
 
-void initBottomUpMsg::parsimUnpack(omnetpp::cCommBuffer *b)
+void InitBottomUpMsg::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
     delete [] this->notAssigned;
@@ -234,7 +234,7 @@ void initBottomUpMsg::parsimUnpack(omnetpp::cCommBuffer *b)
     }
 }
 
-void initBottomUpMsg::setNotAssignedArraySize(unsigned int size)
+void InitBottomUpMsg::setNotAssignedArraySize(unsigned int size)
 {
     Chain *notAssigned2 = (size==0) ? nullptr : new Chain[size];
     unsigned int sz = notAssigned_arraysize < size ? notAssigned_arraysize : size;
@@ -245,30 +245,30 @@ void initBottomUpMsg::setNotAssignedArraySize(unsigned int size)
     this->notAssigned = notAssigned2;
 }
 
-unsigned int initBottomUpMsg::getNotAssignedArraySize() const
+unsigned int InitBottomUpMsg::getNotAssignedArraySize() const
 {
     return notAssigned_arraysize;
 }
 
-Chain& initBottomUpMsg::getNotAssigned(unsigned int k)
+Chain& InitBottomUpMsg::getNotAssigned(unsigned int k)
 {
     if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
     return this->notAssigned[k];
 }
 
-void initBottomUpMsg::setNotAssigned(unsigned int k, const Chain& notAssigned)
+void InitBottomUpMsg::setNotAssigned(unsigned int k, const Chain& notAssigned)
 {
     if (k>=notAssigned_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", notAssigned_arraysize, k);
     this->notAssigned[k] = notAssigned;
 }
 
-class initBottomUpMsgDescriptor : public omnetpp::cClassDescriptor
+class InitBottomUpMsgDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
   public:
-    initBottomUpMsgDescriptor();
-    virtual ~initBottomUpMsgDescriptor();
+    InitBottomUpMsgDescriptor();
+    virtual ~InitBottomUpMsgDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -290,24 +290,24 @@ class initBottomUpMsgDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(initBottomUpMsgDescriptor)
+Register_ClassDescriptor(InitBottomUpMsgDescriptor)
 
-initBottomUpMsgDescriptor::initBottomUpMsgDescriptor() : omnetpp::cClassDescriptor("initBottomUpMsg", "omnetpp::cMessage")
+InitBottomUpMsgDescriptor::InitBottomUpMsgDescriptor() : omnetpp::cClassDescriptor("InitBottomUpMsg", "omnetpp::cMessage")
 {
     propertynames = nullptr;
 }
 
-initBottomUpMsgDescriptor::~initBottomUpMsgDescriptor()
+InitBottomUpMsgDescriptor::~InitBottomUpMsgDescriptor()
 {
     delete[] propertynames;
 }
 
-bool initBottomUpMsgDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool InitBottomUpMsgDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<initBottomUpMsg *>(obj)!=nullptr;
+    return dynamic_cast<InitBottomUpMsg *>(obj)!=nullptr;
 }
 
-const char **initBottomUpMsgDescriptor::getPropertyNames() const
+const char **InitBottomUpMsgDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -318,19 +318,19 @@ const char **initBottomUpMsgDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *initBottomUpMsgDescriptor::getProperty(const char *propertyname) const
+const char *InitBottomUpMsgDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int initBottomUpMsgDescriptor::getFieldCount() const
+int InitBottomUpMsgDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int initBottomUpMsgDescriptor::getFieldTypeFlags(int field) const
+unsigned int InitBottomUpMsgDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -344,7 +344,7 @@ unsigned int initBottomUpMsgDescriptor::getFieldTypeFlags(int field) const
     return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *initBottomUpMsgDescriptor::getFieldName(int field) const
+const char *InitBottomUpMsgDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -358,7 +358,7 @@ const char *initBottomUpMsgDescriptor::getFieldName(int field) const
     return (field>=0 && field<1) ? fieldNames[field] : nullptr;
 }
 
-int initBottomUpMsgDescriptor::findField(const char *fieldName) const
+int InitBottomUpMsgDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
@@ -366,7 +366,7 @@ int initBottomUpMsgDescriptor::findField(const char *fieldName) const
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *initBottomUpMsgDescriptor::getFieldTypeString(int field) const
+const char *InitBottomUpMsgDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -380,7 +380,7 @@ const char *initBottomUpMsgDescriptor::getFieldTypeString(int field) const
     return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **initBottomUpMsgDescriptor::getFieldPropertyNames(int field) const
+const char **InitBottomUpMsgDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -393,7 +393,7 @@ const char **initBottomUpMsgDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *initBottomUpMsgDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *InitBottomUpMsgDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -406,7 +406,7 @@ const char *initBottomUpMsgDescriptor::getFieldProperty(int field, const char *p
     }
 }
 
-int initBottomUpMsgDescriptor::getFieldArraySize(void *object, int field) const
+int InitBottomUpMsgDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -414,14 +414,14 @@ int initBottomUpMsgDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    initBottomUpMsg *pp = (initBottomUpMsg *)object; (void)pp;
+    InitBottomUpMsg *pp = (InitBottomUpMsg *)object; (void)pp;
     switch (field) {
         case 0: return pp->getNotAssignedArraySize();
         default: return 0;
     }
 }
 
-const char *initBottomUpMsgDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *InitBottomUpMsgDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -429,13 +429,13 @@ const char *initBottomUpMsgDescriptor::getFieldDynamicTypeString(void *object, i
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    initBottomUpMsg *pp = (initBottomUpMsg *)object; (void)pp;
+    InitBottomUpMsg *pp = (InitBottomUpMsg *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string initBottomUpMsgDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string InitBottomUpMsgDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -443,14 +443,14 @@ std::string initBottomUpMsgDescriptor::getFieldValueAsString(void *object, int f
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    initBottomUpMsg *pp = (initBottomUpMsg *)object; (void)pp;
+    InitBottomUpMsg *pp = (InitBottomUpMsg *)object; (void)pp;
     switch (field) {
         case 0: {std::stringstream out; out << pp->getNotAssigned(i); return out.str();}
         default: return "";
     }
 }
 
-bool initBottomUpMsgDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool InitBottomUpMsgDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -458,13 +458,13 @@ bool initBottomUpMsgDescriptor::setFieldValueAsString(void *object, int field, i
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    initBottomUpMsg *pp = (initBottomUpMsg *)object; (void)pp;
+    InitBottomUpMsg *pp = (InitBottomUpMsg *)object; (void)pp;
     switch (field) {
         default: return false;
     }
 }
 
-const char *initBottomUpMsgDescriptor::getFieldStructName(int field) const
+const char *InitBottomUpMsgDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -478,7 +478,7 @@ const char *initBottomUpMsgDescriptor::getFieldStructName(int field) const
     };
 }
 
-void *initBottomUpMsgDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *InitBottomUpMsgDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -486,7 +486,7 @@ void *initBottomUpMsgDescriptor::getFieldStructValuePointer(void *object, int fi
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    initBottomUpMsg *pp = (initBottomUpMsg *)object; (void)pp;
+    InitBottomUpMsg *pp = (InitBottomUpMsg *)object; (void)pp;
     switch (field) {
         case 0: return (void *)(&pp->getNotAssigned(i)); break;
         default: return nullptr;

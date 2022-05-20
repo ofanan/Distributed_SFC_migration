@@ -26,7 +26,7 @@ Controller of the simulation:
 
 #include "Datacenter.h"
 #include "Chain.h"
-#include "initBottomUpMsg_m.h"
+#include "InitBottomUpMsg_m.h"
 #include "leftChainsMsg_m.h"
 #include "placementInfoMsg_m.h"
 #include "finishedAlgMsg_m.h"

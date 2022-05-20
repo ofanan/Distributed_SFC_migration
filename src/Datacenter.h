@@ -9,7 +9,7 @@
 #include "MyConfig.h"
 #include "endXmtPkt_m.h"
 #include "bottomUpPkt_m.h"
-#include "initBottomUpMsg_m.h"
+#include "InitBottomUpMsg_m.h"
 #include "placementInfoMsg_m.h"
 #include "pushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"

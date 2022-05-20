@@ -365,18 +365,18 @@ void SimController::initAlg () {
 // Initiate the run of an Sync placement alg'
 void SimController::initAlgSync () 
 {  	
-	initBottomUpMsg* msg;
+	InitBottomUpMsg* msg;
 	uint16_t i;
-	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a initBottomUpMsg to leaf i
+	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
 	
-	// First, send initBottomUpMsg to all the leaves to which new chains have joined.
+	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
 		
-		msg = new initBottomUpMsg ();
+		msg = new InitBottomUpMsg ();
 		msg -> setNotAssignedArraySize (item.second.size());
 		i = 0;
 		for(auto &chain : item.second) {
@@ -386,10 +386,10 @@ void SimController::initAlgSync ()
 		sentInitBottomUpMsg[item.first] = true;
 	}
 
-	// Next, send (empty) initBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
+	// Next, send (empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
 	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
 		if (!(sentInitBottomUpMsg[leafId])) {
-			msg = new initBottomUpMsg ();
+			msg = new InitBottomUpMsg ();
 			msg -> setNotAssignedArraySize (0);
 			sendDirect (msg, (cModule*)(leaves[leafId]), "directMsgsPort");
 		}
@@ -400,7 +400,7 @@ void SimController::initAlgSync ()
 // Initiate the run of a Async placement alg'
 void SimController::initAlgAsync () {  	
 
-	initBottomUpMsg* msg;
+	InitBottomUpMsg* msg;
 	uint16_t i;
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
@@ -408,7 +408,7 @@ void SimController::initAlgAsync () {
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
 		
-		msg = new initBottomUpMsg ();
+		msg = new InitBottomUpMsg ();
 		msg -> setNotAssignedArraySize (item.second.size());
 		i = 0;
 		for(auto &chain : item.second) {

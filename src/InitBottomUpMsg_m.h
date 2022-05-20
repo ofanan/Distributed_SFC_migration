@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/initBottomUpMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from InitBottomUpMsg.msg.
 //
 
 #ifndef __INITBOTTOMUPMSG_M_H
@@ -24,33 +24,33 @@
 // }}
 
 /**
- * Class generated from <tt>src/initBottomUpMsg.msg:12</tt> by nedtool.
+ * Class generated from <tt>InitBottomUpMsg.msg:12</tt> by nedtool.
  * <pre>
- * message initBottomUpMsg
+ * message InitBottomUpMsg
  * {
  *     Chain notAssigned[]; // new or critical chains to be assigned 
  * }
  * </pre>
  */
-class initBottomUpMsg : public ::omnetpp::cMessage
+class InitBottomUpMsg : public ::omnetpp::cMessage
 {
   protected:
     Chain *notAssigned; // array ptr
     unsigned int notAssigned_arraysize;
 
   private:
-    void copy(const initBottomUpMsg& other);
+    void copy(const InitBottomUpMsg& other);
 
   protected:
     // protected and unimplemented operator==(), to prevent accidental usage
-    bool operator==(const initBottomUpMsg&);
+    bool operator==(const InitBottomUpMsg&);
 
   public:
-    initBottomUpMsg(const char *name=nullptr, short kind=0);
-    initBottomUpMsg(const initBottomUpMsg& other);
-    virtual ~initBottomUpMsg();
-    initBottomUpMsg& operator=(const initBottomUpMsg& other);
-    virtual initBottomUpMsg *dup() const override {return new initBottomUpMsg(*this);}
+    InitBottomUpMsg(const char *name=nullptr, short kind=0);
+    InitBottomUpMsg(const InitBottomUpMsg& other);
+    virtual ~InitBottomUpMsg();
+    InitBottomUpMsg& operator=(const InitBottomUpMsg& other);
+    virtual InitBottomUpMsg *dup() const override {return new InitBottomUpMsg(*this);}
     virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
@@ -58,12 +58,12 @@ class initBottomUpMsg : public ::omnetpp::cMessage
     virtual void setNotAssignedArraySize(unsigned int size);
     virtual unsigned int getNotAssignedArraySize() const;
     virtual Chain& getNotAssigned(unsigned int k);
-    virtual const Chain& getNotAssigned(unsigned int k) const {return const_cast<initBottomUpMsg*>(this)->getNotAssigned(k);}
+    virtual const Chain& getNotAssigned(unsigned int k) const {return const_cast<InitBottomUpMsg*>(this)->getNotAssigned(k);}
     virtual void setNotAssigned(unsigned int k, const Chain& notAssigned);
 };
 
-inline void doParsimPacking(omnetpp::cCommBuffer *b, const initBottomUpMsg& obj) {obj.parsimPack(b);}
-inline void doParsimUnpacking(omnetpp::cCommBuffer *b, initBottomUpMsg& obj) {obj.parsimUnpack(b);}
+inline void doParsimPacking(omnetpp::cCommBuffer *b, const InitBottomUpMsg& obj) {obj.parsimPack(b);}
+inline void doParsimUnpacking(omnetpp::cCommBuffer *b, InitBottomUpMsg& obj) {obj.parsimUnpack(b);}
 
 
 #endif // ifndef __INITBOTTOMUPMSG_M_H

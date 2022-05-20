@@ -8,7 +8,7 @@ cplusplus {{
 class noncobject Chain; 
 //class noncobject ChainList; 
 
-message initBottomUpMsg
+message InitBottomUpMsg
 {
 	Chain notAssigned[]; // new or critical chains to be assigned 
 }

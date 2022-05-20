@@ -108,9 +108,9 @@ void Datacenter::handleMessage (cMessage *msg)
   }
 
   // Now we know that this is not a self-msg
-  else if (dynamic_cast<initBottomUpMsg*>(curHandledMsg) != nullptr) {
+  else if (dynamic_cast<InitBottomUpMsg*>(curHandledMsg) != nullptr) {
 		if (!isLeaf) {
-			error ("a non-leaf datacenter received an initBottomUpMsg");
+			error ("a non-leaf datacenter received an InitBottomUpMsg");
 		}  
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
@@ -140,7 +140,7 @@ void Datacenter::handleMessage (cMessage *msg)
 }
 
 /*
-Handle a rcvd initBottomUpMsg:
+Handle a rcvd InitBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
 - Empty this->pushUpSet.
 - Call bottomUp, for running the BU alg'.
@@ -148,7 +148,7 @@ Handle a rcvd initBottomUpMsg:
 void Datacenter::handleInitBottomUpMsg () 
 {
 
-  initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
+  InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
 	
 	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
