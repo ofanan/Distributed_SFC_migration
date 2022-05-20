@@ -51,10 +51,10 @@ class Chain
     uint16_t mu_u_len () const;
 };
 
-/* 
+/*************************************************************************************************************************************************
 * Accessory function, for finding a chain within a given list of chains.
 * We assume that a chain is inequivocally identified by its id.
-*/
+**************************************************************************************************************************************************/
 bool findChainInSet (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
 
 class RT_Chain : public Chain
@@ -82,14 +82,9 @@ struct ChainHash {
   }
 };
 
-/*
+/*************************************************************************************************************************************************
 Find a chain (given by its id) in a given set of chains.
-Inputs:
-- The set of chains.
-- Id of the requested chain.
-- Ref' to which the found chain is written.
-Output: true iff the requested chain is found.
-*/
+**************************************************************************************************************************************************/
 bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains , uint32_t chainId, Chain &c);
 
 /*
@@ -97,10 +92,10 @@ Insert a chain in its correct place to a sorted vector of chains
 */
 void insertSorted (vector <Chain> &vec, const Chain c);
 
-/*
+/*************************************************************************************************************************************************
 Rcvs 2 sorted vectors of chains. 
 Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
-*/
+**************************************************************************************************************************************************/
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 struct sortTwoChainsByCpuUsage {
@@ -117,8 +112,6 @@ typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
 
 
-/*void modifyCurLvl (SetOfChains &setOfChins, const Chain chain, const int8_t curLvl);*/
-/*void SetOfChains::modifyCurLvl (const Chain chain, const int8_t curLvl);*/
 #endif
 
 

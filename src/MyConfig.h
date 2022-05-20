@@ -1,4 +1,4 @@
-// Configuration parameters, writing to files, and accessory functions.
+// Configuration parameters, writing to log files, and accessory functions.
 
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H
@@ -22,10 +22,6 @@
 using namespace omnetpp;
 using namespace std;
 
-/*bool sortChainsByCpuUsage (const Chain &lhs, const Chain &rhs) {*/
-/*	return (lhs.getCpu() < rhs.getCpu());*/
-/*}*/
-
 const int HEIGHT=5;
 
 const int16_t nonAugmentedCpuAtLvl[HEIGHT] = {10,20,30,40,50};
@@ -42,7 +38,7 @@ const bool ASYNC = false;
 
 const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 
-class MyConfig { //: public cSimpleModule {
+class MyConfig { 
 
 	public:
  		static string LogFileName;
@@ -68,10 +64,7 @@ class MyConfig { //: public cSimpleModule {
 		static void printToLog (SetOfChainsOrderedByCpuUsage setOfChains, bool printS_u=true);
 		static void printToLog (UnorderedSetOfChains set2print);
 		static void printSuToLog (Chain chain);
-		// returns the scalar product of two vectors
-/*		static vector<uint16_t> scalarProdcut (const vector<uint8_t> &vec1, const vector<uint16_t> &vec2);*/
-		
-		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2);
+		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2); // returns the scalar product of two vectors
 
 };
 

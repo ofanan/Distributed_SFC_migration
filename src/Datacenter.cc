@@ -128,15 +128,9 @@ void Datacenter::handleMessage (cMessage *msg)
   else if (dynamic_cast<pushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
-  else if (dynamic_cast<PrepareReshUpSyncPkt*>(curHandledMsg) != nullptr)
+  else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
   {
-  	if (isRoot) {
-  		prepareReshDwnSync ();
-  	}
-  	else { // merely redirect the prepare resh req to parent
-  		prepareReshUpSync ();
-  	}
-  	
+    if (MyConfig::mode==SYNC) { prepareReshSync ();} {reshuffleAsync();}
   }
   else
   {
@@ -145,40 +139,23 @@ void Datacenter::handleMessage (cMessage *msg)
   delete (curHandledMsg);
 }
 
-/*********************************************************************************
- Prepare a sync' reshuffle:
- - send a pkt of prepare reshuffle to the parent (will do that up to the root).
-*********************************************************************************/
-
-void Datacenter::prepareReshUpSync ()
-{
-	PrepareReshUpSyncPkt* pkt;
-	sndViaQ (portToPrnt, pkt);
-}
-
-void Datacenter::prepareReshDwnSync ()
-{
-}
-
-/*********************************************************************************
+/*
 Handle a rcvd initBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
 - Empty this->pushUpSet.
 - Call bottomUp, for running the BU alg'.
-*********************************************************************************/
+*/
 void Datacenter::handleInitBottomUpMsg () 
 {
 
   initBottomUpMsg *msg = (initBottomUpMsg*) this->curHandledMsg;
-
-  pushUpSet.	clear (); 
-  notAssigned.clear ();
 	
 	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
 		insertSorted (this->notAssigned, msg->getNotAssigned (i));
 	} 
 
+  pushUpSet.clear (); 
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
@@ -198,9 +175,8 @@ void Datacenter::handlePushUpPkt ()
 	Chain chain;
 	uint16_t mu_u;
 	
-	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
-	pushUpSet.	clear ();
-	notAssigned.clear (); // As we're already in the push-up phase, no need to keep anymore the "notAssigned" set.
+//	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
+	pushUpSet.clear ();
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
 	} 
@@ -299,16 +275,13 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt = new pushUpPkt;
 		uint16_t i(0);
 		for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
-			snprintf (buf, bufSize, "dc %d: chain.S_u=\n", id);
-			printBufToLog();
-			MyConfig::printToLog (chain.S_u);
 			if (chain.S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
 				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
 			}		
 		}
 		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
-			sndViaQ (portOfChild(child), pkt); //send the PU pkt to that child
+			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
 		}
 	}
 }
@@ -349,7 +322,7 @@ void Datacenter::bottomUpSync ()
 		}
 		else { 
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				prepareReshUpSync ();
+				prepareReshSync ();
 			}
 			else {
 				chainPtr++;
@@ -405,15 +378,9 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
 	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
-		MyConfig::printToLog ("In HandleBottomUpPktSync.\n");
-		endSimulation ();
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
-						snprintf (buf, bufSize, "In HandleBottomUpPktSync2. chain.S_u=\n");
-				printBufToLog();
-				MyConfig::printToLog (pkt->getNotAssigned(i).S_u);
-				endSimulation ();
-
 	}
+	
 	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
@@ -421,8 +388,8 @@ void Datacenter::handleBottomUpPktSync ()
 	numBuMsgsRcvd++;
 	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {
 		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0]=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
-			MyConfig::printToLog (buf);
+			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0] id=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
+			printBufToLog ();
 			MyConfig::printToLog (pushUpSet);
 		}
 	}
@@ -477,6 +444,9 @@ void Datacenter::reshuffleAsync ()
 {
 }
 
+void Datacenter::prepareReshSync () 
+{
+}
 
 /*
  * Send the given packet.
@@ -506,5 +476,4 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
-
 

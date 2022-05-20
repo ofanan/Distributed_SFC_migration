@@ -1,3 +1,9 @@
+/*************************************************************************************************************************************************
+Controller of the simulation:
+- reads the trace.
+- runs ths placing algorithm, by calling the relevant datacenter.
+- keeps tracks of the placing algorithm's results and costs.
+**************************************************************************************************************************************************/
 #include "SimController.h"
 
 Define_Module(SimController);
@@ -81,13 +87,13 @@ void SimController::discoverPathsToRoot () {
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 Run a single time step. Such a time step is supposed to include (at most) a single occurence of:
 - A "t = " line.
 - A "usr_that_left" line.
 - A "new_usrs" line
 - An "old_usrs" line.
-*/
+**************************************************************************************************************************************************/
 void SimController::runTimeStep () 
 {
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
@@ -153,11 +159,11 @@ void SimController::finish ()
   }
 }
 
-/*
+/*************************************************************************************************************************************************
 - Inc. numMigs for every chain where curDC!=nxtDc.
 - Set for every chain curDc = nxtDc; nxtDc = UNPLACED.
 - If running in sync mode: calculate and print the total cost
-*/
+**************************************************************************************************************************************************/
 void SimController::concludeTimeStep ()
 {
 	if (MyConfig::DEBUG_LVL>0) {
@@ -229,12 +235,12 @@ void SimController::parseChainPoaToken (string const token, uint32_t &chainId, u
 }
 
 
-/*
+/*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
 The function inserts all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
-*/
+**************************************************************************************************************************************************/
 void SimController::readChainsThatLeftLine (string line)
 {
   char_separator<char> sep(" ");
@@ -258,13 +264,13 @@ void SimController::readChainsThatLeftLine (string line)
   }
 }
 
-/*
+/*************************************************************************************************************************************************
 Read a trace line that includes data about new chains.
 Generate a new chain, and add it to the allChains.
 Also, add the new generated chain to chainsThatJoinedLeaf[leaf], where leaf is the curent leaf, co-located with the poa of this new chain (poa is indicated in the trace, .poa file).
 Inputs: 
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated PoA of chain c_i.
-*/
+**************************************************************************************************************************************************/
 void SimController::readNewChainsLine (string line)
 {
   char_separator<char> sep("() ");
@@ -291,14 +297,13 @@ void SimController::readNewChainsLine (string line)
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 - Read a trace line that includes data about old chains, that moved and thus became critical.
 - Find the chain in the db "allChains". 
 - insert the chain to chainsThatJoinedLeaf[leaf], where leaf is the new, updated leaf.
 Inputs:
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated leaf of chain c_i.
-*/
-// parse each old chain that became critical, and prepare data to be sent to its current place (to rlz its resources), and to its new leaf (to place that chain).
+**************************************************************************************************************************************************/
 void SimController::readOldChainsLine (string line)
 {
   char_separator<char> sep("() ");

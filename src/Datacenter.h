@@ -12,8 +12,7 @@
 #include "initBottomUpMsg_m.h"
 #include "placementInfoMsg_m.h"
 #include "pushUpPkt_m.h"
-#include "prepareReshUpSyncPkt_m.h"
-#include "prepareReshDownSyncPkt_m.h"
+#include "PrepareReshSyncPkt_m.h"
 #include "finishedAlgMsg_m.h"
 
 using namespace omnetpp;
@@ -42,7 +41,6 @@ class Datacenter : public cSimpleModule
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
     UnorderedSetOfChains placedChains; 
-/*    vector <uint32_t> */
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
 		uint8_t numBuMsgsRcvd; 
 		
@@ -75,8 +73,7 @@ class Datacenter : public cSimpleModule
     void bottomUpAsync  			  ();
     void pushUpSync        			();
     void pushUpAsync       			();
-    void prepareReshUpSync		 	();
-    void prepareReshDwnSync		 	();
+    void prepareReshSync		 		();
 		void reshuffleAsync					();
     void sndBottomUpPkt					();
     void sndPushUpPkt						();

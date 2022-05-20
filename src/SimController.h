@@ -1,3 +1,9 @@
+/*************************************************************************************************************************************************
+Controller of the simulation:
+- reads the trace.
+- runs ths placing algorithm, by calling the relevant datacenter.
+- keeps tracks of the placing algorithm's results and costs.
+**************************************************************************************************************************************************/
 #ifndef SIM_CONTROLLER_H
 #define SIM_CONTROLLER_H
 

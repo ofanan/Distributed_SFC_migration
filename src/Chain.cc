@@ -68,7 +68,7 @@ uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 }
 
 
-/* 
+/*************************************************************************************************************************************************
 Find a chain within a given set of chains.
 We assume that a chain is inequivocally identified by its id.
 Inputs: 
@@ -76,7 +76,8 @@ Inputs:
 - id: of the requested chain.
 - &foundChain: a reference, to which the found chain (if there exists) will be written.
 Return value: true iff the requested chain was found.
-*/
+
+**************************************************************************************************************************************************/
 bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chainId, Chain &c)
 {
 	Chain dummy (chainId, {});
@@ -91,17 +92,19 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chai
 	}
 }
 
-// returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
+// returns the id of the datacenter currently hosting "this"; or UNPLACED, if this chain isn't placed
 int16_t Chain::getCurDatacenter () const 
 {
 	return (curLvl==UNPLACED_)? UNPLACED : S_u[curLvl];
 } 
 
+// returns the cpu cost of "this" chain when placed on a datacenter at a certain 
 uint16_t Chain::getCpuCost () const
 {
 	return (isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl];
 }
 
+// return the current cpu consumption of the chain if it's already placed; UNPLACED_ otherwise
 inline uint16_t Chain::getCpu () const
 {
 	if (curLvl==UNPLACED_) {
@@ -112,11 +115,11 @@ inline uint16_t Chain::getCpu () const
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 Insert a chain to its correct order in the (ordered) vector of chains.
 We currently use only RT, and we assume that the input vector is sorted. 
 Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
-*/
+**************************************************************************************************************************************************/
 void insertSorted (vector <Chain> &vec, const Chain c)
 {
 	if (c.isRT_Chain) {
@@ -127,10 +130,11 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 Rcvs 2 sorted vectors of chains. 
 Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
-*/
+Currently unused.
+**************************************************************************************************************************************************/
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
 {
 	for (auto const &chain : vec) {
