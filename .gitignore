@@ -14,3 +14,6 @@ Distributed_SFC_migration*
 *sin_runner*
 *sbatch
 example.txt
+src/*_m.h
+src/*_m.cc
+
