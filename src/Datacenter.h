@@ -15,6 +15,7 @@
 #include "PrepareReshSyncPkt_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "LeftChainsMsg_m.h"
+#include "AskReshSyncMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;

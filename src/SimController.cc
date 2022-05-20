@@ -337,7 +337,11 @@ void SimController::readOldChainsLine (string line)
   }
 }
 
-// Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim').
+
+/*************************************************************************************************************************************************
+- Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim'), based on chainsThatLeftDatacenter.
+- Clear chainsThatLeftDatacenter.
+**************************************************************************************************************************************************/
 void SimController::rlzRsrcsOfChains ()
 {
 
@@ -353,6 +357,7 @@ void SimController::rlzRsrcsOfChains ()
 		}
 		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
 	}
+	chainsThatLeftDatacenter.clear ();
 }
 
 // Initiate the run of placement alg'
@@ -462,11 +467,13 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("rcvd fin alg msg from all leaves ******************\n");
-//			for (auto datacenter : datacenters) {
-//				datacenter -> print ();
-//			}
 		}
 	}
+}
+
+void SimController::handleAskReshSyncMsg (cMessage *msg)
+{
+	
 }
 
 void SimController::handleMessage (cMessage *msg)
@@ -482,6 +489,9 @@ void SimController::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
   	handleFinishedAlgMsg (msg);
+  }
+  else if (dynamic_cast<AskReshSyncMsg*> (msg)) { 
+		handleAskReshSyncMsg (msg);
   }
   else {
   	error ("Rcvd unknown msg type");

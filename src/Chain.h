@@ -51,11 +51,8 @@ class Chain
     uint16_t mu_u_len () const;
 };
 
-/*************************************************************************************************************************************************
-* Accessory function, for finding a chain within a given list of chains.
-* We assume that a chain is inequivocally identified by its id.
-**************************************************************************************************************************************************/
 bool findChainInSet (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
+vector<Chain> findChainsByPoa (set<Chain> setOfChains, uint16_t poa);
 
 class RT_Chain : public Chain
 {

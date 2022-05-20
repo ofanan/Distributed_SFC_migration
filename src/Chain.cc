@@ -68,15 +68,26 @@ uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 }
 
 
-/*************************************************************************************************************************************************
-Find a chain within a given set of chains.
-We assume that a chain is inequivocally identified by its id.
-Inputs: 
-- setOfChains: look for the chain within this set.
-- id: of the requested chain.
-- &foundChain: a reference, to which the found chain (if there exists) will be written.
-Return value: true iff the requested chain was found.
 
+/*************************************************************************************************************************************************
+* Given a set of chains and a poa, return all the chains in the set associated with this poa.
+**************************************************************************************************************************************************/
+vector<Chain> findChainsByPoa (set<Chain> setOfChains, uint16_t poa)
+{
+	vector<Chain> res;
+	
+	for (auto chain : setOfChains) {
+		if (chain.S_u[0] == poa) {
+			res.push_back (chain);
+		}
+	}
+	return res;
+}
+
+/*************************************************************************************************************************************************
+* Given a chain id, finding the respective chain within a given set of chains.
+* The chain is written to foundChain.
+* Output: true iff the requested chain was found.
 **************************************************************************************************************************************************/
 bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chainId, Chain &c)
 {

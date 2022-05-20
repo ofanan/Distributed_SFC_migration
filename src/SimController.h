@@ -30,6 +30,7 @@ Controller of the simulation:
 #include "LeftChainsMsg_m.h"
 #include "PlacementInfoMsg_m.h"
 #include "FinishedAlgMsg_m.h"
+#include "AskReshSyncMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -88,6 +89,7 @@ class SimController : public cSimpleModule
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleFinishedAlgMsg (cMessage *msg);
+		void handleAskReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
     
