@@ -127,7 +127,7 @@ void SimController::runTimeStep ()
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
-  		rlzRsrcsOfChains ();
+  		rlzRsrcsOfChains (chainsThatLeftDatacenter);
   		initAlg ();
   		// Schedule a self-event for reading the handling the next time-step
   		scheduleAt (simTime() + 1.0, new cMessage);
@@ -348,12 +348,12 @@ void SimController::readOldChainsLine (string line)
 - Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim'), based on chainsThatLeftDatacenter.
 - Clear chainsThatLeftDatacenter.
 **************************************************************************************************************************************************/
-void SimController::rlzRsrcsOfChains ()
+void SimController::rlzRsrcsOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc) 
 {
 
 	LeftChainsMsg* msg;
 	uint16_t i;
-	for (auto &item : chainsThatLeftDatacenter)
+	for (auto &item : ChainsToRlzFromDc)
 	{
 		msg = new LeftChainsMsg ();
 		msg -> setLeftChainsArraySize (item.second.size());
@@ -363,7 +363,6 @@ void SimController::rlzRsrcsOfChains ()
 		}
 		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
 	}
-	chainsThatLeftDatacenter.clear ();
 }
 
 // Initiate the run of placement alg'
@@ -382,30 +381,21 @@ The function does the following:
 void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 {
 
-//	for (auto chain : allChains) {
-//		if (chain.S_u[0] == (Datacenter*) (msg->getSenderModule())>id) {
-//  		chainsThatLeftDatacenter[chain.getCurDatacenter()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-//		}
-//	}
-//	return res;
+	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->id;
+  unordered_map <uint16_t, vector<int32_t> > chainsToReplace;
+	InitBottomUpMsg* msg2snd  = new InitBottomUpMsg ();
+	uint16_t numOfChainsToReplace = 0;
 
-//	vector <Chain> ChainsToMigrate = findChainsByPoa (allChains, ((Datacenter*) (msg->getSenderModule()) )->id); // will hold all the chains belonging to the poa that called me
-//	Chain chain;
-//	
-//	// gather into chainsThatLeftDatacenter[dc] all the IDs of chains which should be released from datacenter dc. 
-//	for (const auto& token : tokens) {
-//  	if (!(findChainInSet (allChains, chainId, chain))) {
-//			error ("t=%d: didn't find chain id %d that left", t, chainId);
-//	  }
-//	  else {
-//	  	if (MyConfig::DEBUG_LVL>0 && chain.curLvl == UNPLACED_) {
-//				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
-//	  		continue;
-//	  	}
-//  		chainsThatLeftDatacenter[chain.getCurDatacenter()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-//	  }
-//  }
-//	rlzRsrcsOfChains ();
+	for (auto chain : allChains) {
+		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
+  		chainsToReplace[chain.getCurDatacenter()].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
+			msg2snd -> setNotAssignedArraySize (++numOfChainsToReplace);
+			msg2snd -> setNotAssigned 			   (numOfChainsToReplace-1, chain);
+		}
+	}
+	rlzRsrcsOfChains (chainsToReplace);
+
+	sendDirect (msg2snd, (cModule*)(datacenters[dcId]), "directMsgsPort");
 }
 
 

@@ -486,9 +486,8 @@ void Datacenter::clrRsrc ()
 	notAssigned. 					clear ();
 	pushUpSet.   					clear ();
 	placedChains.			 	  clear ();
-	potPlacedChains.			clear ();
+	potPlacedChainsIds.		clear ();
 	newlyPlacedChainsIds.	clear ();
-
 	availCpu = 0;
 }
 
