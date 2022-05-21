@@ -138,4 +138,17 @@ pot. placed chains:
 allChains
 *******************
 1,0,2,
+DC 0, placed chains: 0,2,
+DC 1, placed chains: 1,
+DC 2, placed chains: 
+DC 3, placed chains: 
+DC 4, placed chains: 
+DC 5, placed chains: 
+DC 6, placed chains: 
+DC 7, placed chains: 
+DC 8, placed chains: 
+DC 9, placed chains: 
+DC 10, placed chains: 
+DC 11, placed chains: 
+DC 12, placed chains: 
 finished sim

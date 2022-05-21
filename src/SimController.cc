@@ -178,6 +178,7 @@ void SimController::concludeTimeStep ()
 	if (MyConfig::LOG_LVL > 1) {
 		printAllDatacenters ();
 	  printAllChains ();
+	  printAllDatacentersByAllChains ();
 	}
 }
 // print all the placed (and possibly, the pot-placed) chains on each DC by this->allChains DB.
