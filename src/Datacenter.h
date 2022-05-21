@@ -16,6 +16,7 @@
 #include "FinishedAlgMsg_m.h"
 #include "LeftChainsMsg_m.h"
 #include "AskReshSyncMsg_m.h"
+#include "PrintAllDatacentersMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -45,7 +46,7 @@ class Datacenter : public cSimpleModule
     UnorderedSetOfChains placedChains; 
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
     vector<uint16_t>  newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
-		uint8_t numBuMsgsRcvd; 
+		uint8_t numBuPktsRcvd; 
 		
     Datacenter();
     ~Datacenter();
@@ -60,7 +61,6 @@ class Datacenter : public cSimpleModule
     vector <cChannel*>  xmtChnl;
     vector <EndXmtPkt*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
-    cPacket  *pkt2send; // Pkt that is currently prepared to be sent.
 		SetOfChainsOrderedByCpuUsage pushUpSet;
 
     virtual void initialize();
@@ -81,11 +81,15 @@ class Datacenter : public cSimpleModule
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		();
+    void clrRsrc 								();
     void genNsndPushUpPktsToChildren ();
     inline void     printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
+		
+		// logging and debug
+		void PrintAllDatacenters 		(); // initiate a print of the content of all the datacenters
 };
 
 #endif

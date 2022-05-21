@@ -47,7 +47,7 @@ void Datacenter::initialize()
   xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
   endXmtEvents.   resize (numPorts);
   idOfChildren.   resize (numChildren);
-  numBuMsgsRcvd = 0;
+  numBuPktsRcvd = 0;
   
   // Discover the xmt channels to the neighbors, and the neighbors' id's.
 	for (int portNum (0); portNum < numPorts; portNum++) {
@@ -119,8 +119,9 @@ void Datacenter::handleMessage (cMessage *msg)
 		handleInitBottomUpMsg ();
   }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
+		numBuPktsRcvd++;
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuMsgsRcvd, numChildren);
+			snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuPktsRcvd, numChildren);
 			printBufToLog ();
 		}
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
@@ -172,8 +173,6 @@ void Datacenter::handlePushUpPkt ()
 		printBufToLog ();
 	}
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
-	Chain chain;
-	uint16_t mu_u;
 	
 //	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
 	pushUpSet.clear ();
@@ -199,7 +198,7 @@ void Datacenter::pushUpSync ()
 		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
 	}
-	reshuffled = true;
+	reshuffled = false;
 	
 	// First, find for each pot-placed of mine whether it was pushed-up by an ancestor, and react correspondigly
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
@@ -266,6 +265,9 @@ void Datacenter::pushUpSync ()
 	pushUpSet.clear();
 }
 
+/*************************************************************************************************************************************************
+Generate pushUpPkts, based on the data currently found in pushUpSet, and xmt these pkts to all the children
+*************************************************************************************************************************************************/
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
@@ -275,7 +277,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pushUpVecArraySize=0;
 		pkt = new PushUpPkt;
-		uint16_t i(0);
 		for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
 			if (chain.S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
@@ -283,18 +284,18 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			}		
 		}
 		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
-			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to my prnt	
+			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
 }
 
-/*
+/*************************************************************************************************************************************************
 Run the PU Async' alg'. 
 Assume that this->pushUpSet already contains the relevant chains.
-*/
+*************************************************************************************************************************************************/
 void Datacenter::pushUpAsync ()
 {
-  PushUpPkt *pkt = (PushUpPkt*)curHandledMsg;
+//  PushUpPkt *pkt = (PushUpPkt*)curHandledMsg;
 }
 
 /************************************************************************************************************************************************
@@ -323,7 +324,7 @@ void Datacenter::bottomUpSync ()
 		}
 		else { 
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				prepareReshSync ();
+				return prepareReshSync ();
 			}
 			else {
 				chainPtr++;
@@ -383,17 +384,16 @@ void Datacenter::handleBottomUpPktSync ()
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
-	numBuMsgsRcvd++;
 	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {
 		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0] id=%d. pushUpSetSize=%d. pushUpSet=", id, numBuMsgsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
+			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpVec[0] id=%d. pushUpSetSize=%d. pushUpSet=", id, numBuPktsRcvd, src, pkt->getPushUpVec(0).id, (int)pushUpSet.size());
 			printBufToLog ();
 			MyConfig::printToLog (pushUpSet);
 		}
 	}
-	if (numBuMsgsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
+	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
-		numBuMsgsRcvd = 0;
+		numBuPktsRcvd = 0;
 	}
 }
 
@@ -410,6 +410,9 @@ void Datacenter::sndPushUpPkt ()
 {
 }
 
+/*************************************************************************************************************************************************
+Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpSet, and xmt it to my parent
+*************************************************************************************************************************************************/
 void Datacenter::sndBottomUpPkt ()
 {
 	BottomUpPkt* pkt2send = new BottomUpPkt;
@@ -420,6 +423,7 @@ void Datacenter::sndBottomUpPkt ()
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
+	i = 0;
 	pkt2send -> setPushUpVecArraySize (pushUpSet.size());
 	for (auto chain : pushUpSet) {
 		pkt2send->setPushUpVec (i++, chain);
@@ -442,15 +446,44 @@ void Datacenter::reshuffleAsync ()
 {
 }
 
-void Datacenter::prepareReshSync () 
+// initiate a print of the content of all the datacenters
+void Datacenter::PrintAllDatacenters ()
 {
+	PrintAllDatacentersMsg* msg2snd = new PrintAllDatacentersMsg; 
+	sendDirect (msg2snd, simController, "directMsgsPort");
 }
 
-/*
+void Datacenter::prepareReshSync () 
+{
+	if (reshuffled) {
+		sndBottomUpPkt ();	
+	}
+	reshuffled = true;
+	clrRsrc ();
+	for (uint8_t child(0); child<numChildren; child++) { // for each child...
+		PrepareReshSyncPkt *pkt = new PrepareReshSyncPkt;
+		sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
+	}
+}
+
+
+/*************************************************************************************************************************************************
+Clear all the resources currently allocated at this datastore:
+- Clear notAssigned and pushUpSet.
+- reset availCpu.
+*************************************************************************************************************************************************/
+void Datacenter::clrRsrc () 
+{
+	notAssigned.clear ();
+	pushUpSet.  clear ();
+	availCpu = 0;
+}
+
+/*************************************************************************************************************************************************
  * Send the given packet.
  * If the output port is free, xmt the pkt immediately.
  * Else, queue the pkt until the output port is free, and then xmt it.
- */
+*************************************************************************************************************************************************/
 void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
 {
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy

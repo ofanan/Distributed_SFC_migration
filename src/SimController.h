@@ -31,6 +31,7 @@ Controller of the simulation:
 #include "PlacementInfoMsg_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "AskReshSyncMsg_m.h"
+#include "PrintAllDatacentersMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;

@@ -39,9 +39,6 @@ void SimController::initialize (int stage)
 	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
 	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
 	    leaves[leafId] = datacenters[dc];
-	    datacenters[dc]->leafId = leafId;
-	    snprintf (buf, bufSize, "leafId = %d\n", leafId);
-	    printBufToLog ();
 	    leafId++;
 	  }
 	}
@@ -167,7 +164,7 @@ void SimController::finish ()
 void SimController::concludeTimeStep ()
 {
 	if (MyConfig::DEBUG_LVL>0) {
-		for (auto const chain : allChains) {
+		for (auto const &chain : allChains) {
 			if (chain.curLvl==UNPLACED_) {
 				error ("t=$d: chain %d is unplaced at the end of cycle\n", t, chain.id);
 			}
@@ -179,7 +176,7 @@ void SimController::concludeTimeStep ()
 	rcvdFinishedAlgMsgFromLeaves = {false};
 	
 	if (MyConfig::LOG_LVL > 1) {
-		printAllDatacenters 					 ();
+		printAllDatacenters ();
 	}
 }
 
@@ -188,7 +185,6 @@ void SimController::printAllDatacenters ()
 	for (const auto datacenter : datacenters) {
 		datacenter -> print ();
 	}
-
 }
 
 // Returns the overall cpu cost at its current location.
@@ -196,7 +192,7 @@ int SimController::calcSolCpuCost ()
 {
 	
 	int cpuCost = 0;
-	for (auto const chain : allChains) {	
+	for (auto const &chain : allChains) {	
 		cpuCost += chain.getCpuCost ();
 	}
 	return cpuCost;
@@ -492,6 +488,11 @@ void SimController::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<AskReshSyncMsg*> (msg)) { 
 		handleAskReshSyncMsg (msg);
+  }
+  else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
+  	MyConfig::printToLog ("rcvd PrintAllDatacentersMsg\n");
+  	printAllDatacenters ();
+  	endSimulation (); //$$$
   }
   else {
   	error ("Rcvd unknown msg type");
