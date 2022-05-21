@@ -15,7 +15,7 @@
 #include "PrepareReshSyncPkt_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "LeftChainsMsg_m.h"
-#include "AskReshSyncMsg_m.h"
+#include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 
 using namespace omnetpp;
@@ -87,6 +87,7 @@ class Datacenter : public cSimpleModule
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
     inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
+		inline void     sndDirectToSimCtrlr (cMessage* msg);
 		
 		// logging and debug
 		void PrintAllDatacenters 		(); // initiate a print of the content of all the datacenters

@@ -30,7 +30,7 @@ Controller of the simulation:
 #include "LeftChainsMsg_m.h"
 #include "PlacementInfoMsg_m.h"
 #include "FinishedAlgMsg_m.h"
-#include "AskReshSyncMsg_m.h"
+#include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 
 using namespace omnetpp;
@@ -89,14 +89,15 @@ class SimController : public cSimpleModule
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleFinishedAlgMsg (cMessage *msg);
-		void handleAskReshSyncMsg (cMessage *msg);
+		void handlePrepareReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
 		void printAllDatacenters ();
-    void printAllChains (ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
+		void printAllDatacentersByAllChains ();
+    void printAllChains (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
 				 
   public:
     string traceFileName = "results/poa_files/Tree_shorter.poa";

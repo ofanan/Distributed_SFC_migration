@@ -7,6 +7,6 @@
 
 t = 30540
 usrs_that_left: 
-new_usrs: (0,0)(1,0)(2,1)(3,1)
+new_usrs: (0,0)(1,0)(2,1)
 old_usrs: 
 

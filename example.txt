@@ -43,6 +43,11 @@ DC 1 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 1. rcvd 2 BU pkts. src=4. pushUpVec[0] id=0. pushUpSetSize=2. pushUpSet=chain 0: S_u=4,1,
 chain 2: S_u=5,1,
 DC 1 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
+DC 1, lvl=1. placed chains: 1,
+pot. placed chains: 
+DC 1 sending a BU pkt to prnt
+DC 1. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=4,1,
+chain 2: S_u=5,1,
 DC 2 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
 DC 2 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
 DC 2 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
@@ -55,19 +60,67 @@ DC 3 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
 DC 3, lvl=1. placed chains: 
 pot. placed chains: 
 DC 3 sending a BU pkt to prnt
-rcvd PrintAllDatacentersMsg
+DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
+DC 0. rcvd 1 BU pkts. src=1. pushUpVec[0] id=0. pushUpSetSize=2. pushUpSet=chain 2: S_u=5,1,
+chain 0: S_u=4,1,
+DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
+DC 0 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
 DC 0, lvl=2. placed chains: 
 pot. placed chains: 
-DC 1, lvl=1. placed chains: 3,
+dc 0 begins PU. pushUpSet=
+chain 2: S_u=5,1,
+chain 0: S_u=4,1,
+DC 0 sending PlacementInfoMsg
+DC 1 rcvd PU pkt
+dc 1 begins PU. pushUpSet=
+chain 2: S_u=5,1,
+chain 0: S_u=4,1,
+DC 1 sending PlacementInfoMsg
+DC 2 rcvd PU pkt
+dc 2 begins PU. pushUpSet=
+DC 3 rcvd PU pkt
+dc 3 begins PU. pushUpSet=
+DC 6 rcvd PU pkt
+dc 6 begins PU. pushUpSet=
+DC 4 rcvd PU pkt
+dc 4 begins PU. pushUpSet=
+chain 0: S_u=4,1,
+DC 5 rcvd PU pkt
+dc 5 begins PU. pushUpSet=
+chain 2: S_u=5,1,
+DC 9 rcvd PU pkt
+dc 9 begins PU. pushUpSet=
+DC 7 rcvd PU pkt
+dc 7 begins PU. pushUpSet=
+DC 8 rcvd PU pkt
+dc 8 begins PU. pushUpSet=
+DC 12 rcvd PU pkt
+dc 12 begins PU. pushUpSet=
+DC 10 rcvd PU pkt
+dc 10 begins PU. pushUpSet=
+DC 11 rcvd PU pkt
+dc 11 begins PU. pushUpSet=
+rcvd fin alg msg from DC 6 leaf 25441
+rcvd fin alg msg from DC 4 leaf 15225
+rcvd fin alg msg from DC 5 leaf 24900
+rcvd fin alg msg from DC 9 leaf 0
+rcvd fin alg msg from DC 7 leaf 0
+rcvd fin alg msg from DC 8 leaf 0
+rcvd fin alg msg from DC 12 leaf 0
+rcvd fin alg msg from DC 10 leaf 0
+rcvd fin alg msg from DC 11 leaf 0
+DC 0, lvl=2. placed chains: 0,2,
+pot. placed chains: 
+DC 1, lvl=1. placed chains: 1,
 pot. placed chains: 
 DC 2, lvl=1. placed chains: 
 pot. placed chains: 
 DC 3, lvl=1. placed chains: 
 pot. placed chains: 
 DC 4, lvl=0. placed chains: 
-pot. placed chains: 0,
+pot. placed chains: 
 DC 5, lvl=0. placed chains: 
-pot. placed chains: 2,
+pot. placed chains: 
 DC 6, lvl=0. placed chains: 
 pot. placed chains: 
 DC 7, lvl=0. placed chains: 
@@ -82,4 +135,7 @@ DC 11, lvl=0. placed chains:
 pot. placed chains: 
 DC 12, lvl=0. placed chains: 
 pot. placed chains: 
+allChains
+*******************
+1,0,2,
 finished sim

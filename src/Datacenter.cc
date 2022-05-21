@@ -16,6 +16,8 @@ inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
 inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
 
+inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
+
 Datacenter::Datacenter()
 {
 }
@@ -463,6 +465,11 @@ void Datacenter::prepareReshSync ()
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		PrepareReshSyncPkt *pkt = new PrepareReshSyncPkt;
 		sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
+	}
+	
+	if (isLeaf) {
+		PrepareReshSyncMsg* msg = new PrepareReshSyncMsg;
+		sndDirectToSimCtrlr (msg);
 	}
 }
 

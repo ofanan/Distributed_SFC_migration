@@ -177,9 +177,27 @@ void SimController::concludeTimeStep ()
 	
 	if (MyConfig::LOG_LVL > 1) {
 		printAllDatacenters ();
+	  printAllChains ();
+	}
+}
+// print all the placed (and possibly, the pot-placed) chains on each DC by this->allChains DB.
+void SimController::printAllDatacentersByAllChains ()
+{
+	// gather the required data
+	vector<uint32_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
+	for (const auto &chain : allChains) {
+		chainsPlacedOnDatacenter [chain.getCurDatacenter ()].push_back (chain.id);
+	}
+	
+	// print the data
+	for (uint16_t dcId(0); dcId<numDatacenters; dcId++) {
+		snprintf (buf, bufSize, "DC %d, placed chains: ", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
 	}
 }
 
+// print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
 void SimController::printAllDatacenters ()
 {
 	for (const auto datacenter : datacenters) {
@@ -200,19 +218,10 @@ int SimController::calcSolCpuCost ()
 
 
 // Print all the chains. Default: print only the chains IDs. 
-void SimController::printAllChains (ofstream &outFile, bool printSu=false, bool printleaf=false, bool printCurDatacenter=false)
+void SimController::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {
 	MyConfig::printToLog ("allChains\n*******************\n");
-	for (auto const & chain : allChains) {
-		outFile << "chain " << chain.id;
-		if (printSu) {
-			for (auto it (chain.S_u.begin()); it <= chain.S_u.end(); it++){
-				outFile << *it << ";";
-			}
-		}
-		outFile << endl;
-	}	
-	outFile << endl;
+	MyConfig::printToLog (allChains);
 }
 
   	
@@ -245,13 +254,13 @@ void SimController::readChainsThatLeftLine (string line)
   int32_t chainId;
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
-  for (const auto& token : tokens) {
+	for (const auto& token : tokens) {
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
-	  	if (chain.curLvl == UNPLACED_) {
+	  	if (MyConfig::DEBUG_LVL>0 && chain.curLvl == UNPLACED_) {
 				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
 	  		continue;
 	  	}
@@ -289,7 +298,7 @@ void SimController::readNewChainsLine (string line)
 	}	
 	if (LOG_LVL>1) {
 	  MyConfig::printToLog ("After readNewCHainsLine: ");
-	  printAllChains (logFile);
+	  printAllChains ();
 	}
 }
 
@@ -329,7 +338,7 @@ void SimController::readOldChainsLine (string line)
 	
 	if (LOG_LVL==2) {
 	  logFile << "After readOldCHainsLine: ";
-  	printAllChains (logFile);
+  	printAllChains ();
   }
 }
 
@@ -360,6 +369,42 @@ void SimController::rlzRsrcsOfChains ()
 void SimController::initAlg () {  	
 
 	return (MyConfig::mode==SYNC)? initAlgSync() : initAlgAsync();
+}
+
+
+/*************************************************************************************************************************************************
+Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.
+The function does the following:
+- rlz the rsrscs of all the chains associated with this poa.
+- Initiate a placement alg' from this poa.
+**************************************************************************************************************************************************/
+void SimController::handlePrepareReshSyncMsg (cMessage *msg)
+{
+
+//	for (auto chain : allChains) {
+//		if (chain.S_u[0] == (Datacenter*) (msg->getSenderModule())>id) {
+//  		chainsThatLeftDatacenter[chain.getCurDatacenter()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+//		}
+//	}
+//	return res;
+
+//	vector <Chain> ChainsToMigrate = findChainsByPoa (allChains, ((Datacenter*) (msg->getSenderModule()) )->id); // will hold all the chains belonging to the poa that called me
+//	Chain chain;
+//	
+//	// gather into chainsThatLeftDatacenter[dc] all the IDs of chains which should be released from datacenter dc. 
+//	for (const auto& token : tokens) {
+//  	if (!(findChainInSet (allChains, chainId, chain))) {
+//			error ("t=%d: didn't find chain id %d that left", t, chainId);
+//	  }
+//	  else {
+//	  	if (MyConfig::DEBUG_LVL>0 && chain.curLvl == UNPLACED_) {
+//				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
+//	  		continue;
+//	  	}
+//  		chainsThatLeftDatacenter[chain.getCurDatacenter()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+//	  }
+//  }
+//	rlzRsrcsOfChains ();
 }
 
 
@@ -438,9 +483,10 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 			if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
 				numMigs++; // Yep --> inc. the mig. cntr.
 			}
-			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-			chain.curLvl = curLvl;
-			allChains.insert (chain);
+			Chain modifiedChain (chain.id, chain.S_u); // will hold the modified chain to be inserted each time
+			modifiedChain.curLvl = curLvl;
+			allChains.erase (chain); // remove the old chain from our DB
+			allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
 }
@@ -467,11 +513,6 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 	}
 }
 
-void SimController::handleAskReshSyncMsg (cMessage *msg)
-{
-	vector <Chain> ChainsToMigrate = findChainsByPoa (allChains, ((Datacenter*) (msg->getSenderModule()) )->id);
-}
-
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
@@ -486,13 +527,11 @@ void SimController::handleMessage (cMessage *msg)
   else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
   	handleFinishedAlgMsg (msg);
   }
-  else if (dynamic_cast<AskReshSyncMsg*> (msg)) { 
-		handleAskReshSyncMsg (msg);
+  else if (dynamic_cast<PrepareReshSyncMsg*> (msg)) { 
+		handlePrepareReshSyncMsg (msg);
   }
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
-  	MyConfig::printToLog ("rcvd PrintAllDatacentersMsg\n");
   	printAllDatacenters ();
-  	endSimulation (); //$$$
   }
   else {
   	error ("Rcvd unknown msg type");
