@@ -51,8 +51,6 @@ class Chain
     uint16_t mu_u_len () const;
 };
 
-bool findChainInSet (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
-
 class RT_Chain : public Chain
 {
 public:
@@ -78,9 +76,6 @@ struct ChainHash {
   }
 };
 
-// Insert a chain in its correct place to a sorted vector of chains
-void insertSorted (vector <Chain> &vec, const Chain c);
-
 /*************************************************************************************************************************************************
 Rcvs 2 sorted vectors of chains. 
 Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
@@ -97,8 +92,13 @@ struct sortTwoChainsByCpuUsage {
 	} 
 };
 
-typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
+typedef unordered_set <Chain, ChainHash> 		 UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
+
+// Insert a chain in its correct place to a sorted vector of chains
+void insertSorted (vector <Chain> &vec, const Chain c);
+bool findChainInSet 	 (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
+bool eraseChainFromSet (UnorderedSetOfChains setOfChains, uint16_t chainId);
 
 /*************************************************************************************************************************************************
 Find a chain (given by its id) in a given set of chains.

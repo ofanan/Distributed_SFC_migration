@@ -1,78 +1,45 @@
 t=30540
-DC 5 rcvd a initBU msg
-DC 5, lvl=0. placed chains: 
-pot. placed chains: 2,
-DC 5 sending a BU pkt to prnt
-DC 5. sending a BU pkt. pushUpVec[0]=2. pushUpSet=chain 2: S_u=5,1,
 DC 4 rcvd a initBU msg
 DC 4, lvl=0. placed chains: 
-pot. placed chains: 0,
+pot. placed chains: 2,
 DC 4 sending a BU pkt to prnt
-DC 4. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=4,1,
+DC 4. sending a BU pkt. pushUpVec[0]=2. pushUpSet=chain 2: S_u=4,1,
+DC 3 rcvd a initBU msg
+DC 3, lvl=0. placed chains: 
+pot. placed chains: 0,
+DC 3 sending a BU pkt to prnt
+DC 3. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=3,1,
+DC 5 rcvd a initBU msg
+DC 5, lvl=0. placed chains: 
+pot. placed chains: 
+DC 5 sending a BU pkt to prnt
 DC 6 rcvd a initBU msg
 DC 6, lvl=0. placed chains: 
 pot. placed chains: 
 DC 6 sending a BU pkt to prnt
-DC 7 rcvd a initBU msg
-DC 7, lvl=0. placed chains: 
-pot. placed chains: 
-DC 7 sending a BU pkt to prnt
-DC 8 rcvd a initBU msg
-DC 8, lvl=0. placed chains: 
-pot. placed chains: 
-DC 8 sending a BU pkt to prnt
-DC 9 rcvd a initBU msg
-DC 9, lvl=0. placed chains: 
-pot. placed chains: 
-DC 9 sending a BU pkt to prnt
-DC 10 rcvd a initBU msg
-DC 10, lvl=0. placed chains: 
-pot. placed chains: 
-DC 10 sending a BU pkt to prnt
-DC 11 rcvd a initBU msg
-DC 11, lvl=0. placed chains: 
-pot. placed chains: 
-DC 11 sending a BU pkt to prnt
-DC 12 rcvd a initBU msg
-DC 12, lvl=0. placed chains: 
-pot. placed chains: 
-DC 12 sending a BU pkt to prnt
-DC 1 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
-DC 1. rcvd 1 BU pkts. src=5. pushUpVec[0] id=2. pushUpSetSize=1. pushUpSet=chain 2: S_u=5,1,
-DC 1 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
-DC 1. rcvd 2 BU pkts. src=4. pushUpVec[0] id=0. pushUpSetSize=2. pushUpSet=chain 0: S_u=4,1,
-chain 2: S_u=5,1,
-DC 1 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
+DC 1 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=2
+DC 1. rcvd 1 BU pkts. src=4. pushUpVec[0] id=2. pushUpSetSize=1. pushUpSet=chain 2: S_u=4,1,
+DC 1 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=2
+DC 1. rcvd 2 BU pkts. src=3. pushUpVec[0] id=0. pushUpSetSize=2. pushUpSet=chain 0: S_u=3,1,
+chain 2: S_u=4,1,
 DC 1 sending a BU pkt to prnt
-DC 1. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=4,1,
-chain 2: S_u=5,1,
-DC 2 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
-DC 2 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
-DC 2 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
+DC 1. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=3,1,
+chain 2: S_u=4,1,
+DC 2 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=2
+DC 2 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=2
 DC 2, lvl=1. placed chains: 
 pot. placed chains: 
 DC 2 sending a BU pkt to prnt
-DC 3 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
-DC 3 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
-DC 3 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
-DC 3, lvl=1. placed chains: 
-pot. placed chains: 
+DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=2
+DC 0. rcvd 1 BU pkts. src=1. pushUpVec[0] id=0. pushUpSetSize=2. pushUpSet=chain 2: S_u=4,1,
+chain 0: S_u=3,1,
 DC 3 sending a BU pkt to prnt
-DC 0 rcvd a BU pkt. num BU pkt rcvd=1, numChildren=3
-DC 0. rcvd 1 BU pkts. src=1. pushUpVec[0] id=0. pushUpSetSize=2. pushUpSet=chain 2: S_u=5,1,
-chain 0: S_u=4,1,
-DC 4 sending a BU pkt to prnt
-DC 4. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=4,1,
-DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=3
-DC 0 rcvd a BU pkt. num BU pkt rcvd=3, numChildren=3
+DC 3. sending a BU pkt. pushUpVec[0]=0. pushUpSet=chain 0: S_u=3,1,
+DC 0 rcvd a BU pkt. num BU pkt rcvd=2, numChildren=2
 DC 0, lvl=2. placed chains: 
 pot. placed chains: 1,
 dc 0 begins PU. pushUpSet=
-chain 1: S_u=4,1,
-chain 2: S_u=5,1,
-chain 0: S_u=4,1,
+chain 1: S_u=3,1,
+chain 2: S_u=4,1,
+chain 0: S_u=3,1,
 DC 0 sending PlacementInfoMsg
-DC 6 rcvd a initBU msg
-DC 6, lvl=0. placed chains: 
-pot. placed chains: 
-DC 6 sending a BU pkt to prnt

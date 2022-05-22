@@ -154,11 +154,14 @@ Handle a rcvd RlzRsrcMsg (rcvd from the sim' ctrlr).
 *************************************************************************************************************************************************/
 void Datacenter::handleRlzRsrcMsg () 
 {
-	error ("in handleRlzRsrcMsg");
-//	for (uint16_t i(0); i< (msg->getChainsToRlzArraySize()); i++) {
-//		insertSorted (this->notAssigned, msg->getNotAssigned (i));
-//	} 
-	
+	RlzRsrcMsg *msg = (RlzRsrcMsg*)curHandledMsg;
+	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
+		if (placedChains.empty()) {
+			break;
+		}		
+		eraseChainFromSet (placedChains, msg->getChainsToRlz(i));
+	} 
+	error ("so far, so good");
 }
 
 /*************************************************************************************************************************************************

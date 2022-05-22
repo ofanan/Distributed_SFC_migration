@@ -85,6 +85,25 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, uin
 }
 
 /*************************************************************************************************************************************************
+* Given a chain id, if that chain is found in the given set - erase it from the set.
+* Returns true iff the requested chain was found (and erased) from the set.
+**************************************************************************************************************************************************/
+bool eraseChainFromSet (UnorderedSetOfChains setOfChains, uint16_t chainId)
+
+{
+	Chain dummy (chainId, {});
+	auto search = setOfChains.find (dummy);
+
+	if (search==setOfChains.end()) {
+		return false;
+	}
+	else {
+		setOfChains.erase(search);
+		return true;
+	}
+}
+
+/*************************************************************************************************************************************************
 * Given a chain id, finding the respective chain within a given set of chains.
 * The chain is written to foundChain.
 * Output: true iff the requested chain was found.
