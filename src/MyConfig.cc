@@ -56,7 +56,7 @@ void MyConfig::printToLog (int d)
 
 void MyConfig::printToLog (vector <Chain> vec) 
 {
-	for (const auto chain : vec) {
+	for (const auto &chain : vec) {
 		logFile << chain.id << ",";
 	}
 	logFile << endl;
@@ -97,7 +97,4 @@ vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const ve
 	return res;
 }
 
-void MyConfig::finish ()
-{
-  logFile.close ();
-}
+

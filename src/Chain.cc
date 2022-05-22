@@ -88,8 +88,7 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, uin
 * Given a chain id, if that chain is found in the given set - erase it from the set.
 * Returns true iff the requested chain was found (and erased) from the set.
 **************************************************************************************************************************************************/
-bool eraseChainFromSet (UnorderedSetOfChains setOfChains, uint16_t chainId)
-
+bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId)
 {
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);

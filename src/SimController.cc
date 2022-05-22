@@ -388,7 +388,11 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 
 	for (auto chain : allChains) {
 		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
-  		chainsToReplace[chain.getCurDatacenter()].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
+			int16_t chainCurDatacenter = chain.getCurDatacenter();
+			if (chainCurDatacenter == UNPLACED) { // if this chain isn't already placed, no need to release it..
+			  continue;
+			}
+			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
 			msg2snd -> setNotAssignedArraySize (++numOfChainsToReplace);
 			msg2snd -> setNotAssigned 			   (numOfChainsToReplace-1, chain);
 		}

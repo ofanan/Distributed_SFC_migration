@@ -98,7 +98,7 @@ typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
 // Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c);
 bool findChainInSet 	 (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
-bool eraseChainFromSet (UnorderedSetOfChains setOfChains, uint16_t chainId);
+bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId);
 
 /*************************************************************************************************************************************************
 Find a chain (given by its id) in a given set of chains.

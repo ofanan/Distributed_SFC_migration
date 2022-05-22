@@ -18,6 +18,20 @@ inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
+// erase the given key from the given set. Returns true iff the requested key was indeed found in the set
+static bool eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
+{
+	auto search = set.find (id);
+
+	if (search==set.end()) {
+		return false;
+	}
+	else {
+		set.erase(search);
+		return true;
+	}
+}
+
 Datacenter::Datacenter()
 {
 }
@@ -155,13 +169,25 @@ Handle a rcvd RlzRsrcMsg (rcvd from the sim' ctrlr).
 void Datacenter::handleRlzRsrcMsg () 
 {
 	RlzRsrcMsg *msg = (RlzRsrcMsg*)curHandledMsg;
+	
+	// remove each chain indicated in the msg from placedChains
+	MyConfig::printToLog ("1");
 	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
 		if (placedChains.empty()) {
 			break;
 		}		
 		eraseChainFromSet (placedChains, msg->getChainsToRlz(i));
 	} 
-	error ("so far, so good");
+
+	// remove each chain indicated in the msg from potPlacedChains
+	error ("2");
+	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
+		if (potPlacedChainsIds.empty()) {
+			break;
+		}		
+		eraseKeyFromSet (potPlacedChainsIds, msg->getChainsToRlz(i));
+	} 
+	error ("3");
 }
 
 /*************************************************************************************************************************************************

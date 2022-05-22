@@ -48,11 +48,7 @@ class MyConfig {
 
 		//Init
 		static void openFiles ();
-		static void finish    ();
 		
-		static ofstream getLogFile ();
-/*		void initialize();*/
-
 		//print
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
@@ -64,8 +60,11 @@ class MyConfig {
 		static void printToLog (SetOfChainsOrderedByCpuUsage setOfChains, bool printS_u=true);
 		static void printToLog (UnorderedSetOfChains set2print);
 		static void printSuToLog (Chain chain);
+		
+		// Other accessories funcs'
+		static ofstream getLogFile ();
 		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2); // returns the scalar product of two vectors
-
+/*		static bool eraseKeyFromSet (unordered_set <uint32_t> set, uint16_t id); // erase the given key from the given set. Returns true iff the requested key was indeed found in the set*/
 };
 
 #endif
