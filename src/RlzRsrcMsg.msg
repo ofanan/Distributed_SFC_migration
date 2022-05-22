@@ -7,9 +7,9 @@ cplusplus {{
 
 class noncobject Chain; 
 
-message LeftChainsMsg
+message RlzRsrcMsg
 {
-	int32_t leftChains[];
+	int32_t chainsToRlz[];
 }
 
 

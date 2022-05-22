@@ -14,7 +14,7 @@
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
 #include "FinishedAlgMsg_m.h"
-#include "LeftChainsMsg_m.h"
+#include "RlzRsrcMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 
@@ -81,7 +81,8 @@ class Datacenter : public cSimpleModule
     void sndBottomUpPkt					();
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		();
-    void clrRsrc 								();
+    void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
+    void rlzRsrc 								(); // Release the resources
     void genNsndPushUpPktsToChildren ();
     inline void     printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;

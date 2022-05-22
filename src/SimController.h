@@ -27,7 +27,7 @@ Controller of the simulation:
 #include "Datacenter.h"
 #include "Chain.h"
 #include "InitBottomUpMsg_m.h"
-#include "LeftChainsMsg_m.h"
+#include "RlzRsrcMsg_m.h"
 #include "PlacementInfoMsg_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
@@ -80,7 +80,7 @@ class SimController : public cSimpleModule
 		void readChainsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void readNewChainsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
 		void readOldChainsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
-		void rlzRsrcsOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
+		void rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
 		void initAlg (); // init a placement alg'
   	void initAlgSync (); // init a sync placement alg'
   	void initAlgAsync (); // init an async placement alg'

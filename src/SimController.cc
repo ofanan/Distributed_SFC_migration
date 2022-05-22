@@ -127,7 +127,7 @@ void SimController::runTimeStep ()
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
-  		rlzRsrcsOfChains (chainsThatLeftDatacenter);
+  		rlzRsrcOfChains (chainsThatLeftDatacenter);
   		initAlg ();
   		// Schedule a self-event for reading the handling the next time-step
   		scheduleAt (simTime() + 1.0, new cMessage);
@@ -166,7 +166,7 @@ void SimController::concludeTimeStep ()
 	if (MyConfig::DEBUG_LVL>0) {
 		for (auto const &chain : allChains) {
 			if (chain.curLvl==UNPLACED_) {
-				error ("t=$d: chain %d is unplaced at the end of cycle\n", t, chain.id);
+				error ("t=%d: chain %d is unplaced at the end of cycle\n", t, chain.id);
 			}
 		}
 	}
@@ -348,18 +348,18 @@ void SimController::readOldChainsLine (string line)
 - Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim'), based on chainsThatLeftDatacenter.
 - Clear chainsThatLeftDatacenter.
 **************************************************************************************************************************************************/
-void SimController::rlzRsrcsOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc) 
+void SimController::rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc) 
 {
 
-	LeftChainsMsg* msg;
+	RlzRsrcMsg* msg;
 	uint16_t i;
 	for (auto &item : ChainsToRlzFromDc)
 	{
-		msg = new LeftChainsMsg ();
-		msg -> setLeftChainsArraySize (item.second.size());
+		msg = new RlzRsrcMsg ();
+		msg -> setChainsToRlzArraySize (item.second.size());
 		i = 0;
 		for (auto & chainId : item.second) {
-			msg -> setLeftChains (i++, chainId);
+			msg -> setChainsToRlz (i++, chainId);
 		}
 		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
 	}
@@ -393,7 +393,7 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 			msg2snd -> setNotAssigned 			   (numOfChainsToReplace-1, chain);
 		}
 	}
-	rlzRsrcsOfChains (chainsToReplace);
+	rlzRsrcOfChains (chainsToReplace);
 
 	sendDirect (msg2snd, (cModule*)(datacenters[dcId]), "directMsgsPort");
 }

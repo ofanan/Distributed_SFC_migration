@@ -478,6 +478,7 @@ void Datacenter::prepareReshSync ()
 
 /*************************************************************************************************************************************************
 Clear all the resources currently allocated at this datastore:
+- Dis-place all the placed and pot-placed chains.
 - Clear notAssigned and pushUpSet.
 - reset availCpu.
 *************************************************************************************************************************************************/
@@ -488,7 +489,7 @@ void Datacenter::clrRsrc ()
 	placedChains.			 	  clear ();
 	potPlacedChainsIds.		clear ();
 	newlyPlacedChainsIds.	clear ();
-	availCpu = 0;
+	availCpu 									 = 0;
 }
 
 /*************************************************************************************************************************************************
