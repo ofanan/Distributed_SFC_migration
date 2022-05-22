@@ -261,6 +261,7 @@ void SimController::readChainsThatLeftLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
   int32_t chainId;
+  int16_t chainCurDatacenter;
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
 	for (const auto& token : tokens) {
@@ -269,11 +270,11 @@ void SimController::readChainsThatLeftLine (string line)
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
-	  	if (MyConfig::DEBUG_LVL>0 && chain.curLvl == UNPLACED_) {
-				MyConfig::printToLog ("Note: this chain was not placed before leaving\n"); 
-	  		continue;
+	  	chainCurDatacenter = chain.getCurDatacenter();
+	  	if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED) {
+				error ("Note: this chain was not placed before leaving\n"); 
 	  	}
-  		chainsThatLeftDatacenter[chain.getCurDatacenter()].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+  		chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
 	  }
   }
 }
@@ -325,6 +326,7 @@ void SimController::readOldChainsLine (string line)
   uint32_t chainId;
   uint16_t poaId;
 	Chain chain; // will hold the chain found in this->allChains
+	int16_t chainCurDatacenter;
 
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
@@ -332,20 +334,23 @@ void SimController::readOldChainsLine (string line)
   	if (!(findChainInSet (allChains, chainId, chain))) {
 			error ("t=%d: didn't find chain id %d in allChains, in readOldChainsLine", t, chainId);
 	  }
-	  else {
-			vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
-			Chain modifiedChain (chain.id, S_u); // will hold the modified chain to be inserted each time
-			allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-			allChains.insert (modifiedChain);
-			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain);			
-			if (chain.curLvl != UNPLACED_) {
-				// insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
-				chainsThatLeftDatacenter[chain.getCurDatacenter ()].push_back (modifiedChain.id); 
-			}
-	  }
+		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
+		Chain modifiedChain (chainId, S_u); // will hold the modified chain to be inserted each time
+		allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+		allChains.insert (modifiedChain);
+		insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain);			
+		chainCurDatacenter = chain.getCurDatacenter();
+
+		if (chainCurDatacenter == UNPLACED) {
+			// snprintf (buf, bufSize, "ERROR t=%d: at readOldChainsLine, old usr %d wasn't placed yet\n", t, chainId);
+			// printBufToLog();
+			error ("ERROR t=%d: at readOldChainsLine, old usr %d wasn't placed yet\n", t, chainId);
+			continue;
+		}
+		chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	}
 	
-	if (LOG_LVL==2) {
+	if (MyConfig::LOG_LVL==DETAILED_LOG) {
 	  logFile << "After readOldCHainsLine: ";
   	printAllChains ();
   }
@@ -397,7 +402,7 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 	for (auto chain : allChains) {
 		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
 			int16_t chainCurDatacenter = chain.getCurDatacenter();
-			if (chainCurDatacenter == UNPLACED) { // if this chain isn't already placed, no need to release it..
+			if (chainCurDatacenter == UNPLACED) { // if this chain isn't already placed, no need to release it.
 			  continue;
 			}
 			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
