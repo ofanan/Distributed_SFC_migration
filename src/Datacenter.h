@@ -45,7 +45,7 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned, pushUpVec; 
     UnorderedSetOfChains placedChains; 
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
-    vector<uint16_t>  newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
+    unordered_set <uint32_t>  newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
 		uint8_t numBuPktsRcvd; 
 		
     Datacenter();
@@ -66,9 +66,10 @@ class Datacenter : public cSimpleModule
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
     
-    void handleSelfMsg    ();
     void sndViaQ         (int16_t portNum, cPacket* pkt2send);
     void xmt              (int16_t portNum, cPacket *pkt2send);
+    void handleRlzRsrcMsg 			();
+    void handleSelfMsg    		  ();
     void handleInitBottomUpMsg 	();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();

@@ -135,11 +135,30 @@ void Datacenter::handleMessage (cMessage *msg)
   {
     if (MyConfig::mode==SYNC) { prepareReshSync ();} {reshuffleAsync();}
   }
+  else if (dynamic_cast<RlzRsrcMsg*>(curHandledMsg) != nullptr)
+  {
+    handleRlzRsrcMsg ();
+  }
   else
   {
     error ("rcvd a pkt  of an unknown type");
   }
   delete (curHandledMsg);
+}
+
+/*************************************************************************************************************************************************
+Handle a rcvd RlzRsrcMsg (rcvd from the sim' ctrlr).
+- For each chain indicated in the msg:
+	- Remove the chain from the lists of placed chains, potPlaced and newlyPlaced chains.
+	rlz all the cpu resources assigned to this chain.
+*************************************************************************************************************************************************/
+void Datacenter::handleRlzRsrcMsg () 
+{
+	error ("in handleRlzRsrcMsg");
+//	for (uint16_t i(0); i< (msg->getChainsToRlzArraySize()); i++) {
+//		insertSorted (this->notAssigned, msg->getNotAssigned (i));
+//	} 
+	
 }
 
 /*************************************************************************************************************************************************
@@ -222,7 +241,7 @@ void Datacenter::pushUpSync ()
 		chainPtr = pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		if (modifiedChain.curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
 			placedChains.insert (modifiedChain);
-			newlyPlacedChainsIds.push_back (modifiedChain.id);
+			newlyPlacedChainsIds.insert (modifiedChain.id);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
 			availCpu += requiredCpuToLocallyPlaceChain (modifiedChain);
@@ -242,7 +261,7 @@ void Datacenter::pushUpSync ()
 			Chain pushedUpChain = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
 			pushedUpChain.curLvl = lvl;
 			placedChains.insert (pushedUpChain);
-			newlyPlacedChainsIds.push_back (pushedUpChain.id);
+			newlyPlacedChainsIds.insert (pushedUpChain.id);
 			chainPtr = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains
 			pushUpSet.insert (pushedUpChain);
 		}
@@ -319,7 +338,7 @@ void Datacenter::bottomUpSync ()
 				modifiedChain.curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				placedChains.insert (modifiedChain);
-				newlyPlacedChainsIds.push_back (modifiedChain.id);
+				newlyPlacedChainsIds.insert (modifiedChain.id);
 			}
 			else {
 				potPlacedChainsIds.insert (modifiedChain.id);
@@ -349,15 +368,21 @@ void Datacenter::bottomUpSync ()
   }
 }
 
+/*************************************************************************************************************************************************
+Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChainsIds.
+Later, clear newlyPlacedChainsIds.
+*************************************************************************************************************************************************/
 void Datacenter::sndPlacementInfoMsg ()
 {
 
-	uint16_t numOfNewlyPlacedChains = newlyPlacedChainsIds.size ();
-	PlacementInfoMsg* msg = new PlacementInfoMsg;
+//	uint16_t numOfNewlyPlacedChains = newlyPlacedChainsIds.size ();
 
-	msg -> setNewlyPlacedChainsIdsArraySize (numOfNewlyPlacedChains);
-	for (uint16_t i=0; i<numOfNewlyPlacedChains; i++) {
-		msg->setNewlyPlacedChainsIds (i, newlyPlacedChainsIds[i]);
+	PlacementInfoMsg* msg = new PlacementInfoMsg;
+	msg -> setNewlyPlacedChainsIdsArraySize (newlyPlacedChainsIds.size ());
+
+	uint16_t i(0);	
+	for (const auto &chainId : newlyPlacedChainsIds) {
+		msg->setNewlyPlacedChainsIds (i++, chainId);
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -365,6 +390,7 @@ void Datacenter::sndPlacementInfoMsg ()
 		printBufToLog ();
 	}
 	sendDirect (msg, simController, "directMsgsPort");
+	newlyPlacedChainsIds.clear ();
 }
 
 /*************************************************************************************************************************************************
