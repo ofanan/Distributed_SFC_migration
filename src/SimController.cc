@@ -39,6 +39,7 @@ void SimController::initialize (int stage)
 	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
 	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
 	    leaves[leafId] = datacenters[dc];
+	    leaves[leafId]->setLeafId (leafId);
 	    leafId++;
 	  }
 	}
@@ -72,14 +73,14 @@ void SimController::openFiles () {
 // pathToRoot[i] will hold the path from leaf i to the root.
 void SimController::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
-	uint16_t dc_id;
+	uint16_t dcId;
 	for (uint16_t leafId(0) ; leafId < numLeaves; leafId++)  {
 		pathToRoot[leafId].resize (height);
-		dc_id = leaves[leafId]->id;
+		dcId = leaves[leafId]->id;
 	  int height = 0;
-		while (dc_id != root_id) {
-		 	pathToRoot[leafId][height++] = dc_id;
-		 	dc_id = datacenters[dc_id]->idOfParent;
+		while (dcId != root_id) {
+		 	pathToRoot[leafId][height++] = dcId;
+		 	dcId = datacenters[dcId]->idOfParent;
 		}
 	}
 }

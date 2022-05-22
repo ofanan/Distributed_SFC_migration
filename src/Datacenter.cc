@@ -97,6 +97,12 @@ void Datacenter::print ()
 	MyConfig::printToLog (potPlacedChainsIds);
 }
 
+void Datacenter::setLeafId (uint16_t leafId)
+{
+	this->leafId = leafId;
+}
+
+
 /*************************************************************************************************************************************************
  * Handle an aririving set message. Currently, the only self-message is the one indicating the end of the transmission of a pkt.
  * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
@@ -135,11 +141,6 @@ void Datacenter::handleMessage (cMessage *msg)
 		handleInitBottomUpMsg ();
   }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
-		numBuPktsRcvd++;
-		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuPktsRcvd, numChildren);
-			printBufToLog ();
-		}
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
@@ -180,14 +181,20 @@ void Datacenter::handleRlzRsrcMsg ()
 	} 
 
 	// remove each chain indicated in the msg from potPlacedChains
-	error ("2");
 	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
 		if (potPlacedChainsIds.empty()) {
 			break;
 		}		
 		eraseKeyFromSet (potPlacedChainsIds, msg->getChainsToRlz(i));
 	} 
-	error ("3");
+
+	// remove each chain indicated in the msg from potPlacedChains
+	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
+		if (newlyPlacedChainsIds.empty()) {
+			break;
+		}		
+		eraseKeyFromSet (newlyPlacedChainsIds, msg->getChainsToRlz(i));
+	} 
 }
 
 /*************************************************************************************************************************************************
@@ -376,6 +383,9 @@ void Datacenter::bottomUpSync ()
 		}
 		else { 
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+				if (reshuffled) {
+					error ("couldn't find a feasible sol' even after reshuffling");
+				}
 				return prepareReshSync ();
 			}
 			else {
@@ -430,6 +440,16 @@ Handle a bottomUP pkt, when running in sync' mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktSync ()
 {
+
+	if (numBuPktsRcvd==0) { // this is the first BU pkt rcvd from a child at this period
+		notAssigned.clear ();
+		pushUpSet.  clear ();
+	}
+	numBuPktsRcvd++;
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "DC \%d rcvd a BU pkt. num BU pkt rcvd=%d, numChildren=%d\n", id, numBuPktsRcvd, numChildren);
+		printBufToLog ();
+	}
 	uint16_t src = ((Datacenter*) curHandledMsg->getSenderModule())->id;
 	
 	BottomUpPkt *pkt = (BottomUpPkt*)(curHandledMsg);
@@ -471,6 +491,8 @@ void Datacenter::sndPushUpPkt ()
 
 /*************************************************************************************************************************************************
 Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpSet, and xmt it to my parent
+If this isn't a "reshuffle" run, then after xmting the pkt to my parent, clear this->notAssigned and this->pushUpSet, 
+so that they won't mix up with the "not assigned" and "push up" in the next run.
 *************************************************************************************************************************************************/
 void Datacenter::sndBottomUpPkt ()
 {
@@ -499,6 +521,11 @@ void Datacenter::sndBottomUpPkt ()
 	}
 
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+	if (!reshuffled) { 
+		notAssigned.clear ();
+		pushUpSet.  clear ();
+	}
+	
 }
 
 void Datacenter::reshuffleAsync ()

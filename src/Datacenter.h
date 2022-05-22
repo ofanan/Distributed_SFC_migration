@@ -45,8 +45,11 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned, pushUpVec; 
     UnorderedSetOfChains placedChains; 
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
-    unordered_set <uint32_t>  newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
+    unordered_set <uint32_t> newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
 		uint8_t numBuPktsRcvd; 
+		
+		//getter
+		void setLeafId (uint16_t leafId);
 		
     Datacenter();
     ~Datacenter();
