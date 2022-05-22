@@ -5,8 +5,11 @@ Makefile
 simulations/*
 *.exe
 .oppbuildspec
-.meta*
 .cmdenv-log
+.project
+.metadata/*
+out/*
+.qtenv*
 .alias_pusher.txt
 Distributed_SFC_migration*
 *.img
