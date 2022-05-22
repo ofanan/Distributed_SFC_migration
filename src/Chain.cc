@@ -127,17 +127,17 @@ int16_t Chain::getCurDatacenter () const
 	return (curLvl==UNPLACED_)? UNPLACED : S_u[curLvl];
 } 
 
-// returns the cpu cost of "this" chain when placed on a datacenter at a certain 
+// returns UNPLACED if the chain isn't placed; and the cpu cost at the current place
 uint16_t Chain::getCpuCost () const
 {
-	return (isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl];
+	return (curLvl==UNPLACED_)? UNPLACED : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
 }
 
 // return the current cpu consumption of the chain if it's already placed; UNPLACED_ otherwise
 inline uint16_t Chain::getCpu () const
 {
 	if (curLvl==UNPLACED_) {
-		return -1;
+		return UNPLACED;
 	}
 	else {
 	  return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];

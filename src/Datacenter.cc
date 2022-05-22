@@ -6,7 +6,7 @@ using namespace std;
 Define_Module(Datacenter);
 
 inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {
-    return lhs.getCpu() < rhs.getCpu();
+    return lhs.getCpu() <= rhs.getCpu();
 }
 
 inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) const {return chain.mu_u_len() == this->lvl+1;}

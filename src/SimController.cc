@@ -187,7 +187,11 @@ void SimController::printAllDatacentersByAllChains ()
 	// gather the required data
 	vector<uint32_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
 	for (const auto &chain : allChains) {
-		chainsPlacedOnDatacenter [chain.getCurDatacenter ()].push_back (chain.id);
+		int16_t chainCurDatacenter = chain.getCurDatacenter();
+		if (chainCurDatacenter==UNPLACED) {
+			continue;
+		}
+		chainsPlacedOnDatacenter [chainCurDatacenter].push_back (chain.id);
 	}
 	
 	// print the data
@@ -210,11 +214,15 @@ void SimController::printAllDatacenters ()
 int SimController::calcSolCpuCost () 
 {
 	
-	int cpuCost = 0;
+	int totCpuCost = 0;
 	for (auto const &chain : allChains) {	
-		cpuCost += chain.getCpuCost ();
+		int16_t cpuCost = chain.getCpuCost ();
+		if (MyConfig::mode==SYNC && cpuCost == UNPLACED) {
+			error ("calcSolCpuCost Sync encountered a chain that isn't placed yet");
+		}
+		cpuCost += cpuCost;
 	}
-	return cpuCost;
+	return totCpuCost;
 }
 
 
@@ -375,8 +383,8 @@ void SimController::initAlg () {
 /*************************************************************************************************************************************************
 Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.
 The function does the following:
-- rlz the rsrscs of all the chains associated with this poa.
-- Initiate a placement alg' from this poa.
+- rlz the rsrscs of all the chains associated with this poa (by sending RlzRsrcMsg to each of the DCs currently placing such chains).
+- Initiate a placement alg' from this poa (by sending this poa an InitBottomUpMsg).
 **************************************************************************************************************************************************/
 void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 {
