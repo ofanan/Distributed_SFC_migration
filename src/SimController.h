@@ -77,9 +77,9 @@ class SimController : public cSimpleModule
 		// Other Functions
 		void runTrace  ();
 		void runTimeStep ();
-		void readChainsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
-		void readNewChainsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
-		void readOldChainsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
+		void readUsrsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
+		void readNewUsrsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
+		void readOldUsrsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
 		void rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
 		void initAlg (); // init a placement alg'
   	void initAlgSync (); // init a sync placement alg'

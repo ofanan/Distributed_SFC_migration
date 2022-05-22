@@ -118,13 +118,13 @@ void SimController::runTimeStep ()
 			}
   	}
   	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
-  		readChainsThatLeftLine (line.substr(15));
+  		readUsrsThatLeftLine (line.substr(15));
   	} 	
   	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-  		readNewChainsLine (line.substr(9)); 
+  		readNewUsrsLine (line.substr(9)); 
   	}
   	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		readOldChainsLine (line.substr(9));
+  		readOldUsrsLine (line.substr(9));
   		
   		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
   		// place all the new / critical chains.
@@ -256,7 +256,7 @@ The function inserts all the IDs of chains that left some datacenter dc to chain
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 **************************************************************************************************************************************************/
-void SimController::readChainsThatLeftLine (string line)
+void SimController::readUsrsThatLeftLine (string line)
 {
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -287,7 +287,7 @@ Also, add the new generated chain to chainsThatJoinedLeaf[leaf], where leaf is t
 Inputs: 
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated PoA of chain c_i.
 **************************************************************************************************************************************************/
-void SimController::readNewChainsLine (string line)
+void SimController::readNewUsrsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -308,7 +308,7 @@ void SimController::readNewChainsLine (string line)
 		allChains.insert (chain); 
 	}	
 	if (LOG_LVL>1) {
-	  MyConfig::printToLog ("After readNewCHainsLine: ");
+	  MyConfig::printToLog ("After readNewUsrsLine: ");
 	  printAllChains ();
 	}
 }
@@ -320,7 +320,7 @@ void SimController::readNewChainsLine (string line)
 Inputs:
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated leaf of chain c_i.
 **************************************************************************************************************************************************/
-void SimController::readOldChainsLine (string line)
+void SimController::readOldUsrsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -333,7 +333,7 @@ void SimController::readOldChainsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
-			error ("t=%d: didn't find chain id %d in allChains, in readOldChainsLine", t, chainId);
+			error ("t=%d: didn't find chain id %d in allChains, in readOldUsrsLine", t, chainId);
 	  }
 		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
 		Chain modifiedChain (chainId, S_u); // will hold the modified chain to be inserted each time
@@ -343,16 +343,16 @@ void SimController::readOldChainsLine (string line)
 		chainCurDatacenter = chain.getCurDatacenter();
 
 		if (chainCurDatacenter == UNPLACED) {
-			// snprintf (buf, bufSize, "ERROR t=%d: at readOldChainsLine, old usr %d wasn't placed yet\n", t, chainId);
+			// snprintf (buf, bufSize, "ERROR t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			// printBufToLog();
-			error ("ERROR t=%d: at readOldChainsLine, old usr %d wasn't placed yet\n", t, chainId);
+			error ("ERROR t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			continue;
 		}
 		chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	}
 	
 	if (MyConfig::LOG_LVL==DETAILED_LOG) {
-	  logFile << "After readOldCHainsLine: ";
+	  logFile << "After readOldUsrsLine: ";
   	printAllChains ();
   }
 }
