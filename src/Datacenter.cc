@@ -92,12 +92,11 @@ void Datacenter::initialize()
 // Print the chains placed / pot-placed in this DC.
 void Datacenter::print ()
 {
-	snprintf (buf, bufSize, "DC %d, lvl=%d. placed chains: ", id, lvl);
+	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", id, lvl);
 	printBufToLog ();
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChainsIds);
-	MyConfig::printToLog ("\n");
 }
 
 void Datacenter::setLeafId (uint16_t leafId)
@@ -138,7 +137,7 @@ void Datacenter::handleMessage (cMessage *msg)
 			error ("a non-leaf datacenter received an InitBottomUpMsg");
 		}  
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC \%d rcvd a initBU msg\n", id);
+			snprintf (buf, bufSize, "\nDC \%d rcvd a initBU msg", id);
 			printBufToLog ();
 		}
 		handleInitBottomUpMsg ();
@@ -230,12 +229,21 @@ void Datacenter::handlePushUpPkt ()
 {
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "DC %d rcvd PU pkt\n", id);
+		snprintf (buf, bufSize, "\nDC %d rcvd PU pkt", id);
 		printBufToLog ();
 	}
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-//	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		if (pkt->getPushUpVecArraySize()==pkt->getPushUpVecArraySize()) {
+			MyConfig::printToLog ("pushUpVec rcvd is empty");
+		}
+		else {
+			snprintf (buf, bufSize, "pushUpVec[0]=%d", pkt->getPushUpVec(0).id);
+			printBufToLog ();
+		}
+	}
+	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
 	} 
@@ -253,11 +261,16 @@ Assume that this->pushUpSet already contains the relevant chains.
 *************************************************************************************************************************************************/
 void Datacenter::pushUpSync ()
 {
+
+	// $$$
+	snprintf (buf, bufSize, "\nDC %d beginning PU Sync. pushUpSet=", id);
+	printBufToLog ();
+  MyConfig::printToLog (pushUpSet);
+
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "dc %d begins PU. pushUpSet=", id);
+		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
-		MyConfig::printToLog ("\n");		
 	}
 	reshuffled = false;
 	
@@ -289,7 +302,10 @@ void Datacenter::pushUpSync ()
 	}
 	
 	if (!potPlacedChainsIds.empty()) {
-		error ("potPlacedChains should be empty at this stage of running PU");
+		snprintf (buf, bufSize, "\nDC %d: ERROR: potPlacedChains should be empty at this stage of running PU. potPlacedChainsIds=", id);
+		printBufToLog ();
+    MyConfig::printToLog (potPlacedChainsIds);
+		error ("potPlacedChains should be empty at this stage of running PU. Please check the log file\n");
 	}
 	
 	// Next, try to push-up chains of my descendants
@@ -396,7 +412,7 @@ void Datacenter::bottomUpSync ()
 		else { 
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				if (reshuffled) {
-					snprintf (buf, bufSize, "dc %d: couldn't find a feasible sol' even after reshuffling\n", id);
+					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
 					printBufToLog ();
 					PrintAllDatacenters ();
 				}
@@ -409,6 +425,11 @@ void Datacenter::bottomUpSync ()
 	
 	}
 
+	// $$$
+	snprintf (buf, bufSize, "\nDC %d, BU sync: potPlacedChainsIds=", id);
+	printBufToLog ();
+  MyConfig::printToLog (potPlacedChainsIds);
+
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		this -> print ();
 	}
@@ -417,7 +438,7 @@ void Datacenter::bottomUpSync ()
   	pushUpSync ();
   }
   else {
-  	sndBottomUpPkt ();
+  	genNsndBottomUpPkt ();
   }
 }
 
@@ -441,7 +462,7 @@ void Datacenter::sndPlacementInfoMsg ()
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "DC \%d sending PlacementInfoMsg\n", id);
+		snprintf (buf, bufSize, "\nDC \%d sending PlacementInfoMsg", id);
 		printBufToLog ();
 	}
 	sendDirect (msg, simController, "directMsgsPort");
@@ -476,10 +497,9 @@ void Datacenter::handleBottomUpPktSync ()
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "DC %d rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
+		snprintf (buf, bufSize, "\nDC %d rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
-		MyConfig::printToLog ("\n");
 	}
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
@@ -493,7 +513,7 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpAsync ()
 {
-	sndBottomUpPkt ();
+	genNsndBottomUpPkt ();
 }
 
 void Datacenter::sndPushUpPkt () 
@@ -507,7 +527,7 @@ Generate a BottomUpPkt, based on the data currently found in notAssigned and pus
 For each chain in this->notAssigned:
 	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
 *************************************************************************************************************************************************/
-void Datacenter::sndBottomUpPkt ()
+void Datacenter::genNsndBottomUpPkt ()
 {
 	BottomUpPkt* pkt2send = new BottomUpPkt;
 
@@ -532,26 +552,29 @@ void Datacenter::sndBottomUpPkt ()
 	}
 	pkt2send -> setPushUpVecArraySize (prevPushUpSetSize - pushUpSet.size()); // the pkt includes all the chains that were removed from pushUpSet. 
 
-
-//	for (auto chain : pushUpSet) {
-//		pkt2send->setPushUpVec (i++, chain);
-//	}
+  // 
+	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nDC %d: after preparing BU pkt to snd to prnt, pushUpSet=", id);
+		printBufToLog();
+		MyConfig::printToLog (pushUpSet);
+	}
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
+		snprintf (buf, bufSize, "\nDC %d sending a BU pkt pushUpSet=", id);
 		MyConfig::printToLog (buf);
-		if (pushUpSet.size() > 0) {
-			snprintf (buf, bufSize, "DC %d. sending a BU pkt pushUpSet=", id);
-			MyConfig::printToLog (buf);
-			MyConfig::printToLog (pushUpSet);
-			MyConfig::printToLog ("\n");
+		MyConfig::printToLog (pushUpSet);
+		if (pkt2send -> getPushUpVecArraySize ()== 0) {
+			snprintf (buf, bufSize, "pushUpVec is empty");
 		}
+		else {
+			snprintf (buf, bufSize, "pushUpVec[0]=%d", pkt2send->getPushUpVec(0).id);
+		}
+		MyConfig::printToLog (buf);
 	}
 
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 	if (!reshuffled) { 
 		notAssigned.clear ();
-		pushUpSet.  clear ();
 	}
 	
 }
@@ -570,7 +593,7 @@ void Datacenter::PrintAllDatacenters ()
 void Datacenter::prepareReshSync () 
 {
 	if (reshuffled) {
-		sndBottomUpPkt ();	
+		genNsndBottomUpPkt ();	
 	}
 	reshuffled = true;
 	clrRsrc ();
