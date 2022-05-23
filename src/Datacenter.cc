@@ -262,11 +262,6 @@ Assume that this->pushUpSet already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 
-	// $$$
-	snprintf (buf, bufSize, "\nDC %d beginning PU Sync. pushUpSet=", id);
-	printBufToLog ();
-  MyConfig::printToLog (pushUpSet);
-
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
 		printBufToLog ();
@@ -415,6 +410,7 @@ void Datacenter::bottomUpSync ()
 					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
 					printBufToLog ();
 					PrintAllDatacenters ();
+					error ("couldn't find a feasible sol' even after reshuffling");
 				}
 				return prepareReshSync ();
 			}

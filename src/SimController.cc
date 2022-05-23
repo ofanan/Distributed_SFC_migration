@@ -111,7 +111,7 @@ void SimController::runTimeStep ()
 			t = atoi (strtok (NULL, " = "));
 
 			if (MyConfig::LOG_LVL>0) {
-				snprintf (buf, bufSize, "t=%d\n", t);
+				snprintf (buf, bufSize, "\nt = %d\n", t);
 				MyConfig::printToLog (buf); 
 			}
 		}
@@ -481,7 +481,7 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 	uint32_t chainId;
 
 	//$$$
-	snprintf (buf, bufSize, "in handlePlacementInfoMsg. sender = %d\n", ((Datacenter*)curHandledMsg->getSenderModule())->id);
+	snprintf (buf, bufSize, "\nin handlePlacementInfoMsg. sender = %d", ((Datacenter*)curHandledMsg->getSenderModule())->id);
 	printBufToLog ();
 	
 	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsIdsArraySize()); i++) {
@@ -498,7 +498,7 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 			}
 			Chain modifiedChain (chain.id, chain.S_u); // will hold the modified chain to be inserted each time
 			modifiedChain.curLvl = curLvl;
-			snprintf (buf, bufSize, "chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[curLvl]);
+			snprintf (buf, bufSize, "\nchain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[curLvl]);
 			printBufToLog ();
 			allChains.erase (chain); // remove the old chain from our DB
 			allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
@@ -511,7 +511,7 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 	uint16_t leafId = ((Datacenter*) (msg->getSenderModule()) )->leafId;
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "rcvd fin alg msg from DC %d leaf %d\n", ((Datacenter*) (msg->getSenderModule()) )->id, leafId);
+		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", ((Datacenter*) (msg->getSenderModule()) )->id, leafId);
 		MyConfig::printToLog (buf);
 	}
 	
@@ -523,8 +523,9 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 	}
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-			MyConfig::printToLog ("rcvd fin alg msg from all leaves ******************\n");
+			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
 		}
+		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	}
 }
 
