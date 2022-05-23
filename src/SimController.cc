@@ -335,20 +335,20 @@ void SimController::readOldUsrsLine (string line)
   	if (!(findChainInSet (allChains, chainId, chain))) {
 			error ("t=%d: didn't find chain id %d in allChains, in readOldUsrsLine", t, chainId);
 	  }
+		chainCurDatacenter = chain.getCurDatacenter();
 		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
 		Chain modifiedChain (chainId, S_u); // will hold the modified chain to be inserted each time
+		if (!modifiedChain.isDelayFeasible (chainCurDatacenter)) { // if the current place of this chain isn't delay-feasible for it anymore
+			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain); // need to inform the chain's new poa that it has to place it
+			chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // need to rlz this chain's rsrcs from its current place
+		}
 		allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
 		allChains.insert (modifiedChain);
-		insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain);			
-		chainCurDatacenter = chain.getCurDatacenter();
 
 		if (chainCurDatacenter == UNPLACED) {
-			// snprintf (buf, bufSize, "ERROR t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
-			// printBufToLog();
 			error ("ERROR t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			continue;
 		}
-		chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // insert the id of the moved chain to the set of chains that left the current datacenter, where the chain is placed.
 	}
 	
 	if (MyConfig::LOG_LVL==DETAILED_LOG) {

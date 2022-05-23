@@ -4,7 +4,7 @@
 
 const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
-const vector<uint16_t> RT_Chain		 ::mu_u = {1, 1, 1};
+const vector<uint16_t> RT_Chain		 ::mu_u = {1, 1};
 const vector<uint16_t> Non_RT_Chain::mu_u = {1, 1};
 
 const uint8_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
@@ -67,7 +67,15 @@ uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }
 
-
+bool Chain::isDelayFeasible (uint16_t dcId) const 
+{
+	for (auto const dc : S_u) {
+		if (dc==dcId) { // the suggested datacenter appears in my vector of delay-feasible datacenters
+			return true;
+		}
+	}
+	return false;
+}
 
 /*************************************************************************************************************************************************
 * Given a set of chains and a poa, return all the chains in the set associated with this poa.

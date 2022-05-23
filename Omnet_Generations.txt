@@ -48,11 +48,21 @@ When this works, convert the docker container to a singularity container.
 
 Docker
 ///////////////////
+within /home/ofanan/containers, run:
 docker build . -t omnetpp-5.6.2 
+
+For the gui version, within /home/ofanan/containers/containuers_gui, run:
 docker build . -t omnetpp-5.6.2-gui 
+However, this results in a docker for which trying to run:
+> omnetpp
+results in "ide is not installed" error. Indeed no subdirectory of omnetpp-5.6.2 is found. 
+May try to solve it by installing it in ubuntu u18.04, as requested (my ubunto is 20.04).
+
+
 docker login
 docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
 docker push ofanan/omnetpp-5.6.2
+
 docker push ofanan/omnetpp-5.6.2-gui
 docker run -it ofanan/omnetpp-5.6.2-gui
 // -i: interactively. -t: terminal

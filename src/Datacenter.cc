@@ -236,7 +236,6 @@ void Datacenter::handlePushUpPkt ()
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
 //	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
-	pushUpSet.clear ();
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
 	} 
@@ -287,6 +286,10 @@ void Datacenter::pushUpSync ()
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
 			availCpu += requiredCpuToLocallyPlaceChain (modifiedChain);
 		}
+	}
+	
+	if (!potPlacedChainsIds.empty()) {
+		error ("potPlacedChains should be empty at this stage of running PU");
 	}
 	
 	// Next, try to push-up chains of my descendants
@@ -473,7 +476,7 @@ void Datacenter::handleBottomUpPktSync ()
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
+		snprintf (buf, bufSize, "DC %d rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
 		MyConfig::printToLog ("\n");
@@ -498,25 +501,41 @@ void Datacenter::sndPushUpPkt ()
 }
 
 /*************************************************************************************************************************************************
-Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpSet, and xmt it to my parent
-If this isn't a "reshuffle" run, then after xmting the pkt to my parent, clear this->notAssigned and this->pushUpSet, 
-so that they won't mix up with the "not assigned" and "push up" in the next run.
+Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpSet, and xmt it to my parent:
+- For each chain in this->pushUpSet:
+	- if the chain can be placed higher, include it in pushUpSet to be xmtd to prnt, and remove it from the this->pushUpSet.
+For each chain in this->notAssigned:
+	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
 *************************************************************************************************************************************************/
 void Datacenter::sndBottomUpPkt ()
 {
 	BottomUpPkt* pkt2send = new BottomUpPkt;
-	uint16_t i;
 
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());
+	uint16_t i; 
 	for (i=0; i<notAssigned.size(); i++) {
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
+	uint16_t prevPushUpSetSize = pushUpSet.size();
+	pkt2send -> setPushUpVecArraySize (prevPushUpSetSize);
 	i = 0;
-	pkt2send -> setPushUpVecArraySize (pushUpSet.size());
-	for (auto chain : pushUpSet) {
-		pkt2send->setPushUpVec (i++, chain);
+	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+		if (CannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec transmitted to prnt
+			chainPtr++;
+			continue;
+		}
+		
+		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt, and remove it from the local db (pushUpSet)
+		pkt2send->setPushUpVec (i++, *chainPtr);
+		chainPtr = pushUpSet.erase (chainPtr); 
 	}
+	pkt2send -> setPushUpVecArraySize (prevPushUpSetSize - pushUpSet.size()); // the pkt includes all the chains that were removed from pushUpSet. 
+
+
+//	for (auto chain : pushUpSet) {
+//		pkt2send->setPushUpVec (i++, chain);
+//	}
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "DC \%d sending a BU pkt to prnt\n", id);
@@ -525,6 +544,7 @@ void Datacenter::sndBottomUpPkt ()
 			snprintf (buf, bufSize, "DC %d. sending a BU pkt pushUpSet=", id);
 			MyConfig::printToLog (buf);
 			MyConfig::printToLog (pushUpSet);
+			MyConfig::printToLog ("\n");
 		}
 	}
 
