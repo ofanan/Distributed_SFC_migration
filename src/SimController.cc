@@ -480,6 +480,10 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 	int16_t  curLvl;
 	uint32_t chainId;
 
+	//$$$
+	snprintf (buf, bufSize, "in handlePlacementInfoMsg. sender = %d\n", ((Datacenter*)curHandledMsg->getSenderModule())->id);
+	printBufToLog ();
+	
 	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsIdsArraySize()); i++) {
 		
 		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
@@ -494,6 +498,8 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 			}
 			Chain modifiedChain (chain.id, chain.S_u); // will hold the modified chain to be inserted each time
 			modifiedChain.curLvl = curLvl;
+			snprintf (buf, bufSize, "chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[curLvl]);
+			printBufToLog ();
 			allChains.erase (chain); // remove the old chain from our DB
 			allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}

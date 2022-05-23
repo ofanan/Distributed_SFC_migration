@@ -310,6 +310,12 @@ void Datacenter::pushUpSync ()
 		}
 	}
 
+	
+	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
+	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
+		sndPlacementInfoMsg ();
+	}
+
 	if (isLeaf) {
 		FinishedAlgMsg *msg2send = new FinishedAlgMsg;
 		sendDirect (msg2send, simController, "directMsgsPort");
@@ -322,11 +328,7 @@ void Datacenter::pushUpSync ()
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
 	
 	}
-	
-	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
-	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
-		sndPlacementInfoMsg ();
-	}
+
 	genNsndPushUpPktsToChildren ();
 	pushUpSet.clear();
 }
