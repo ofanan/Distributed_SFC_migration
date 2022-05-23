@@ -58,6 +58,8 @@ class SimController : public cSimpleModule
 
 		uint32_t numMigs=0; // number of migration performed		
 		
+		string line; //current line being read from the tracefile
+		
 		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
     unordered_map <uint16_t, vector<int32_t> > chainsThatLeftDatacenter;
     unordered_map <uint16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
@@ -77,6 +79,7 @@ class SimController : public cSimpleModule
 		// Other Functions
 		void runTrace  ();
 		void runTimeStep ();
+		void readTraceLine ();
 		void readUsrsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void readNewUsrsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
 		void readOldUsrsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.

@@ -49,9 +49,11 @@ When this works, convert the docker container to a singularity container.
 Docker
 ///////////////////
 docker build . -t omnetpp-5.6.2 
+docker build . -t omnetpp-5.6.2-gui 
 docker login
 docker tag omnetpp-5.6.2 ofanan/omnetpp-5.6.2
 docker push ofanan/omnetpp-5.6.2
+docker push ofanan/omnetpp-5.6.2-w-gui:latest
 docker run -it ofanan/omnetpp-5.6.2
 // -i: interactively. -t: terminal
 For getting a shell, may have to run:

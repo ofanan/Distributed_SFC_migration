@@ -36,7 +36,6 @@ void MyConfig::printToLog (UnorderedSetOfChains set2print)
 	for (auto chain : set2print) {
 		logFile << chain.id << ",";
 	}
-	logFile << endl;
 }
 
 void MyConfig::printToLog (char* buf) 
@@ -83,7 +82,6 @@ void MyConfig::printToLog (unordered_set <uint32_t> set2print)
 	for (const auto i : set2print) {
 		logFile << i << ",";
 	}
-	logFile << endl;
 }
 
 vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 

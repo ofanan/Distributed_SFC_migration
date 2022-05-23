@@ -45,14 +45,14 @@ void Chain::print (bool printS_u)
 {
 	uint8_t bufSize = 128;
 	char buf[bufSize];
-	snprintf (buf, bufSize, "chain %d", id);
-	MyConfig::printToLog (buf);
 	if (printS_u) {
-		MyConfig::printToLog (": S_u=");
+		snprintf (buf, bufSize, "chain %d: S_u=", id);
+		MyConfig::printToLog (buf);
 		MyConfig::printToLog (S_u);
 	}
 	else {
-		MyConfig::printToLog ("\n");	
+		snprintf (buf, bufSize, "%d, ", id);
+		MyConfig::printToLog (buf);
 	}
 }
 

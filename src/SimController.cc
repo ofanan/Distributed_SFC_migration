@@ -27,7 +27,7 @@ void SimController::initialize (int stage)
 	}
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
-	openFiles ();
+	MyConfig::openFiles ();
 	checkParams ();
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
@@ -64,11 +64,6 @@ void SimController::checkParams ()
 	}
 }
 
-// Open input, output, and log files 
-void SimController::openFiles () {
-	MyConfig::openFiles ();
-}
-
 // Fill this->pathToRoot.
 // pathToRoot[i] will hold the path from leaf i to the root.
 void SimController::discoverPathsToRoot () {
@@ -86,11 +81,11 @@ void SimController::discoverPathsToRoot () {
 }
 
 /*************************************************************************************************************************************************
-Run a single time step. Such a time step is supposed to include (at most) a single occurence of:
+Run a single time step. Such a time step is assumed to include (at most) a single occurence of:
 - A "t = " line.
 - A "usr_that_left" line.
 - A "new_usrs" line
-- An "old_usrs" line.
+- An "old_usrs" line. This should be the last line for the time step.
 **************************************************************************************************************************************************/
 void SimController::runTimeStep () 
 {
@@ -100,39 +95,43 @@ void SimController::runTimeStep ()
 	}
 	
   string line;
+  
+  // discard empty and comment lines
   while (getline (traceFile, line)) { 
-  	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ // discard empty and comment lines
+  	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ 
   	}
-  	else if ( (line.substr(0,4)).compare("t = ")==0) {
-  	
-  		isLastPeriod = false;
-  		// extract the t (time) from the traceFile, and update this->t accordingly.
-  		char lineAsCharArray[line.length()+1];
-  		strcpy (lineAsCharArray, line.c_str());
-  		strtok (lineAsCharArray, " = ");
-  		t = atoi (strtok (NULL, " = "));
+
+		if ( (line.substr(0,4)).compare("t = ")==0) {
+			
+			isLastPeriod = false;
+			// extract the t (time) from the traceFile, and update this->t accordingly.
+			char lineAsCharArray[line.length()+1];
+			strcpy (lineAsCharArray, line.c_str());
+			strtok (lineAsCharArray, " = ");
+			t = atoi (strtok (NULL, " = "));
 
 			if (MyConfig::LOG_LVL>0) {
 				snprintf (buf, bufSize, "t=%d\n", t);
 				MyConfig::printToLog (buf); 
 			}
-  	}
-  	else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
-  		readUsrsThatLeftLine (line.substr(15));
-  	} 	
-  	else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-  		readNewUsrsLine (line.substr(9)); 
-  	}
-  	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-  		readOldUsrsLine (line.substr(9));
-  		
-  		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
-  		// place all the new / critical chains.
-  		rlzRsrcOfChains (chainsThatLeftDatacenter);
-  		initAlg ();
-  		// Schedule a self-event for reading the handling the next time-step
-  		scheduleAt (simTime() + 1.0, new cMessage);
-  	}
+		}
+		else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
+			readUsrsThatLeftLine (line.substr(15));
+		} 	
+		else if ( (line.substr(0,8)).compare("new_usrs")==0) {
+			readNewUsrsLine (line.substr(9)); 
+		}
+		else if ( (line.substr(0,8)).compare("old_usrs")==0) {
+			readOldUsrsLine (line.substr(9));
+			
+			// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
+			// place all the new / critical chains.
+			rlzRsrcOfChains (chainsThatLeftDatacenter);
+			initAlg ();
+			// Schedule a self-event for reading the handling the next time-step
+			scheduleAt (simTime() + 1.0, new cMessage);
+			break;
+		}
   }
 }
 
@@ -232,6 +231,7 @@ void SimController::printAllChains () //(bool printSu=true, bool printleaf=false
 {
 	MyConfig::printToLog ("allChains\n*******************\n");
 	MyConfig::printToLog (allChains);
+	MyConfig::printToLog ("\n");
 }
 
   	
