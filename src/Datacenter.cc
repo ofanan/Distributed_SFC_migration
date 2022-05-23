@@ -293,9 +293,9 @@ void Datacenter::pushUpSync ()
 	uint16_t mu_u;
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor; 
-				mu_u > availCpu || // or because not enough avail' cpu for pushing-up 
-				!this->isDelayFeasibleForThisChain (*chainPtr)) {// or because I'm not delay-feasible for this chain  
+		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
+				mu_u > availCpu || // or because not enough avail' cpu for pushing-up, ...
+				!this->isDelayFeasibleForThisChain (*chainPtr)) { // or because I'm not delay-feasible for this chain  
 			chainPtr++;
 			continue;
 		}
@@ -372,10 +372,6 @@ void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
 	Chain modifiedChain; // the modified chain, to be pushed to datastructures
-	if (id==1) { //$$$
-		MyConfig::printToLog ("DC 1: beginning bottomUpSync: notAssigned=");
-		MyConfig::printToLog (notAssigned);
-	}
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
@@ -406,10 +402,6 @@ void Datacenter::bottomUpSync ()
 			}
 		}
 	
-	}
-	if (id==1) { //$$$
-		MyConfig::printToLog ("DC 1: after looping over notAssigned: notAssigned=");
-		MyConfig::printToLog (notAssigned);
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -513,10 +505,6 @@ void Datacenter::sndBottomUpPkt ()
 	BottomUpPkt* pkt2send = new BottomUpPkt;
 	uint16_t i;
 
-	if (id==1) { //$$$
-		MyConfig::printToLog ("DC 1: in sndBUPkt. notAssigned=");
-		MyConfig::printToLog (notAssigned);
-	}
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());
 	for (i=0; i<notAssigned.size(); i++) {
 		pkt2send->setNotAssigned (i, notAssigned[i]);
