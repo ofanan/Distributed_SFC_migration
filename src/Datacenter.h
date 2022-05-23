@@ -89,9 +89,10 @@ class Datacenter : public cSimpleModule
     void rlzRsrc 								(); // Release the resources
     void genNsndPushUpPktsToChildren ();
     inline void     printBufToLog () const {MyConfig::printToLog (buf);}
-    inline bool 	  CannotPlaceThisChainHigher 		 (const Chain chain) const;
-    inline uint16_t requiredCpuToLocallyPlaceChain (const Chain chain) const;
-		inline uint8_t 	portOfChild 									 (const uint8_t child) const; 
+    inline bool 	  CannotPlaceThisChainHigher 		 	(const Chain chain) const;
+		inline bool 		isDelayFeasibleForThisChain 		(const Chain chain) const;
+    inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
+		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 
 		inline void     sndDirectToSimCtrlr (cMessage* msg);
 		
 		// logging and debug

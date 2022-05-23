@@ -9,7 +9,8 @@ inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {
     return lhs.getCpu() <= rhs.getCpu();
 }
 
-inline bool 		Datacenter::CannotPlaceThisChainHigher 			(const Chain chain) const {return chain.mu_u_len() == this->lvl+1;}
+inline bool Datacenter::CannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
+inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
 
 inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
@@ -17,6 +18,7 @@ inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) 
 inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
+
 
 // erase the given key from the given set. Returns true iff the requested key was indeed found in the set
 static bool eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
@@ -263,7 +265,7 @@ void Datacenter::pushUpSync ()
 	// First, find for each pot-placed of mine whether it was pushed-up by an ancestor, and react correspondigly
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 
-		if (potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
+		if (isRoot || potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
 			break;
 		}
 
@@ -291,7 +293,9 @@ void Datacenter::pushUpSync ()
 	uint16_t mu_u;
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (chainPtr->curLvl >= lvl || mu_u > availCpu) { // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor; or because not enough avail' cpu for pushing-up 
+		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor; 
+				mu_u > availCpu || // or because not enough avail' cpu for pushing-up 
+				!this->isDelayFeasibleForThisChain (*chainPtr)) {// or because I'm not delay-feasible for this chain  
 			chainPtr++;
 			continue;
 		}
@@ -368,6 +372,10 @@ void Datacenter::bottomUpSync ()
 {
 	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
 	Chain modifiedChain; // the modified chain, to be pushed to datastructures
+	if (id==1) { //$$$
+		MyConfig::printToLog ("DC 1: beginning bottomUpSync: notAssigned=");
+		MyConfig::printToLog (notAssigned);
+	}
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
 	  mu_u = chainPtr->mu_u_at_lvl(lvl);
 		if (availCpu >= mu_u) {
@@ -390,7 +398,6 @@ void Datacenter::bottomUpSync ()
 					snprintf (buf, bufSize, "dc %d: couldn't find a feasible sol' even after reshuffling\n", id);
 					printBufToLog ();
 					PrintAllDatacenters ();
-//					error ("couldn't find a feasible sol' even after reshuffling");
 				}
 				return prepareReshSync ();
 			}
@@ -399,6 +406,10 @@ void Datacenter::bottomUpSync ()
 			}
 		}
 	
+	}
+	if (id==1) { //$$$
+		MyConfig::printToLog ("DC 1: after looping over notAssigned: notAssigned=");
+		MyConfig::printToLog (notAssigned);
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -467,12 +478,11 @@ void Datacenter::handleBottomUpPktSync ()
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
-	if (pushUpSet.size()>0 && pkt->getPushUpVecArraySize ()>0) {
-		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
-			printBufToLog ();
-			MyConfig::printToLog (pushUpSet);
-		}
+	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "DC %d. rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
+		printBufToLog ();
+		MyConfig::printToLog (pushUpSet);
+		MyConfig::printToLog ("\n");
 	}
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
@@ -503,6 +513,10 @@ void Datacenter::sndBottomUpPkt ()
 	BottomUpPkt* pkt2send = new BottomUpPkt;
 	uint16_t i;
 
+	if (id==1) { //$$$
+		MyConfig::printToLog ("DC 1: in sndBUPkt. notAssigned=");
+		MyConfig::printToLog (notAssigned);
+	}
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());
 	for (i=0; i<notAssigned.size(); i++) {
 		pkt2send->setNotAssigned (i, notAssigned[i]);
