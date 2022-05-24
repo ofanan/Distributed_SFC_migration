@@ -35,8 +35,7 @@ DC 1 rcvd PU pkt. pushUpVec rcvd is empty
 DC 1 begins PU. pushUpSet=0, 2, 
 DC 1 sending PlacementInfoMsg
 DC 2 rcvd PU pkt. pushUpVec rcvd is empty
-DC 2 begins PU. pushUpSet=
-in handlePlacementInfoMsg. sender = 1
+DC 2 begins PU. pushUpSet=in handlePlacementInfoMsg
 chain 1: curLvl=1, curDC=1
 
 DC 4 rcvd PU pkt. pushUpVec[0]=2
@@ -48,12 +47,10 @@ DC 3 sending PlacementInfoMsg
 DC 6 rcvd PU pkt. pushUpVec rcvd is empty
 DC 6 begins PU. pushUpSet=
 DC 5 rcvd PU pkt. pushUpVec rcvd is empty
-DC 5 begins PU. pushUpSet=
-in handlePlacementInfoMsg. sender = 4
+DC 5 begins PU. pushUpSet=in handlePlacementInfoMsg
 chain 2: curLvl=0, curDC=4
 
-rcvd fin alg msg from DC 4 leaf 1
-in handlePlacementInfoMsg. sender = 3
+rcvd fin alg msg from DC 4 leaf 1in handlePlacementInfoMsg
 chain 0: curLvl=0, curDC=3
 
 rcvd fin alg msg from DC 3 leaf 0

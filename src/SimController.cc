@@ -309,7 +309,7 @@ void SimController::readNewUsrsLine (string line)
 		
 		if (MyConfig::DEBUG_LVL>0) {
 			if (findChainInSet (allChains, chainId, chain)) {
-				error ("new chain %d already found in allChains\n", chainId);
+				error ("t=%d: in readNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 			}
 		}
 		
@@ -354,8 +354,8 @@ void SimController::readOldUsrsLine (string line)
 		allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
 		allChains.insert (modifiedChain);
 
-		if (chainCurDatacenter == UNPLACED) {
-			error ("ERROR t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
+		if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED) {
+			error ("t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			continue;
 		}
 	}
@@ -482,17 +482,22 @@ void SimController::initAlgAsync () {
 	}
 }
 
+/*************************************************************************************************************************************************
+Handle a PlacementInfoMsg, which arrived as a "direct msg" from a datacenter.
+- Increase the cntrs of the number of migs as required.
+- Update this->allChains db.
+**************************************************************************************************************************************************/
 void SimController::handlePlacementInfoMsg (cMessage *msg)
 {
+		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+			MyConfig::printToLog ("in handlePlacementInfoMsg");
+		}
+
 	PlacementInfoMsg* curHandledMsg = (PlacementInfoMsg*) (msg);
 	Chain chain;
 	int16_t  curLvl;
 	uint32_t chainId;
 
-	//$$$
-	snprintf (buf, bufSize, "\nin handlePlacementInfoMsg. sender = %d", ((Datacenter*)curHandledMsg->getSenderModule())->id);
-	printBufToLog ();
-	
 	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsIdsArraySize()); i++) {
 		
 		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
@@ -507,14 +512,22 @@ void SimController::handlePlacementInfoMsg (cMessage *msg)
 			}
 			Chain modifiedChain (chain.id, chain.S_u); // will hold the modified chain to be inserted each time
 			modifiedChain.curLvl = curLvl;
-			snprintf (buf, bufSize, "\nchain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[curLvl]);
-			printBufToLog ();
+			
+			if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+				snprintf (buf, bufSize, "\nchain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[curLvl]);
+				printBufToLog ();
+			}
 			allChains.erase (chain); // remove the old chain from our DB
 			allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
 }
 
+/*************************************************************************************************************************************************
+Handle a finishedAlgMsg, which arrived as a "direct msg" from a datacenter.
+- Increase the cntrs of the number of migs as required.
+- Update this->allChains db.
+**************************************************************************************************************************************************/
 void SimController::handleFinishedAlgMsg (cMessage *msg)
 {
 	uint16_t leafId = ((Datacenter*) (msg->getSenderModule()) )->leafId;
