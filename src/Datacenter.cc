@@ -21,6 +21,8 @@ inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
+inline void	Datacenter::PrintStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
+
 // erase the given key from the given set. Returns true iff the requested key was indeed found in the set
 static bool eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
 {
@@ -159,7 +161,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else
   {
-    error ("rcvd a pkt  of an unknown type");
+    error ("rcvd a pkt of an unknown type");
   }
   delete (curHandledMsg);
 }
@@ -299,7 +301,8 @@ void Datacenter::pushUpSync ()
 		snprintf (buf, bufSize, "\nDC %d: ERROR: potPlacedChains should be empty at this stage of running PU. potPlacedChainsIds=", id);
 		printBufToLog ();
     MyConfig::printToLog (potPlacedChainsIds);
-		error ("potPlacedChains should be empty at this stage of running PU. Please check the log file\n");
+		MyConfig::printToLog ("\n\nError: potPlacedChains should be empty at this stage of running PU.");
+		PrintStateAndEndSim  ();
 	}
 	
 	// Next, try to push-up chains of my descendants
@@ -415,7 +418,8 @@ void Datacenter::bottomUpSync ()
 					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
 					printBufToLog ();
 					PrintAllDatacenters ();
-					error ("couldn't find a feasible sol' even after reshuffling");
+					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
+					PrintStateAndEndSim  ();
 				}
 				return prepareReshSync ();
 			}

@@ -71,6 +71,10 @@ DC 4, placed chains: 2,
 DC 5, placed chains: 
 DC 6, placed chains: 
 
+allChains
+*******************
+format: (c,p), where c is the chain id, and p is the dcId of its poa
+(0,3)(2,4)(1,1)
 t = 1
 
 DC 3 rcvd a initBU msg
@@ -108,3 +112,26 @@ DC 3 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 1 rcvd 1 BU pkts. src=4. pushUpSet=
 DC 1 rcvd 2 BU pkts. src=3. pushUpSet=
 DC 1: couldn't find a feasible sol' even after reshuffling
+
+Error: couldn't find a feasible sol' even after reshuffling
+DC 1: after preparing BU pkt to snd to prnt, pushUpSet=
+DC 1 sending a BU pkt pushUpSet=pushUpVec is empty
+DC 0, lvl=2. placed chains: pot. placed chains: 
+DC 1, lvl=1. placed chains: pot. placed chains: 
+DC 2, lvl=1. placed chains: pot. placed chains: 
+DC 3, lvl=0. placed chains: pot. placed chains: 
+DC 4, lvl=0. placed chains: pot. placed chains: 
+DC 5, lvl=0. placed chains: pot. placed chains: 3,
+DC 6, lvl=0. placed chains: pot. placed chains: Printing state and finishing simulation
+
+allChains
+*******************
+format: (c,p), where c is the chain id, and p is the dcId of its poa
+(2,-1)(1,-1)(3,5)(0,3)
+DC 0, lvl=2. placed chains: pot. placed chains: 
+DC 1, lvl=1. placed chains: pot. placed chains: 
+DC 2, lvl=1. placed chains: pot. placed chains: 
+DC 3, lvl=0. placed chains: pot. placed chains: 
+DC 4, lvl=0. placed chains: pot. placed chains: 
+DC 5, lvl=0. placed chains: pot. placed chains: 3,
+DC 6, lvl=0. placed chains: pot. placed chains: simulation abnormally terminated by SimController.PrintStateAndEndSim

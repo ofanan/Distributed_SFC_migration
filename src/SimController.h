@@ -32,6 +32,7 @@ Controller of the simulation:
 #include "FinishedAlgMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
+#include "PrintStateAndEndSimMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -100,7 +101,8 @@ class SimController : public cSimpleModule
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
 		void printAllDatacenters ();
 		void printAllDatacentersByMyDatabase ();
-    void printAllChainsPoas (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
+    void printAllChainsPoas  (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
+    void PrintStateAndEndSim (); // print the system's state, and end the simulation. 
 				 
   public:
     string traceFileName = "results/poa_files/Tree_shorter.poa";

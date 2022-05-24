@@ -180,6 +180,7 @@ void SimController::concludeTimeStep ()
 	if (MyConfig::LOG_LVL > 1) {
 		printAllDatacenters ();
 	  printAllDatacentersByMyDatabase ();
+	  printAllChainsPoas ();
 	}
 }
 // print all the placed (and possibly, the pot-placed) chains on each DC by this->allChains DB.
@@ -227,11 +228,11 @@ int SimController::calcSolCpuCost ()
 }
 
 
-// Print all the chains' current places
+// Print the PoA of each currently-active user
 void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {
 	MyConfig::printToLog ("\nallChains\n*******************\n");
-	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa");
+	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
 	
 	for (auto chain : allChains) {
 		int16_t curDatacenter = chain.getCurDatacenter ();
@@ -243,11 +244,8 @@ void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=f
 		}
 		printBufToLog ();
 	}
-	
-	MyConfig::printToLog ("\n");
 }
 
-  	
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
 void SimController::parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId)
 {
@@ -554,6 +552,19 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 	}
 }
 
+
+/*************************************************************************************************************************************************
+Print the "state" (PoAs of active users, and current placement of chains), and end the sim'.
+**************************************************************************************************************************************************/
+void SimController::PrintStateAndEndSim () 
+{
+	MyConfig::printToLog ("Printing state and finishing simulation\n");
+  printAllChainsPoas  (); 
+	printAllDatacenters ();
+	MyConfig::printToLog ("simulation abnormally terminated by SimController.PrintStateAndEndSim");
+	error ("simulation abnormally terminated by SimController.PrintStateAndEndSim. Check the log file for details.");
+}
+
 void SimController::handleMessage (cMessage *msg)
 {
   if (msg -> isSelfMessage()) {
@@ -573,6 +584,9 @@ void SimController::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
   	printAllDatacenters ();
+  }
+  else if (dynamic_cast<PrintStateAndEndSimMsg*> (msg)) { 
+  	PrintStateAndEndSim ();
   }
   else {
   	error ("Rcvd unknown msg type");

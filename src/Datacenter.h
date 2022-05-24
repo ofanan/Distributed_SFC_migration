@@ -17,6 +17,7 @@
 #include "RlzRsrcMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
+#include "PrintStateAndEndSimMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -91,6 +92,8 @@ class Datacenter : public cSimpleModule
     inline void     printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool 	  CannotPlaceThisChainHigher 		 	(const Chain chain) const;
 		inline bool 		isDelayFeasibleForThisChain 		(const Chain chain) const;
+		inline void			PrintStateAndEndSim 						();
+
     inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
 		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 
 		inline void     sndDirectToSimCtrlr (cMessage* msg);
