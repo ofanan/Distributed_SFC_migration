@@ -356,9 +356,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt->setPushUpVecArraySize (pushUpSet.size ()); // default size of pushUpVec, for case that all chains in pushUpSet belong to this child; will later shrink pushUpVec otherwise 
 		uint16_t idxInPushUpVec = 0;
 		for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {	// consider all the chains in pushUpVec
-//			snprintf (buf, bufSize, "DC %d in genNsndPushUpPktsToChildren. chain Su=\n", id);
-//			printBufToLog ();
-//			MyConfig::printToLog (chain.Su);
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
 				chainPtr = pushUpSet.erase (chainPtr);
@@ -629,9 +626,10 @@ void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
     xmt (portNum, pkt2send);
   }
 }
-    /*
+
+/*************************************************************************************************************************************************
  * Xmt self.pkt2send to the given output port; schedule a self msg for the end of transmission.
- */
+*************************************************************************************************************************************************/
 void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
 {
   EV << "Starting transmission of " << pkt2send << endl;
