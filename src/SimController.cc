@@ -114,7 +114,7 @@ void SimController::runTimeStep ()
 			t = atoi (strtok (NULL, " = "));
 
 			if (MyConfig::LOG_LVL>0) {
-				snprintf (buf, bufSize, "\nt = %d\n", t);
+				snprintf (buf, bufSize, "\n\nt = %d\n********************", t);
 				MyConfig::printToLog (buf); 
 			}
 		}
@@ -235,13 +235,7 @@ void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=f
 	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
 	
 	for (auto chain : allChains) {
-		int16_t curDatacenter = chain.getCurDatacenter ();
-		if (curDatacenter==UNPLACED) {
-			snprintf (buf, bufSize, "(%d,-1)", chain.id);
-		}
-		else {
-			snprintf (buf, bufSize, "(%d,%d)", chain.id, datacenters[curDatacenter]->id);
-		}
+		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
 		printBufToLog ();
 	}
 }
@@ -369,15 +363,15 @@ void SimController::readOldUsrsLine (string line)
 
 
 /*************************************************************************************************************************************************
-- Call each datacenters from which chains were moved (either to another datacenter, or merely left the sim'), based on chainsThatLeftDatacenter.
-- Clear chainsThatLeftDatacenter.
+- Call each datacenter to inform it of all chains that left it - due to either leaving the sim', moving to another poa, or due to a preparation
+  for reshuffle.
 **************************************************************************************************************************************************/
 void SimController::rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc) 
 {
 
 	RlzRsrcMsg* msg;
 	uint16_t i;
-	for (auto &item : ChainsToRlzFromDc)
+	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
 	{
 		msg = new RlzRsrcMsg ();
 		msg -> setChainsToRlzArraySize (item.second.size());
