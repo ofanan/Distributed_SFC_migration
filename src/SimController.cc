@@ -6,6 +6,9 @@ Controller of the simulation:
 **************************************************************************************************************************************************/
 #include "SimController.h"
 
+// returns true iff the given datacenter id, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
+inline bool isDelayFeasibleForChain (uint16_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
+
 Define_Module(SimController);
 
 SimController::SimController() {
@@ -338,7 +341,7 @@ void SimController::readOldUsrsLine (string line)
 		chainCurDatacenter = chain.getCurDatacenter();
 		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
 		Chain modifiedChain (chainId, S_u); // will hold the modified chain to be inserted each time
-		if (!modifiedChain.isDelayFeasible (chainCurDatacenter)) { // if the current place of this chain isn't delay-feasible for it anymore
+		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, modifiedChain)) { // if the current place of this chain isn't delay-feasible for it anymore
 			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain); // need to inform the chain's new poa that it has to place it
 			chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // need to rlz this chain's rsrcs from its current place
 		}

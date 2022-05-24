@@ -56,26 +56,30 @@ void Chain::print (bool printS_u)
 	}
 }
 
+// returns the number of datacenters which are delay-feasible for this chain
 uint16_t Chain::mu_u_len () const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
 }
 
 
+// returns the mu_u (amount of cpu required by the chain) at a given level in the tree
 uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }
 
-bool Chain::isDelayFeasible (uint16_t dcId) const 
-{
-	for (auto const dc : S_u) {
-		if (dc==dcId) { // the suggested datacenter appears in my vector of delay-feasible datacenters
-			return true;
-		}
-	}
-	return false;
-}
+//// returns true iff the given datacenter id is delay-feasible for this chain (namely, appears in its S_u)
+//bool Chain::isDelayFeasible (uint16_t dcId) const 
+//{
+//	for (auto const dc : S_u) {
+//		if (dc==dcId) { // the suggested datacenter appears in my vector of delay-feasible datacenters
+//			return true;
+//		}
+//	}
+//	return false;
+//}
+
 
 /*************************************************************************************************************************************************
 * Given a set of chains and a poa, return all the chains in the set associated with this poa.
