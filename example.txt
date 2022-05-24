@@ -3,58 +3,51 @@ t = 0
 
 DC 4 rcvd a initBU msg
 DC 4, BU sync: potPlacedChainsIds=2,
-DC 4, lvl=0. placed chains: pot. placed chains: 2,
 DC 4: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 4 sending a BU pkt pushUpSet=pushUpVec[0]=2
 DC 3 rcvd a initBU msg
 DC 3, BU sync: potPlacedChainsIds=0,
-DC 3, lvl=0. placed chains: pot. placed chains: 0,
 DC 3: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 3 sending a BU pkt pushUpSet=pushUpVec[0]=0
 DC 5 rcvd a initBU msg
 DC 5, BU sync: potPlacedChainsIds=
-DC 5, lvl=0. placed chains: pot. placed chains: 
 DC 5: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 5 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 6 rcvd a initBU msg
 DC 6, BU sync: potPlacedChainsIds=
-DC 6, lvl=0. placed chains: pot. placed chains: 
 DC 6: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 6 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 1 rcvd 1 BU pkts. src=4. pushUpSet=2, 
 DC 1 rcvd 2 BU pkts. src=3. pushUpSet=0, 2, 
 DC 1, BU sync: potPlacedChainsIds=
-DC 1, lvl=1. placed chains: 1,pot. placed chains: 
 DC 1: after preparing BU pkt to snd to prnt, pushUpSet=0, 2, 
 DC 1 sending a BU pkt pushUpSet=0, 2, pushUpVec is empty
 DC 2 rcvd 1 BU pkts. src=5. pushUpSet=
 DC 2 rcvd 2 BU pkts. src=6. pushUpSet=
 DC 2, BU sync: potPlacedChainsIds=
-DC 2, lvl=1. placed chains: pot. placed chains: 
 DC 2: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 2 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 0 rcvd 1 BU pkts. src=1. pushUpSet=
 DC 0 rcvd 2 BU pkts. src=2. pushUpSet=
 DC 0, BU sync: potPlacedChainsIds=
-DC 0, lvl=2. placed chains: pot. placed chains: 
 DC 0 begins PU. pushUpSet=
-DC 1 rcvd PU pktpushUpVec rcvd is empty
+DC 1 rcvd PU pkt. pushUpVec rcvd is empty
 DC 1 begins PU. pushUpSet=0, 2, 
 DC 1 sending PlacementInfoMsg
-DC 2 rcvd PU pktpushUpVec rcvd is empty
+DC 2 rcvd PU pkt. pushUpVec rcvd is empty
 DC 2 begins PU. pushUpSet=
 in handlePlacementInfoMsg. sender = 1
 chain 1: curLvl=1, curDC=1
 
-DC 4 rcvd PU pktpushUpVec rcvd is empty
+DC 4 rcvd PU pkt. pushUpVec[0]=2
 DC 4 begins PU. pushUpSet=2, 
 DC 4 sending PlacementInfoMsg
-DC 3 rcvd PU pktpushUpVec rcvd is empty
+DC 3 rcvd PU pkt. pushUpVec[0]=0
 DC 3 begins PU. pushUpSet=0, 
 DC 3 sending PlacementInfoMsg
-DC 6 rcvd PU pktpushUpVec rcvd is empty
+DC 6 rcvd PU pkt. pushUpVec rcvd is empty
 DC 6 begins PU. pushUpSet=
-DC 5 rcvd PU pktpushUpVec rcvd is empty
+DC 5 rcvd PU pkt. pushUpVec rcvd is empty
 DC 5 begins PU. pushUpSet=
 in handlePlacementInfoMsg. sender = 4
 chain 2: curLvl=0, curDC=4
@@ -85,25 +78,21 @@ DC 5, placed chains:
 DC 6, placed chains: 
 
 t = 1
-11
+
 DC 3 rcvd a initBU msg
 DC 3, BU sync: potPlacedChainsIds=
-DC 3, lvl=0. placed chains: pot. placed chains: 
 DC 3: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 3 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 5 rcvd a initBU msg
 DC 5, BU sync: potPlacedChainsIds=3,
-DC 5, lvl=0. placed chains: pot. placed chains: 3,
 DC 5: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 5 sending a BU pkt pushUpSet=pushUpVec[0]=3
 DC 4 rcvd a initBU msg
 DC 4, BU sync: potPlacedChainsIds=
-DC 4, lvl=0. placed chains: pot. placed chains: 
 DC 4: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 4 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 6 rcvd a initBU msg
 DC 6, BU sync: potPlacedChainsIds=
-DC 6, lvl=0. placed chains: pot. placed chains: 
 DC 6: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 6 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 1 rcvd 1 BU pkts. src=3. pushUpSet=
@@ -111,18 +100,15 @@ DC 2 rcvd 1 BU pkts. src=5. pushUpSet=3,
 DC 1 rcvd 2 BU pkts. src=4. pushUpSet=
 DC 2 rcvd 2 BU pkts. src=6. pushUpSet=3, 
 DC 2, BU sync: potPlacedChainsIds=
-DC 2, lvl=1. placed chains: pot. placed chains: 
 DC 2: after preparing BU pkt to snd to prnt, pushUpSet=3, 
 DC 2 sending a BU pkt pushUpSet=3, pushUpVec is empty
 DC 0 rcvd 1 BU pkts. src=2. pushUpSet=
 DC 4 rcvd a initBU msg
 DC 4, BU sync: potPlacedChainsIds=
-DC 4, lvl=0. placed chains: pot. placed chains: 
 DC 4: after preparing BU pkt to snd to prnt, pushUpSet=
-DC 4 sending a BU pkt pushUpSet=pushUpVec is empty1
+DC 4 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 3 rcvd a initBU msg
 DC 3, BU sync: potPlacedChainsIds=
-DC 3, lvl=0. placed chains: pot. placed chains: 
 DC 3: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 3 sending a BU pkt pushUpSet=pushUpVec is empty
 DC 1 rcvd 1 BU pkts. src=4. pushUpSet=

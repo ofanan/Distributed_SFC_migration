@@ -350,14 +350,16 @@ Generate pushUpPkts, based on the data currently found in pushUpSet, and xmt the
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
-	Chain chain;
 	
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
 		pkt->setPushUpVecArraySize (pushUpSet.size ()); // default size of pushUpVec, for case that all chains in pushUpSet belong to this child; will later shrink pushUpVec otherwise 
 		uint16_t idxInPushUpVec = 0;
 		for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {	// consider all the chains in pushUpVec
-			if (chain.S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
+//			snprintf (buf, bufSize, "DC %d in genNsndPushUpPktsToChildren. chain Su=\n", id);
+//			printBufToLog ();
+//			MyConfig::printToLog (chain.Su);
+			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
 				chainPtr = pushUpSet.erase (chainPtr);
 			}
@@ -390,22 +392,21 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpSync ()
 {
-	uint16_t mu_u; // amount of cpu required for locally placing the chain in question
-	Chain modifiedChain; // the modified chain, to be pushed to datastructures
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
-	  mu_u = chainPtr->mu_u_at_lvl(lvl);
-		if (availCpu >= mu_u) {
+		uint16_t mu_u = chainPtr->mu_u_at_lvl(lvl); // amount of cpu required for locally placing the chain in question
+		Chain modifiedChain; // the modified chain, to be pushed to datastructures
+		if (availCpu >= mu_u) { // I have enough avail' cpu for this chain --> assign it
 				modifiedChain = *chainPtr;
 				chainPtr = notAssigned.erase(chainPtr);
 				availCpu -= mu_u;
 				modifiedChain.curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				placedChains.insert (modifiedChain);
+				placedChains.				 insert (modifiedChain);
 				newlyPlacedChainsIds.insert (modifiedChain.id);
 			}
 			else {
 				potPlacedChainsIds.insert (modifiedChain.id);
-				pushUpSet.insert (modifiedChain);
+				pushUpSet.				 insert (modifiedChain);
 			}
 		}
 		else { 
@@ -425,13 +426,10 @@ void Datacenter::bottomUpSync ()
 	
 	}
 
-	// $$$
-	snprintf (buf, bufSize, "\nDC %d, BU sync: potPlacedChainsIds=", id);
-	printBufToLog ();
-  MyConfig::printToLog (potPlacedChainsIds);
-
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		this -> print ();
+		snprintf (buf, bufSize, "\nDC %d, BU sync: potPlacedChainsIds=", id);
+		printBufToLog ();
+		MyConfig::printToLog (potPlacedChainsIds);
 	}
 
   if (isRoot) { 
@@ -516,10 +514,6 @@ void Datacenter::bottomUpAsync ()
 	genNsndBottomUpPkt ();
 }
 
-void Datacenter::sndPushUpPkt () 
-{
-}
-
 /*************************************************************************************************************************************************
 Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpSet, and xmt it to my parent:
 - For each chain in this->pushUpSet:
@@ -532,27 +526,24 @@ void Datacenter::genNsndBottomUpPkt ()
 	BottomUpPkt* pkt2send = new BottomUpPkt;
 
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());
-	uint16_t i; 
-	for (i=0; i<notAssigned.size(); i++) {
+	for (uint16_t i=0; i<notAssigned.size(); i++) {
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
-	uint16_t prevPushUpSetSize = pushUpSet.size();
-	pkt2send -> setPushUpVecArraySize (prevPushUpSetSize);
-	i = 0;
+	pkt2send -> setPushUpVecArraySize (pushUpSet.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	uint16_t idixInPushUpVec = 0;
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
-		if (CannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec transmitted to prnt
+		if (CannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 			chainPtr++;
 			continue;
 		}
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt, and remove it from the local db (pushUpSet)
-		pkt2send->setPushUpVec (i++, *chainPtr);
+		pkt2send->setPushUpVec (idixInPushUpVec++, *chainPtr);
 		chainPtr = pushUpSet.erase (chainPtr); 
 	}
-	pkt2send -> setPushUpVecArraySize (prevPushUpSetSize - pushUpSet.size()); // the pkt includes all the chains that were removed from pushUpSet. 
+	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjest the array's size to the real number of chains inserted into it. 
 
-  // 
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d: after preparing BU pkt to snd to prnt, pushUpSet=", id);
 		printBufToLog();
@@ -576,7 +567,6 @@ void Datacenter::genNsndBottomUpPkt ()
 	if (!reshuffled) { 
 		notAssigned.clear ();
 	}
-	
 }
 
 void Datacenter::reshuffleAsync ()
@@ -646,7 +636,7 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
 {
   EV << "Starting transmission of " << pkt2send << endl;
 
-  send(pkt2send, "port$o", portNum);
+	send(pkt2send, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
   endXmtEvents[portNum] = new EndXmtPkt ("");
