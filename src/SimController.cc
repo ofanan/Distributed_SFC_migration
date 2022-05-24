@@ -153,7 +153,6 @@ void SimController::runTrace () {
 void SimController::finish () 
 {
   traceFile.close ();
-//  concludeTimeStep (); 
 	if (MyConfig::LOG_LVL>0) {
   	MyConfig::printToLog ("finished sim\n");
   }
@@ -307,6 +306,13 @@ void SimController::readNewUsrsLine (string line)
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
 			chain = Non_RT_Chain (chainId, vector<uint16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
 		}
+		
+		if (MyConfig::DEBUG_LVL>0) {
+			if (findChainInSet (allChains, chainId, chain)) {
+				error ("new chain %d already found in allChains\n", chainId);
+			}
+		}
+		
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
 		allChains.insert (chain); 
 	}	
