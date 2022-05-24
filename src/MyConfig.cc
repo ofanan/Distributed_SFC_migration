@@ -26,6 +26,15 @@ void MyConfig::printSuToLog (Chain chain)
 	printToLog (chain.S_u);
 }
 
+//// for each chain in the set, print its PoA 
+//void MyConfig::printToLog (UnorderedSetOfChains set2print, bool printPoa)
+//{
+//	for (auto chain : set2print) {
+//		logFile << chain.id << ",";
+//	}
+//}
+
+
 void MyConfig::printToLog (UnorderedSetOfChains set2print)
 {
 	for (auto chain : set2print) {

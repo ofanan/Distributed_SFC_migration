@@ -179,12 +179,11 @@ void SimController::concludeTimeStep ()
 	
 	if (MyConfig::LOG_LVL > 1) {
 		printAllDatacenters ();
-	  printAllChains ();
-	  printAllDatacentersByAllChains ();
+	  printAllDatacentersByMyDatabase ();
 	}
 }
 // print all the placed (and possibly, the pot-placed) chains on each DC by this->allChains DB.
-void SimController::printAllDatacentersByAllChains ()
+void SimController::printAllDatacentersByMyDatabase ()
 {
 	// gather the required data
 	vector<uint32_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
@@ -228,11 +227,23 @@ int SimController::calcSolCpuCost ()
 }
 
 
-// Print all the chains. Default: print only the chains IDs. 
-void SimController::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
+// Print all the chains' current places
+void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {
-	MyConfig::printToLog ("allChains\n*******************\n");
-	MyConfig::printToLog (allChains);
+	MyConfig::printToLog ("\nallChains\n*******************\n");
+	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa");
+	
+	for (auto chain : allChains) {
+		int16_t curDatacenter = chain.getCurDatacenter ();
+		if (curDatacenter==UNPLACED) {
+			snprintf (buf, bufSize, "(%d,-1)", chain.id);
+		}
+		else {
+			snprintf (buf, bufSize, "(%d,%d)", chain.id, datacenters[curDatacenter]->id);
+		}
+		printBufToLog ();
+	}
+	
 	MyConfig::printToLog ("\n");
 }
 
@@ -316,10 +327,6 @@ void SimController::readNewUsrsLine (string line)
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
 		allChains.insert (chain); 
 	}	
-	if (LOG_LVL>1) {
-	  MyConfig::printToLog ("After readNewUsrsLine: ");
-	  printAllChains ();
-	}
 }
 
 /*************************************************************************************************************************************************
@@ -360,10 +367,6 @@ void SimController::readOldUsrsLine (string line)
 		}
 	}
 	
-	if (MyConfig::LOG_LVL==DETAILED_LOG) {
-	  logFile << "After readOldUsrsLine: ";
-  	printAllChains ();
-  }
 }
 
 

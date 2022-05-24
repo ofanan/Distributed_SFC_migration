@@ -99,8 +99,8 @@ class SimController : public cSimpleModule
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
 		void printAllDatacenters ();
-		void printAllDatacentersByAllChains ();
-    void printAllChains (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
+		void printAllDatacentersByMyDatabase ();
+    void printAllChainsPoas (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the list of all chains
 				 
   public:
     string traceFileName = "results/poa_files/Tree_shorter.poa";
