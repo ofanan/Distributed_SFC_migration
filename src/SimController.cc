@@ -119,13 +119,13 @@ void SimController::runTimeStep ()
 			}
 		}
 		else if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
-			readUsrsThatLeftLine (line.substr(15));
+			rdUsrsThatLeftLine (line.substr(15));
 		} 	
 		else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-			readNewUsrsLine (line.substr(9)); 
+			rdNewUsrsLine (line.substr(9)); 
 		}
 		else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-			readOldUsrsLine (line.substr(9));
+			rdOldUsrsLine (line.substr(9));
 			
 			// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
 			// place all the new / critical chains.
@@ -257,11 +257,12 @@ void SimController::parseChainPoaToken (string const token, uint32_t &chainId, u
 
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
-The function inserts all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
+- insert all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
+- remove each chain that left from this->allChains.
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 **************************************************************************************************************************************************/
-void SimController::readUsrsThatLeftLine (string line)
+void SimController::rdUsrsThatLeftLine (string line)
 {
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -272,7 +273,7 @@ void SimController::readUsrsThatLeftLine (string line)
   // parse each old chain in the trace (.poa file), and find its current datacenter
 	for (const auto& token : tokens) {
   	chainId = stoi (token);
-  	if (!(findChainInSet (allChains, chainId, chain))) {
+  	if (MyConfig::DEBUG_LVL>0 && !(findChainInSet (allChains, chainId, chain))) {
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
@@ -281,6 +282,7 @@ void SimController::readUsrsThatLeftLine (string line)
 				error ("Note: this chain was not placed before leaving\n"); 
 	  	}
   		chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+  		eraseChainFromSet (allChains, chainId);
 	  }
   }
 }
@@ -292,7 +294,7 @@ Also, add the new generated chain to chainsThatJoinedLeaf[leaf], where leaf is t
 Inputs: 
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated PoA of chain c_i.
 **************************************************************************************************************************************************/
-void SimController::readNewUsrsLine (string line)
+void SimController::rdNewUsrsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -312,7 +314,7 @@ void SimController::readNewUsrsLine (string line)
 		
 		if (MyConfig::DEBUG_LVL>0) {
 			if (findChainInSet (allChains, chainId, chain)) {
-				error ("t=%d: in readNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
+				error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 			}
 		}
 		
@@ -328,7 +330,7 @@ void SimController::readNewUsrsLine (string line)
 Inputs:
 - line: the line to parse. The line contains data in the format (c_1, leaf_1)(c_2, leaf_2), ... where leaf_i is the updated leaf of chain c_i.
 **************************************************************************************************************************************************/
-void SimController::readOldUsrsLine (string line)
+void SimController::rdOldUsrsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
@@ -341,7 +343,7 @@ void SimController::readOldUsrsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	if (!(findChainInSet (allChains, chainId, chain))) {
-			error ("t=%d: didn't find chain id %d in allChains, in readOldUsrsLine", t, chainId);
+			error ("t=%d: didn't find chain id %d in allChains, in rdOldUsrsLine", t, chainId);
 	  }
 		chainCurDatacenter = chain.getCurDatacenter();
 		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
@@ -354,7 +356,7 @@ void SimController::readOldUsrsLine (string line)
 		allChains.insert (modifiedChain);
 
 		if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED) {
-			error ("t=%d: at readOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
+			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			continue;
 		}
 	}
