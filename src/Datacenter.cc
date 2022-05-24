@@ -313,16 +313,15 @@ void Datacenter::pushUpSync ()
 			continue;
 		}
 		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
-			availCpu -= mu_u;
-			Chain pushedUpChain = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpVec
+			availCpu 						-= mu_u;
+			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpSet
 			pushedUpChain.curLvl = lvl;
-			placedChains.insert (pushedUpChain);
+			chainPtr 						 = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain i
+			placedChains.				 insert (pushedUpChain);
 			newlyPlacedChainsIds.insert (pushedUpChain.id);
-			chainPtr = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains
-			pushUpSet.insert (pushedUpChain);
+			pushUpSet.					 insert (pushedUpChain);
 		}
 	}
-
 	
 	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
 	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
@@ -339,7 +338,6 @@ void Datacenter::pushUpSync ()
 			}
 		}
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
-	
 	}
 
 	genNsndPushUpPktsToChildren ();
@@ -352,19 +350,26 @@ Generate pushUpPkts, based on the data currently found in pushUpSet, and xmt the
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
-	uint16_t pushUpVecArraySize;
 	Chain chain;
 	
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
-		pushUpVecArraySize=0;
 		pkt = new PushUpPkt;
-		for (Chain chain : pushUpSet) {	// consider all the chains in pushUpVec
+		pkt->setPushUpVecArraySize (pushUpSet.size ()); // default size of pushUpVec, for case that all chains in pushUpSet belong to this child; will later shrink pushUpVec otherwise 
+		uint16_t idxInPushUpVec = 0;
+		for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {	// consider all the chains in pushUpVec
 			if (chain.S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
-				pkt->setPushUpVecArraySize (++pushUpVecArraySize);
-				pkt->setPushUpVec (pushUpVecArraySize-1, chain);
-			}		
+				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
+				chainPtr = pushUpSet.erase (chainPtr);
+			}
+			else {
+				chainPtr++;
+			}
 		}
-		if (MyConfig::mode==SYNC || pushUpVecArraySize> 0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+		
+		// shrink pushUpVec to its real size
+		pkt->setPushUpVecArraySize (idxInPushUpVec);
+		
+		if (MyConfig::mode==SYNC || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
