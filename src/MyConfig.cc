@@ -14,11 +14,6 @@ void MyConfig::openFiles()
 	logFile.open (LogFileName);
 }
 
-//ofstream MyConfig::getLogFile ()
-//{
-//	return logFile;
-//}
-
 void MyConfig::printToLog (SetOfChainsOrderedByCpuUsage setOfChains, bool printS_u)
 {
 	for (auto chain : setOfChains) {
@@ -95,4 +90,8 @@ vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const ve
 	return res;
 }
 
+//ofstream MyConfig::getLogFile ()
+//{
+//	return logFile;
+//}
 

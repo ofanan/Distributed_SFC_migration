@@ -5,9 +5,11 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {
-    return lhs.getCpu() <= rhs.getCpu();
-}
+
+/*************************************************************************************************************************************************
+ * Infline functions
+*************************************************************************************************************************************************/
+inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= rhs.getCpu();}
 
 inline bool Datacenter::CannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
 inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
@@ -18,7 +20,6 @@ inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) 
 inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
-
 
 // erase the given key from the given set. Returns true iff the requested key was indeed found in the set
 static bool eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
@@ -89,7 +90,7 @@ void Datacenter::initialize()
 
 }
 
-// Print the chains placed / pot-placed in this DC.
+// Print all the chains placed and pot-placed in this DC.
 void Datacenter::print ()
 {
 	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", id, lvl);
@@ -111,8 +112,8 @@ void Datacenter::setLeafId (uint16_t leafId)
 *************************************************************************************************************************************************/
 void Datacenter::handleSelfMsg ()
 {
-  EndXmtPkt *end_xmt_pkt = (EndXmtPkt*) curHandledMsg;
-  int16_t portNum = end_xmt_pkt -> getPortNum();
+  EndXmtPkt *endXmtPkt = (EndXmtPkt*) curHandledMsg;
+  int16_t portNum 		 = endXmtPkt -> getPortNum();
   endXmtEvents[portNum] = nullptr;
   if (outputQ[portNum].isEmpty()) {
       return;
@@ -173,8 +174,7 @@ void Datacenter::handleRlzRsrcMsg ()
 {
 	RlzRsrcMsg *msg = (RlzRsrcMsg*)curHandledMsg;
 	
-	// remove each chain indicated in the msg from placedChains
-	MyConfig::printToLog ("1");
+	// remove from this->placedChains each chain indicated in the msg 
 	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
 		if (placedChains.empty()) {
 			break;
@@ -182,7 +182,7 @@ void Datacenter::handleRlzRsrcMsg ()
 		eraseChainFromSet (placedChains, msg->getChainsToRlz(i));
 	} 
 
-	// remove each chain indicated in the msg from potPlacedChains
+	// remove from this->potPlacedChainsIds each (id of a chain) chain indicated in the msg 
 	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
 		if (potPlacedChainsIds.empty()) {
 			break;
@@ -190,7 +190,7 @@ void Datacenter::handleRlzRsrcMsg ()
 		eraseKeyFromSet (potPlacedChainsIds, msg->getChainsToRlz(i));
 	} 
 
-	// remove each chain indicated in the msg from potPlacedChains
+	// remove from this->newlyPlacedChainsIds each chain indicated in the msg 
 	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
 		if (newlyPlacedChainsIds.empty()) {
 			break;
@@ -204,6 +204,7 @@ Handle a rcvd InitBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
 - Empty this->pushUpSet.
 - Call bottomUp, for running the BU alg'.
+* Note: this msg is expected to arrive to leaves only.
 *************************************************************************************************************************************************/
 void Datacenter::handleInitBottomUpMsg () 
 {
@@ -228,25 +229,22 @@ Handle a rcvd PushUpPkt:
 void Datacenter::handlePushUpPkt () 
 {
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d rcvd PU pkt", id);
-		printBufToLog ();
-	}
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		if (pkt->getPushUpVecArraySize()==pkt->getPushUpVecArraySize()) {
-			MyConfig::printToLog ("pushUpVec rcvd is empty");
+		if (pkt->getPushUpVecArraySize()==0) {
+			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", id);
+			printBufToLog ();
 		}
 		else {
-			snprintf (buf, bufSize, "pushUpVec[0]=%d", pkt->getPushUpVec(0).id);
+			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0]=%d", id, pkt->getPushUpVec(0).id);
 			printBufToLog ();
 		}
 	}
-	// insert all the chains found in pushUpVec field the incoming pkt into this-> pushUpSet.
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		pushUpSet.insert (pkt->getPushUpVec (i));
 	} 
+
 	if (MyConfig::mode==SYNC){ 
 		pushUpSync ();
 	}
@@ -272,7 +270,8 @@ void Datacenter::pushUpSync ()
 	// First, find for each pot-placed of mine whether it was pushed-up by an ancestor, and react correspondigly
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 
-		if (isRoot || potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
+		if (isRoot || // if I'm the root, I have no ancestors, which could have pushed-up a pkt of mine
+		 	  potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
 			break;
 		}
 
@@ -280,7 +279,7 @@ void Datacenter::pushUpSync ()
 		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
 		if (search==potPlacedChainsIds.end()) { 
-			chainPtr++; // this chain wasn't pot-placed by me, but by another DC --> continue to the next chain in pushUpSet
+			chainPtr++; // this chain wasn't pushed-up from me, but from another DC --> continue to the next chain in pushUpSet
 			continue; 
 		}
 		
@@ -288,7 +287,7 @@ void Datacenter::pushUpSync ()
 		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		chainPtr = pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
 		if (modifiedChain.curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
-			placedChains.insert (modifiedChain);
+			placedChains.				 insert (modifiedChain);
 			newlyPlacedChainsIds.insert (modifiedChain.id);
 		}
 		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
@@ -296,7 +295,7 @@ void Datacenter::pushUpSync ()
 		}
 	}
 	
-	if (!potPlacedChainsIds.empty()) {
+	if (MyConfig::DEBUG_LVL > 0 && !potPlacedChainsIds.empty()) {
 		snprintf (buf, bufSize, "\nDC %d: ERROR: potPlacedChains should be empty at this stage of running PU. potPlacedChainsIds=", id);
 		printBufToLog ();
     MyConfig::printToLog (potPlacedChainsIds);
