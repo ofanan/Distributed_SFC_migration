@@ -202,6 +202,23 @@ void Datacenter::handleRlzRsrcMsg ()
 }
 
 /*************************************************************************************************************************************************
+release resources of chains that left "this".
+- For each chain that left:
+	- Remove the chain from the lists of placed chains, potPlaced and newlyPlaced chains.
+	rlz all the cpu resources assigned to this chain.
+*************************************************************************************************************************************************/
+void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz) 
+{
+
+//	for (const chainIdPtr=IdsOfChainsToRlz.begin(); chainIdPtr!=IdsOfChainsToRlz.end(); ) {
+	for (auto chainId : IdsOfChainsToRlz) {
+		eraseChainFromSet (placedChains, 					chainId);
+		eraseKeyFromSet   (potPlacedChainsIds, 		chainId);
+		eraseKeyFromSet   (newlyPlacedChainsIds, 	chainId);
+	}
+}
+
+/*************************************************************************************************************************************************
 Handle a rcvd InitBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
 - Empty this->pushUpSet.

@@ -57,6 +57,7 @@ class Datacenter : public cSimpleModule
   	
     // Log / debug funcs
     void print ();
+    void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
     
   private:
   	static const uint8_t portToPrnt=0;

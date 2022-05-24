@@ -369,18 +369,24 @@ void SimController::readOldUsrsLine (string line)
 void SimController::rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc) 
 {
 
-	RlzRsrcMsg* msg;
-	uint16_t i;
 	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
 	{
-		msg = new RlzRsrcMsg ();
-		msg -> setChainsToRlzArraySize (item.second.size());
-		i = 0;
-		for (auto & chainId : item.second) {
-			msg -> setChainsToRlz (i++, chainId);
-		}
-		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
+		datacenters[item.first]->rlzRsrc (item.second); 
 	}
+
+
+//	RlzRsrcMsg* msg;
+//	uint16_t i;
+//	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
+//	{
+//		msg = new RlzRsrcMsg ();
+//		msg -> setChainsToRlzArraySize (item.second.size());
+//		i = 0;
+//		for (auto & chainId : item.second) {
+//			msg -> setChainsToRlz (i++, chainId);
+//		}
+//		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
+//	}
 }
 
 // Initiate the run of placement alg'
