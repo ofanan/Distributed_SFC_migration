@@ -372,6 +372,9 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
+	if (MyConfig::DEBUG_LVL>0 && !pushUpSet.empty()) {
+		error ("pushUpSet not empty after sending PU pkts to all children");
+	}
 }
 
 /*************************************************************************************************************************************************
