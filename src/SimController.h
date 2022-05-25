@@ -92,6 +92,7 @@ class SimController : public cSimpleModule
 		
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
+		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds);
 		void handleFinishedAlgMsg (cMessage *msg);
 		void handlePrepareReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
