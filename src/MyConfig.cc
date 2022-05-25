@@ -100,14 +100,6 @@ vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const ve
 }
 
 
-void MyConfig::updatePlacementAtSimController (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds)
-{
-}
-
-
-
-
-
 //ofstream MyConfig::getLogFile ()
 //{
 //	return logFile;

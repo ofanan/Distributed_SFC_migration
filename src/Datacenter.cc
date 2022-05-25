@@ -474,14 +474,7 @@ void Datacenter::updateSimController ()
 		return;
 	}
 	
-	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds); // works, but MyConfig doesn't succeed to call simController...
-	SimController *scPtr = (SimController*) network->getSubmodule("sim_controller"); //simControllerAsSimController;
-	scPtr->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
-//	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
-//	simController = (SimController*)simController;
-//	SimController* gamad;
-//	updatePlacementInfo	
-	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds); // works, but MyConfig doesn't succeed to call simController...
+	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }
