@@ -465,6 +465,26 @@ void Datacenter::bottomUpSync ()
 Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChainsIds.
 Later, clear newlyPlacedChainsIds.
 *************************************************************************************************************************************************/
+void Datacenter::updateSimController ()
+{
+
+	if (newlyPlacedChainsIds.empty () && newlyDisplacedChainsIds.empty()) {
+		return;
+	}
+	
+	MyConfig::printToLog ();
+	MyConfig::printToLog (newlyPlacedChainsIds, newlyDisplacedChainsIds);
+//	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds);
+//	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds);
+	newlyPlacedChainsIds.		clear ();
+	newlyDisplacedChainsIds.clear ();
+}
+
+
+/*************************************************************************************************************************************************
+Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChainsIds.
+Later, clear newlyPlacedChainsIds.
+*************************************************************************************************************************************************/
 void Datacenter::sndPlacementInfoMsg ()
 {
 
@@ -665,4 +685,3 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
-
