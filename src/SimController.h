@@ -94,11 +94,11 @@ class SimController : public cSimpleModule
 		
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
-		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds);
 		void handleFinishedAlgMsg (cMessage *msg);
 		void handlePrepareReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
+    void parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId);
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
@@ -116,8 +116,8 @@ class SimController : public cSimpleModule
 		ofstream logFile;
     SimController ();
     ~SimController ();
-    void parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId);
     void checkParams (); // Sanity checks for various parameters
+		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds);
 };
 
 #endif

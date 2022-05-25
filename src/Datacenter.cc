@@ -476,7 +476,7 @@ void Datacenter::updateSimController ()
 	
 	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds); // works, but MyConfig doesn't succeed to call simController...
 	SimController *scPtr = (SimController*) network->getSubmodule("sim_controller"); //simControllerAsSimController;
-//	scPtr->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
+	scPtr->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
 //	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
 //	simController = (SimController*)simController;
 //	SimController* gamad;
