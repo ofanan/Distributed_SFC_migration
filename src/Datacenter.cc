@@ -474,7 +474,7 @@ void Datacenter::updateSimController ()
 		return;
 	}
 	
-	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
+	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds, this->id); 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }

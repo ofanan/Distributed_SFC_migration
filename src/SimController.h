@@ -117,7 +117,7 @@ class SimController : public cSimpleModule
     SimController ();
     ~SimController ();
     void checkParams (); // Sanity checks for various parameters
-		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds);
+		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds, uint16_t dcId);
 };
 
 #endif

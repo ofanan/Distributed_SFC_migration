@@ -485,8 +485,15 @@ void SimController::initAlgAsync () {
 	}
 }
 
-void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds)
-{}
+/*************************************************************************************************************************************************
+Update chains' placement info, by the data sent from a datacenter.
+- Increase the cntrs of the number of migs as required.
+- Update this->allChains db.
+**************************************************************************************************************************************************/
+void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds, uint16_t dcId)
+{
+
+}
 
 
 /*************************************************************************************************************************************************
