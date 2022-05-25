@@ -50,6 +50,9 @@ class MyConfig {
 		static void openFiles ();
 		
 		//print
+		static void updatePlacementAtSimController (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds);
+		static void printToLog (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds);
+		static void printToLog (); 
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
 		static void printToLog (int d); // print "d,", where d is the integer, to the log file
@@ -68,5 +71,4 @@ class MyConfig {
 };
 
 #endif
-
 
