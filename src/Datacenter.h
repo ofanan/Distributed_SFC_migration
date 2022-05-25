@@ -7,6 +7,8 @@
 #include <set>
 
 #include "MyConfig.h"
+//#include "SimController.h"
+
 #include "EndXmtPkt_m.h"
 #include "BottomUpPkt_m.h"
 #include "InitBottomUpMsg_m.h"
@@ -46,7 +48,8 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned, pushUpVec; 
     UnorderedSetOfChains     placedChains; 
     unordered_set <uint32_t> potPlacedChainsIds; //IDs of chains that are potentially-placed on me
-    unordered_set <uint32_t> newlyPlacedChainsIds; // IDs of the chains that I began place since the last update I sent to SimCtrlr.
+    unordered_set <uint32_t> newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
+    unordered_set <uint32_t> newlyDisplacedChainsIds; // IDs of the chains that I have displaceed after the last update I had sent to SimCtrlr.
 		uint8_t numBuPktsRcvd; 
 		
 		//getter
@@ -87,6 +90,7 @@ class Datacenter : public cSimpleModule
     void genNsndBottomUpPkt			();
     void sndPushUpPkt						();
     void sndPlacementInfoMsg 		();
+    void updateSimController 		();
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void rlzRsrc 								(); // Release the resources
     void genNsndPushUpPktsToChildren ();
