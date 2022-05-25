@@ -473,10 +473,9 @@ void Datacenter::updateSimController ()
 		return;
 	}
 	
-	MyConfig::printToLog ();
-	MyConfig::printToLog (newlyPlacedChainsIds, newlyDisplacedChainsIds);
-//	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds);
-//	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds);
+	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds); // works, but MyConfig doesn't succeed to call simController...
+	
+	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds); // works, but MyConfig doesn't succeed to call simController...
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }

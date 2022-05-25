@@ -485,6 +485,10 @@ void SimController::initAlgAsync () {
 	}
 }
 
+void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds)
+{}
+
+
 /*************************************************************************************************************************************************
 Handle a PlacementInfoMsg, which arrived as a "direct msg" from a datacenter.
 - Increase the cntrs of the number of migs as required.

@@ -24,11 +24,14 @@
 using namespace omnetpp;
 using namespace std;
 
+class SimController;
+
 class Datacenter : public cSimpleModule
 {
   public:
   
-    cModule *network, *simController; // Pointer to the network on which the simulation is running, and to the simController*/
+    cModule *network; // Pointer to the network on which the simulation is running
+    cModule *simController; // Pointer to the simController
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
     uint8_t 	numChildren;
