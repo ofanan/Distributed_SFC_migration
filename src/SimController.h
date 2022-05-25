@@ -41,6 +41,8 @@ using namespace boost;
 const int16_t root_id = 0;
 const int8_t LOG_LVL = 1;
 
+class Datacenter;
+
 class SimController : public cSimpleModule
 {
   private:

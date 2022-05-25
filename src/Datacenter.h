@@ -7,7 +7,7 @@
 #include <set>
 
 #include "MyConfig.h"
-//#include "SimController.h"
+#include "SimController.h"
 
 #include "EndXmtPkt_m.h"
 #include "BottomUpPkt_m.h"
@@ -31,8 +31,8 @@ class Datacenter : public cSimpleModule
   public:
   
     cModule *network; // Pointer to the network on which the simulation is running
-/*    cModule *simController; // Pointer to the simController*/*/
-    SimController *simController;
+    cModule *simController; // Pointer to the simController*/
+    SimController *simControllerAsSimController;
   	string networkName;
   	uint8_t   lvl; // level in the tree (leaf's lvl is 0).
     uint8_t 	numChildren;

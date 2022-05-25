@@ -54,9 +54,8 @@ Datacenter::~Datacenter()
 void Datacenter::initialize()
 {
 	network     	= (cModule*) (getParentModule ()); 
-//	simController = (cModule*) network->getSubmodule("sim_controller"); // works, but as a cModule...
-	simController = (SimController*) network->getSubmodule("sim_controller");
-//	gamad = (SimController*) network->getSubmodule("sim_controller");
+	simController = (cModule*) network->getSubmodule("sim_controller"); // works, but as a cModule...
+	simControllerAsSimController = (SimController*) network->getSubmodule("sim_controller");
 	networkName = (network -> par ("name")).stdstringValue();
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));
@@ -476,7 +475,9 @@ void Datacenter::updateSimController ()
 	}
 	
 	MyConfig::updatePlacementAtSimController (newlyPlacedChainsIds, newlyDisplacedChainsIds); // works, but MyConfig doesn't succeed to call simController...
-//	simController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
+	SimController *scPtr = (SimController*) network->getSubmodule("sim_controller"); //simControllerAsSimController;
+//	scPtr->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
+//	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds); 
 //	simController = (SimController*)simController;
 //	SimController* gamad;
 //	updatePlacementInfo	
