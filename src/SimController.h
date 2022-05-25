@@ -28,7 +28,6 @@ Controller of the simulation:
 #include "Chain.h"
 #include "InitBottomUpMsg_m.h"
 #include "RlzRsrcMsg_m.h"
-#include "PlacementInfoMsg_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
@@ -117,7 +116,7 @@ class SimController : public cSimpleModule
     SimController ();
     ~SimController ();
     void checkParams (); // Sanity checks for various parameters
-		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds, uint16_t dcId);
+		void updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, int8_t lvl);
 };
 
 #endif

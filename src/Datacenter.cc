@@ -347,7 +347,8 @@ void Datacenter::pushUpSync ()
 	
 	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
 	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
-		sndPlacementInfoMsg ();
+//		sndPlacementInfoMsg ();
+		updateSimController ();
 	}
 
 	if (isLeaf) {
@@ -474,38 +475,11 @@ void Datacenter::updateSimController ()
 		return;
 	}
 	
-	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, newlyDisplacedChainsIds, this->id); 
+	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, this->lvl); 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }
 
-
-/*************************************************************************************************************************************************
-Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChainsIds.
-Later, clear newlyPlacedChainsIds.
-*************************************************************************************************************************************************/
-void Datacenter::sndPlacementInfoMsg ()
-{
-
-	if (newlyPlacedChainsIds.empty ()) {
-		return;
-	}
-
-	PlacementInfoMsg* msg = new PlacementInfoMsg;
-	msg -> setNewlyPlacedChainsIdsArraySize (newlyPlacedChainsIds.size ());
-
-	uint16_t i(0);	
-	for (const auto &chainId : newlyPlacedChainsIds) {
-		msg->setNewlyPlacedChainsIds (i++, chainId);
-	}
-
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC \%d sending PlacementInfoMsg", id);
-		printBufToLog ();
-	}
-	sendDirect (msg, simController, "directMsgsPort");
-	newlyPlacedChainsIds.clear ();
-}
 
 /*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in sync' mode.

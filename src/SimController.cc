@@ -490,52 +490,33 @@ Update chains' placement info, by the data sent from a datacenter.
 - Increase the cntrs of the number of migs as required.
 - Update this->allChains db.
 **************************************************************************************************************************************************/
-void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, unordered_set <uint32_t> newlyDisplacedChainsIds, uint16_t dcId)
+void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, int8_t lvl)
 {
-
-}
-
-
-/*************************************************************************************************************************************************
-Handle a PlacementInfoMsg, which arrived as a "direct msg" from a datacenter.
-- Increase the cntrs of the number of migs as required.
-- Update this->allChains db.
-**************************************************************************************************************************************************/
-void SimController::handlePlacementInfoMsg (cMessage *msg)
-{
-		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			MyConfig::printToLog ("in handlePlacementInfoMsg");
-		}
-
-	PlacementInfoMsg* curHandledMsg = (PlacementInfoMsg*) (msg);
-	Chain chain;
-	int16_t  curLvl;
+	Chain 	   chain;
 	uint32_t chainId;
 
-	for (uint16_t i(0); i< (uint16_t) (curHandledMsg -> getNewlyPlacedChainsIdsArraySize()); i++) {
-		
-		curLvl = ((Datacenter*)curHandledMsg->getSenderModule())->lvl; 
-		chainId 			= curHandledMsg -> getNewlyPlacedChainsIds (i);
+	for (auto chainId : newlyPlacedChainsIds) {
 		if (!(findChainInSet (allChains, chainId, chain))) {
-			error ("t=%d: didn't find chain id %d that appeared in a PlacementInfoMsg", t, chainId);
+			error ("t=%d: didn't find chain id %d that appeared in a call to updatePlacementInfo", t, chainId);
 
 		}
 		else {
 			if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
 				numMigs++; // Yep --> inc. the mig. cntr.
 			}
-			Chain modifiedChain (chain.id, chain.S_u); // will hold the modified chain to be inserted each time
-			modifiedChain.curLvl = curLvl;
+			Chain modifiedChain (chainId, chain.S_u); // will hold the modified chain to be inserted each time
+			modifiedChain.curLvl = lvl;
 			
 			if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-				snprintf (buf, bufSize, "\nchain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[curLvl]);
+				snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[lvl]);
 				printBufToLog ();
 			}
-			allChains.erase (chain); // remove the old chain from our DB
+			allChains.erase (chain); 					// remove the old chain from our DB
 			allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
 }
+
 
 /*************************************************************************************************************************************************
 Handle a finishedAlgMsg, which arrived as a "direct msg" from a datacenter.
@@ -585,9 +566,6 @@ void SimController::handleMessage (cMessage *msg)
 		if (!isLastPeriod) {
 			runTimeStep ();
 		}
-  }
-  else if (dynamic_cast<PlacementInfoMsg*> (msg)) { 
-  	handlePlacementInfoMsg (msg);
   }
   else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
   	handleFinishedAlgMsg (msg);
