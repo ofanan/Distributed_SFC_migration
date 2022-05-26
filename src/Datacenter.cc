@@ -402,6 +402,8 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 void Datacenter::bottomUpSync ()
 {
 
+	Chain dummy;
+	pushUpSet.			insert (dummy); // This line causes the f...king error!
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
 		printBufToLog ();
