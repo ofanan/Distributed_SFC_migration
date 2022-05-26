@@ -85,7 +85,7 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 struct sortTwoChainsByCpuUsage {
 	bool operator () (const Chain& lhs, const Chain& rhs) const {
-		if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return true
+		if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return false
 			return false;
 		}
 	  return ((lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl]) <
@@ -94,7 +94,8 @@ struct sortTwoChainsByCpuUsage {
 };
 
 typedef unordered_set <Chain, ChainHash> 		 UnorderedSetOfChains;
-typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
+typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage; 
+/*typedef unordered_set <Chain, ChainHash> SetOfChainsOrderedByCpuUsage;  //$$$$$$$$$*/
 
 // Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.

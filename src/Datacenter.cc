@@ -405,8 +405,8 @@ void Datacenter::bottomUpSync ()
 {
 
 
-	Chain dummy (0, {});
-	pushUpSet.			insert (dummy); // This line causes the f...king error!
+//	Chain dummy (0, {});
+//	pushUpSet_.			insert (dummy); // This line causes the f...king error!
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
 		printBufToLog ();
@@ -427,35 +427,32 @@ void Datacenter::bottomUpSync ()
 					}
 					else {
 						potPlacedChains.insert (modifiedChain);
-//						pushUpSet.			insert (modifiedChain); // This line causes the f...king error!
+						pushUpSet_.			insert (modifiedChain); // This line causes the f...king error!
 					}
 			}
-			else {
-				chainPtr++;
+			else { 
+				if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+					if (reshuffled) {
+						snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
+						printBufToLog ();
+						PrintAllDatacenters ();
+						MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
+						PrintStateAndEndSim  ();
+					}
+					return prepareReshSync ();
+				}
+				else {
+					chainPtr++;
+				}
 			}
-	//		else { 
-	//			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-	//				if (reshuffled) {
-	//					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
-	//					printBufToLog ();
-	//					PrintAllDatacenters ();
-	//					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
-	//					PrintStateAndEndSim  ();
-	//				}
-	//				return prepareReshSync ();
-	//			}
-	//			else {
-	//				chainPtr++;
-	//			}
-	//		}
 		}
 
-//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-//		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
-//		printBufToLog ();
-//		print ();
-//		MyConfig::printToLog (potPlacedChains);
-//	}
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
+		printBufToLog ();
+		print ();
+		MyConfig::printToLog (potPlacedChains);
+	}
 
   if (isRoot) { 
   	pushUpSync ();
