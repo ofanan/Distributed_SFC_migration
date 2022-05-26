@@ -420,10 +420,10 @@ void Datacenter::bottomUpSync ()
 						placedChains.				 insert (modifiedChain);
 						newlyPlacedChainsIds.insert (modifiedChain.id);
 					}
-//					else {
-//						potPlacedChains.insert (modifiedChain);
-//						pushUpSet.			insert (modifiedChain);
-//					}
+					else {
+						potPlacedChains.insert (modifiedChain);
+//						pushUpSet.			insert (modifiedChain); // This line causes the f...king error!
+					}
 			}
 			else {
 				chainPtr++;
