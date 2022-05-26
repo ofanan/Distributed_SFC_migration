@@ -109,3 +109,6 @@ For binding a directory (may be helpful if calling sinularity as root), use
 > singularity shell -B /home/ofanan omnetpp.img 
 
 
+
+Can't find a source file at "/build/glibc-SzIz7B/glibc-2.31/stdio-common/snprintf.c" 
+Locate the file or edit the source lookup path to include its location.
