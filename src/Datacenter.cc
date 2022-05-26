@@ -280,7 +280,12 @@ void Datacenter::pushUpSync ()
 {
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
+		if (pushUpSet.empty()) {
+			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", id);
+		}
+		else {
+			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
+		}
 		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
 	}
@@ -403,52 +408,55 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
-		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
-		Chain modifiedChain; // the modified chain, to be pushed to datastructures
-		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
-				modifiedChain = *chainPtr;
-				chainPtr = notAssigned.erase(chainPtr);
-				availCpu -= requiredCpuToLocallyPlaceThisChain;
-				modifiedChain.curLvl = lvl;
-			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				placedChains.				 insert (modifiedChain);
-				newlyPlacedChainsIds.insert (modifiedChain.id);
-			}
-			else {
-				potPlacedChains.insert (modifiedChain);
-				pushUpSet.			insert (modifiedChain);
-			}
+	if (!notAssigned.empty()) {
+		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
+	//		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
+	//		Chain modifiedChain; // the modified chain, to be pushed to datastructures
+	//		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
+	//				modifiedChain = *chainPtr;
+	//				chainPtr = notAssigned.erase(chainPtr);
+	//				availCpu -= requiredCpuToLocallyPlaceThisChain;
+	//				modifiedChain.curLvl = lvl;
+	//			if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
+	//				placedChains.				 insert (modifiedChain);
+	//				newlyPlacedChainsIds.insert (modifiedChain.id);
+	//			}
+	//			else {
+	//				potPlacedChains.insert (modifiedChain);
+	//				pushUpSet.			insert (modifiedChain);
+	//			}
+	//		}
+	//		else { 
+	//			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+	//				if (reshuffled) {
+	//					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
+	//					printBufToLog ();
+	//					PrintAllDatacenters ();
+	//					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
+	//					PrintStateAndEndSim  ();
+	//				}
+	//				return prepareReshSync ();
+	//			}
+	//			else {
+	//				chainPtr++;
+	//			}
+	//		}
 		}
-		else { 
-			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				if (reshuffled) {
-					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
-					printBufToLog ();
-					PrintAllDatacenters ();
-					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
-					PrintStateAndEndSim  ();
-				}
-				return prepareReshSync ();
-			}
-			else {
-				chainPtr++;
-			}
-		}
-	
 	}
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
-		printBufToLog ();
-		print ();
-		MyConfig::printToLog (potPlacedChains);
-	}
+//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+//		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
+//		printBufToLog ();
+//		print ();
+//		MyConfig::printToLog (potPlacedChains);
+//	}
 
   if (isRoot) { 
+		MyConfig::printToLog ("0");
   	pushUpSync ();
   }
   else {
+		MyConfig::printToLog ("1");
   	genNsndBottomUpPkt ();
   }
 }
@@ -558,10 +566,10 @@ void Datacenter::genNsndBottomUpPkt ()
 		MyConfig::printToLog (buf);
 		MyConfig::printToLog (pushUpSet);
 		if (pkt2send -> getPushUpVecArraySize ()== 0) {
-			snprintf (buf, bufSize, "pushUpVec is empty");
+			snprintf (buf, bufSize, ", pushUpVec is empty");
 		}
 		else {
-			snprintf (buf, bufSize, "pushUpVec[0]=%d", pkt2send->getPushUpVec(0).id);
+			snprintf (buf, bufSize, ", pushUpVec[0]=%d", pkt2send->getPushUpVec(0).id);
 		}
 		MyConfig::printToLog (buf);
 	}
