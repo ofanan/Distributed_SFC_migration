@@ -410,8 +410,8 @@ void Datacenter::bottomUpSync ()
 
 		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
-//			Chain modifiedChain; // the modified chain, to be pushed to datastructures
-//			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
+			Chain modifiedChain; // the modified chain, to be pushed to datastructures
+			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 //					modifiedChain = *chainPtr;
 //					chainPtr = notAssigned.erase(chainPtr);
 //					availCpu -= requiredCpuToLocallyPlaceThisChain;
@@ -424,7 +424,7 @@ void Datacenter::bottomUpSync ()
 //						potPlacedChains.insert (modifiedChain);
 //						pushUpSet.			insert (modifiedChain);
 //					}
-//			}
+			}
 //			else {
 //				chainPtr++;
 //			}
