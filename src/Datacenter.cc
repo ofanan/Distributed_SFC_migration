@@ -408,7 +408,7 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-	if (!notAssigned.empty()) {
+//	if (!notAssigned.empty()) {
 		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 			Chain modifiedChain; // the modified chain, to be pushed to datastructures
@@ -442,7 +442,7 @@ void Datacenter::bottomUpSync ()
 	//			}
 	//		}
 		}
-	}
+//	}
 
 //	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 //		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
