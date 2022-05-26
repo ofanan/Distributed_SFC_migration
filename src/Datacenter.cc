@@ -416,8 +416,8 @@ void Datacenter::bottomUpSync ()
 				newlyPlacedChainsIds.insert (modifiedChain.id);
 			}
 			else {
-				potPlacedChainsIds.insert (modifiedChain.id);
-				pushUpSet.				 insert (modifiedChain);
+				potPlacedChains.insert (modifiedChain);
+				pushUpSet.			insert (modifiedChain);
 			}
 		}
 		else { 
@@ -442,7 +442,7 @@ void Datacenter::bottomUpSync ()
 		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
 		printBufToLog ();
 		print ();
-//		MyConfig::printToLog (potPlacedChainsIds);
+		MyConfig::printToLog (potPlacedChains);
 	}
 
   if (isRoot) { 
@@ -613,7 +613,7 @@ void Datacenter::clrRsrc ()
 	notAssigned. 					clear ();
 	pushUpSet.   					clear ();
 	placedChains.			 	  clear ();
-	potPlacedChainsIds.		clear ();
+	potPlacedChains.			clear ();
 	newlyPlacedChainsIds.	clear ();
 	availCpu 									 = 0;
 }
