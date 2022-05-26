@@ -225,11 +225,6 @@ Handle a rcvd InitBottomUpMsg:
 void Datacenter::handleInitBottomUpMsg () 
 {
 
-//	Chain dummy1; // (0, {}); 
-//	Chain dummy2; // (0, {}); 
-//	pushUpSet.insert (dummy1); 
-//	pushUpSet.insert (dummy2); 
-//	endSimulation ();
   InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
 
 	pushUpSet.clear ();	

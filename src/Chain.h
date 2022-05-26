@@ -95,7 +95,6 @@ struct sortTwoChainsByCpuUsage {
 
 typedef unordered_set <Chain, ChainHash> 		 UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage; 
-/*typedef unordered_set <Chain, ChainHash> SetOfChainsOrderedByCpuUsage;  //$$$$$$$$$*/
 
 // Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
