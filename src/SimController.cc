@@ -496,7 +496,6 @@ Update chains' placement info, by the data sent from a datacenter.
 void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, int8_t lvl)
 {
 	Chain 	   chain;
-	uint32_t chainId;
 
 	for (auto chainId : newlyPlacedChainsIds) {
 		if (!(findChainInSet (allChains, chainId, chain))) {
