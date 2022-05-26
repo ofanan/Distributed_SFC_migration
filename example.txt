@@ -8,14 +8,14 @@ DC 4 beginning BU sync. notAssigned=2,
 DC 4 finished BU sync. State is
 DC 4, lvl=0. placed chains: pot. placed chains: 2,2,
 DC 4: after preparing BU pkt to snd to prnt, pushUpSet=
-DC 4 sending a BU pkt pushUpSet=, pushUpVec is empty
+DC 4 sending a BU pkt pushUpSet=, pushUpVec[0]=2
 DC 3 rcvd a initBU msg
 DC 3 beginning BU sync. notAssigned=0,1,
 
 DC 3 finished BU sync. State is
 DC 3, lvl=0. placed chains: pot. placed chains: 0,0,
 DC 3: after preparing BU pkt to snd to prnt, pushUpSet=
-DC 3 sending a BU pkt pushUpSet=, pushUpVec is empty
+DC 3 sending a BU pkt pushUpSet=, pushUpVec[0]=0
 DC 5 rcvd a initBU msg
 DC 5 beginning BU sync. notAssigned=
 
@@ -30,14 +30,14 @@ DC 6 finished BU sync. State is
 DC 6, lvl=0. placed chains: pot. placed chains: 
 DC 6: after preparing BU pkt to snd to prnt, pushUpSet=
 DC 6 sending a BU pkt pushUpSet=, pushUpVec is empty
-DC 1 rcvd 1 BU pkts. src=4. pushUpSet=
-DC 1 rcvd 2 BU pkts. src=3. pushUpSet=
+DC 1 rcvd 1 BU pkts. src=4. pushUpSet=2, 
+DC 1 rcvd 2 BU pkts. src=3. pushUpSet=2, 
 DC 1 beginning BU sync. notAssigned=1,
 
 DC 1 finished BU sync. State is
 DC 1, lvl=1. placed chains: 1,pot. placed chains: 
-DC 1: after preparing BU pkt to snd to prnt, pushUpSet=
-DC 1 sending a BU pkt pushUpSet=, pushUpVec is empty
+DC 1: after preparing BU pkt to snd to prnt, pushUpSet=2, 
+DC 1 sending a BU pkt pushUpSet=2, , pushUpVec is empty
 DC 2 rcvd 1 BU pkts. src=5. pushUpSet=
 DC 2 rcvd 2 BU pkts. src=6. pushUpSet=
 DC 2 beginning BU sync. notAssigned=
@@ -54,7 +54,7 @@ DC 0 finished BU sync. State is
 DC 0, lvl=2. placed chains: pot. placed chains: 
 DC 0 begins PU. pushUpSet is empty
 DC 1 rcvd PU pkt. pushUpVec rcvd is empty
-DC 1 begins PU. pushUpSet is empty
+DC 1 begins PU. pushUpSet=2, 
 simCtrlr updating: chain 1: curLvl=1, curDC=1
 
 DC 2 rcvd PU pkt. pushUpVec rcvd is empty

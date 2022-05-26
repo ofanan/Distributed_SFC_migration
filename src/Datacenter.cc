@@ -282,14 +282,14 @@ void Datacenter::pushUpSync ()
 {
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		if (pushUpSet.empty()) {
+		if (pushUpSet_.empty()) {
 			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", id);
 		}
 		else {
 			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
 		}
 		printBufToLog ();
-		MyConfig::printToLog (pushUpSet);
+		MyConfig::printToLog (pushUpSet_);
 	}
 	reshuffled = false;
 	
@@ -542,9 +542,9 @@ void Datacenter::genNsndBottomUpPkt ()
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
-	pkt2send -> setPushUpVecArraySize (pushUpSet.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	pkt2send -> setPushUpVecArraySize (pushUpSet_.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
 	uint16_t idixInPushUpVec = 0;
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+	for (auto chainPtr=pushUpSet_.begin(); chainPtr!=pushUpSet_.end(); ) {
 		if (CannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 			chainPtr++;
 			continue;
@@ -552,20 +552,20 @@ void Datacenter::genNsndBottomUpPkt ()
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt, and remove it from the local db (pushUpSet)
 		pkt2send->setPushUpVec (idixInPushUpVec++, *chainPtr);
-		chainPtr = pushUpSet.erase (chainPtr); 
+		chainPtr = pushUpSet_.erase (chainPtr); 
 	}
 	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjest the array's size to the real number of chains inserted into it. 
 
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d: after preparing BU pkt to snd to prnt, pushUpSet=", id);
 		printBufToLog();
-		MyConfig::printToLog (pushUpSet);
+		MyConfig::printToLog (pushUpSet_);
 	}
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d sending a BU pkt pushUpSet=", id);
 		MyConfig::printToLog (buf);
-		MyConfig::printToLog (pushUpSet);
+		MyConfig::printToLog (pushUpSet_);
 		if (pkt2send -> getPushUpVecArraySize ()== 0) {
 			snprintf (buf, bufSize, ", pushUpVec is empty");
 		}
@@ -621,6 +621,7 @@ void Datacenter::clrRsrc ()
 {
 	notAssigned. 					clear ();
 	pushUpSet.   					clear ();
+	pushUpSet_.   					clear ();
 	placedChains.			 	  clear ();
 	potPlacedChains.			clear ();
 	newlyPlacedChainsIds.	clear ();
