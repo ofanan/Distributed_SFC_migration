@@ -59,8 +59,10 @@ simCtrlr updating: chain 1: curLvl=1, curDC=1
 
 DC 2 rcvd PU pkt. pushUpVec rcvd is empty
 DC 2 begins PU. pushUpSet is empty
-DC 4 rcvd PU pkt. pushUpVec rcvd is empty
-DC 4 begins PU. pushUpSet is empty
+DC 4 rcvd PU pkt. pushUpVec[0]=2
+DC 4 begins PU. pushUpSet=2, 
+simCtrlr updating: chain 2: curLvl=0, curDC=4
+
 DC 3 rcvd PU pkt. pushUpVec rcvd is empty
 DC 3 begins PU. pushUpSet is empty
 DC 6 rcvd PU pkt. pushUpVec rcvd is empty
@@ -71,12 +73,12 @@ rcvd fin alg msg from DC 4 leaf 1
 rcvd fin alg msg from DC 3 leaf 0
 rcvd fin alg msg from DC 6 leaf 3
 rcvd fin alg msg from DC 5 leaf 2
-rcvd fin alg msg from all leaves ******************t=0: chain 2 is unplaced at the end of cycle. Printing state and exiting
+rcvd fin alg msg from all leaves ******************t=0: chain 0 is unplaced at the end of cycle. Printing state and exiting
 
 DC 0, lvl=2. placed chains: pot. placed chains: 
 DC 1, lvl=1. placed chains: 1,pot. placed chains: 
 DC 2, lvl=1. placed chains: pot. placed chains: 
 DC 3, lvl=0. placed chains: pot. placed chains: 0,
-DC 4, lvl=0. placed chains: pot. placed chains: 2,
+DC 4, lvl=0. placed chains: 2,pot. placed chains: 
 DC 5, lvl=0. placed chains: pot. placed chains: 
 DC 6, lvl=0. placed chains: pot. placed chains: 

@@ -295,8 +295,9 @@ void Datacenter::pushUpSync ()
 	
 	Chain chainInPotPlacedChains;
 	
-	for (auto chainInPushUpSet=pushUpSet.begin(); chainInPushUpSet!=pushUpSet.end(); ) { // for each chain in pushUpSet
+	for (auto chainInPushUpSet=pushUpSet_.begin(); chainInPushUpSet!=pushUpSet_.end(); ) { // for each chain in pushUpSet
 		if (!findChainInSet (potPlacedChains, chainInPushUpSet->id, chainInPotPlacedChains)) { // If this chain doesn't appear in my potPlacedChains, nothing to do
+			chainInPushUpSet++;
 			continue;
 		}	
 		
@@ -309,12 +310,12 @@ void Datacenter::pushUpSync ()
 			newlyPlacedChainsIds.insert (chainInPotPlacedChains.id);
 		}
 		eraseChainFromSet (potPlacedChains, chainInPotPlacedChains.id);
-		chainInPushUpSet = pushUpSet.erase (chainInPushUpSet);
+		chainInPushUpSet = pushUpSet_.erase (chainInPushUpSet);
 	}
 
 	// Next, try to push-up chains of my descendants
 	uint16_t requiredCpuToLocallyPlaceThisChain;
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+	for (auto chainPtr=pushUpSet_.begin(); chainPtr!=pushUpSet_.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
 				requiredCpuToLocallyPlaceThisChain > availCpu || // or because not enough avail' cpu for pushing-up, ...
@@ -326,10 +327,10 @@ void Datacenter::pushUpSync ()
 			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
 			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpSet
 			pushedUpChain.curLvl = lvl;
-			chainPtr 						 = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain i
+			chainPtr 						 = pushUpSet_.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain i
 			placedChains.				 insert (pushedUpChain);
 			newlyPlacedChainsIds.insert (pushedUpChain.id);
-			pushUpSet.					 insert (pushedUpChain);
+			pushUpSet_.					 insert (pushedUpChain);
 		}
 	}
 	
@@ -344,7 +345,7 @@ void Datacenter::pushUpSync ()
 		sendDirect (msg2send, simController, "directMsgsPort");
 		
 		if (MyConfig::DEBUG_LVL > 0) {
-			if (!pushUpSet.empty()) {
+			if (!pushUpSet_.empty()) {
 				error ("pushUpSet isn't empty after running pushUp() on a leaf");
 			}
 		}
@@ -364,12 +365,12 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 	
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
-		pkt->setPushUpVecArraySize (pushUpSet.size ()); // default size of pushUpVec, for case that all chains in pushUpSet belong to this child; will later shrink pushUpVec otherwise 
+		pkt->setPushUpVecArraySize (pushUpSet_.size ()); // default size of pushUpVec, for case that all chains in pushUpSet belong to this child; will later shrink pushUpVec otherwise 
 		uint16_t idxInPushUpVec = 0;
-		for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {	// consider all the chains in pushUpVec
+		for (auto chainPtr=pushUpSet_.begin(); chainPtr!=pushUpSet_.end(); ) {	// consider all the chains in pushUpVec
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
-				chainPtr = pushUpSet.erase (chainPtr);
+				chainPtr = pushUpSet_.erase (chainPtr);
 			}
 			else {
 				chainPtr++;
@@ -383,7 +384,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
-	if (MyConfig::DEBUG_LVL>0 && !pushUpSet.empty()) {
+	if (MyConfig::DEBUG_LVL>0 && !pushUpSet_.empty()) {
 		error ("pushUpSet not empty after sending PU pkts to all children");
 	}
 }
@@ -404,9 +405,6 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 void Datacenter::bottomUpSync ()
 {
 
-
-//	Chain dummy (0, {});
-//	pushUpSet_.			insert (dummy); // This line causes the f...king error!
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
 		printBufToLog ();
