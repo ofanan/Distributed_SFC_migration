@@ -227,12 +227,12 @@ void Datacenter::handleInitBottomUpMsg ()
 
 //	Chain dummy1; // (0, {}); 
 //	Chain dummy2; // (0, {}); 
-//	pushUpSet.insert (dummy1); 
-//	pushUpSet.insert (dummy2); 
+//	pushUpSet_.insert (dummy1); 
+//	pushUpSet_.insert (dummy2); 
 //	endSimulation ();
   InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
 
-	pushUpSet.clear ();	
+	pushUpSet_.clear ();	
 	notAssigned.clear ();
 	//	 insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
 	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
@@ -263,7 +263,7 @@ void Datacenter::handlePushUpPkt ()
 		}
 	}
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		pushUpSet.insert (pkt->getPushUpVec (i));
+		pushUpSet_.insert (pkt->getPushUpVec (i));
 	} 
 
 	if (MyConfig::mode==SYNC){ 
@@ -490,7 +490,7 @@ void Datacenter::handleBottomUpPktSync ()
 
 	if (numBuPktsRcvd==0) { // this is the first BU pkt rcvd from a child at this period
 		notAssigned.clear ();
-		pushUpSet.  clear ();
+		pushUpSet_.  clear ();
 	}
 	numBuPktsRcvd++;
 	uint16_t src = ((Datacenter*) curHandledMsg->getSenderModule())->id;
@@ -504,12 +504,12 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-		pushUpSet.insert (pkt->getPushUpVec(i));
+		pushUpSet_.insert (pkt->getPushUpVec(i));
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
 		printBufToLog ();
-		MyConfig::printToLog (pushUpSet);
+		MyConfig::printToLog (pushUpSet_);
 	}
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
