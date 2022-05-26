@@ -416,10 +416,10 @@ void Datacenter::bottomUpSync ()
 					chainPtr = notAssigned.erase(chainPtr);
 					availCpu -= requiredCpuToLocallyPlaceThisChain;
 					modifiedChain.curLvl = lvl;
-//					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
-//						placedChains.				 insert (modifiedChain);
-//						newlyPlacedChainsIds.insert (modifiedChain.id);
-//					}
+					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
+						placedChains.				 insert (modifiedChain);
+						newlyPlacedChainsIds.insert (modifiedChain.id);
+					}
 //					else {
 //						potPlacedChains.insert (modifiedChain);
 //						pushUpSet.			insert (modifiedChain);
