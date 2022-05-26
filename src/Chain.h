@@ -95,9 +95,9 @@ typedef unordered_set <Chain, ChainHash> 		 UnorderedSetOfChains;
 typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
 
 // Insert a chain in its correct place to a sorted vector of chains
-void insertSorted (vector <Chain> &vec, const Chain c);
-bool findChainInSet 	 (set<Chain> setOfChains, uint32_t id, Chain& foundChain);
-bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId);
+void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+bool findChainInSet 	 (set<Chain> setOfChains, uint32_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
+bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId); // Given chainId, erases the respective chain from the set. 
 
 /*************************************************************************************************************************************************
 Find a chain (given by its id) in a given set of chains.

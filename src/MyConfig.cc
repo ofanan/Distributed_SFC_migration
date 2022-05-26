@@ -99,6 +99,20 @@ vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const ve
 	return res;
 }
 
+// erase the given key from the given set. Returns true iff the requested key was indeed found in the set
+bool MyConfig::eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
+{
+	auto search = set.find (id);
+
+	if (search==set.end()) {
+		return false;
+	}
+	else {
+		set.erase(search);
+		return true;
+	}
+}
+
 
 //ofstream MyConfig::getLogFile ()
 //{

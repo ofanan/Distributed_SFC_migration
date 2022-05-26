@@ -67,6 +67,7 @@ class MyConfig {
 		// Other accessories funcs'
 		static ofstream getLogFile ();
 		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2); // returns the scalar product of two vectors
+		static bool eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id);
 /*		static bool eraseKeyFromSet (unordered_set <uint32_t> set, uint16_t id); // erase the given key from the given set. Returns true iff the requested key was indeed found in the set*/
 };
 

@@ -24,20 +24,6 @@ inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, si
 
 inline void	Datacenter::PrintStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
 
-// erase the given key from the given set. Returns true iff the requested key was indeed found in the set
-static bool eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
-{
-	auto search = set.find (id);
-
-	if (search==set.end()) {
-		return false;
-	}
-	else {
-		set.erase(search);
-		return true;
-	}
-}
-
 Datacenter::Datacenter()
 {
 }
@@ -101,7 +87,7 @@ void Datacenter::print ()
 	printBufToLog ();
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
-	MyConfig::printToLog (potPlacedChainsIds);
+	MyConfig::printToLog (potPlacedChains);
 }
 
 void Datacenter::setLeafId (uint16_t leafId)
@@ -186,12 +172,12 @@ void Datacenter::handleRlzRsrcMsg ()
 		eraseChainFromSet (placedChains, msg->getChainsToRlz(i));
 	} 
 
-	// remove from this->potPlacedChainsIds each (id of a chain) chain indicated in the msg 
+	// remove from this->potPlacedChains each (id of a chain) chain indicated in the msg 
 	for (uint16_t i(0); i<(msg->getChainsToRlzArraySize()); i++) {
-		if (potPlacedChainsIds.empty()) {
+		if (potPlacedChains.empty()) {
 			break;
 		}		
-		eraseKeyFromSet (potPlacedChainsIds, msg->getChainsToRlz(i));
+		eraseChainFromSet (potPlacedChains, msg->getChainsToRlz(i));
 	} 
 
 	// remove from this->newlyPlacedChainsIds each chain indicated in the msg 
@@ -199,7 +185,7 @@ void Datacenter::handleRlzRsrcMsg ()
 		if (newlyPlacedChainsIds.empty()) {
 			break;
 		}		
-		eraseKeyFromSet (newlyPlacedChainsIds, msg->getChainsToRlz(i));
+		MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, msg->getChainsToRlz(i));
 	} 
 }
 
@@ -212,11 +198,20 @@ release resources of chains that left "this".
 void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz) 
 {
 
-//	for (const chainIdPtr=IdsOfChainsToRlz.begin(); chainIdPtr!=IdsOfChainsToRlz.end(); ) {
 	for (auto chainId : IdsOfChainsToRlz) {
-		eraseChainFromSet (placedChains, 					chainId);
-		eraseKeyFromSet   (potPlacedChainsIds, 		chainId);
-		eraseKeyFromSet   (newlyPlacedChainsIds, 	chainId);
+
+		if (!potPlacedChains.empty() && eraseChainFromSet (potPlacedChains,	chainId)) { // if the chain was found in the potPlacedChains db, delete it
+			continue; // if the chain was found in the potPlacedChains db, it's surely not in the placedChains and newlyPlacedChains
+		}
+		
+		if (!placedChains.empty()) {
+			eraseChainFromSet (placedChains, chainId);
+		}
+		
+		if (!newlyPlacedChainsIds.empty()) {
+			MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
+		}
+		
 	}
 }
 
@@ -281,90 +276,101 @@ Assume that this->pushUpSet already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
-		printBufToLog ();
-		MyConfig::printToLog (pushUpSet);
-	}
-	reshuffled = false;
-	
-	// First, find for each pot-placed of mine whether it was pushed-up by an ancestor, and react correspondigly
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+//		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
+//		printBufToLog ();
+//		MyConfig::printToLog (pushUpSet);
+//	}
+//	reshuffled = false;
+//	
+//	// First, find for each pot-placed of mine whether it was pushed-up by an ancestor, and react correspondigly
+//	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 
-		if (isRoot || // if I'm the root, I have no ancestors, which could have pushed-up a pkt of mine
-		 	  potPlacedChainsIds.empty()) { // No more pot-placed chains to check                                                            
-			break;
-		}
+//		if (isRoot || // if I'm the root, I have no ancestors, which could have pushed-up a pkt of mine
+//		 	  potPlacedChains.empty()) { // No more pot-placed chains to check                                                            
+//			break;
+//		}
 
-		Chain modifiedChain; // the modified chain, to be pushed to datastructures
-		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
+//		Chain modifiedChain; // the modified chain, to be pushed to datastructures
 
-		if (search==potPlacedChainsIds.end()) { 
-			chainPtr++; // this chain wasn't pushed-up from me, but from another DC --> continue to the next chain in pushUpSet
-			continue; 
-		}
-		
-		modifiedChain = *chainPtr;
-		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
-		chainPtr = pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
-		if (modifiedChain.curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
-			placedChains.				 insert (modifiedChain);
-			newlyPlacedChainsIds.insert (modifiedChain.id);
-		}
-		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
-			availCpu += requiredCpuToLocallyPlaceChain (modifiedChain);
-		}
-	}
-	
-	if (MyConfig::DEBUG_LVL > 0 && !potPlacedChainsIds.empty()) {
-		snprintf (buf, bufSize, "\nDC %d: ERROR: potPlacedChains should be empty at this stage of running PU. potPlacedChainsIds=", id);
-		printBufToLog ();
-    MyConfig::printToLog (potPlacedChainsIds);
-		MyConfig::printToLog ("\n\nError: potPlacedChains should be empty at this stage of running PU.");
-		PrintStateAndEndSim  ();
-	}
-	
-	// Next, try to push-up chains of my descendants
-	uint16_t mu_u;
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
-		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
-				mu_u > availCpu || // or because not enough avail' cpu for pushing-up, ...
-				!this->isDelayFeasibleForThisChain (*chainPtr)) { // or because I'm not delay-feasible for this chain  
-			chainPtr++;
-			continue;
-		}
-		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
-			availCpu 						-= mu_u;
-			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpSet
-			pushedUpChain.curLvl = lvl;
-			chainPtr 						 = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain i
-			placedChains.				 insert (pushedUpChain);
-			newlyPlacedChainsIds.insert (pushedUpChain.id);
-			pushUpSet.					 insert (pushedUpChain);
-		}
-	}
-	
-	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
-	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
-//		sndPlacementInfoMsg ();
-		updateSimController ();
-	}
+//	auto search = potPlacedChains.find (dummy);
 
-	if (isLeaf) {
-		FinishedAlgMsg *msg2send = new FinishedAlgMsg;
-		sendDirect (msg2send, simController, "directMsgsPort");
-		
-		if (MyConfig::DEBUG_LVL > 0) {
-			if (!pushUpSet.empty()) {
-				error ("pushUpSet isn't empty after running pushUp() on a leaf");
-			}
-		}
-		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
-	}
+//	if (search==setOfChains.end()) {
+//		return false;
+//	}
+//	else {
+//		c = *search;
+//		return true;
+//		
+//		
+//		auto search = potPlacedChainsIds.find (chainPtr->id); // Look for this chain's id in my pot-placed chains 
 
-	genNsndPushUpPktsToChildren ();
-	pushUpSet.clear();
+//		if (search==potPlacedChainsIds.end()) { 
+//			chainPtr++; // this chain wasn't pushed-up from me, but from another DC --> continue to the next chain in pushUpSet
+//			continue; 
+//		}
+//		
+//		modifiedChain = *chainPtr;
+//		potPlacedChainsIds.erase (search); // remove this chain from the vec of pot-placed chains: it will be either placed here, or already placed (pushed-up) by an ancestor
+//		chainPtr = pushUpSet.erase (chainPtr); // remove this chain from the vec of pushed-up chains: it will be either placed here, or already placed (pushed-up) by an ancestor
+//		if (modifiedChain.curLvl==this->lvl) { // this chain wasn't pushed-up; need to place it here
+//			placedChains.				 insert (modifiedChain);
+//			newlyPlacedChainsIds.insert (modifiedChain.id);
+//		}
+//		else { // the chain was pushed-up --> no need to reserve cpu for it anymore --> regain its resources.
+//			availCpu += requiredCpuToLocallyPlaceChain (modifiedChain);
+//		}
+//	}
+//	
+//	if (MyConfig::DEBUG_LVL > 0 && !potPlacedChainsIds.empty()) {
+//		snprintf (buf, bufSize, "\nDC %d: ERROR: potPlacedChains should be empty at this stage of running PU. potPlacedChainsIds=", id);
+//		printBufToLog ();
+//    MyConfig::printToLog (potPlacedChainsIds);
+//		MyConfig::printToLog ("\n\nError: potPlacedChains should be empty at this stage of running PU.");
+//		PrintStateAndEndSim  ();
+//	}
+//	
+//	// Next, try to push-up chains of my descendants
+//	uint16_t mu_u;
+//	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+//		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
+//		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
+//				mu_u > availCpu || // or because not enough avail' cpu for pushing-up, ...
+//				!this->isDelayFeasibleForThisChain (*chainPtr)) { // or because I'm not delay-feasible for this chain  
+//			chainPtr++;
+//			continue;
+//		}
+//		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
+//			availCpu 						-= mu_u;
+//			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpSet
+//			pushedUpChain.curLvl = lvl;
+//			chainPtr 						 = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain i
+//			placedChains.				 insert (pushedUpChain);
+//			newlyPlacedChainsIds.insert (pushedUpChain.id);
+//			pushUpSet.					 insert (pushedUpChain);
+//		}
+//	}
+//	
+//	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
+//	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
+////		sndPlacementInfoMsg ();
+//		updateSimController ();
+//	}
+
+//	if (isLeaf) {
+//		FinishedAlgMsg *msg2send = new FinishedAlgMsg;
+//		sendDirect (msg2send, simController, "directMsgsPort");
+//		
+//		if (MyConfig::DEBUG_LVL > 0) {
+//			if (!pushUpSet.empty()) {
+//				error ("pushUpSet isn't empty after running pushUp() on a leaf");
+//			}
+//		}
+//		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
+//	}
+
+//	genNsndPushUpPktsToChildren ();
+//	pushUpSet.clear();
 }
 
 /*************************************************************************************************************************************************
@@ -415,6 +421,13 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpSync ()
 {
+
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
+		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+	}
+
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
 		uint16_t mu_u = chainPtr->mu_u_at_lvl(lvl); // amount of cpu required for locally placing the chain in question
 		Chain modifiedChain; // the modified chain, to be pushed to datastructures
@@ -451,9 +464,10 @@ void Datacenter::bottomUpSync ()
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d, BU sync: potPlacedChainsIds=", id);
+		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
 		printBufToLog ();
-		MyConfig::printToLog (potPlacedChainsIds);
+		print ();
+//		MyConfig::printToLog (potPlacedChainsIds);
 	}
 
   if (isRoot) { 

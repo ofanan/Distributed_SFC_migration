@@ -168,6 +168,9 @@ void SimController::concludeTimeStep ()
 	if (MyConfig::DEBUG_LVL>0) {
 		for (auto const &chain : allChains) {
 			if (chain.curLvl==UNPLACED_) {
+				snprintf (buf, bufSize, "t=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
+				printBufToLog ();
+				printAllDatacenters ();			
 				error ("t=%d: chain %d is unplaced at the end of cycle\n", t, chain.id);
 			}
 		}
