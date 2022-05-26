@@ -408,14 +408,14 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
+		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 			Chain modifiedChain; // the modified chain, to be pushed to datastructures
 			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 					modifiedChain = *chainPtr;
 					chainPtr = notAssigned.erase(chainPtr);
 					availCpu -= requiredCpuToLocallyPlaceThisChain;
-//					modifiedChain.curLvl = lvl;
+					modifiedChain.curLvl = lvl;
 //					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
 //						placedChains.				 insert (modifiedChain);
 //						newlyPlacedChainsIds.insert (modifiedChain.id);
@@ -425,9 +425,9 @@ void Datacenter::bottomUpSync ()
 //						pushUpSet.			insert (modifiedChain);
 //					}
 			}
-//			else {
-//				chainPtr++;
-//			}
+			else {
+				chainPtr++;
+			}
 	//		else { 
 	//			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 	//				if (reshuffled) {
