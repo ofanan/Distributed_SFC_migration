@@ -353,7 +353,7 @@ void Datacenter::pushUpSync ()
 	}
 
 	genNsndPushUpPktsToChildren ();
-	pushUpSet.clear();
+	pushUpSet_.clear();
 }
 
 /*************************************************************************************************************************************************
@@ -618,7 +618,6 @@ Clear all the resources currently allocated at this datastore:
 void Datacenter::clrRsrc () 
 {
 	notAssigned. 					clear ();
-	pushUpSet.   					clear ();
 	pushUpSet_.   					clear ();
 	placedChains.			 	  clear ();
 	potPlacedChains.			clear ();
