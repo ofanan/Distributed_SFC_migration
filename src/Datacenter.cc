@@ -306,7 +306,6 @@ void Datacenter::pushUpSync ()
 	}
 
 	// Next, try to push-up chains of my descendants
-	uint16_t mu_u;
 	uint16_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
