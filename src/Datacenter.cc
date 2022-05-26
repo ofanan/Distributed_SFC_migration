@@ -412,9 +412,9 @@ void Datacenter::bottomUpSync ()
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 			Chain modifiedChain; // the modified chain, to be pushed to datastructures
 			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
-//					modifiedChain = *chainPtr;
-//					chainPtr = notAssigned.erase(chainPtr);
-//					availCpu -= requiredCpuToLocallyPlaceThisChain;
+					modifiedChain = *chainPtr;
+					chainPtr = notAssigned.erase(chainPtr);
+					availCpu -= requiredCpuToLocallyPlaceThisChain;
 //					modifiedChain.curLvl = lvl;
 //					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
 //						placedChains.				 insert (modifiedChain);
