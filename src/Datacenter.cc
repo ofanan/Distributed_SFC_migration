@@ -200,28 +200,29 @@ release resources of chains that left "this".
 void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz) 
 {
 
-//	for (auto chainId : IdsOfChainsToRlz) {
+	for (auto chainId : IdsOfChainsToRlz) {
 
-//		Chain chain;
-//		if (!potPlacedChains.empty())
-//			if (findChainInSet (chain)) {
-//				regainRsrcOfChain (chain);
-//			}
-//		
-//		 && eraseChainFromSet (potPlacedChains,	chainId)) { // if the chain was found in the potPlacedChains db, delete it
-//			continue; // if the chain was found in the potPlacedChains db, it's surely not in the placedChains and newlyPlacedChains
-//		}
-//		
-//		if (!placedChains.empty()) {
-//			if (findChainInSet ()
-//			eraseChainFromSet (placedChains, chainId);
-//		}
-//		
-//		if (!newlyPlacedChainsIds.empty()) {
-//			MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
-//		}
-//		
-//	}
+		Chain chain;
+		if (!potPlacedChains.empty()) {
+			if (findChainInSet (potPlacedChains, chainId, chain)) {
+				regainRsrcOfChain (chain);
+				eraseChainFromSet (potPlacedChains,	chainId);
+				continue; // if the chain was found in the potPlacedChains db, it's surely not in the placedChains and newlyPlacedChains
+			}
+		}
+		
+		if (!placedChains.empty()) {
+			if (findChainInSet (placedChains, chainId, chain)) {
+				regainRsrcOfChain (chain);
+				eraseChainFromSet (placedChains, chainId);
+			}
+		}
+		
+		if (!newlyPlacedChainsIds.empty()) {
+			MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
+		}
+		
+	}
 }
 
 /*************************************************************************************************************************************************
