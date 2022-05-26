@@ -11,7 +11,7 @@
 
 using namespace std;
 
-typedef uint32_t ChainId_t;
+typedef int32_t ChainId_t;
 
 class Chain
 {

@@ -73,7 +73,7 @@ void MyConfig::printToLog (vector <uint16_t> vec)
 	logFile << endl;
 }
 
-void MyConfig::printToLog (vector <uint32_t> vec) 
+void MyConfig::printToLog (vector <ChainId_t> vec) 
 {
 	for (const auto i : vec) {
 		logFile << i << ",";
@@ -81,7 +81,7 @@ void MyConfig::printToLog (vector <uint32_t> vec)
 	logFile << endl;
 }
 
-void MyConfig::printToLog (unordered_set <uint32_t> set2print) 
+void MyConfig::printToLog (unordered_set <ChainId_t> set2print) 
 {
 	for (const auto i : set2print) {
 		logFile << i << ",";
@@ -100,7 +100,7 @@ vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const ve
 }
 
 // erase the given key from the given set. Returns true iff the requested key was indeed found in the set
-bool MyConfig::eraseKeyFromSet (unordered_set <uint32_t> &set, uint16_t id) 
+bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id) 
 {
 	auto search = set.find (id);
 

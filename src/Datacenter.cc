@@ -229,15 +229,15 @@ void Datacenter::handleInitBottomUpMsg ()
 //	Chain dummy2; // (0, {}); 
 //	pushUpSet.insert (dummy1); 
 //	pushUpSet.insert (dummy2); 
-
 //	endSimulation ();
-//  InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
-	
-//	notAssigned.clear ();
-	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
-//	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
-//		insertSorted (this->notAssigned, msg->getNotAssigned (i));
-//	} 
+  InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
+
+	pushUpSet.clear ();	
+	notAssigned.clear ();
+	//	 insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
+	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
+		insertSorted (this->notAssigned, msg->getNotAssigned (i));
+	} 
 
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
@@ -405,8 +405,8 @@ void Datacenter::bottomUpSync ()
 {
 
 
-//	Chain dummy;
-//	pushUpSet.			insert (dummy); // This line causes the f...king error!
+	Chain dummy (0, {});
+	pushUpSet.			insert (dummy); // This line causes the f...king error!
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
 		printBufToLog ();
