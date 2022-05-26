@@ -105,7 +105,8 @@ class Datacenter : public cSimpleModule
     inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
 		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 
 		inline void     sndDirectToSimCtrlr (cMessage* msg);
-		
+		inline void 		regainRsrcOfChain (const Chain chain);
+
 		// logging and debug
 		void PrintAllDatacenters 		(); // initiate a print of the content of all the datacenters
 };
