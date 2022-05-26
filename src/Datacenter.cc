@@ -1,3 +1,4 @@
+
 #include "Datacenter.h"
 
 
@@ -15,7 +16,7 @@ inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= 
 inline bool Datacenter::CannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
 inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
 
-inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain 	(const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
+inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
 inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
@@ -304,38 +305,19 @@ void Datacenter::pushUpSync ()
 		chainInPushUpSet = pushUpSet.erase (chainInPushUpSet);
 	}
 
-
-//	Chain chainInPushUpSet;
-//	
-//	for (auto chainPtr=potPlacedChains.begin(); chainPtr!=potPlacedChains.end(); ) {
-//		if (!findChainInSet (pushUpSet, chainPtr->id, chainInPushUpSet) {
-//			error ("pushed-up chain %d that I potentially-placed isn't found in pushUpSet", chainPtr->id);
-//		}	
-//		if (chainInPushUpSet.curLvl>(this->lvl) ) { // was the chain pushed-up?
-//			regainRsrcOfChain (chainInPushUpSet); 
-//		}
-//		else { //the chain wasn't pushed-up --> need to locally place it
-//			chainPtr->curLvl = this->lvl)
-//			placedChains.				 insert (*chainPtr);
-//			newlyPlacedChainsIds.insert (chainPtr->id);
-//		}
-//		eraseChainFromSet (pushUpSet, chainInPushUpSet->id);
-//		chainPtr = potPlacedChains.erase (chainPtr);
-//	}
-	
-	
 	// Next, try to push-up chains of my descendants
 	uint16_t mu_u;
+	uint16_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
-		mu_u = requiredCpuToLocallyPlaceChain (*chainPtr);
+		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
-				mu_u > availCpu || // or because not enough avail' cpu for pushing-up, ...
+				requiredCpuToLocallyPlaceThisChain > availCpu || // or because not enough avail' cpu for pushing-up, ...
 				!this->isDelayFeasibleForThisChain (*chainPtr)) { // or because I'm not delay-feasible for this chain  
 			chainPtr++;
 			continue;
 		}
 		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
-			availCpu 						-= mu_u;
+			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
 			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpSet
 			pushedUpChain.curLvl = lvl;
 			chainPtr 						 = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain i
@@ -423,12 +405,12 @@ void Datacenter::bottomUpSync ()
 	}
 
 	for (auto chainPtr=notAssigned.begin(); chainPtr<notAssigned.end(); ) {
-		uint16_t mu_u = chainPtr->mu_u_at_lvl(lvl); // amount of cpu required for locally placing the chain in question
+		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		Chain modifiedChain; // the modified chain, to be pushed to datastructures
-		if (availCpu >= mu_u) { // I have enough avail' cpu for this chain --> assign it
+		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 				modifiedChain = *chainPtr;
 				chainPtr = notAssigned.erase(chainPtr);
-				availCpu -= mu_u;
+				availCpu -= requiredCpuToLocallyPlaceThisChain;
 				modifiedChain.curLvl = lvl;
 			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				placedChains.				 insert (modifiedChain);
