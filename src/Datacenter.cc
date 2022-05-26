@@ -215,6 +215,10 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 	}
 }
 
+void initBottomUp (vector<Chain> vecOfChainThatJoined)
+{
+}
+
 /*************************************************************************************************************************************************
 Handle a rcvd InitBottomUpMsg:
 - Insert all the chains in the msg into this->notAssigned.
@@ -420,7 +424,7 @@ void Datacenter::bottomUpSync ()
 					}
 					else {
 						potPlacedChains.insert (modifiedChain);
-						pushUpSet.			insert (modifiedChain); // This line causes the f...king error!
+						pushUpSet.			insert (modifiedChain); 
 					}
 			}
 			else { 
@@ -561,11 +565,16 @@ void Datacenter::genNsndBottomUpPkt ()
 		MyConfig::printToLog (pushUpSet);
 		if (pkt2send -> getPushUpVecArraySize ()== 0) {
 			snprintf (buf, bufSize, ", pushUpVec is empty");
+			MyConfig::printToLog (buf);
 		}
 		else {
 			snprintf (buf, bufSize, ", pushUpVec[0]=%d", pkt2send->getPushUpVec(0).id);
+			MyConfig::printToLog (buf);
+			if (pkt2send -> getPushUpVecArraySize()>1) {
+				snprintf (buf, bufSize, ", pushUpVec[1]=%d", pkt2send->getPushUpVec(1).id);
+				MyConfig::printToLog (buf);
+			}
 		}
-		MyConfig::printToLog (buf);
 	}
 
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	

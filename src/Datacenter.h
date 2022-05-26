@@ -19,6 +19,7 @@
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
+#include "Chain.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -63,6 +64,8 @@ class Datacenter : public cSimpleModule
     // Log / debug funcs
     void print ();
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
+    void initBottomUp (vector<Chain> vecOfChainThatJoined);
+    void initBottomUp (vector<int>& vecOfChainThatJoined);
     
   private:
   	static const uint8_t portToPrnt=0;

@@ -435,38 +435,69 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 // Initiate the run of an Sync placement alg'
 void SimController::initAlgSync () 
 {  	
-	InitBottomUpMsg* msg;
-	uint16_t i;
-	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
 	
+	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
+	vector<int> dummy;
+	leaves[0]->initBottomUp (dummy);
+
 	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
-		
-		msg = new InitBottomUpMsg ();
-		msg -> setNotAssignedArraySize (item.second.size());
-		i = 0;
-		for(auto &chain : item.second) {
-			msg -> setNotAssigned (i++, chain);
-		}    
-		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
+
+//		vector <Chain> vecOfChains;		
+//		for(auto &chain : item.second) {
+//			vecOfChains.push_back (chain);
+//		}    
+//		leaves[item.first]->initBottomUp (vecOfChains);
 		sentInitBottomUpMsg[item.first] = true;
 	}
 
 	// Next, send (empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
 	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
 		if (!(sentInitBottomUpMsg[leafId])) {
-			msg = new InitBottomUpMsg ();
-			msg -> setNotAssignedArraySize (0);
-			sendDirect (msg, (cModule*)(leaves[leafId]), "directMsgsPort");
+//			leaves[leafId]->initBottomUp ({});
 		}
 	}	
 	delete[] sentInitBottomUpMsg;
 }
 
+//// Initiate the run of an Sync placement alg'
+//void SimController::initAlgSync () 
+//{  	
+//	InitBottomUpMsg* msg;
+//	uint16_t i;
+//	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
+//	
+//	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
+//	for (auto const& item : chainsThatJoinedLeaf)
+//	{
+//		if (LOG_LVL==2) {
+//			logFile << "Chains that joined dc " << item.first << ": ";
+//		}
+//		
+//		msg = new InitBottomUpMsg ();
+//		msg -> setNotAssignedArraySize (item.second.size());
+//		i = 0;
+//		for(auto &chain : item.second) {
+//			msg -> setNotAssigned (i++, chain);
+//		}    
+//		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
+//		sentInitBottomUpMsg[item.first] = true;
+//	}
+
+//	// Next, send (empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
+//	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
+//		if (!(sentInitBottomUpMsg[leafId])) {
+//			msg = new InitBottomUpMsg ();
+//			msg -> setNotAssignedArraySize (0);
+//			sendDirect (msg, (cModule*)(leaves[leafId]), "directMsgsPort");
+//		}
+//	}	
+//	delete[] sentInitBottomUpMsg;
+//}
 // Initiate the run of a Async placement alg'
 void SimController::initAlgAsync () {  	
 
