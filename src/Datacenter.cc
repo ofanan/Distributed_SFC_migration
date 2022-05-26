@@ -408,24 +408,26 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-//	if (!notAssigned.empty()) {
 		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
-			Chain modifiedChain; // the modified chain, to be pushed to datastructures
-			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
-					modifiedChain = *chainPtr;
-					chainPtr = notAssigned.erase(chainPtr);
-					availCpu -= requiredCpuToLocallyPlaceThisChain;
-					modifiedChain.curLvl = lvl;
-				if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
-					placedChains.				 insert (modifiedChain);
-					newlyPlacedChainsIds.insert (modifiedChain.id);
-				}
-				else {
-					potPlacedChains.insert (modifiedChain);
-					pushUpSet.			insert (modifiedChain);
-				}
-			}
+//			Chain modifiedChain; // the modified chain, to be pushed to datastructures
+//			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
+//					modifiedChain = *chainPtr;
+//					chainPtr = notAssigned.erase(chainPtr);
+//					availCpu -= requiredCpuToLocallyPlaceThisChain;
+//					modifiedChain.curLvl = lvl;
+//					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
+//						placedChains.				 insert (modifiedChain);
+//						newlyPlacedChainsIds.insert (modifiedChain.id);
+//					}
+//					else {
+//						potPlacedChains.insert (modifiedChain);
+//						pushUpSet.			insert (modifiedChain);
+//					}
+//			}
+//			else {
+//				chainPtr++;
+//			}
 	//		else { 
 	//			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 	//				if (reshuffled) {
@@ -442,7 +444,6 @@ void Datacenter::bottomUpSync ()
 	//			}
 	//		}
 		}
-//	}
 
 //	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 //		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
