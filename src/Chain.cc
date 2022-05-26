@@ -14,30 +14,41 @@ const uint8_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 const vector <uint16_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
 const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
 
-Chain::Chain (uint32_t id, vector <uint16_t> S_u) 
+Chain::Chain () 
+{
+//	this->id = 0; // Should change id to be int32_6
+	this->curLvl = UNPLACED_;
+	this->S_u = {};
+	this->isRT_Chain = false;
+};
+
+Chain::Chain (ChainId_t id, vector <uint16_t> S_u) 
 {
 	this->id = id;
 	this->S_u = S_u;
-	curLvl = UNPLACED_;
+	this->curLvl = UNPLACED_;
+	this->isRT_Chain = false;
 };
 
 Chain::Chain (const Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
-  this->isRT_Chain 	= c.isRT_Chain;
   this->curLvl			= c.curLvl;
+  this->isRT_Chain 	= c.isRT_Chain;
 }
 
 
-RT_Chain::RT_Chain (uint32_t id, vector <uint16_t> S_u) {
+RT_Chain::RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
   this->id        	= id;
   this->S_u       	= S_u;
+	this->curLvl = UNPLACED_;
   this->isRT_Chain 	= true;
 };
 
-Non_RT_Chain::Non_RT_Chain (uint32_t id, vector <uint16_t> S_u) {
+Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
+	this->curLvl = UNPLACED_;
   this->isRT_Chain 	= false;
 };
 
@@ -119,7 +130,7 @@ bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId)
 * The chain is written to foundChain.
 * Output: true iff the requested chain was found.
 **************************************************************************************************************************************************/
-bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, uint32_t chainId, Chain &c)
+bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)
 {
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);

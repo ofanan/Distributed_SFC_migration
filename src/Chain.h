@@ -11,10 +11,12 @@
 
 using namespace std;
 
+typedef uint32_t ChainId_t;
+
 class Chain
 {
   public:
-    uint32_t id;
+    ChainId_t id;
     vector <uint16_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
 		const static vector<uint16_t> costOfCpuUnitAtLvl; 
@@ -22,9 +24,9 @@ class Chain
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
 
 		// C'tors
-    Chain () {};
+    Chain ();
 		Chain (const Chain &c);
-    Chain (uint32_t id, vector <uint16_t> S_u);
+    Chain (ChainId_t id, vector <uint16_t> S_u);
             
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
@@ -56,7 +58,7 @@ public:
   static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
 	static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
-  RT_Chain (uint32_t id, vector <uint16_t> S_u);
+  RT_Chain (ChainId_t id, vector <uint16_t> S_u);
 };
 
 class Non_RT_Chain: public Chain
@@ -65,13 +67,13 @@ class Non_RT_Chain: public Chain
 	  static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const uint8_t  mu_u_len;
 		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
-    Non_RT_Chain (uint32_t id, vector <uint16_t> S_u);
+    Non_RT_Chain (ChainId_t id, vector <uint16_t> S_u);
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
 struct ChainHash {
 	size_t operator()(const Chain& c) const {
-  	return hash<uint32_t>()(c.id);
+  	return hash<ChainId_t>()(c.id);
   }
 };
 
@@ -82,11 +84,11 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 struct sortTwoChainsByCpuUsage {
-	bool operator () (const Chain lhs, const Chain rhs) const {
+	bool operator () (const Chain& lhs, const Chain& rhs) const {
 		if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return true
-			return true;
+			return false;
 		}
-	  return ((lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl]) <=
+	  return ((lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl]) <
 			  	 ((rhs.isRT_Chain)? RT_Chain::mu_u[rhs.curLvl] : Non_RT_Chain::mu_u[rhs.curLvl]);
 	} 
 };
@@ -96,13 +98,13 @@ typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage;
 
 // Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-bool findChainInSet 	 (set<Chain> setOfChains, uint32_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
+bool findChainInSet 	 (set<Chain> setOfChains, ChainId_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
 bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId); // Given chainId, erases the respective chain from the set. 
 
 /*************************************************************************************************************************************************
 Find a chain (given by its id) in a given set of chains.
 **************************************************************************************************************************************************/
-bool 					findChainInSet  (UnorderedSetOfChains setOfChains , uint32_t chainId, Chain &c);
+bool 					findChainInSet  (UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, uint16_t poa);
 
 #endif

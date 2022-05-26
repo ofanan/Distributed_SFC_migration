@@ -50,8 +50,8 @@ class Datacenter : public cSimpleModule
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
     UnorderedSetOfChains     placedChains, potPlacedChains; 
-    unordered_set <uint32_t> newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
-    unordered_set <uint32_t> newlyDisplacedChainsIds; // IDs of the chains that I have displaceed after the last update I had sent to SimCtrlr.
+    unordered_set <ChainId_t> newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
+    unordered_set <ChainId_t> newlyDisplacedChainsIds; // IDs of the chains that I have displaceed after the last update I had sent to SimCtrlr.
 		uint8_t numBuPktsRcvd; 
 		
 		//getter

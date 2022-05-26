@@ -190,7 +190,7 @@ void SimController::concludeTimeStep ()
 void SimController::printAllDatacentersByMyDatabase ()
 {
 	// gather the required data
-	vector<uint32_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
+	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
 	for (const auto &chain : allChains) {
 		int16_t chainCurDatacenter = chain.getCurDatacenter();
 		if (chainCurDatacenter==UNPLACED) {
@@ -244,7 +244,7 @@ void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=f
 }
 
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
-void SimController::parseChainPoaToken (string const token, uint32_t &chainId, uint16_t &poaId)
+void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, uint16_t &poaId)
 {
 	istringstream newChainToken(token); 
   string numStr; 
@@ -301,7 +301,7 @@ void SimController::rdNewUsrsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  uint32_t chainId;
+  ChainId_t chainId;
   uint16_t poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
   
@@ -337,7 +337,7 @@ void SimController::rdOldUsrsLine (string line)
 {
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
-  uint32_t chainId;
+  ChainId_t chainId;
   uint16_t poaId;
 	Chain chain; // will hold the chain found in this->allChains
 	int16_t chainCurDatacenter;
@@ -493,7 +493,7 @@ Update chains' placement info, by the data sent from a datacenter.
 - Increase the cntrs of the number of migs as required.
 - Update this->allChains db.
 **************************************************************************************************************************************************/
-void SimController::updatePlacementInfo (unordered_set <uint32_t> newlyPlacedChainsIds, int8_t lvl)
+void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl)
 {
 	Chain 	   chain;
 

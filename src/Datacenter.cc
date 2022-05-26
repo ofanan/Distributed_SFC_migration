@@ -1,12 +1,9 @@
-
 #include "Datacenter.h"
-
 
 using namespace omnetpp;
 using namespace std;
 
 Define_Module(Datacenter);
-
 
 /*************************************************************************************************************************************************
  * Infline functions
@@ -228,14 +225,19 @@ Handle a rcvd InitBottomUpMsg:
 void Datacenter::handleInitBottomUpMsg () 
 {
 
-  InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
+//	Chain dummy1; // (0, {}); 
+//	Chain dummy2; // (0, {}); 
+//	pushUpSet.insert (dummy1); 
+//	pushUpSet.insert (dummy2); 
+
+//	endSimulation ();
+//  InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
 	
-	notAssigned.clear ();
-  pushUpSet.	clear (); 
+//	notAssigned.clear ();
 	// insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
-	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
-		insertSorted (this->notAssigned, msg->getNotAssigned (i));
-	} 
+//	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
+//		insertSorted (this->notAssigned, msg->getNotAssigned (i));
+//	} 
 
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
@@ -402,8 +404,9 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 void Datacenter::bottomUpSync ()
 {
 
-	Chain dummy;
-	pushUpSet.			insert (dummy); // This line causes the f...king error!
+
+//	Chain dummy;
+//	pushUpSet.			insert (dummy); // This line causes the f...king error!
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
 		printBufToLog ();
@@ -455,11 +458,9 @@ void Datacenter::bottomUpSync ()
 //	}
 
   if (isRoot) { 
-		MyConfig::printToLog ("0");
   	pushUpSync ();
   }
   else {
-		MyConfig::printToLog ("1");
   	genNsndBottomUpPkt ();
   }
 }
@@ -504,7 +505,7 @@ void Datacenter::handleBottomUpPktSync ()
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
 	}
 	
-	// Add each chain stated in the pkt's pushUpVec field into its this->pushUpSet
+	// Add each chain stated in the pkt's pushUpVec field into this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
