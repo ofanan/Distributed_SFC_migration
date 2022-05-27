@@ -105,6 +105,7 @@ class SimController : public cSimpleModule
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
 		void printAllDatacenters ();
 		void printAllDatacentersByMyDatabase ();
+		void printAllChains ();
     void printAllChainsPoas  (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim (); // print the system's state, and end the simulation. 
 				 

@@ -17,13 +17,13 @@ DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet:
 DC 6 received vecOfChainThatJoined=
 DC 6 beginning BU sync. notAssigned=
 DC 6 finished BU sync. State is
-DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: =channelDe2, =channelDe2, 
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 213].port[0] <--> 2, 213].port[0] <--> 2, 
 DC 1 beginning BU sync. notAssigned=1,
 DC 1 finished BU sync. State is
-DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 2, atat
+DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 2, {d{d
 DC 2 beginning BU sync. notAssigned=
 DC 2 finished BU sync. State is
-DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 1]1]
+DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 7].port[1]7].port[1]
 DC 0 beginning BU sync. notAssigned=
 DC 0 finished BU sync. State is
 DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
@@ -48,7 +48,8 @@ rcvd fin alg msg from DC 4 leaf 1
 rcvd fin alg msg from DC 3 leaf 0
 rcvd fin alg msg from DC 6 leaf 3
 rcvd fin alg msg from DC 5 leaf 2
-rcvd fin alg msg from all leaves ******************t=0: chain 0 is unplaced at the end of cycle. Printing state and exiting
+rcvd fin alg msg from all leaves ******************
+t=0: chain 0 is unplaced at the end of cycle. Printing state and exiting
 
 DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
 DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 
@@ -57,3 +58,7 @@ DC 3, lvl=0. placed chains: pot. placed chains: 0,pushUpSet:
 DC 4, lvl=0. placed chains: 2,pot. placed chains: pushUpSet: 
 DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+allChains
+*******************
+format: (c,d), where c is the chain id, and d is the id of its current1 DC
+(2,4)(1,1)(0,-1)

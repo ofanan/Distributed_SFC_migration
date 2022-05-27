@@ -170,10 +170,11 @@ void SimController::concludeTimeStep ()
 	if (MyConfig::DEBUG_LVL>0) {
 		for (auto const &chain : allChains) {
 			if (chain.curLvl==UNPLACED_) {
-				snprintf (buf, bufSize, "t=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
+				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
 				printBufToLog ();
 				printAllDatacenters ();			
-				error ("t=%d: chain %d is unplaced at the end of cycle\n", t, chain.id);
+				printAllChains ();
+				error ("chain %d is unplaced at the end of cycle\n", chain.id);
 			}
 		}
 	}
@@ -241,6 +242,18 @@ void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=f
 	
 	for (auto chain : allChains) {
 		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
+		printBufToLog ();
+	}
+}
+
+// Print the PoA of each currently-active user
+void SimController::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
+{
+	MyConfig::printToLog ("\nallChains\n*******************\n");
+	MyConfig::printToLog ("format: (c,d), where c is the chain id, and d is the id of its current1 DC\n");
+	
+	for (auto chain : allChains) {
+		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());
 		printBufToLog ();
 	}
 }
@@ -475,8 +488,8 @@ Update chains' placement info, by the data sent from a datacenter.
 **************************************************************************************************************************************************/
 void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl)
 {
+	Enter_Method ("updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl)");
 	Chain 	   chain;
-
 	for (auto chainId : newlyPlacedChainsIds) {
 		if (!(findChainInSet (allChains, chainId, chain))) {
 			error ("t=%d: didn't find chain id %d that appeared in a call to updatePlacementInfo", t, chainId);

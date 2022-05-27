@@ -21,7 +21,7 @@ class Chain
     bool isRT_Chain;
 		const static vector<uint16_t> costOfCpuUnitAtLvl; 
 		int8_t curLvl;        // Level of the datacenter currently hosting me 
-		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). We may get rid of this by setting curDatacenter==-1 to new chains.
+		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). 
 
 		// C'tors
     Chain ();
