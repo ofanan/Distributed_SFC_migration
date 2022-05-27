@@ -65,7 +65,7 @@ class Datacenter : public cSimpleModule
     void print ();
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
     void initBottomUp (vector<Chain> vecOfChainThatJoined);
-    void initBottomUp (vector<int>& vecOfChainThatJoined);
+    void gamad (vector<int>& vecOfChainThatJoined);
     
   private:
   	static const uint8_t portToPrnt=0;
