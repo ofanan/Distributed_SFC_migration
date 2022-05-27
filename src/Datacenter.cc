@@ -122,6 +122,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	handleEndXmtMsg ();
   }
 	else if (dynamic_cast <BottomUpSelfMsg*>(curHandledMsg) != nullptr) {
+		error ("DC %d rcvd BottomUpSelfMsg", id);
   	if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
 	}
   // Now we know that this is not a self-msg
@@ -211,7 +212,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 Initiate the bottomUpSyncAlg:
 - Clear this->pushUpSet and this->notAssigned.
 - Insert the chains  into this->notAssigned. The input vector is assumed to be already sorted by the delay tightness.
-- Call bottomUp, for running the BU alg'.
+- Schedule a self-msg to call0 bottomUp, for running the BU alg'.
 * Note: this func to be called only when the Datacenter is a leaf.
 *************************************************************************************************************************************************/
 void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
@@ -227,6 +228,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 	notAssigned = vecOfChainThatJoined;
 	
 	BottomUpSelfMsg* msg = new BottomUpSelfMsg;
+	scheduleAt(simTime(), msg);
 }
 
 /*************************************************************************************************************************************************
@@ -503,7 +505,6 @@ Assume that this->notAssigned and this->pushUpSet already contain the relevant c
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpAsync ()
 {
-	genNsndBottomUpPkt ();
 }
 
 /*************************************************************************************************************************************************

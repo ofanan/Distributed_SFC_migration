@@ -2,10 +2,3 @@
 
 t = 0
 ********************
-DC 4 beginning BU sync. notAssigned=2,
-b4 for loop, potPlacedChains=
-inserting
-DC 4 finished BU sync. State is
-DC 4, lvl=0. placed chains: pot. placed chains: 2,
-DC 4: after preparing BU pkt to snd to prnt, pushUpSet=
-DC 4 sending a BU pkt pushUpSet=, pushUpVec[0]=2

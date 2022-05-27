@@ -47,7 +47,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-	runTrace ();	  
+	runTrace ();
 }
 
 void SimController::checkParams ()
