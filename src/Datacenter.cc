@@ -100,7 +100,7 @@ void Datacenter::setLeafId (uint16_t leafId)
  * Handle an aririving set message. Currently, the only self-message is the one indicating the end of the transmission of a pkt.
  * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
 *************************************************************************************************************************************************/
-void Datacenter::handleSelfMsg ()
+void Datacenter::handleEndXmtPkt ()
 {
   EndXmtPkt *endXmtPkt = (EndXmtPkt*) curHandledMsg;
   int16_t portNum 		 = endXmtPkt -> getPortNum();
@@ -118,10 +118,9 @@ void Datacenter::handleSelfMsg ()
 void Datacenter::handleMessage (cMessage *msg)
 {
   curHandledMsg = msg;
-  if (curHandledMsg -> isSelfMessage()) {
-    handleSelfMsg ();
+  if (dynamic_cast<EndXmtPkt*>(curHandledMsg) != nullptr) {
+  	handleEndXmtPkt ();
   }
-
   // Now we know that this is not a self-msg
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
