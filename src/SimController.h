@@ -28,6 +28,7 @@ Controller of the simulation:
 #include "Chain.h"
 #include "RunTraceSelfMsg_m.h"
 #include "RlzRsrcMsg_m.h"
+#include "BottomUpMsg_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
@@ -59,6 +60,7 @@ class SimController : public cSimpleModule
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
 		uint32_t numMigs=0; // number of migration performed		
+		float period=1.0;
 		
 		string line; //current line being read from the tracefile
 		

@@ -62,7 +62,6 @@ void MyConfig::printToLog (vector <Chain> vec)
 	for (const auto &chain : vec) {
 		logFile << chain.id << ",";
 	}
-	logFile << endl;
 }
 
 void MyConfig::printToLog (vector <uint16_t> vec) 
@@ -70,7 +69,6 @@ void MyConfig::printToLog (vector <uint16_t> vec)
 	for (const auto i : vec) {
 		logFile << i << ",";
 	}
-	logFile << endl;
 }
 
 void MyConfig::printToLog (vector <ChainId_t> vec) 
@@ -78,7 +76,6 @@ void MyConfig::printToLog (vector <ChainId_t> vec)
 	for (const auto i : vec) {
 		logFile << i << ",";
 	}
-	logFile << endl;
 }
 
 void MyConfig::printToLog (unordered_set <ChainId_t> set2print) 

@@ -88,6 +88,8 @@ void Datacenter::print ()
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChains);
+	MyConfig::printToLog ("pushUpSet: ");
+	MyConfig::printToLog (pushUpSet);
 }
 
 void Datacenter::setLeafId (uint16_t leafId)
@@ -122,7 +124,6 @@ void Datacenter::handleMessage (cMessage *msg)
   	handleEndXmtMsg ();
   }
 	else if (dynamic_cast <BottomUpSelfMsg*>(curHandledMsg) != nullptr) {
-		error ("DC %d rcvd BottomUpSelfMsg", id);
   	if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
 	}
   // Now we know that this is not a self-msg
@@ -218,8 +219,10 @@ Initiate the bottomUpSyncAlg:
 void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 {
 
-//	MyConfig::printToLog ("\nthe received vecOfChainThatJoined is "); //
-//	MyConfig::printToLog(vecOfChainThatJoined);
+	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainThatJoined)");
+	snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", id);
+	printBufToLog (); 
+	MyConfig::printToLog(vecOfChainThatJoined);
 
 	if (!isLeaf) {
 		error ("Non-leaf DC %d was called by initBottomUp");
@@ -227,8 +230,9 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 	pushUpSet.clear ();	
 	notAssigned = vecOfChainThatJoined;
 	
-	BottomUpSelfMsg* msg = new BottomUpSelfMsg;
-	scheduleAt(simTime(), msg);
+  if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
+//	BottomUpSelfMsg* msg = new BottomUpSelfMsg;
+//	scheduleAt(simTime(), msg);
 }
 
 /*************************************************************************************************************************************************
@@ -400,13 +404,14 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
+		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 			Chain modifiedChain; // the modified chain, to be pushed to datastructures
 			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 					modifiedChain = *chainPtr;
 					availCpu -= requiredCpuToLocallyPlaceThisChain;
 					modifiedChain.curLvl = lvl;
+					chainPtr = notAssigned.erase (chainPtr);
 					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
 						placedChains.				 insert (modifiedChain);
 						newlyPlacedChainsIds.insert (modifiedChain.id);
@@ -427,6 +432,7 @@ void Datacenter::bottomUpSync ()
 					}
 					return prepareReshSync ();
 				}
+				chainPtr++; // I don't have enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain. But maybe I've enough availCpu for the next notAssigned chain  
 			}
 		}
 
@@ -486,10 +492,13 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpSet
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
+		if (MyConfig::DEBUG_LVL==VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "\nDC %d inserting chain %d to pu", id, pkt->getPushUpVec(i).id);
+			printBufToLog ();
+		}
 		pushUpSet.insert (pkt->getPushUpVec(i));
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d rcvd %d BU pkts. src=%d. pushUpSet=", id, numBuPktsRcvd, src);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpSet);
 	}
@@ -536,30 +545,6 @@ void Datacenter::genNsndBottomUpPkt ()
 		chainPtr = pushUpSet.erase (chainPtr); 
 	}
 	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjest the array's size to the real number of chains inserted into it. 
-
-	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d: after preparing BU pkt to snd to prnt, pushUpSet=", id);
-		printBufToLog();
-		MyConfig::printToLog (pushUpSet);
-	}
-	
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d sending a BU pkt pushUpSet=", id);
-		MyConfig::printToLog (buf);
-		MyConfig::printToLog (pushUpSet);
-		if (pkt2send -> getPushUpVecArraySize ()== 0) {
-			snprintf (buf, bufSize, ", pushUpVec is empty");
-			MyConfig::printToLog (buf);
-		}
-		else {
-			snprintf (buf, bufSize, ", pushUpVec[0]=%d", pkt2send->getPushUpVec(0).id);
-			MyConfig::printToLog (buf);
-			if (pkt2send -> getPushUpVecArraySize()>1) {
-				snprintf (buf, bufSize, ", pushUpVec[1]=%d", pkt2send->getPushUpVec(1).id);
-				MyConfig::printToLog (buf);
-			}
-		}
-	}
 
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 	if (!reshuffled) { 

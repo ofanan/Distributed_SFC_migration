@@ -48,7 +48,8 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot ();
 	RunTraceSelfMsg *runTraceSelfMsg = new RunTraceSelfMsg;
-	scheduleAt (simTime(), runTraceSelfMsg);
+	runTrace ();
+//	scheduleAt (simTime(), runTraceSelfMsg);
 }
 
 void SimController::checkParams ()
@@ -133,7 +134,7 @@ void SimController::runTimeStep ()
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
-//			scheduleAt (simTime() + 1.0, new cMessage); //$$$
+			scheduleAt (simTime() + period, new cMessage); //$$$
 			break;
 		}
   }
@@ -435,7 +436,8 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 // Initiate the run of an Sync placement alg'
 void SimController::initAlgSync () 
 {  	
-	
+
+//	BottomUpMsg* msg;
 	bool *initAlgAtLeaf { new bool[numLeaves]{} }; // initAlgAtLeaf will be true iff we already sent a InitBottomUpMsg to leaf i
 
 	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
@@ -445,6 +447,7 @@ void SimController::initAlgSync ()
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
 		leaves[item.first]->initBottomUp (item.second);
+//		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 		initAlgAtLeaf[item.first] = true;
 	}
 
@@ -453,6 +456,7 @@ void SimController::initAlgSync ()
 		if (!(initAlgAtLeaf[leafId])) {
 			vector<Chain> emptyVecOfChains = {};
 			leaves[leafId]->initBottomUp (emptyVecOfChains);
+//			sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 		}
 	}	
 	delete[] initAlgAtLeaf;
@@ -530,6 +534,7 @@ Print the "state" (PoAs of active users, and current placement of chains), and e
 **************************************************************************************************************************************************/
 void SimController::PrintStateAndEndSim () 
 {
+	Enter_Method ("PrintStateAndEndSim ()");
 	MyConfig::printToLog ("Printing state and finishing simulation\n");
   printAllChainsPoas  (); 
 	printAllDatacenters ();
