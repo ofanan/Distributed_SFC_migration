@@ -18,7 +18,7 @@ inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) c
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
 inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
 
-inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simControllerAsSimController, "directMsgsPort");}
+inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
 inline void	Datacenter::PrintStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
 
@@ -40,7 +40,7 @@ Datacenter::~Datacenter()
 void Datacenter::initialize()
 {
 	network     	= (cModule*) (getParentModule ()); 
-	simControllerAsSimController = (SimController*) network->getSubmodule("sim_controller");
+	simController = (SimController*) network->getSubmodule("sim_controller");
 	networkName = (network -> par ("name")).stdstringValue();
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));
@@ -334,7 +334,7 @@ void Datacenter::pushUpSync ()
 
 	if (isLeaf) {
 		FinishedAlgMsg *msg2send = new FinishedAlgMsg;
-		sendDirect (msg2send, simControllerAsSimController, "directMsgsPort");
+		sendDirect (msg2send, simController, "directMsgsPort");
 		
 		if (MyConfig::DEBUG_LVL > 0) {
 			if (!pushUpSet.empty()) {
@@ -460,7 +460,7 @@ void Datacenter::updateSimController ()
 		return;
 	}
 	
-	simControllerAsSimController->updatePlacementInfo (newlyPlacedChainsIds, this->lvl); 
+	simController->updatePlacementInfo (newlyPlacedChainsIds, this->lvl); 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }
@@ -559,7 +559,7 @@ void Datacenter::reshuffleAsync ()
 void Datacenter::PrintAllDatacenters ()
 {
 	PrintAllDatacentersMsg* msg2snd = new PrintAllDatacentersMsg; 
-	sendDirect (msg2snd, simControllerAsSimController, "directMsgsPort");
+	sendDirect (msg2snd, simController, "directMsgsPort");
 }
 
 void Datacenter::prepareReshSync () 
