@@ -96,7 +96,7 @@ class Datacenter : public cSimpleModule
 		void reshuffleAsync					();
     void genNsndBottomUpPkt			();
     void sndPushUpPkt						();
-    void updateSimController 		();
+    void updatePlacementInfo 		();
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void rlzRsrc 								(); // Release the resources
     void genNsndPushUpPktsToChildren ();

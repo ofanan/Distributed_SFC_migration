@@ -329,7 +329,7 @@ void Datacenter::pushUpSync ()
 	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
 	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
 //		sndPlacementInfoMsg ();
-		updateSimController ();
+		updatePlacementInfo ();
 	}
 
 	if (isLeaf) {
@@ -453,7 +453,7 @@ void Datacenter::bottomUpSync ()
 Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChainsIds.
 Later, clear newlyPlacedChainsIds.
 *************************************************************************************************************************************************/
-void Datacenter::updateSimController ()
+void Datacenter::updatePlacementInfo ()
 {
 
 	if (newlyPlacedChainsIds.empty () && newlyDisplacedChainsIds.empty()) {
