@@ -6,8 +6,6 @@ Controller of the simulation:
 **************************************************************************************************************************************************/
 #include "SimController.h"
 
-void func(vector<int>& vect) { vect.push_back(30); }
-
 // returns true iff the given datacenter id, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 inline bool isDelayFeasibleForChain (uint16_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
 
@@ -433,28 +431,14 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 	sendDirect (msg2snd, (cModule*)(datacenters[dcId]), "directMsgsPort");
 }
 
-void SimController::DummyFunc(vector<int>& vect) 
-{ 
-	vect.push_back(30); 
-}
-
-
 // Initiate the run of an Sync placement alg'
 void SimController::initAlgSync () 
 {  	
 	
 	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
 
-    	vector<int> dummyVec;
-   vector<int> vect;
-    vect.push_back(10);
-    func(dummyVec);
-	DummyFunc (dummyVec);
-	vector<Chain> vecOfChains;
-	leaves[0]->initBottomUp (vecOfChains);
-//	DummyFunc (dummyVec);
-    //	vector<int> dummyVec;
-//	leaves[0]->gamad (dummy);
+//	vector<Chain> vecOfChains;
+//	leaves[0]->initBottomUp (vecOfChains);
 
 	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
 	for (auto const& item : chainsThatJoinedLeaf)
@@ -467,7 +451,7 @@ void SimController::initAlgSync ()
 //		for(auto &chain : item.second) {
 //			vecOfChains.push_back (chain);
 //		}    
-//		leaves[item.first]->initBottomUp (vecOfChains);
+		leaves[item.first]->initBottomUp (item.second);
 		sentInitBottomUpMsg[item.first] = true;
 	}
 
