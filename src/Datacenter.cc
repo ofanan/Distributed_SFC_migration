@@ -123,16 +123,6 @@ void Datacenter::handleMessage (cMessage *msg)
   }
 
   // Now we know that this is not a self-msg
-  else if (dynamic_cast<InitBottomUpMsg*>(curHandledMsg) != nullptr) {
-		if (!isLeaf) {
-			error ("a non-leaf datacenter received an InitBottomUpMsg");
-		}  
-		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\nDC \%d rcvd a initBU msg", id);
-			printBufToLog ();
-		}
-		handleInitBottomUpMsg ();
-  }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
@@ -215,28 +205,26 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 	}
 }
 
-void Datacenter::initBottomUp (vector<Chain> vecOfChainThatJoined)
-{
-}
-
 /*************************************************************************************************************************************************
-Handle a rcvd InitBottomUpMsg:
-- Insert all the chains in the msg into this->notAssigned.
-- Empty this->pushUpSet.
+Initiate the bottomUpSyncAlg:
+- Clear this->pushUpSet and this->notAssigned.
+- Insert the chains  into this->notAssigned. The input vector is assumed to be already sorted by the delay tightness.
 - Call bottomUp, for running the BU alg'.
-* Note: this msg is expected to arrive to leaves only.
+* Note: this func to be called only when the Datacenter is a leaf.
 *************************************************************************************************************************************************/
-void Datacenter::handleInitBottomUpMsg () 
+void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 {
 
-  InitBottomUpMsg *msg = (InitBottomUpMsg*) this->curHandledMsg;
-
+	if (!isLeaf) {
+		error ("Non-leaf DC %d was called by initBottomUp");
+	}
 	pushUpSet.clear ();	
-	notAssigned.clear ();
-	//	 insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
-	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
-		insertSorted (this->notAssigned, msg->getNotAssigned (i));
-	} 
+	notAssigned = vecOfChainThatJoined;
+	
+//	//	 insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
+//	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
+//		insertSorted (this->notAssigned, msg->getNotAssigned (i));
+//	} 
 
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }

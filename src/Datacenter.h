@@ -63,7 +63,7 @@ class Datacenter : public cSimpleModule
   	
 		// Communication with the sim controller
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
-    void initBottomUp (vector<Chain> vecOfChainThatJoined);
+    void initBottomUp (vector<Chain>& vecOfChainThatJoined);
 
     // Log / debug funcs
     void print ();
@@ -85,7 +85,6 @@ class Datacenter : public cSimpleModule
     void xmt              (int16_t portNum, cPacket *pkt2send);
     void handleRlzRsrcMsg 			();
     void handleSelfMsg    		  ();
-    void handleInitBottomUpMsg 	();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();
     void bottomUpSync     			();

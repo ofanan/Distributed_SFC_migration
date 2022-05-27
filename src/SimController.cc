@@ -435,25 +435,26 @@ void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 void SimController::initAlgSync () 
 {  	
 	
-	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
+	bool *initAlgAtLeaf { new bool[numLeaves]{} }; // initAlgAtLeaf will be true iff we already sent a InitBottomUpMsg to leaf i
 
 	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
-	for (auto const& item : chainsThatJoinedLeaf)
+	for (auto item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
 		leaves[item.first]->initBottomUp (item.second);
-		sentInitBottomUpMsg[item.first] = true;
+		initAlgAtLeaf[item.first] = true;
 	}
 
 	// Next, send (an empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
 	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
-		if (!(sentInitBottomUpMsg[leafId])) {
-			leaves[leafId]->initBottomUp ({});
+		if (!(initAlgAtLeaf[leafId])) {
+			vector<Chain> emptyVecOfChains = {};
+			leaves[leafId]->initBottomUp (emptyVecOfChains);
 		}
 	}	
-	delete[] sentInitBottomUpMsg;
+	delete[] initAlgAtLeaf;
 }
 
 //// Initiate the run of an Sync placement alg'
