@@ -215,10 +215,6 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 	}
 }
 
-void Datacenter::DummyIntFunc(int i)
-{ 
-}
-
 void Datacenter::DummyFunc(vector<int>& vect)
 { vect.push_back(30); 
 }

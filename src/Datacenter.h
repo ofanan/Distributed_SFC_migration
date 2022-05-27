@@ -65,7 +65,6 @@ class Datacenter : public cSimpleModule
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
     void initBottomUp (vector<Chain> vecOfChainThatJoined);
     void DummyFunc(vector<int>& vect); // { vect.push_back(30); }
-    void DummyIntFunc(int i); // { vect.push_back(30); }
 
     // Log / debug funcs
     void print ();
