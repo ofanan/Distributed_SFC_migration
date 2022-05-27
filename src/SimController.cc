@@ -410,25 +410,25 @@ The function does the following:
 void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 {
 
-	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->id;
-  unordered_map <uint16_t, vector<int32_t> > chainsToReplace;
-	InitBottomUpMsg* msg2snd  = new InitBottomUpMsg ();
-	uint16_t numOfChainsToReplace = 0;
+//	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->id;
+//  unordered_map <uint16_t, vector<int32_t> > chainsToReplace;
+//	InitBottomUpMsg* msg2snd  = new InitBottomUpMsg ();
+//	uint16_t numOfChainsToReplace = 0;
 
-	for (auto chain : allChains) {
-		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
-			int16_t chainCurDatacenter = chain.getCurDatacenter();
-			if (chainCurDatacenter == UNPLACED) { // if this chain isn't already placed, no need to release it.
-			  continue;
-			}
-			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
-			msg2snd -> setNotAssignedArraySize (++numOfChainsToReplace);
-			msg2snd -> setNotAssigned 			   (numOfChainsToReplace-1, chain);
-		}
-	}
-	rlzRsrcOfChains (chainsToReplace);
+//	for (auto chain : allChains) {
+//		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
+//			int16_t chainCurDatacenter = chain.getCurDatacenter();
+//			if (chainCurDatacenter == UNPLACED) { // if this chain isn't already placed, no need to release it.
+//			  continue;
+//			}
+//			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
+//			msg2snd -> setNotAssignedArraySize (++numOfChainsToReplace);
+//			msg2snd -> setNotAssigned 			   (numOfChainsToReplace-1, chain);
+//		}
+//	}
+//	rlzRsrcOfChains (chainsToReplace);
 
-	sendDirect (msg2snd, (cModule*)(datacenters[dcId]), "directMsgsPort");
+//	sendDirect (msg2snd, (cModule*)(datacenters[dcId]), "directMsgsPort");
 }
 
 // Initiate the run of an Sync placement alg'
@@ -457,59 +457,10 @@ void SimController::initAlgSync ()
 	delete[] initAlgAtLeaf;
 }
 
-//// Initiate the run of an Sync placement alg'
-//void SimController::initAlgSync () 
-//{  	
-//	InitBottomUpMsg* msg;
-//	uint16_t i;
-//	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
-//	
-//	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
-//	for (auto const& item : chainsThatJoinedLeaf)
-//	{
-//		if (LOG_LVL==2) {
-//			logFile << "Chains that joined dc " << item.first << ": ";
-//		}
-//		
-//		msg = new InitBottomUpMsg ();
-//		msg -> setNotAssignedArraySize (item.second.size());
-//		i = 0;
-//		for(auto &chain : item.second) {
-//			msg -> setNotAssigned (i++, chain);
-//		}    
-//		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
-//		sentInitBottomUpMsg[item.first] = true;
-//	}
-
-//	// Next, send (empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
-//	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
-//		if (!(sentInitBottomUpMsg[leafId])) {
-//			msg = new InitBottomUpMsg ();
-//			msg -> setNotAssignedArraySize (0);
-//			sendDirect (msg, (cModule*)(leaves[leafId]), "directMsgsPort");
-//		}
-//	}	
-//	delete[] sentInitBottomUpMsg;
-//}
 // Initiate the run of a Async placement alg'
-void SimController::initAlgAsync () {  	
+void SimController::initAlgAsync () 
+{
 
-	InitBottomUpMsg* msg;
-	uint16_t i;
-	for (auto const& item : chainsThatJoinedLeaf)
-	{
-		if (LOG_LVL==2) {
-			logFile << "Chains that joined dc " << item.first << ": ";
-		}
-		
-		msg = new InitBottomUpMsg ();
-		msg -> setNotAssignedArraySize (item.second.size());
-		i = 0;
-		for(auto &chain : item.second) {
-			msg -> setNotAssigned (i++, chain);
-		}    
-		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
-	}
 }
 
 /*************************************************************************************************************************************************

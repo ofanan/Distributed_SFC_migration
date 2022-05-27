@@ -11,7 +11,6 @@
 
 #include "EndXmtPkt_m.h"
 #include "BottomUpPkt_m.h"
-#include "InitBottomUpMsg_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
 #include "FinishedAlgMsg_m.h"
