@@ -437,28 +437,20 @@ void SimController::initAlgSync ()
 	
 	bool *sentInitBottomUpMsg { new bool[numLeaves]{} }; // sentInitBottomUpMsg will be true iff we already sent a InitBottomUpMsg to leaf i
 
-//	vector<Chain> vecOfChains;
-//	leaves[0]->initBottomUp (vecOfChains);
-
 	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
 	for (auto const& item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
-
-//		vector <Chain> vecOfChains;		
-//		for(auto &chain : item.second) {
-//			vecOfChains.push_back (chain);
-//		}    
 		leaves[item.first]->initBottomUp (item.second);
 		sentInitBottomUpMsg[item.first] = true;
 	}
 
-	// Next, send (empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
+	// Next, send (an empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
 	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
 		if (!(sentInitBottomUpMsg[leafId])) {
-//			leaves[leafId]->initBottomUp ({});
+			leaves[leafId]->initBottomUp ({});
 		}
 	}	
 	delete[] sentInitBottomUpMsg;
