@@ -47,7 +47,8 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-	runTrace ();
+	RunTraceSelfMsg *runTraceSelfMsg = new RunTraceSelfMsg;
+	scheduleAt (simTime(), runTraceSelfMsg);
 }
 
 void SimController::checkParams ()
@@ -132,7 +133,7 @@ void SimController::runTimeStep ()
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
-			scheduleAt (simTime() + 1.0, new cMessage);
+//			scheduleAt (simTime() + 1.0, new cMessage); //$$$
 			break;
 		}
   }
@@ -543,6 +544,9 @@ void SimController::handleMessage (cMessage *msg)
 		if (!isLastPeriod) {
 			runTimeStep ();
 		}
+  }
+  else if (dynamic_cast<RunTraceSelfMsg*> (msg)) { 
+  	runTrace ();
   }
   else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
   	handleFinishedAlgMsg (msg);
