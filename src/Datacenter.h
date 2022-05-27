@@ -8,8 +8,10 @@
 
 #include "MyConfig.h"
 #include "SimController.h"
+#include "Chain.h"
 
 #include "EndXmtPkt_m.h"
+#include "BottomUpSelfMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
@@ -18,7 +20,6 @@
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
-#include "Chain.h"
 
 using namespace omnetpp;
 using namespace std;

@@ -121,6 +121,9 @@ void Datacenter::handleMessage (cMessage *msg)
   if (dynamic_cast<EndXmtPkt*>(curHandledMsg) != nullptr) {
   	handleEndXmtPkt ();
   }
+	else if (dynamic_cast <BottomUpSelfMsg*>(curHandledMsg) != nullptr) {
+  	if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
+	}
   // Now we know that this is not a self-msg
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
