@@ -450,6 +450,8 @@ void SimController::initAlgSync ()
     vect.push_back(10);
     func(dummyVec);
 	DummyFunc (dummyVec);
+	leaves[0]->DummyIntFunc	(3);
+	leaves[0]->DummyFunc (dummyVec);
 //	DummyFunc (dummyVec);
     //	vector<int> dummyVec;
 //	leaves[0]->gamad (dummy);

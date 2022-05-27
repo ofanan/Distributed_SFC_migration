@@ -61,11 +61,15 @@ class Datacenter : public cSimpleModule
     Datacenter();
     ~Datacenter();
   	
-    // Log / debug funcs
-    void print ();
+		// Communication with the sim controller
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
     void initBottomUp (vector<Chain> vecOfChainThatJoined);
-    void gamad (vector<int>& vecOfChainThatJoined);
+    void DummyFunc(vector<int>& vect); // { vect.push_back(30); }
+    void DummyIntFunc(int i); // { vect.push_back(30); }
+
+    // Log / debug funcs
+    void print ();
+    
     
   private:
   	static const uint8_t portToPrnt=0;

@@ -215,7 +215,15 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 	}
 }
 
-void initBottomUp (vector<Chain> vecOfChainThatJoined)
+void Datacenter::DummyIntFunc(int i)
+{ 
+}
+
+void Datacenter::DummyFunc(vector<int>& vect)
+{ vect.push_back(30); 
+}
+
+void Datacenter::initBottomUp (vector<Chain> vecOfChainThatJoined)
 {
 }
 
