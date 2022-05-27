@@ -97,13 +97,13 @@ void Datacenter::setLeafId (uint16_t leafId)
 
 
 /*************************************************************************************************************************************************
- * Handle an aririving set message. Currently, the only self-message is the one indicating the end of the transmission of a pkt.
- * In that case, if the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
+ * Handle an arriving EndXmtMsg, indicating the end of the transmission of a pkt.
+ * If the relevant output queue isn't empty, the function transmits the pkt in the head of the queue.
 *************************************************************************************************************************************************/
-void Datacenter::handleEndXmtPkt ()
+void Datacenter::handleEndXmtMsg ()
 {
-  EndXmtPkt *endXmtPkt = (EndXmtPkt*) curHandledMsg;
-  int16_t portNum 		 = endXmtPkt -> getPortNum();
+  EndXmtMsg *endXmtMsg = (EndXmtMsg*) curHandledMsg;
+  int16_t portNum 		 = endXmtMsg -> getPortNum();
   endXmtEvents[portNum] = nullptr;
   if (outputQ[portNum].isEmpty()) {
       return;
@@ -118,8 +118,8 @@ void Datacenter::handleEndXmtPkt ()
 void Datacenter::handleMessage (cMessage *msg)
 {
   curHandledMsg = msg;
-  if (dynamic_cast<EndXmtPkt*>(curHandledMsg) != nullptr) {
-  	handleEndXmtPkt ();
+  if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
+  	handleEndXmtMsg ();
   }
 	else if (dynamic_cast <BottomUpSelfMsg*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
@@ -226,7 +226,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 	pushUpSet.clear ();	
 	notAssigned = vecOfChainThatJoined;
 	
-	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
+	BottomUpSelfMsg* msg = new BottomUpSelfMsg;
 }
 
 /*************************************************************************************************************************************************
@@ -637,7 +637,7 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
 	send(pkt2send, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
-  endXmtEvents[portNum] = new EndXmtPkt ("");
+  endXmtEvents[portNum] = new EndXmtMsg ("");
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }

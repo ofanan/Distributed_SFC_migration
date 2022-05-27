@@ -10,7 +10,7 @@
 #include "SimController.h"
 #include "Chain.h"
 
-#include "EndXmtPkt_m.h"
+#include "EndXmtMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
@@ -74,7 +74,7 @@ class Datacenter : public cSimpleModule
   	bool 							reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     vector <cQueue>     outputQ;
     vector <cChannel*>  xmtChnl;
-    vector <EndXmtPkt*> endXmtEvents; 
+    vector <EndXmtMsg*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 		SetOfChainsOrderedByCpuUsage pushUpSet;
 
@@ -84,7 +84,7 @@ class Datacenter : public cSimpleModule
     void sndViaQ         (int16_t portNum, cPacket* pkt2send);
     void xmt              (int16_t portNum, cPacket *pkt2send);
     void handleRlzRsrcMsg 			();
-    void handleEndXmtPkt   		  ();
+    void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();
     void bottomUpSync     			();
