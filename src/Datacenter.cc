@@ -215,17 +215,15 @@ Initiate the bottomUpSyncAlg:
 void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 {
 
+//	MyConfig::printToLog ("\nthe received vecOfChainThatJoined is "); //
+//	MyConfig::printToLog(vecOfChainThatJoined);
+
 	if (!isLeaf) {
 		error ("Non-leaf DC %d was called by initBottomUp");
 	}
 	pushUpSet.clear ();	
 	notAssigned = vecOfChainThatJoined;
 	
-//	//	 insert all the not-assigned chains that are written in the msg into this->notAssigned vector; chains are inserted in a sorted way 
-//	for (int i(0); i< (msg->getNotAssignedArraySize()); i++) {
-//		insertSorted (this->notAssigned, msg->getNotAssigned (i));
-//	} 
-
 	return (MyConfig::mode==SYNC)? bottomUpSync () : bottomUpAsync ();
 }
 
@@ -398,12 +396,11 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
+		for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); chainPtr++) {
 			uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 			Chain modifiedChain; // the modified chain, to be pushed to datastructures
 			if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 					modifiedChain = *chainPtr;
-					chainPtr = notAssigned.erase(chainPtr);
 					availCpu -= requiredCpuToLocallyPlaceThisChain;
 					modifiedChain.curLvl = lvl;
 					if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
@@ -426,9 +423,6 @@ void Datacenter::bottomUpSync ()
 					}
 					return prepareReshSync ();
 				}
-				else {
-					chainPtr++;
-				}
 			}
 		}
 
@@ -436,7 +430,6 @@ void Datacenter::bottomUpSync ()
 		snprintf (buf, bufSize, "\nDC %d finished BU sync. State is", id);
 		printBufToLog ();
 		print ();
-		MyConfig::printToLog (potPlacedChains);
 	}
 
   if (isRoot) { 
