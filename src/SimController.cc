@@ -94,6 +94,7 @@ Run a single time step. Such a time step is assumed to include (at most) a singl
 **************************************************************************************************************************************************/
 void SimController::runTimeStep () 
 {
+	MyConfig::printToLog ("\nBeginning a time step");
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
 	  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
@@ -497,6 +498,7 @@ void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedCh
 			allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
+	printAllChains();
 }
 
 
