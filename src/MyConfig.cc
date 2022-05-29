@@ -14,12 +14,12 @@ void MyConfig::openFiles()
 	logFile.open (LogFileName);
 }
 
-void MyConfig::printToLog (set<Chain, UsesMoreCpu> setOfChains, bool printS_u)
-{
-	for (auto chain : setOfChains) {
-		chain.print (printS_u);
-	}
-}
+//void MyConfig::printToLog (set<Chain, UsesMoreCpu> setOfChains, bool printS_u)
+//{
+//	for (auto chain : setOfChains) {
+//		chain.print (printS_u);
+//	}
+//}
 
 void MyConfig::printSuToLog (Chain chain)
 {

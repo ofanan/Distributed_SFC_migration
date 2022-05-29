@@ -64,7 +64,7 @@ class MyConfig {
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
-		static void printToLog (set<Chain, std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>> setOfChains, bool printS_u=false);
+/*		static void printToLog (set<Chain, std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>> setOfChains, bool printS_u=false);*/
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printSuToLog (Chain chain);
 		

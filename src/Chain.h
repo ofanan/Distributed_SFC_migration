@@ -99,16 +99,16 @@ Find a chain (given by its id) in a given set of chains.
 bool 					findChainInSet  (UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, uint16_t poa);
 
-bool UsesMoreCpu (const Chain& lhs, const Chain& rhs);
-/* {*/
+/*bool UsesMoreCpu (const Chain& lhs, const Chain& rhs);*/
+/*{*/
 /*        return lhs.getCpu () >= rhs.getCpu ();*/
 /*}*/
 
-using UsesMoreCpuType = std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>;
+/*using UsesMoreCpuType = std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>;*/
 
-set<Chain, UsesMoreCpuType> set1;
+/*set<Chain, UsesMoreCpuType> set1;*/
 
-set<Chain, std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>> set2;
+/*set<Chain, std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>> set2;*/
 
 #endif
 

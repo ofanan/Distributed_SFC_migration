@@ -199,9 +199,9 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
 	}
 }
 
-bool UsesMoreCpu (const Chain& lhs, const Chain& rhs) {
-        return lhs.getCpu () >= rhs.getCpu ();
-}
+//bool UsesMoreCpu (const Chain& lhs, const Chain& rhs) {
+//        return lhs.getCpu () >= rhs.getCpu ();
+//}
 
 //struct sortTwoChainsByCpuUsage {
 //        bool operator () (const Chain& lhs, const Chain& rhs) const {
