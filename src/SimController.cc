@@ -47,9 +47,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-	RunTraceSelfMsg *runTraceSelfMsg = new RunTraceSelfMsg;
 	runTrace ();
-//	scheduleAt (simTime(), runTraceSelfMsg);
 }
 
 void SimController::checkParams ()
@@ -394,19 +392,6 @@ void SimController::rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > 
 		datacenters[item.first]->rlzRsrc (item.second); 
 	}
 
-
-//	RlzRsrcMsg* msg;
-//	uint16_t i;
-//	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
-//	{
-//		msg = new RlzRsrcMsg ();
-//		msg -> setChainsToRlzArraySize (item.second.size());
-//		i = 0;
-//		for (auto & chainId : item.second) {
-//			msg -> setChainsToRlz (i++, chainId);
-//		}
-//		sendDirect (msg, (cModule*)(datacenters[item.first]), "directMsgsPort");
-//	}
 }
 
 // Initiate the run of placement alg'
@@ -419,7 +404,7 @@ void SimController::initAlg () {
 /*************************************************************************************************************************************************
 Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.
 The function does the following:
-- rlz the rsrscs of all the chains associated with this poa (by sending RlzRsrcMsg to each of the DCs currently placing such chains).
+- rlz the rsrscs of all the chains associated with this poa.
 - Initiate a placement alg' from this poa (by sending this poa an InitBottomUpMsg).
 **************************************************************************************************************************************************/
 void SimController::handlePrepareReshSyncMsg (cMessage *msg)
@@ -562,9 +547,6 @@ void SimController::handleMessage (cMessage *msg)
 		if (!isLastPeriod) {
 			runTimeStep ();
 		}
-  }
-  else if (dynamic_cast<RunTraceSelfMsg*> (msg)) { 
-  	runTrace ();
   }
   else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
   	handleFinishedAlgMsg (msg);

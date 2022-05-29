@@ -84,7 +84,6 @@ class Datacenter : public cSimpleModule
     
     void sndViaQ         (int16_t portNum, cPacket* pkt2send);
     void xmt              (int16_t portNum, cPacket *pkt2send);
-    void handleRlzRsrcMsg 			();
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();
