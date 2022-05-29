@@ -108,10 +108,13 @@ class Datacenter : public cSimpleModule
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void rlzRsrc 								(); // Release the resources
     void genNsndPushUpPktsToChildren ();
-    inline void     printBufToLog () const {MyConfig::printToLog (buf);}
-    inline bool 	  CannotPlaceThisChainHigher 		 	(const Chain chain) const;
 		inline bool 		isDelayFeasibleForThisChain 		(const Chain chain) const;
-		inline void			PrintStateAndEndSim 						();
+    
+    // Print functions
+    inline void printBufToLog () const {MyConfig::printToLog (buf);}
+    inline bool cannotPlaceThisChainHigher (const Chain chain) const;
+		inline void	printStateAndEndSim 			 ();
+		void				printToLog 								 (SetOfChainsOrderedByDecCpuUsage setOfChains);	
 
     inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
 		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 

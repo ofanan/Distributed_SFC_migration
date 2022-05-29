@@ -11,7 +11,7 @@ Define_Module(Datacenter);
 *************************************************************************************************************************************************/
 inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= rhs.getCpu();}
 
-inline bool Datacenter::CannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
+inline bool Datacenter::cannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
 inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
 
 inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
@@ -21,7 +21,7 @@ inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
-inline void	Datacenter::PrintStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
+inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain)   	 {availCpu += chain.mu_u_at_lvl(lvl); }
 
@@ -187,16 +187,16 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
  	notAssigned = vecOfChainThatJoined;
 
 
- 	// $$$
-// 	Chain chain0 (0, {1,1});
-//// 	pushUpSet.insert (chain0);
-// 	MyConfig::printToLog ("\npushUpSet=");
+// 	 $$$
+ 	Chain chain0 (0, {1,1});
+ 	pushUpSet.insert (chain0);
+ 	MyConfig::printToLog ("\npushUpSet=");
 // 	MyConfig::printToLog (pushUpSet);
-//    Chain chain2 (2, {1,1});
-//    pushUpSet.insert (chain2);
-//    MyConfig::printToLog ("\npushUpSet=");
+    Chain chain2 (2, {1,1});
+    pushUpSet.insert (chain2);
+    MyConfig::printToLog ("\npushUpSet=");
 //    MyConfig::printToLog (pushUpSet);
-// 	endSimulation ();
+	 	endSimulation ();
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", id);
 		printBufToLog (); 
@@ -382,7 +382,7 @@ void Datacenter::bottomUpSync ()
 //				modifiedChain = *chainPtr;
 //				modifiedChain.curLvl = lvl;
 //				chainPtr = notAssigned.erase (chainPtr);
-//				if (CannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
+//				if (cannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
 //					placedChains.				 insert (modifiedChain);
 //					newlyPlacedChainsIds.insert (modifiedChain.id);
 //				}
@@ -392,13 +392,13 @@ void Datacenter::bottomUpSync ()
 //				}
 //		}
 //		else { 
-//			if (CannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+//			if (cannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 //				if (reshuffled) {
 //					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
 //					printBufToLog ();
 //					PrintAllDatacenters ();
 //					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
-//					PrintStateAndEndSim  ();
+//					printStateAndEndSim  ();
 //				}
 //				return prepareReshSync ();
 //			}
@@ -510,7 +510,7 @@ void Datacenter::genNsndBottomUpPkt ()
 //	pkt2send -> setPushUpVecArraySize (pushUpSet.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
 //	uint16_t idixInPushUpVec = 0;
 //	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
-//		if (CannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
+//		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 //			continue;
 //		}
 //		
