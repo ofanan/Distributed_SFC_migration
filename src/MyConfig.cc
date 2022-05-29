@@ -27,6 +27,13 @@ void MyConfig::printSuToLog (Chain chain)
 //	}
 //}
 
+void MyConfig::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u)
+{
+	for (auto chain : setOfChains) {
+		logFile << chain.id << ",";
+	}
+}
+
 
 void MyConfig::printToLog (UnorderedSetOfChains set2print)
 {

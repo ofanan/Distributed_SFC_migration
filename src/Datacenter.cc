@@ -100,7 +100,7 @@ void Datacenter::print ()
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChains);
-//	MyConfig::printToLog ("pushUpSet: ");
+	MyConfig::printToLog ("pushUpSet: ");
 //	MyConfig::printToLog (pushUpSet);
 }
 
@@ -193,22 +193,11 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 	if (!isLeaf) { 
 		error ("Non-leaf DC %d was called by initBottomUp");
 	}
-//	pushUpSet.clear ();	
+	pushUpSet.clear ();	
 	placedChains.clear ();
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainThatJoined;
 
-
-// 	 $$$
- 	Chain chain0 (0, {1,1});
- 	pushUpSet.insert (chain0);
- 	MyConfig::printToLog ("\npushUpSet=");
- 	printToLog (pushUpSet);
-  Chain chain2 (2, {1,1});
-  pushUpSet.insert (chain2);
-  MyConfig::printToLog ("\npushUpSet=");
-  printToLog (pushUpSet);
-	endSimulation ();
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", id);
 		printBufToLog (); 
