@@ -28,10 +28,10 @@ DC 1 inserted chain 2 to pushUpSet. PushUpSetSize=1
 DC 1 pushUpSet=2,
 DC 1 handling a BU pkt. src=3
 DC 1 inserted chain 0 to pushUpSet. PushUpSetSize=2
-DC 1 pushUpSet=2,0,
+DC 1 pushUpSet=0,2,
 DC 1 beginning BU sync. notAssigned=1,
 DC 1 finished BU sync.
-DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 2,0,
+DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 0,2,
 DC 2 handling a BU pkt. src=5
 DC 2 pushUpSet=
 DC 2 handling a BU pkt. src=6
@@ -48,7 +48,7 @@ DC 0 finished BU sync.
 DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
 DC 0 begins PU. pushUpSet is empty
 DC 1 rcvd PU pkt. pushUpVec rcvd is empty
-DC 1 begins PU. pushUpSet=2,0,
+DC 1 begins PU. pushUpSet=0,2,
 simCtrlr updating: chain 1: curLvl=1, curDC=1
 
 allChains

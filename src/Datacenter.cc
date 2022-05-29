@@ -80,16 +80,16 @@ void Datacenter::initialize()
 
 }
 
-//void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
-//{
-//	vector <ChainId_t> vec;
-//	
-//	for (Chain chain : setOfChains) {
-//		vec.insert (vec.begin(), chain.id);
-//	}
-//	
-//	MyConfig::printToLog (vec);
-//}
+void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
+{
+	vector <ChainId_t> vec;
+	
+	for (Chain chain : setOfChains) {
+		vec.insert (vec.begin(), chain.id);
+	}
+	
+	MyConfig::printToLog (vec);
+}
 
 
 // Print all the chains placed and pot-placed in this DC.
@@ -101,7 +101,7 @@ void Datacenter::print ()
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChains);
 	MyConfig::printToLog ("pushUpSet: ");
-	MyConfig::printToLog (pushUpSet);
+	printToLog (pushUpSet);
 }
 
 void Datacenter::setLeafId (uint16_t leafId)
@@ -254,7 +254,7 @@ void Datacenter::pushUpSync ()
 			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
 		}
 		printBufToLog ();
-		MyConfig::printToLog (pushUpSet);
+		printToLog (pushUpSet);
 	}
 	reshuffled = false;
 	
@@ -475,7 +475,7 @@ void Datacenter::handleBottomUpPktSync ()
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
         snprintf (buf, bufSize, "\nDC %d pushUpSet=", id);
 		printBufToLog ();
-		MyConfig::printToLog (pushUpSet);
+		printToLog (pushUpSet);
 	}
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
