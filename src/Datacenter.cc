@@ -80,6 +80,18 @@ void Datacenter::initialize()
 
 }
 
+void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
+{
+	vector <ChainId_t> vec;
+	
+	for (Chain chain : setOfChains) {
+		vec.insert (vec.begin(), chain.id);
+	}
+	
+	MyConfig::printToLog (vec);
+}
+
+
 // Print all the chains placed and pot-placed in this DC.
 void Datacenter::print ()
 {
