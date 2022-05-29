@@ -3,22 +3,22 @@
 t = 0
 ********************
 DC 4 received vecOfChainThatJoined=2,
-DC 4, lvl=0. placed chains: pot. placed chains: 
+DC 4, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 DC 3 received vecOfChainThatJoined=0,1,
-DC 3, lvl=0. placed chains: pot. placed chains: 
+DC 3, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 DC 5 received vecOfChainThatJoined=
-DC 5, lvl=0. placed chains: pot. placed chains: 
+DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 DC 6 received vecOfChainThatJoined=
-DC 6, lvl=0. placed chains: pot. placed chains: 
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 t=0: chain 2 is unplaced at the end of cycle. Printing state and exiting
 
-DC 0, lvl=2. placed chains: pot. placed chains: 
-DC 1, lvl=1. placed chains: pot. placed chains: 
-DC 2, lvl=1. placed chains: pot. placed chains: 
-DC 3, lvl=0. placed chains: pot. placed chains: 
-DC 4, lvl=0. placed chains: pot. placed chains: 
-DC 5, lvl=0. placed chains: pot. placed chains: 
-DC 6, lvl=0. placed chains: pot. placed chains: 
+DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
+DC 1, lvl=1. placed chains: pot. placed chains: pushUpSet: 
+DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 
+DC 3, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 4, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 allChains
 *******************
 format: (c,d), where c is the chain id, and d is the id of its current1 DC
