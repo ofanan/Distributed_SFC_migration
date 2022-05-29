@@ -1,5 +1,4 @@
 
-Beginning a time step
 
 t = 0
 ********************
@@ -82,18 +81,6 @@ rcvd fin alg msg from DC 3 leaf 0
 rcvd fin alg msg from DC 6 leaf 3
 rcvd fin alg msg from DC 5 leaf 2
 rcvd fin alg msg from all leaves ******************
-Beginning a time step
-DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
-DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 
-DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 
-DC 3, lvl=0. placed chains: 0,pot. placed chains: pushUpSet: 
-DC 4, lvl=0. placed chains: 2,pot. placed chains: pushUpSet: 
-DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
-DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: DC 0, placed chains: DC 1, placed chains: 1,DC 2, placed chains: DC 3, placed chains: 0,DC 4, placed chains: 2,DC 5, placed chains: DC 6, placed chains: 
-allChains
-*******************
-format: (c,p), where c is the chain id, and p is the dcId of its poa
-(0,3)(2,4)(1,3)
 
 t = 1
 ********************
@@ -173,10 +160,9 @@ format: (c,d), where c is the chain id, and d is the id of its current1 DC
 (3,5)(2,3)(1,-1)
 rcvd fin alg msg from DC 4 leaf 1
 rcvd fin alg msg from DC 3 leaf 0
-rcvd fin alg msg from all leaves ******************
 rcvd fin alg msg from DC 6 leaf 3
 rcvd fin alg msg from DC 5 leaf 2
-Beginning a time step
+rcvd fin alg msg from all leaves ******************
 t=1: chain 1 is unplaced at the end of cycle. Printing state and exiting
 
 DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 

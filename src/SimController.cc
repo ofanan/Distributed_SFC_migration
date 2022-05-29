@@ -36,7 +36,7 @@ void SimController::initialize (int stage)
 	checkParams ();
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
-	rcvdFinishedAlgMsgFromLeaves = {false};
+	std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
 	uint16_t leafId = 0;
@@ -94,7 +94,6 @@ Run a single time step. Such a time step is assumed to include (at most) a singl
 **************************************************************************************************************************************************/
 void SimController::runTimeStep () 
 {
-	MyConfig::printToLog ("\nBeginning a time step");
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
 	  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
@@ -173,22 +172,27 @@ void SimController::concludeTimeStep ()
 			if (chain.curLvl==UNPLACED_) {
 				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
 				printBufToLog ();
-				printAllDatacenters ();			
+				printAllDatacenters ();
 				printAllChains ();
 				error ("chain %d is unplaced at the end of cycle\n", chain.id);
 			}
 		}
 	}
+
 //	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
-	rcvdFinishedAlgMsgFromLeaves = {false};
+	std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	
-	if (MyConfig::LOG_LVL > 1) {
-		printAllDatacenters ();
-	  printAllDatacentersByMyDatabase ();
-	  printAllChainsPoas ();
-	}
+//	if (MyConfig::LOG_LVL > 3) {
+//		snprintf (buf, bufSize, "\nt=%d. sim_controller concluding time step and printing state\n", t);
+//		printBufToLog ();
+//		printAllDatacenters ();
+//	  MyConfig::printToLog ("\nDCs content by my database is:");
+//	  printAllDatacentersByMyDatabase ();
+//	  MyConfig::printToLog ("\npoas of all chains are");
+//	  printAllChainsPoas ();
+//	}
 }
 // print all the placed (and possibly, the pot-placed) chains on each DC by this->allChains DB.
 void SimController::printAllDatacentersByMyDatabase ()
@@ -526,6 +530,7 @@ void SimController::handleFinishedAlgMsg (cMessage *msg)
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
 		}
+		
 		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	}
 }
