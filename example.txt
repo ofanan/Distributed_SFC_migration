@@ -2,5 +2,5 @@
 
 t = 0
 ********************
-pushUpSet=0, 
-pushUpSet=0, 
+pushUpSet=0,
+pushUpSet=0,2,
