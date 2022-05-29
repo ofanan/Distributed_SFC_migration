@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/FinishedAlgMsg.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from FinishedAlgMsg.msg.
 //
 
 #ifndef __FINISHEDALGMSG_M_H
@@ -23,7 +23,7 @@
 // }}
 
 /**
- * Class generated from <tt>src/FinishedAlgMsg.msg:10</tt> by nedtool.
+ * Class generated from <tt>FinishedAlgMsg.msg:10</tt> by nedtool.
  * <pre>
  * message FinishedAlgMsg
  * {

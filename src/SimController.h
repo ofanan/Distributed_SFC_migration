@@ -26,7 +26,6 @@ Controller of the simulation:
 
 #include "Datacenter.h"
 #include "Chain.h"
-#include "RlzRsrcMsg_m.h"
 #include "BottomUpMsg_m.h"
 #include "FinishedAlgMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"

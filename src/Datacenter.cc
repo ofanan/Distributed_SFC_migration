@@ -80,16 +80,16 @@ void Datacenter::initialize()
 
 }
 
-void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
-{
-	vector <ChainId_t> vec;
-	
-	for (Chain chain : setOfChains) {
-		vec.insert (vec.begin(), chain.id);
-	}
-	
-	MyConfig::printToLog (vec);
-}
+//void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
+//{
+//	vector <ChainId_t> vec;
+//	
+//	for (Chain chain : setOfChains) {
+//		vec.insert (vec.begin(), chain.id);
+//	}
+//	
+//	MyConfig::printToLog (vec);
+//}
 
 
 // Print all the chains placed and pot-placed in this DC.
@@ -200,15 +200,15 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 
 
 // 	 $$$
- 	Chain chain0 (0, {1,1});
- 	pushUpSet.insert (chain0);
- 	MyConfig::printToLog ("\npushUpSet=");
-// 	MyConfig::printToLog (pushUpSet);
-    Chain chain2 (2, {1,1});
-    pushUpSet.insert (chain2);
-    MyConfig::printToLog ("\npushUpSet=");
-//    MyConfig::printToLog (pushUpSet);
-	 	endSimulation ();
+// 	Chain chain0 (0, {1,1});
+// 	pushUpSet.insert (chain0);
+// 	MyConfig::printToLog ("\npushUpSet=");
+// 	printToLog (pushUpSet);
+//  Chain chain2 (2, {1,1});
+//  pushUpSet.insert (chain2);
+//  MyConfig::printToLog ("\npushUpSet=");
+//  printToLog (pushUpSet);
+	endSimulation ();
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", id);
 		printBufToLog (); 

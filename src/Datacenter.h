@@ -9,6 +9,7 @@
 #include "MyConfig.h"
 #include "SimController.h"
 #include "Chain.h"
+#include "SetsOfChains.h"
 
 #include "EndXmtMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
@@ -17,7 +18,6 @@
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
 #include "FinishedAlgMsg_m.h"
-#include "RlzRsrcMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
@@ -26,15 +26,6 @@ using namespace omnetpp;
 using namespace std;
 
 class SimController;
-
-bool UsesMoreCpu (const Chain& lhs, const Chain& rhs)
-{
-        return lhs.getCpu () >= rhs.getCpu ();
-}
-
-using UsesMoreCpuType = std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>;
-
-typedef set<Chain, UsesMoreCpuType> SetOfChainsOrderedByDecCpuUsage;
 
 class Datacenter : public cSimpleModule
 {
@@ -86,7 +77,7 @@ class Datacenter : public cSimpleModule
     vector <cChannel*>  xmtChnl;
     vector <EndXmtMsg*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
-		SetOfChainsOrderedByDecCpuUsage pushUpSet;
+/*		SetOfChainsOrderedByDecCpuUsage pushUpSet;*/
 
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
@@ -114,7 +105,7 @@ class Datacenter : public cSimpleModule
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool cannotPlaceThisChainHigher (const Chain chain) const;
 		inline void	printStateAndEndSim 			 ();
-		void				printToLog 								 (SetOfChainsOrderedByDecCpuUsage setOfChains);	
+/*		void				printToLog 								 (SetOfChainsOrderedByDecCpuUsage setOfChains);	*/
 
     inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
 		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 

@@ -6,6 +6,8 @@ Controller of the simulation:
 **************************************************************************************************************************************************/
 #include "SimController.h"
 
+class Datacenter;
+
 // returns true iff the given datacenter id, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 inline bool isDelayFeasibleForChain (uint16_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
 
