@@ -5,10 +5,6 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-bool UsesMoreCpu (const Chain& lhs, const Chain& rhs)
-{
-        return lhs.getCpu () >= rhs.getCpu ();
-}
 
 /*************************************************************************************************************************************************
  * Infline functions

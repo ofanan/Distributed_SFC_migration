@@ -27,6 +27,15 @@ using namespace std;
 
 class SimController;
 
+bool UsesMoreCpu (const Chain& lhs, const Chain& rhs)
+{
+        return lhs.getCpu () >= rhs.getCpu ();
+}
+
+using UsesMoreCpuType = std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>;
+
+typedef set<Chain, UsesMoreCpuType> SetOfChainsOrderedByDecCpuUsage;
+
 class Datacenter : public cSimpleModule
 {
   public:
@@ -77,7 +86,7 @@ class Datacenter : public cSimpleModule
     vector <cChannel*>  xmtChnl;
     vector <EndXmtMsg*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
-/*		SetOfChainsOrderedByCpuUsage pushUpSet;*/
+		SetOfChainsOrderedByDecCpuUsage pushUpSet;
 
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
