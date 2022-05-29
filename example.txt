@@ -4,22 +4,162 @@ t = 0
 ********************
 DC 4 received vecOfChainThatJoined=2,
 DC 4, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 4 beginning BU sync. notAssigned=2,
+DC 4 finished BU sync.
+DC 4, lvl=0. placed chains: pot. placed chains: 2,pushUpSet: 2,
 DC 3 received vecOfChainThatJoined=0,1,
 DC 3, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 3 beginning BU sync. notAssigned=0,1,
+DC 3 finished BU sync.
+DC 3, lvl=0. placed chains: pot. placed chains: 0,pushUpSet: 0,
 DC 5 received vecOfChainThatJoined=
+DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 5 beginning BU sync. notAssigned=
+DC 5 finished BU sync.
 DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 DC 6 received vecOfChainThatJoined=
 DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
-t=0: chain 2 is unplaced at the end of cycle. Printing state and exiting
+DC 6 beginning BU sync. notAssigned=
+DC 6 finished BU sync.
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 1 handling a BU pkt. src=4
+DC 1 inserted chain 2 to pushUpSet. PushUpSetSize=1
+DC 1 pushUpSet=2,
+DC 1 handling a BU pkt. src=3
+DC 1 inserted chain 0 to pushUpSet. PushUpSetSize=2
+DC 1 pushUpSet=2,0,
+DC 1 beginning BU sync. notAssigned=1,
+DC 1 finished BU sync.
+DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 2,0,
+DC 2 handling a BU pkt. src=5
+DC 2 pushUpSet=
+DC 2 handling a BU pkt. src=6
+DC 2 pushUpSet=
+DC 2 beginning BU sync. notAssigned=
+DC 2 finished BU sync.
+DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 
+DC 0 handling a BU pkt. src=1
+DC 0 pushUpSet=
+DC 0 handling a BU pkt. src=2
+DC 0 pushUpSet=
+DC 0 beginning BU sync. notAssigned=
+DC 0 finished BU sync.
+DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
+DC 0 begins PU. pushUpSet is empty
+DC 1 rcvd PU pkt. pushUpVec rcvd is empty
+DC 1 begins PU. pushUpSet=2,0,
+simCtrlr updating: chain 1: curLvl=1, curDC=1
+
+DC 2 rcvd PU pkt. pushUpVec rcvd is empty
+DC 2 begins PU. pushUpSet is empty
+DC 4 rcvd PU pkt. pushUpVec[0]=2
+DC 4 begins PU. pushUpSet=2,
+simCtrlr updating: chain 2: curLvl=0, curDC=4
+
+DC 3 rcvd PU pkt. pushUpVec[0]=0
+DC 3 begins PU. pushUpSet=0,
+simCtrlr updating: chain 0: curLvl=0, curDC=3
+
+DC 6 rcvd PU pkt. pushUpVec rcvd is empty
+DC 6 begins PU. pushUpSet is empty
+DC 5 rcvd PU pkt. pushUpVec rcvd is empty
+DC 5 begins PU. pushUpSet is empty
+rcvd fin alg msg from DC 4 leaf 1
+rcvd fin alg msg from DC 3 leaf 0
+rcvd fin alg msg from DC 6 leaf 3
+rcvd fin alg msg from DC 5 leaf 2
+rcvd fin alg msg from all leaves ******************
+DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
+DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 
+DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 
+DC 3, lvl=0. placed chains: 0,pot. placed chains: pushUpSet: 
+DC 4, lvl=0. placed chains: 2,pot. placed chains: pushUpSet: 
+DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: DC 0, placed chains: DC 1, placed chains: 1,DC 2, placed chains: DC 3, placed chains: 0,DC 4, placed chains: 2,DC 5, placed chains: DC 6, placed chains: 
+allChains
+*******************
+format: (c,p), where c is the chain id, and p is the dcId of its poa
+(0,3)(2,4)(1,3)
+
+t = 1
+********************
+DC 3 received vecOfChainThatJoined=2,
+DC 3, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 3 beginning BU sync. notAssigned=2,
+DC 3 finished BU sync.
+DC 3, lvl=0. placed chains: pot. placed chains: 2,pushUpSet: 2,
+DC 5 received vecOfChainThatJoined=3,
+DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 5 beginning BU sync. notAssigned=3,
+DC 5 finished BU sync.
+DC 5, lvl=0. placed chains: pot. placed chains: 3,pushUpSet: 3,
+DC 4 received vecOfChainThatJoined=
+DC 4, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 4 beginning BU sync. notAssigned=
+DC 4 finished BU sync.
+DC 4, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 6 received vecOfChainThatJoined=
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 6 beginning BU sync. notAssigned=
+DC 6 finished BU sync.
+DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 1 handling a BU pkt. src=3
+DC 1 inserted chain 2 to pushUpSet. PushUpSetSize=1
+DC 1 pushUpSet=2,
+DC 2 handling a BU pkt. src=5
+DC 2 inserted chain 3 to pushUpSet. PushUpSetSize=1
+DC 2 pushUpSet=3,
+DC 1 handling a BU pkt. src=4
+DC 1 pushUpSet=2,
+DC 1 beginning BU sync. notAssigned=
+DC 1 finished BU sync.
+DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 2,
+DC 2 handling a BU pkt. src=6
+DC 2 pushUpSet=3,
+DC 2 beginning BU sync. notAssigned=
+DC 2 finished BU sync.
+DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 3,
+DC 0 handling a BU pkt. src=1
+DC 0 pushUpSet=
+DC 0 handling a BU pkt. src=2
+DC 0 pushUpSet=
+DC 0 beginning BU sync. notAssigned=
+DC 0 finished BU sync.
+DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
+DC 0 begins PU. pushUpSet is empty
+DC 1 rcvd PU pkt. pushUpVec rcvd is empty
+DC 1 begins PU. pushUpSet=2,
+DC 2 rcvd PU pkt. pushUpVec rcvd is empty
+DC 2 begins PU. pushUpSet=3,
+simCtrlr updating: chain 3: curLvl=1, curDC=2
+
+DC 4 rcvd PU pkt. pushUpVec rcvd is empty
+DC 4 begins PU. pushUpSet is empty
+DC 3 rcvd PU pkt. pushUpVec[0]=2
+DC 3 begins PU. pushUpSet=2,
+simCtrlr updating: chain 2: curLvl=0, curDC=3
+
+DC 6 rcvd PU pkt. pushUpVec rcvd is empty
+DC 6 begins PU. pushUpSet is empty
+DC 5 rcvd PU pkt. pushUpVec[0]=3
+DC 5 begins PU. pushUpSet=3,
+simCtrlr updating: chain 3: curLvl=0, curDC=5
+
+rcvd fin alg msg from DC 4 leaf 1
+rcvd fin alg msg from DC 3 leaf 0
+rcvd fin alg msg from all leaves ******************
+rcvd fin alg msg from DC 6 leaf 3
+rcvd fin alg msg from DC 5 leaf 2
+t=1: chain 1 is unplaced at the end of cycle. Printing state and exiting
 
 DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
-DC 1, lvl=1. placed chains: pot. placed chains: pushUpSet: 
-DC 2, lvl=1. placed chains: pot. placed chains: pushUpSet: 
-DC 3, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 1, lvl=1. placed chains: 1,pot. placed chains: pushUpSet: 
+DC 2, lvl=1. placed chains: 3,pot. placed chains: pushUpSet: 
+DC 3, lvl=0. placed chains: 2,pot. placed chains: pushUpSet: 
 DC 4, lvl=0. placed chains: pot. placed chains: pushUpSet: 
-DC 5, lvl=0. placed chains: pot. placed chains: pushUpSet: 
+DC 5, lvl=0. placed chains: 3,pot. placed chains: pushUpSet: 
 DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 allChains
 *******************
 format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(2,-1)(1,-1)(0,-1)
+(3,5)(2,3)(1,-1)
