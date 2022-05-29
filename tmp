@@ -1,51 +1,23 @@
-void SimController::runTimeStep () 
-{
-	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
-	if (!isFirstPeriod) {
-	  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
-	}
+#include "Chain.h"
+
+#ifndef SETS_OF_CHAINS
+#define SETS_OF_CHAINS
+
+class Chain;
+
+struct sortTwoChainsByCpuUsage {
+	bool operator () (const Chain& lhs, const Chain& rhs) const {
+		return lhs.getCpu () >= rhs.getCpu ();
 	
-	readTraceLine ();
-  if ( (line.substr(0,4)).compare("t = ")==0) {
-  	
-		isLastPeriod = false;
-		// extract the t (time) from the traceFile, and update this->t accordingly.
-		char lineAsCharArray[line.length()+1];
-		strcpy (lineAsCharArray, line.c_str());
-		strtok (lineAsCharArray, " = ");
-		t = atoi (strtok (NULL, " = "));
+/*		if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return false*/
+/*			return false;*/
+/*		}*/
+/*	  return ((lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl]) <*/
+/*			  	 ((rhs.isRT_Chain)? RT_Chain::mu_u[rhs.curLvl] : Non_RT_Chain::mu_u[rhs.curLvl]);*/
+	} 
+};
 
-		if (MyConfig::LOG_LVL>0) {
-			snprintf (buf, bufSize, "t=%d\n", t);
-			MyConfig::printToLog (buf); 
-		}
-	}
+typedef unordered_set <Chain, ChainHash> 		 UnorderedSetOfChains;
+typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage; 
 
-	readTraceLine ();
-	if ( (line.substr(0,14)).compare("usrs_that_left")==0) {
-		readUsrsThatLeftLine (line.substr(15));
-	} 	
-	
-	readTraceLine ();
-	if ( (line.substr(0,8)).compare("new_usrs")==0) {
-		readNewUsrsLine (line.substr(9)); 
-	}
-
-	readTraceLine ();
-	if ( (line.substr(0,8)).compare("old_usrs")==0) {
-		readOldUsrsLine (line.substr(9));
-	}
-	error ("after read old usrs");
-//	else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-//		readOldUsrsLine (line.substr(9));
-//		
-//		// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
-//		// place all the new / critical chains.
-//		rlzRsrcOfChains (chainsThatLeftDatacenter);
-//		initAlg ();
-//		// Schedule a self-event for reading the handling the next time-step
-//		scheduleAt (simTime() + 1.0, new cMessage);
-//	}
-//  }
-}
-
+#endif

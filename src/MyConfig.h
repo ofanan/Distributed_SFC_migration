@@ -12,18 +12,20 @@
 #include <utility>
 #include <cstdlib>
 
-#include "Chain.h"
-/*#include "SimController.h"*/
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <unordered_set>
 
+#include "Chain.h"
+#/*#include "SimController.h"*/
 
 using namespace omnetpp;
 using namespace std;
 
-
+class Chain;
+class ChainHash;
+typedef int32_t ChainId_t;
 
 const int HEIGHT=5;
 
@@ -41,6 +43,7 @@ const bool ASYNC = false;
 const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 
 const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
+
 
 class MyConfig { 
 
@@ -61,8 +64,8 @@ class MyConfig {
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
-		static void printToLog (	SetOfChainsOrderedByCpuUsage setOfChains, bool printS_u=false);
-		static void printToLog (UnorderedSetOfChains set2print);
+		static void printToLog (set<Chain, std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>> setOfChains, bool printS_u=false);
+		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'

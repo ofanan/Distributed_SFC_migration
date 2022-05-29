@@ -1,6 +1,6 @@
 #include <vector>
+#include <type_traits>
 #include "Chain.h"
-#include "MyConfig.h"
 
 const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
@@ -157,7 +157,7 @@ uint16_t Chain::getCpuCost () const
 }
 
 // return the current cpu consumption of the chain if it's already placed; UNPLACED_ otherwise
-inline uint16_t Chain::getCpu () const
+uint16_t Chain::getCpu () const
 {
 	if (curLvl==UNPLACED_) {
 		return UNPLACED;
@@ -198,4 +198,24 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
 		}
 	}
 }
+
+bool UsesMoreCpu (const Chain& lhs, const Chain& rhs) {
+        return lhs.getCpu () >= rhs.getCpu ();
+}
+
+//struct sortTwoChainsByCpuUsage {
+//        bool operator () (const Chain& lhs, const Chain& rhs) const {
+//                return lhs.getCpu () >= rhs.getCpu ();
+//        
+///*              if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return false*/
+///*                      return false;*/
+///*              }*/
+///*        return ((lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl]) <*/
+///*                               ((rhs.isRT_Chain)? RT_Chain::mu_u[rhs.curLvl] : Non_RT_Chain::mu_u[rhs.curLvl]);*/
+//        } 
+//};
+
+//typedef unordered_set <Chain, ChainHash>                 UnorderedSetOfChains;
+//typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage; 
+
 

@@ -9,9 +9,11 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include "MyConfig.h"
 using namespace std;
 
 typedef int32_t ChainId_t;
+
 
 class Chain
 {
@@ -35,8 +37,8 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-		int16_t 	getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
-    uint16_t 	getCpuCost () const;
+		int16_t  getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
+    uint16_t getCpuCost () const;
     uint16_t getCpu     () const; 
     
 		/* 
@@ -71,30 +73,20 @@ class Non_RT_Chain: public Chain
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
-struct ChainHash {
+class ChainHash {
+	public:
 	size_t operator()(const Chain& c) const {
   	return hash<ChainId_t>()(c.id);
   }
 };
+
+typedef unordered_set <Chain, ChainHash>                 UnorderedSetOfChains;
 
 /*************************************************************************************************************************************************
 Rcvs 2 sorted vectors of chains. 
 Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
 **************************************************************************************************************************************************/
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
-
-struct sortTwoChainsByCpuUsage {
-	bool operator () (const Chain& lhs, const Chain& rhs) const {
-		if (lhs.curLvl==-1 || rhs.curLvl==-1) { // if either lhs, or rhs, is unplaced, arbitrarily return false
-			return false;
-		}
-	  return ((lhs.isRT_Chain)? RT_Chain::mu_u[lhs.curLvl] : Non_RT_Chain::mu_u[lhs.curLvl]) <
-			  	 ((rhs.isRT_Chain)? RT_Chain::mu_u[rhs.curLvl] : Non_RT_Chain::mu_u[rhs.curLvl]);
-	} 
-};
-
-typedef unordered_set <Chain, ChainHash> 		 UnorderedSetOfChains;
-typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage; 
 
 // Insert a chain in its correct place to a sorted vector of chains
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
@@ -106,6 +98,17 @@ Find a chain (given by its id) in a given set of chains.
 **************************************************************************************************************************************************/
 bool 					findChainInSet  (UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, uint16_t poa);
+
+bool UsesMoreCpu (const Chain& lhs, const Chain& rhs);
+/* {*/
+/*        return lhs.getCpu () >= rhs.getCpu ();*/
+/*}*/
+
+using UsesMoreCpuType = std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>;
+
+set<Chain, UsesMoreCpuType> set1;
+
+set<Chain, std::integral_constant<decltype(&UsesMoreCpu), &UsesMoreCpu>> set2;
 
 #endif
 

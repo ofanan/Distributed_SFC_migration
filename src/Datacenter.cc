@@ -187,10 +187,14 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 
 
  	// $$$
- 	Chain chain1 (0, {1,1});
- 	pushUpSet.insert (chain1);
- 	MyConfig::printToLog ("pushUpSet=");
+ 	Chain chain0 (0, {1,1});
+ 	pushUpSet.insert (chain0);
+ 	MyConfig::printToLog ("\npushUpSet=");
  	MyConfig::printToLog (pushUpSet);
+    Chain chain2 (2, {1,1});
+    pushUpSet.insert (chain2);
+    MyConfig::printToLog ("\npushUpSet=");
+    MyConfig::printToLog (pushUpSet);
  	endSimulation ();
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", id);
