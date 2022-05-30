@@ -414,7 +414,7 @@ The function does the following:
 - rlz the rsrscs of all the chains associated with this poa.
 - Initiate a placement alg' from this poa (by sending this poa an InitBottomUpMsg).
 **************************************************************************************************************************************************/
-void SimController::handlePrepareReshSyncMsg (cMessage *msg)
+void SimController::prepareReshSync (uint16_t dcId, uint16_t leafId)
 {
 
 //	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->dcId;
@@ -558,9 +558,6 @@ void SimController::handleMessage (cMessage *msg)
 		if (!isLastPeriod) {
 			runTimeStep ();
 		}
-  }
-  else if (dynamic_cast<PrepareReshSyncMsg*> (msg)) { 
-		handlePrepareReshSyncMsg (msg);
   }
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
   	printAllDatacenters ();

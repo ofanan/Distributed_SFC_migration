@@ -27,7 +27,6 @@ Controller of the simulation:
 #include "Datacenter.h"
 #include "Chain.h"
 #include "BottomUpMsg_m.h"
-#include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
 
@@ -93,7 +92,6 @@ class SimController : public cSimpleModule
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleAlgMsg (cMessage *msg);
-		void handlePrepareReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
     void parseChainPoaToken (string const token, ChainId_t &chainId, uint16_t &poaId);
@@ -118,6 +116,7 @@ class SimController : public cSimpleModule
     void checkParams (); // Sanity checks for various parameters
 		void updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl);
 		void finishedAlg (uint16_t dcId, uint16_t leafId);
+		void prepareReshSync (uint16_t dcId, uint16_t leafId);
 };
 
 #endif

@@ -549,8 +549,7 @@ void Datacenter::prepareReshSync ()
 	}
 	
 	if (isLeaf) {
-		PrepareReshSyncMsg* msg = new PrepareReshSyncMsg;
-		sndDirectToSimCtrlr (msg);
+		simController->prepareReshSync (dcId, leafId);
 	}
 }
 
