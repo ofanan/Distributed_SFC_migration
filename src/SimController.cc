@@ -342,7 +342,7 @@ void SimController::rdNewUsrsLine (string line)
 		}
 		
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
-		allChains.insert (chain); 
+		MyConfig::allChains.insert (chain); 
 	}	
 }
 

@@ -47,7 +47,11 @@ const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
 class MyConfig { 
 
+		static const uint16_t bufSize = 128;
+		static char buf[bufSize];
+
 	public:
+	
 		static unordered_set <Chain, ChainHash> allChains;
  		static string LogFileName;
     static ofstream logFile;
@@ -58,6 +62,7 @@ class MyConfig {
 		static void openFiles ();
 		
 		//print
+		static void printAllChains ();
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
 		static void printToLog (int d); // print "d,", where d is the integer, to the log file

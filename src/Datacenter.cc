@@ -431,7 +431,31 @@ void Datacenter::updatePlacementInfo ()
 		return;
 	}
 	
-	simController->updatePlacementInfo (newlyPlacedChainsIds, this->lvl); 
+	Chain 	   chain;
+	for (auto chainId : newlyPlacedChainsIds) {
+		if (!(findChainInSet (MyConfig::allChains, chainId, chain))) {
+			error ("didn't find chain id %d that appeared in a call to updatePlacementInfo", chainId);
+
+		}
+		else {
+			if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
+//				numMigs++; // Yep --> inc. the mig. cntr.
+			}
+			Chain modifiedChain (chainId, chain.S_u); // will hold the modified chain to be inserted each time
+			modifiedChain.curLvl = lvl;
+			
+			if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+				snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[lvl]);
+				printBufToLog ();
+			}
+			MyConfig::allChains.erase (chain); 					// remove the old chain from our DB
+			MyConfig::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
+		}
+	}
+//	printAllChains();
+
+
+//	simController->updatePlacementInfo (newlyPlacedChainsIds, this->lvl); 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }

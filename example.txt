@@ -50,29 +50,17 @@ DC 1 rcvd PU pkt. pushUpVec rcvd is empty
 DC 1 begins PU. pushUpSet=0,2,
 simCtrlr updating: chain 1: curLvl=1, curDC=1
 
-allChains
-*******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(1,1)(2,-1)(0,-1)
 DC 2 rcvd PU pkt. pushUpVec rcvd is empty
 DC 2 begins PU. pushUpSet is empty
 DC 4 rcvd PU pkt. pushUpVec[0]=2
 DC 4 begins PU. pushUpSet=2,
 simCtrlr updating: chain 2: curLvl=0, curDC=4
 
-allChains
-*******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(2,4)(1,1)(0,-1)
 rcvd fin alg msg from DC 4 leaf 1
 DC 3 rcvd PU pkt. pushUpVec[0]=0
 DC 3 begins PU. pushUpSet=0,
 simCtrlr updating: chain 0: curLvl=0, curDC=3
 
-allChains
-*******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(0,3)(2,4)(1,1)
 rcvd fin alg msg from DC 3 leaf 0
 DC 6 rcvd PU pkt. pushUpVec rcvd is empty
 DC 6 begins PU. pushUpSet is empty
@@ -134,10 +122,6 @@ DC 2 rcvd PU pkt. pushUpVec rcvd is empty
 DC 2 begins PU. pushUpSet=3,
 simCtrlr updating: chain 3: curLvl=1, curDC=2
 
-allChains
-*******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(3,2)(2,-1)(1,-1)
 DC 4 rcvd PU pkt. pushUpVec rcvd is empty
 DC 4 begins PU. pushUpSet is empty
 rcvd fin alg msg from DC 4 leaf 1
@@ -145,10 +129,6 @@ DC 3 rcvd PU pkt. pushUpVec[0]=2
 DC 3 begins PU. pushUpSet=2,
 simCtrlr updating: chain 2: curLvl=0, curDC=3
 
-allChains
-*******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(2,3)(3,2)(1,-1)
 rcvd fin alg msg from DC 3 leaf 0
 DC 6 rcvd PU pkt. pushUpVec rcvd is empty
 DC 6 begins PU. pushUpSet is empty
@@ -157,10 +137,6 @@ DC 5 rcvd PU pkt. pushUpVec[0]=3
 DC 5 begins PU. pushUpSet=3,
 simCtrlr updating: chain 3: curLvl=0, curDC=5
 
-allChains
-*******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
-(3,5)(2,3)(1,-1)
 rcvd fin alg msg from DC 5 leaf 2
 rcvd fin alg msg from all leaves ******************
 t=1: chain 1 is unplaced at the end of cycle. Printing state and exiting

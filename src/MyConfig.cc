@@ -8,6 +8,7 @@ using namespace std;
 string 														MyConfig::LogFileName;
 ofstream 													MyConfig::logFile;
 unordered_set <Chain, ChainHash> 	MyConfig::allChains;
+char 															MyConfig::buf[MyConfig::bufSize];
 
 void MyConfig::openFiles()
 {
@@ -101,6 +102,18 @@ bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id)
 	else {
 		set.erase(search);
 		return true;
+	}
+}
+
+// Print the PoA of each currently-active user
+void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
+{
+	printToLog ("\nallChains\n*******************\n");
+	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current1 DC\n");
+	
+	for (auto chain : MyConfig::allChains) {
+		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());
+		printToLog (buf);
 	}
 }
 
