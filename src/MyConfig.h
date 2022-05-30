@@ -47,11 +47,8 @@ const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
 class MyConfig { 
 
-  private:
-  static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
-
-
 	public:
+		static unordered_set <Chain, ChainHash> allChains;
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;
@@ -68,7 +65,7 @@ class MyConfig {
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
-		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);
+/*		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);*/
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printSuToLog (Chain chain);
 		

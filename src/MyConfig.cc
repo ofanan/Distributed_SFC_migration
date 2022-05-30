@@ -5,8 +5,9 @@
 using namespace omnetpp;
 using namespace std;
 
-string 		MyConfig::LogFileName;
-ofstream 	MyConfig::logFile;
+string 														MyConfig::LogFileName;
+ofstream 													MyConfig::logFile;
+unordered_set <Chain, ChainHash> 	MyConfig::allChains;
 
 void MyConfig::openFiles()
 {
