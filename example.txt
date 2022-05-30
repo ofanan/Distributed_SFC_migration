@@ -68,7 +68,7 @@ rcvd fin alg msg from DC 6 leaf 3
 DC 5 rcvd PU pkt. pushUpVec rcvd is empty
 DC 5 begins PU. pushUpSet is empty
 rcvd fin alg msg from DC 5 leaf 2
-rcvd fin alg msg from all leaves ******************
+rcvd fin alg msg from all leaves
 
 t = 1
 ********************
@@ -138,7 +138,7 @@ DC 5 begins PU. pushUpSet=3,
 simCtrlr updating: chain 3: curLvl=0, curDC=5
 
 rcvd fin alg msg from DC 5 leaf 2
-rcvd fin alg msg from all leaves ******************
+rcvd fin alg msg from all leaves
 t=1: chain 1 is unplaced at the end of cycle. Printing state and exiting
 
 DC 0, lvl=2. placed chains: pot. placed chains: pushUpSet: 
@@ -150,5 +150,5 @@ DC 5, lvl=0. placed chains: 3,pot. placed chains: pushUpSet:
 DC 6, lvl=0. placed chains: pot. placed chains: pushUpSet: 
 allChains
 *******************
-format: (c,d), where c is the chain id, and d is the id of its current1 DC
+format: (c,d), where c is the chain id, and d is the id of its current DC
 (3,5)(2,3)(1,-1)
