@@ -94,6 +94,7 @@ class SimController : public cSimpleModule
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleFinishedAlgMsg (cMessage *msg);
+		void finishedAlg (uint16_t dcId, uint16_t leafId);
 		void handlePrepareReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost

@@ -452,7 +452,6 @@ void SimController::initAlgSync ()
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
 		leaves[item.first]->initBottomUp (item.second);
-//		sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 		initAlgAtLeaf[item.first] = true;
 	}
 
@@ -461,7 +460,6 @@ void SimController::initAlgSync ()
 		if (!(initAlgAtLeaf[leafId])) {
 			vector<Chain> emptyVecOfChains = {};
 			leaves[leafId]->initBottomUp (emptyVecOfChains);
-//			sendDirect (msg, (cModule*)(leaves[item.first]), "directMsgsPort");
 		}
 	}	
 	delete[] initAlgAtLeaf;
@@ -503,6 +501,39 @@ void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedCh
 		}
 	}
 	printAllChains();
+}
+
+/*************************************************************************************************************************************************
+This func' is called on sync' mode, when a leaf finishes the alg'. The func'
+- Increase the cntrs of the number of migs as required.
+- Update this->allChains db.
+- If all leaves finished, conclude this time step.
+**************************************************************************************************************************************************/
+void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
+{
+
+	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==ASYNC) {
+		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
+	}
+	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", dcId, leafId);
+		MyConfig::printToLog (buf);
+	}
+	
+	bool rcvdFinishedAlgMsgFromAllLeaves = true;
+	for (uint16_t i(0); i < numLeaves; i++) {
+		if (!rcvdFinishedAlgMsgFromLeaves[i]) {
+			rcvdFinishedAlgMsgFromAllLeaves = false;
+		}
+	}
+	if (rcvdFinishedAlgMsgFromAllLeaves) {
+		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
+		}
+		
+		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+	}
 }
 
 
