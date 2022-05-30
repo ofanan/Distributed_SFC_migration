@@ -35,7 +35,7 @@ const int16_t chainMigCost = 600;
 
 const int32_t DUMMY  		= -1;
 const int16_t UNPLACED  = -1;
-const int8_t  UNPLACED_ = -1;
+extern const int8_t  UNPLACED_;
 
 const bool SYNC  = true;
 const bool ASYNC = false;

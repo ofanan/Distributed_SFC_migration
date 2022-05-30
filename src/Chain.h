@@ -12,6 +12,10 @@
 #include "MyConfig.h"
 using namespace std;
 
+/*const int32_t DUMMY  		= -1;*/
+/*const int16_t UNPLACED  = -1;*/
+extern const int8_t  UNPLACED_;
+
 typedef int32_t ChainId_t;
 
 
@@ -28,7 +32,7 @@ class Chain
 		// C'tors
     Chain ();
 		Chain (const Chain &c);
-    Chain (ChainId_t id, vector <uint16_t> S_u, int8_t curLvl=-1);
+    Chain (ChainId_t id, vector <uint16_t> S_u, int8_t curLvl=UNPLACED_);
             
     bool operator== (const Chain &right) const {
       return (this->id == right.id);

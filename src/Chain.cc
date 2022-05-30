@@ -2,6 +2,8 @@
 #include <type_traits>
 #include "Chain.h"
 
+extern const int8_t UNPLACED_;
+
 const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
 const vector<uint16_t> RT_Chain		 ::mu_u = {1, 1};

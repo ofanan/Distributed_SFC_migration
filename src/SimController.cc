@@ -1,6 +1,5 @@
 //$$$ ToDo:
 // Set numMigs in MyConfig.
-// Check why at t=1 chain 1's curDatacenter is set to UNPLACED_.
 // Check why at t=1 chain 3 is placed in both DC 3 and DC 5.
 
 
