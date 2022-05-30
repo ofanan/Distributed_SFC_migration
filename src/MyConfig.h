@@ -47,9 +47,8 @@ const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
 class MyConfig { 
 
-/*		unordered_set <Chain, ChainHash>*/
-/*  UnorderedSetOfChains allChains; // All the currently active chains. */
-
+  private:
+  static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 
 
 	public:
