@@ -539,36 +539,6 @@ void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
 
 
 /*************************************************************************************************************************************************
-Handle a finishedAlgMsg, which arrived as a "direct msg" from a datacenter.
-- Increase the cntrs of the number of migs as required.
-- Update this->allChains db.
-**************************************************************************************************************************************************/
-//void SimController::handleFinishedAlgMsg (cMessage *msg)
-//{
-//	uint16_t leafId = ((Datacenter*) (msg->getSenderModule()) )->leafId;
-//	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
-//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-//		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", ((Datacenter*) (msg->getSenderModule()) )->dcId, leafId);
-//		MyConfig::printToLog (buf);
-//	}
-//	
-//	bool rcvdFinishedAlgMsgFromAllLeaves = true;
-//	for (uint16_t i(0); i < numLeaves; i++) {
-//		if (!rcvdFinishedAlgMsgFromLeaves[i]) {
-//			rcvdFinishedAlgMsgFromAllLeaves = false;
-//		}
-//	}
-//	if (rcvdFinishedAlgMsgFromAllLeaves) {
-//		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-//			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
-//		}
-//		
-//		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-//	}
-//}
-
-
-/*************************************************************************************************************************************************
 Print the "state" (PoAs of active users, and current placement of chains), and end the sim'.
 **************************************************************************************************************************************************/
 void SimController::PrintStateAndEndSim () 

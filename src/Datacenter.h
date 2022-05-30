@@ -17,7 +17,6 @@
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
-#include "FinishedAlgMsg_m.h"
 #include "PrepareReshSyncMsg_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
