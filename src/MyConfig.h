@@ -19,14 +19,12 @@
 
 #include "Chain.h"
 #include "SetsOfChains.h"
-#/*#include "SimController.h"*/
 
 using namespace omnetpp;
 using namespace std;
 
 class Chain;
 class ChainHash;
-class Datacenter;
 typedef int32_t ChainId_t;
 
 const int HEIGHT=5;
@@ -49,6 +47,11 @@ const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
 class MyConfig { 
 
+/*		unordered_set <Chain, ChainHash>*/
+/*  UnorderedSetOfChains allChains; // All the currently active chains. */
+
+
+
 	public:
  		static string LogFileName;
     static ofstream logFile;
@@ -66,7 +69,7 @@ class MyConfig {
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
-/*		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);*/
+		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printSuToLog (Chain chain);
 		

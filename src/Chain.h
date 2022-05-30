@@ -80,7 +80,7 @@ class ChainHash {
   }
 };
 
-typedef unordered_set <Chain, ChainHash>                 UnorderedSetOfChains;
+typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
 
 /*************************************************************************************************************************************************
 Rcvs 2 sorted vectors of chains. 
