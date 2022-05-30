@@ -22,11 +22,11 @@ Chain::Chain ()
 	this->isRT_Chain = false;
 };
 
-Chain::Chain (ChainId_t id, vector <uint16_t> S_u) 
+Chain::Chain (ChainId_t id, vector <uint16_t> S_u, int8_t curLvl) 
 {
 	this->id = id;
 	this->S_u = S_u;
-	this->curLvl = UNPLACED_;
+	this->curLvl = curLvl;
 	this->isRT_Chain = false;
 };
 

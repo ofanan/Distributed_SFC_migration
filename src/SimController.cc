@@ -1,3 +1,9 @@
+//$$$ ToDo:
+// Set numMigs in MyConfig.
+// Check why at t=1 chain 1's curDatacenter is set to UNPLACED_.
+// Check why at t=1 chain 3 is placed in both DC 3 and DC 5.
+
+
 /*************************************************************************************************************************************************
 Controller of the simulation:
 - reads the trace.
@@ -162,7 +168,6 @@ void SimController::finish ()
 
 /*************************************************************************************************************************************************
 - Inc. numMigs for every chain where curDC!=nxtDc.
-- Set for every chain curDc = nxtDc; nxtDc = UNPLACED.
 - If running in sync mode: calculate and print the total cost
 **************************************************************************************************************************************************/
 void SimController::concludeTimeStep ()
@@ -337,7 +342,7 @@ void SimController::rdOldUsrsLine (string line)
 	  }
 		chainCurDatacenter = chain.getCurDatacenter();
 		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
-		Chain modifiedChain (chainId, S_u); // will hold the modified chain to be inserted each time
+		Chain modifiedChain (chainId, S_u, chain.curLvl); // will hold the modified chain to be inserted each time
 		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, modifiedChain)) { // if the current place of this chain isn't delay-feasible for it anymore
 			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain); // need to inform the chain's new poa that it has to place it
 			chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // need to rlz this chain's rsrcs from its current place

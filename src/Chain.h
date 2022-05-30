@@ -28,7 +28,7 @@ class Chain
 		// C'tors
     Chain ();
 		Chain (const Chain &c);
-    Chain (ChainId_t id, vector <uint16_t> S_u);
+    Chain (ChainId_t id, vector <uint16_t> S_u, int8_t curLvl=-1);
             
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
