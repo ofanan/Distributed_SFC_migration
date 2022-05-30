@@ -46,7 +46,7 @@ void Datacenter::initialize()
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));
   lvl				  = (uint8_t)  (par("lvl"));
-  id					= (uint16_t) (par("id"));
+  dcId					= (uint16_t) (par("dcId"));
   availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
 
   numPorts    = numParents + numChildren;
@@ -64,14 +64,14 @@ void Datacenter::initialize()
 	  xmtChnl[portNum]  = outGate->getTransmissionChannel();
 	  cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
 	  if (isRoot) {
-	    idOfChildren[portNum] = int16_t (nghbr -> par ("id"));
+	    idOfChildren[portNum] = int16_t (nghbr -> par ("dcId"));
 	  }
 	  else {
 	    if (portNum==0) { // port 0 is towards the parents
-	      idOfParent = uint16_t (nghbr -> par ("id"));
+	      idOfParent = uint16_t (nghbr -> par ("dcId"));
 	    }
 	    else { // ports 1...numChildren are towards the children
-	      idOfChildren[portNum-1] = uint16_t (nghbr -> par ("id"));
+	      idOfChildren[portNum-1] = uint16_t (nghbr -> par ("dcId"));
 	    }
   	}       
   }
@@ -95,7 +95,7 @@ void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
 // Print all the chains placed and pot-placed in this DC.
 void Datacenter::print ()
 {
-	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", id, lvl);
+	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", dcId, lvl);
 	printBufToLog ();
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
@@ -199,7 +199,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
  	notAssigned = vecOfChainThatJoined;
 
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", id);
+		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", dcId);
 		printBufToLog (); 
 		MyConfig::printToLog(vecOfChainThatJoined);
 		print (); 
@@ -219,11 +219,11 @@ void Datacenter::handlePushUpPkt ()
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
-			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", id);
+			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
 		}
 		else {
-			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0]=%d", id, pkt->getPushUpVec(0).id);
+			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0]=%d", dcId, pkt->getPushUpVec(0).id);
 			printBufToLog ();
 		}
 	}
@@ -248,10 +248,10 @@ void Datacenter::pushUpSync ()
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		if (pushUpSet.empty()) {
-			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", id);
+			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", dcId);
 		}
 		else {
-			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", id);
+			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", dcId);
 		}
 		printBufToLog ();
 		printToLog (pushUpSet);
@@ -305,8 +305,8 @@ void Datacenter::pushUpSync ()
 	}
 
 	if (isLeaf) {
-		FinishedAlgMsg *msg2send = new FinishedAlgMsg;
-		sendDirect (msg2send, simController, "directMsgsPort");
+
+		simController->finishedAlg (dcId, leafId);
 		
 		if (MyConfig::DEBUG_LVL > 0) {
 			if (!pushUpSet.empty()) {
@@ -369,7 +369,7 @@ void Datacenter::bottomUpSync ()
 {
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", id);
+		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
 	}
@@ -394,7 +394,7 @@ void Datacenter::bottomUpSync ()
 		else { 
 			if (cannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				if (reshuffled) {
-					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", id);
+					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", dcId);
 					printBufToLog ();
 					PrintAllDatacenters ();
 					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
@@ -407,7 +407,7 @@ void Datacenter::bottomUpSync ()
 	}
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d finished BU sync.", id);
+		snprintf (buf, bufSize, "\nDC %d finished BU sync.", dcId);
 		printBufToLog ();
 		print ();
 	}
@@ -447,7 +447,7 @@ void Datacenter::handleBottomUpPktSync ()
 {
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d handling a BU pkt. src=%d", id, ((Datacenter*) curHandledMsg->getSenderModule())->id);
+		snprintf (buf, bufSize, "\nDC %d handling a BU pkt. src=%d", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 	}
 
@@ -468,12 +468,12 @@ void Datacenter::handleBottomUpPktSync ()
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
         pushUpSet.insert (pkt->getPushUpVec(i));
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\nDC %d inserted chain %d to pushUpSet. PushUpSetSize=%d", id, pkt->getPushUpVec(i).id, (int)pushUpSet.size());
+			snprintf (buf, bufSize, "\nDC %d inserted chain %d to pushUpSet. PushUpSetSize=%d", dcId, pkt->getPushUpVec(i).id, (int)pushUpSet.size());
 			printBufToLog ();
 		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-        snprintf (buf, bufSize, "\nDC %d pushUpSet=", id);
+        snprintf (buf, bufSize, "\nDC %d pushUpSet=", dcId);
 		printBufToLog ();
 		printToLog (pushUpSet);
 	}

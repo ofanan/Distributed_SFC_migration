@@ -8,7 +8,7 @@ Controller of the simulation:
 
 class Datacenter;
 
-// returns true iff the given datacenter id, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
+// returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 inline bool isDelayFeasibleForChain (uint16_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
 
 Define_Module(SimController);
@@ -76,7 +76,7 @@ void SimController::discoverPathsToRoot () {
 	uint16_t dcId;
 	for (uint16_t leafId(0) ; leafId < numLeaves; leafId++)  {
 		pathToRoot[leafId].resize (height);
-		dcId = leaves[leafId]->id;
+		dcId = leaves[leafId]->dcId;
 	  int height = 0;
 		while (dcId != root_id) {
 		 	pathToRoot[leafId][height++] = dcId;
@@ -417,7 +417,7 @@ The function does the following:
 void SimController::handlePrepareReshSyncMsg (cMessage *msg)
 {
 
-//	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->id;
+//	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->dcId;
 //  unordered_map <uint16_t, vector<int32_t> > chainsToReplace;
 //	InitBottomUpMsg* msg2snd  = new InitBottomUpMsg ();
 //	uint16_t numOfChainsToReplace = 0;
@@ -512,6 +512,7 @@ This func' is called on sync' mode, when a leaf finishes the alg'. The func'
 void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
 {
 
+	Enter_Method ("finishedAlg (uint16_t dcId, uint16_t leafId)");
 	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==ASYNC) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
@@ -542,29 +543,29 @@ Handle a finishedAlgMsg, which arrived as a "direct msg" from a datacenter.
 - Increase the cntrs of the number of migs as required.
 - Update this->allChains db.
 **************************************************************************************************************************************************/
-void SimController::handleFinishedAlgMsg (cMessage *msg)
-{
-	uint16_t leafId = ((Datacenter*) (msg->getSenderModule()) )->leafId;
-	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", ((Datacenter*) (msg->getSenderModule()) )->id, leafId);
-		MyConfig::printToLog (buf);
-	}
-	
-	bool rcvdFinishedAlgMsgFromAllLeaves = true;
-	for (uint16_t i(0); i < numLeaves; i++) {
-		if (!rcvdFinishedAlgMsgFromLeaves[i]) {
-			rcvdFinishedAlgMsgFromAllLeaves = false;
-		}
-	}
-	if (rcvdFinishedAlgMsgFromAllLeaves) {
-		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
-		}
-		
-		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	}
-}
+//void SimController::handleFinishedAlgMsg (cMessage *msg)
+//{
+//	uint16_t leafId = ((Datacenter*) (msg->getSenderModule()) )->leafId;
+//	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
+//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+//		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", ((Datacenter*) (msg->getSenderModule()) )->dcId, leafId);
+//		MyConfig::printToLog (buf);
+//	}
+//	
+//	bool rcvdFinishedAlgMsgFromAllLeaves = true;
+//	for (uint16_t i(0); i < numLeaves; i++) {
+//		if (!rcvdFinishedAlgMsgFromLeaves[i]) {
+//			rcvdFinishedAlgMsgFromAllLeaves = false;
+//		}
+//	}
+//	if (rcvdFinishedAlgMsgFromAllLeaves) {
+//		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+//			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
+//		}
+//		
+//		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+//	}
+//}
 
 
 /*************************************************************************************************************************************************
@@ -587,9 +588,6 @@ void SimController::handleMessage (cMessage *msg)
 		if (!isLastPeriod) {
 			runTimeStep ();
 		}
-  }
-  else if (dynamic_cast<FinishedAlgMsg*> (msg)) { 
-  	handleFinishedAlgMsg (msg);
   }
   else if (dynamic_cast<PrepareReshSyncMsg*> (msg)) { 
 		handlePrepareReshSyncMsg (msg);

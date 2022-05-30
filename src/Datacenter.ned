@@ -4,7 +4,7 @@ simple Datacenter
 {
   parameters:
     @display("i=block/routing");
-    int id 			= default (0);
+    int  dcId 			= default (0);
     int numParents 	= default (1);
     int numChildren = default (4); 
     int lvl; // level of this datacenter in the tree

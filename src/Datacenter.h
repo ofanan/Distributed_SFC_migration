@@ -43,7 +43,7 @@ class Datacenter : public cSimpleModule
     vector <uint16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
-    int16_t id;
+    int16_t dcId;
     int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1
 		static const uint16_t bufSize = 128;
 		char buf[bufSize];

@@ -67,7 +67,7 @@ class SimController : public cSimpleModule
     unordered_map <uint16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
     vector <bool> rcvdFinishedAlgMsgFromLeaves; //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
-    vector <vector<uint16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter id of leaf # i.
+    vector <vector<uint16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
 
 		// Init Functions
     void initialize(int stage);
@@ -93,8 +93,7 @@ class SimController : public cSimpleModule
 		
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
-		void handleFinishedAlgMsg (cMessage *msg);
-		void finishedAlg (uint16_t dcId, uint16_t leafId);
+		void handleAlgMsg (cMessage *msg);
 		void handlePrepareReshSyncMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
@@ -119,6 +118,7 @@ class SimController : public cSimpleModule
     ~SimController ();
     void checkParams (); // Sanity checks for various parameters
 		void updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl);
+		void finishedAlg (uint16_t dcId, uint16_t leafId);
 };
 
 #endif

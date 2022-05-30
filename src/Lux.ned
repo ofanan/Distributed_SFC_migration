@@ -31,7 +31,7 @@ network Lux
 
     datacenters [numDatacenters] : Datacenter {
         parameters:
-          id = index;            
+          dcId = index;            
     };
     
   connections allowunconnected:
