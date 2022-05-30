@@ -52,7 +52,7 @@ class MyConfig {
 
 	public:
 	
-		static unordered_set <Chain, ChainHash> allChains;
+		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;
@@ -63,6 +63,7 @@ class MyConfig {
 		
 		//print
 		static void printAllChains ();
+		static void printAllChainsPoas ();
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
 		static void printToLog (int d); // print "d,", where d is the integer, to the log file

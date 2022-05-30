@@ -53,7 +53,6 @@ class SimController : public cSimpleModule
     bool isLastPeriod = false;
     uint32_t seed = 42;
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
-    UnorderedSetOfChains allChains; // All the currently active chains. 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
 		uint32_t numMigs=0; // number of migration performed		
@@ -101,7 +100,6 @@ class SimController : public cSimpleModule
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
 		void printAllDatacenters ();
 		void printAllDatacentersByMyDatabase ();
-		void printAllChains ();
     void printAllChainsPoas  (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim (); // print the system's state, and end the simulation. 
 				 

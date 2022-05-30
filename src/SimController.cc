@@ -173,8 +173,8 @@ void SimController::concludeTimeStep ()
 				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
 				printBufToLog ();
 				printAllDatacenters ();
-				printAllChains ();
-				error ("chain %d is unplaced at the end of cycle\n", chain.id);
+				MyConfig::printAllChains ();
+				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
 			}
 		}
 	}
@@ -184,17 +184,8 @@ void SimController::concludeTimeStep ()
 	chainsThatLeftDatacenter.clear ();
 	std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	
-//	if (MyConfig::LOG_LVL > 3) {
-//		snprintf (buf, bufSize, "\nt=%d. sim_controller concluding time step and printing state\n", t);
-//		printBufToLog ();
-//		printAllDatacenters ();
-//	  MyConfig::printToLog ("\nDCs content by my database is:");
-//	  printAllDatacentersByMyDatabase ();
-//	  MyConfig::printToLog ("\npoas of all chains are");
-//	  printAllChainsPoas ();
-//	}
 }
-// print all the placed (and possibly, the pot-placed) chains on each DC by this->allChains DB.
+// print all the placed (and possibly, the pot-placed) chains on each DC by MyConfig::allChains DB.
 void SimController::printAllDatacentersByMyDatabase ()
 {
 	// gather the required data
@@ -239,30 +230,6 @@ int SimController::calcSolCpuCost ()
 }
 
 
-// Print the PoA of each currently-active user
-void SimController::printAllChainsPoas () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
-{
-	MyConfig::printToLog ("\nallChains\n*******************\n");
-	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
-	
-	for (auto chain : MyConfig::allChains) {
-		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
-		printBufToLog ();
-	}
-}
-
-// Print the PoA of each currently-active user
-void SimController::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
-{
-	MyConfig::printToLog ("\nallChains\n*******************\n");
-	MyConfig::printToLog ("format: (c,d), where c is the chain id, and d is the id of its current1 DC\n");
-	
-	for (auto chain : MyConfig::allChains) {
-		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());
-		printBufToLog ();
-	}
-}
-
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
 void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, uint16_t &poaId)
 {
@@ -281,7 +248,7 @@ void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, 
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
 - insert all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
-- remove each chain that left from this->allChains.
+- remove each chain that left from MyConfig::allChains.
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 **************************************************************************************************************************************************/
@@ -359,7 +326,7 @@ void SimController::rdOldUsrsLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
   uint16_t poaId;
-	Chain chain; // will hold the chain found in this->allChains
+	Chain chain; // will hold the chain found in MyConfig::allChains
 	int16_t chainCurDatacenter;
 
 	for (const auto& token : tokens) {
@@ -474,7 +441,7 @@ void SimController::initAlgAsync ()
 /*************************************************************************************************************************************************
 Update chains' placement info, by the data sent from a datacenter.
 - Increase the cntrs of the number of migs as required.
-- Update this->allChains db.
+- Update MyConfig::allChains db.
 **************************************************************************************************************************************************/
 void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl)
 {
@@ -500,13 +467,13 @@ void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedCh
 			MyConfig::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
-	printAllChains();
+	MyConfig::printAllChains();
 }
 
 /*************************************************************************************************************************************************
 This func' is called on sync' mode, when a leaf finishes the alg'. The func'
 - Increase the cntrs of the number of migs as required.
-- Update this->allChains db.
+- Update MyConfig::allChains db.
 - If all leaves finished, conclude this time step.
 **************************************************************************************************************************************************/
 void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
@@ -545,8 +512,9 @@ void SimController::PrintStateAndEndSim ()
 {
 	Enter_Method ("PrintStateAndEndSim ()");
 	MyConfig::printToLog ("Printing state and finishing simulation\n");
-  printAllChainsPoas  (); 
 	printAllDatacenters ();
+	MyConfig::printToLog ("Printing the PoAs of each chain\n");
+  MyConfig::printAllChainsPoas  (); 
 	MyConfig::printToLog ("simulation abnormally terminated by SimController.PrintStateAndEndSim");
 	error ("simulation abnormally terminated by SimController.PrintStateAndEndSim. Check the log file for details.");
 }
