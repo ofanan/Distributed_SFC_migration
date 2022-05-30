@@ -109,7 +109,7 @@ bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id)
 void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {
 	printToLog ("\nallChains\n*******************\n");
-	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current1 DC\n");
+	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current DC\n");
 	
 	for (auto chain : MyConfig::allChains) {
 		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());

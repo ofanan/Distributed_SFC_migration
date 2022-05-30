@@ -379,14 +379,13 @@ void SimController::initAlg () {
 Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.
 The function does the following:
 - rlz the rsrscs of all the chains associated with this poa.
-- Initiate a placement alg' from this poa (by sending this poa an InitBottomUpMsg).
+- Initiate a placement alg' from this poa .
 **************************************************************************************************************************************************/
 void SimController::prepareReshSync (uint16_t dcId, uint16_t leafId)
 {
 
 //	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->dcId;
 //  unordered_map <uint16_t, vector<int32_t> > chainsToReplace;
-//	InitBottomUpMsg* msg2snd  = new InitBottomUpMsg ();
 //	uint16_t numOfChainsToReplace = 0;
 
 //	for (auto chain : MyConfig::allChains) {
@@ -409,10 +408,9 @@ void SimController::prepareReshSync (uint16_t dcId, uint16_t leafId)
 void SimController::initAlgSync () 
 {  	
 
-//	BottomUpMsg* msg;
-	bool *initAlgAtLeaf { new bool[numLeaves]{} }; // initAlgAtLeaf will be true iff we already sent a InitBottomUpMsg to leaf i
+	bool *initAlgAtLeaf { new bool[numLeaves]{} }; // initAlgAtLeaf[i] will be true iff we already initiated a run of BUPU in leaf i
 
-	// First, send InitBottomUpMsg to all the leaves to which new chains have joined.
+	// First, initiate the alg' in all the leaves to which new chains have joined.
 	for (auto item : chainsThatJoinedLeaf)
 	{
 		if (LOG_LVL==2) {
@@ -422,7 +420,7 @@ void SimController::initAlgSync ()
 		initAlgAtLeaf[item.first] = true;
 	}
 
-	// Next, send (an empty) InitBottomUpMsg to the remainder leaves, just to initiate sync' BUPU.
+	// Next, initiate the alg' in the remainder leaves, just to initiate sync' BUPU.
 	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
 		if (!(initAlgAtLeaf[leafId])) {
 			vector<Chain> emptyVecOfChains = {};
@@ -497,7 +495,7 @@ void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
 	}
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves ******************");
+			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves");
 		}
 		
 		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);

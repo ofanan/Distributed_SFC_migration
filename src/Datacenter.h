@@ -13,7 +13,6 @@
 
 #include "EndXmtMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
-#include "BottomUpMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
