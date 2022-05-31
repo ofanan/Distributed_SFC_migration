@@ -100,8 +100,6 @@ void Datacenter::print ()
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChains);
-//	MyConfig::printToLog ("pushUpSet: ");
-//	printToLog (pushUpSet);
 	MyConfig::printToLog ("pushUpList: ");
 	MyConfig::printToLog (pushUpList);
 }
@@ -182,7 +180,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 
 /*************************************************************************************************************************************************
 Initiate the bottomUpSyncAlg:
-- Clear this->pushUpSet and this->notAssigned.
+- Clear this->pushUpList and this->notAssigned.
 - Insert the chains  into this->notAssigned. The input vector is assumed to be already sorted by the delay tightness.
 - Schedule a self-msg to call0 bottomUp, for running the BU alg'.
 * Note: this func to be called only when the Datacenter is a leaf.
@@ -195,7 +193,6 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 	if (!isLeaf) { 
 		error ("Non-leaf DC %d was called by initBottomUp");
 	}
-	pushUpSet.clear ();	
 	pushUpList.clear ();	
 	placedChains.clear ();
 	potPlacedChains.clear ();
@@ -212,7 +209,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 
 /*************************************************************************************************************************************************
 Handle a rcvd PushUpPkt:
-- Read the data from the pkt to this->pushUpSet.
+- Read the data from the pkt to this->pushUpList.
 - Call pushUpSync() | pushUpAsync(), for running the PU alg'.
 *************************************************************************************************************************************************/
 void Datacenter::handlePushUpPkt () 
@@ -237,7 +234,6 @@ void Datacenter::handlePushUpPkt ()
 			snprintf (buf, bufSize, "\nchain2pushUp.id=%d, chain2pushUp.curLvl=%d", chain2pushUp.id, chain2pushUp.curLvl);
 			printBufToLog ();
 		}
-		pushUpSet.insert (chain2pushUp);
 		insertSorted (pushUpList, chain2pushUp); 
 	} 
 
@@ -251,7 +247,7 @@ void Datacenter::handlePushUpPkt ()
 
 /*************************************************************************************************************************************************
 Run the PU Sync alg'. 
-Assume that this->pushUpSet already contains the relevant chains.
+Assume that this->pushUpList already contains the relevant chains.
 *************************************************************************************************************************************************/
 void Datacenter::pushUpSync ()
 {
@@ -260,20 +256,12 @@ void Datacenter::pushUpSync ()
 		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
-//		if (pushUpSet.empty()) {
-//			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", dcId);
-//		}
-//		else {
-//			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", dcId);
-//		}
-//		printBufToLog ();
-//		printToLog (pushUpSet);
 	}
 	reshuffled = false;
 	
 	Chain chainInPotPlacedChains;
 	
-	for (auto chainInPushUpList=pushUpList.begin(); chainInPushUpList!=pushUpList.end(); ) { // for each chain in pushUpSet
+	for (auto chainInPushUpList=pushUpList.begin(); chainInPushUpList!=pushUpList.end(); ) { // for each chain in pushUpList
 		if (!findChainInSet (potPlacedChains, chainInPushUpList->id, chainInPotPlacedChains)) { // If this chain doesn't appear in my potPlacedChains, nothing to do
 			chainInPushUpList++;
 			continue;
