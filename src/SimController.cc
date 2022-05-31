@@ -174,7 +174,7 @@ void SimController::finish ()
 {
   traceFile.close ();
 	if (MyConfig::LOG_LVL>0) {
-  	MyConfig::printToLog ("finished sim\n");
+  	MyConfig::printToLog ("\nfinished sim\n");
   }
 }
 
