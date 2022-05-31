@@ -20,4 +20,8 @@ using UsesMoreCpuType = std::integral_constant<decltype(&UsesMoreCpu), &UsesMore
 
 typedef set<Chain, UsesMoreCpuType> SetOfChainsOrderedByDecCpuUsage;
 
+/*struct CompareChainsByCpuUsage;*/
+
+
+
 #endif

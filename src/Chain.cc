@@ -39,6 +39,19 @@ Chain::Chain (const Chain &c) {
   this->isRT_Chain 	= c.isRT_Chain;
 }
 
+RT_Chain::RT_Chain (const RT_Chain &c) {
+	this->id 					= c.id;
+  this->S_u 				= c.S_u;
+  this->curLvl			= c.curLvl;
+  this->isRT_Chain 	= c.isRT_Chain;
+}
+
+Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
+	this->id 					= c.id;
+  this->S_u 				= c.S_u;
+  this->curLvl			= c.curLvl;
+  this->isRT_Chain 	= c.isRT_Chain;
+}
 
 RT_Chain::RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
   this->id        	= id;
@@ -183,6 +196,27 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 		vec.push_back (c);
 	}
 }
+
+inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
+	int16_t lhsCpu = lhs.getCpu ();
+	int16_t rhsCpu = rhs.getCpu ();
+	if (lhsCpu==UNPLACED ||  rhsCpu==UNPLACED) {  // break ties
+		return true;
+	}
+	return lhsCpu > rhsCpu;
+}
+
+void insertSorted (list <Chain> &sortedList, const Chain chain)
+{
+	auto begin 	= sortedList.begin();
+  auto end 		= sortedList.end();
+  
+  while ((begin != end) && CompareChainsByDecCpuUsage (*begin, chain)) { // skip all chains in the list which use more cpu than me
+  	begin++;
+  }
+  sortedList.insert(begin, chain);
+}
+
 
 /*************************************************************************************************************************************************
 Rcvs 2 sorted vectors of chains. 

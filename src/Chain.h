@@ -64,6 +64,7 @@ public:
   static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
 	static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
+	RT_Chain (const RT_Chain &c);
   RT_Chain (ChainId_t id, vector <uint16_t> S_u);
 };
 
@@ -74,6 +75,7 @@ class Non_RT_Chain: public Chain
 	  static const uint8_t  mu_u_len;
 		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
     Non_RT_Chain (ChainId_t id, vector <uint16_t> S_u);
+	  Non_RT_Chain (const Non_RT_Chain &c);
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
@@ -92,8 +94,10 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 **************************************************************************************************************************************************/
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
-// Insert a chain in its correct place to a sorted vector of chains
+// Insert a chain in its correct place to a sorted datastructure
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
+void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 bool findChainInSet 	 (set<Chain> setOfChains, ChainId_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
 bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId); // Given chainId, erases the respective chain from the set. 
 

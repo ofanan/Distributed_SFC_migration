@@ -1,7 +1,6 @@
 //$$$ ToDo:
 // Set numMigs in MyConfig.
-// Check why at t=1 chain 3 is placed in both DC 3 and DC 5.
-
+// Check why at t=1 chain 3 is placed in both DC 2 and DC 5.
 
 /*************************************************************************************************************************************************
 Controller of the simulation:
@@ -54,6 +53,13 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
+//	// $$$$
+//	SetOfChainsOrderedByDecCpuUsage pushUpSet; 
+//	Chain c1 (1, {}, 1);
+//	pushUpSet.insert (c1);
+//	Chain c2 (1, {}, 1);
+//	pushUpSet.insert (c2);
+//	endSimulation ();
 	runTrace ();
 }
 
@@ -180,6 +186,9 @@ void SimController::concludeTimeStep ()
 				MyConfig::printAllChains ();
 				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
 			}
+		}
+		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+			printAllDatacenters ();
 		}
 	}
 
@@ -504,6 +513,7 @@ void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
 		
 		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	}
+	
 }
 
 

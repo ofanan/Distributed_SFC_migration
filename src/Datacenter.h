@@ -65,6 +65,7 @@ class Datacenter : public cSimpleModule
 
     // Log / debug funcs
     void print ();
+		void				printToLog 								 (SetOfChainsOrderedByDecCpuUsage setOfChains);	
     
     
   private:
@@ -102,7 +103,6 @@ class Datacenter : public cSimpleModule
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool cannotPlaceThisChainHigher (const Chain chain) const;
 		inline void	printStateAndEndSim 			 ();
-		void				printToLog 								 (SetOfChainsOrderedByDecCpuUsage setOfChains);	
 
     inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
 		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 

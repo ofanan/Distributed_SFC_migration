@@ -217,18 +217,29 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
+//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG && dcId==5 && pkt->getPushUpVecArraySize()>0) { //$$$
+//		snprintf (buf, bufSize, "\nDC %d chainId=%d, pushUpSet[0].curLvl = %d", dcId, (pkt->getPushUpVec (0)).id, (pkt->getPushUpVec (0)).curLvl);
+//		printBufToLog ();
+//	}
+
+
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
 			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
 		}
 		else {
-			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0]=%d", dcId, pkt->getPushUpVec(0).id);
+			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0].id=%d pushUpSet[0].curLvl = %d", dcId, pkt->getPushUpVec(0).id, pkt->getPushUpVec(0).curLvl);
 			printBufToLog ();
 		}
 	}
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		pushUpSet.insert (pkt->getPushUpVec (i));
+		Chain chain2pushUp = pkt->getPushUpVec (i);
+		if (dcId==5) {
+			snprintf (buf, bufSize, "\nchain2pushUp.id=%d, chain2pushUp.curLvl=%d", chain2pushUp.id, chain2pushUp.curLvl);
+			printBufToLog ();
+		}
+		pushUpSet.insert (chain2pushUp);
 	} 
 
 	if (MyConfig::mode==SYNC){ 
@@ -304,6 +315,12 @@ void Datacenter::pushUpSync ()
 		updatePlacementInfo ();
 	}
 
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nDC %d finihsed PU.", dcId);
+		printBufToLog ();
+		print ();
+	}
+
 	if (isLeaf) {
 
 		simController->finishedAlg (dcId, leafId);
@@ -335,6 +352,10 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
 				chainPtr = pushUpSet.erase (chainPtr);
+				if (MyConfig::LOG_LVL==VERY_DETAILED_LOG && dcId==2) { //$$$
+					snprintf (buf, bufSize, "\nDC %d chainId=%d, pushUpVec[0].curLvl = %d", dcId, (pkt->getPushUpVec (idxInPushUpVec-1)).id, (pkt->getPushUpVec (idxInPushUpVec-1)).curLvl);
+					printBufToLog ();
+				}
 			}
 			else {
 				chainPtr++;
@@ -434,7 +455,7 @@ void Datacenter::updatePlacementInfo ()
 	Chain 	   chain;
 	for (auto chainId : newlyPlacedChainsIds) {
 		if (!(findChainInSet (MyConfig::allChains, chainId, chain))) {
-			error ("didn't find chain id %d that appeared in a call to updatePlacementInfo", chainId);
+			error ("didn't find placed chain id %d that appeared in a call to updatePlacementInfo", chainId);
 
 		}
 		else {
@@ -452,10 +473,8 @@ void Datacenter::updatePlacementInfo ()
 			MyConfig::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
-//	printAllChains();
 
 
-//	simController->updatePlacementInfo (newlyPlacedChainsIds, this->lvl); 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
 }
