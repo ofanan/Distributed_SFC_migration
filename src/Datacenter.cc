@@ -230,6 +230,7 @@ void Datacenter::handlePushUpPkt ()
 			printBufToLog ();
 		}
 	}
+	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		Chain chain2pushUp = pkt->getPushUpVec (i);
 		if (dcId==5) {
@@ -272,14 +273,14 @@ void Datacenter::pushUpSync ()
 	
 	Chain chainInPotPlacedChains;
 	
-	for (auto chainInPushUpSet=pushUpSet.begin(); chainInPushUpSet!=pushUpSet.end(); ) { // for each chain in pushUpSet
-		if (!findChainInSet (potPlacedChains, chainInPushUpSet->id, chainInPotPlacedChains)) { // If this chain doesn't appear in my potPlacedChains, nothing to do
-			chainInPushUpSet++;
+	for (auto chainInPushUpList=pushUpList.begin(); chainInPushUpList!=pushUpList.end(); ) { // for each chain in pushUpSet
+		if (!findChainInSet (potPlacedChains, chainInPushUpList->id, chainInPotPlacedChains)) { // If this chain doesn't appear in my potPlacedChains, nothing to do
+			chainInPushUpList++;
 			continue;
 		}	
 		
-		if (chainInPushUpSet->curLvl>(this->lvl) ) { // was the chain pushed-up?
-			regainRsrcOfChain (*chainInPushUpSet); // Yes --> regain its resources
+		if (chainInPushUpList->curLvl>(this->lvl) ) { // was the chain pushed-up?
+			regainRsrcOfChain (*chainInPushUpList); // Yes --> regain its resources
 		}
 		else { //the chain wasn't pushed-up --> need to locally place it
 			chainInPotPlacedChains.curLvl = this->lvl;
@@ -287,12 +288,12 @@ void Datacenter::pushUpSync ()
 			newlyPlacedChainsIds.insert (chainInPotPlacedChains.id);
 		}
 		eraseChainFromSet (potPlacedChains, chainInPotPlacedChains.id);
-		chainInPushUpSet = pushUpSet.erase (chainInPushUpSet);
+		chainInPushUpList = pushUpList.erase (chainInPushUpList);
 	}
 
 	// Next, try to push-up chains of my descendants
 	uint16_t requiredCpuToLocallyPlaceThisChain;
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {
+	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
 				requiredCpuToLocallyPlaceThisChain > availCpu || // or because not enough avail' cpu for pushing-up, ...
@@ -302,12 +303,12 @@ void Datacenter::pushUpSync ()
 		}
 		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
 			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
-			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpSet
+			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpList
 			pushedUpChain.curLvl = lvl;
-			chainPtr 						 = pushUpSet.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain
+			chainPtr 						 = pushUpList.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain);
 			newlyPlacedChainsIds.insert (pushedUpChain.id);
-			pushUpSet.					 insert (pushedUpChain);
+			insertSorted 								(pushUpList, pushedUpChain);
 		}
 	}
 	
@@ -327,19 +328,19 @@ void Datacenter::pushUpSync ()
 		simController->finishedAlg (dcId, leafId);
 		
 		if (MyConfig::DEBUG_LVL > 0) {
-			if (!pushUpSet.empty()) {
-				error ("pushUpSet isn't empty after running pushUp() on a leaf");
+			if (!pushUpList.empty()) {
+				error ("pushUpList isn't empty after running pushUp() on a leaf");
 			}
 		}
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
 	}
 
 	genNsndPushUpPktsToChildren ();
-	pushUpSet.clear();
+	pushUpList.clear();
 }
 
 /*************************************************************************************************************************************************
-Generate pushUpPkts, based on the data currently found in pushUpSet, and xmt these pkts to all the children
+Generate pushUpPkts, based on the data currently found in pushUpList, and xmt these pkts to all the children
 *************************************************************************************************************************************************/
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
@@ -347,12 +348,12 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 	
 	for (uint8_t child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
-		pkt->setPushUpVecArraySize (pushUpSet.size ()); // default size of pushUpVec, for case that all chains in pushUpSet belong to this child; will later shrink pushUpVec otherwise 
+		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
 		uint16_t idxInPushUpVec = 0;
-		for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); ) {	// consider all the chains in pushUpVec
+		for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {	// consider all the chains in pushUpVec
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
-				chainPtr = pushUpSet.erase (chainPtr);
+				chainPtr = pushUpList.erase (chainPtr);
 				if (MyConfig::LOG_LVL==VERY_DETAILED_LOG && dcId==2) { //$$$
 					snprintf (buf, bufSize, "\nDC %d chainId=%d, pushUpVec[0].curLvl = %d", dcId, (pkt->getPushUpVec (idxInPushUpVec-1)).id, (pkt->getPushUpVec (idxInPushUpVec-1)).curLvl);
 					printBufToLog ();
@@ -370,14 +371,14 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
-	if (MyConfig::DEBUG_LVL>0 && !pushUpSet.empty()) {
-		error ("pushUpSet not empty after sending PU pkts to all children");
+	if (MyConfig::DEBUG_LVL>0 && !pushUpList.empty()) {
+		error ("pushUpList not empty after sending PU pkts to all children");
 	}
 }
 
 /*************************************************************************************************************************************************
 Run the PU Async' alg'. 
-Assume that this->pushUpSet already contains the relevant chains.
+Assume that this->pushUpList already contains the relevant chains.
 *************************************************************************************************************************************************/
 void Datacenter::pushUpAsync ()
 {
@@ -385,7 +386,7 @@ void Datacenter::pushUpAsync ()
 
 /************************************************************************************************************************************************
 Running the BU alg'. 
-Assume that this->notAssigned and this->pushUpSet already contain the relevant chains, and are sorted.
+Assume that this->notAssigned and this->pushUpList already contain the relevant chains, and are sorted.
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpSync ()
 {
@@ -410,7 +411,7 @@ void Datacenter::bottomUpSync ()
 				}
 				else {
 					potPlacedChains.insert (modifiedChain);
-					pushUpSet.			insert (modifiedChain); 
+					insertSorted (pushUpList, modifiedChain); 
 				}
 		}
 		else { 
@@ -497,7 +498,7 @@ void Datacenter::handleBottomUpPktSync ()
 
 	if (numBuPktsRcvd==0) { // this is the first BU pkt rcvd from a child at this period
 		notAssigned.clear ();
-		pushUpSet.  clear ();
+		pushUpList.  clear ();
 	}
 	numBuPktsRcvd++;
 	
@@ -508,18 +509,18 @@ void Datacenter::handleBottomUpPktSync ()
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
 	}
 	
-	// Add each chain stated in the pkt's pushUpVec field into this->pushUpSet
+	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-        pushUpSet.insert (pkt->getPushUpVec(i));
+        insertSorted (pushUpList, pkt->getPushUpVec(i));
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\nDC %d inserted chain %d to pushUpSet. PushUpSetSize=%d", dcId, pkt->getPushUpVec(i).id, (int)pushUpSet.size());
+			snprintf (buf, bufSize, "\nDC %d inserted chain %d to pushUpList. pushUpListSize=%d", dcId, pkt->getPushUpVec(i).id, (int)pushUpList.size());
 			printBufToLog ();
 		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-        snprintf (buf, bufSize, "\nDC %d pushUpSet=", dcId);
+        snprintf (buf, bufSize, "\nDC %d pushUpList=", dcId);
 		printBufToLog ();
-		printToLog (pushUpSet);
+		MyConfig::printToLog (pushUpList);
 	}
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUpSync ();
@@ -529,16 +530,16 @@ void Datacenter::handleBottomUpPktSync ()
 
 /*************************************************************************************************************************************************
 Running the BU alg'. 
-Assume that this->notAssigned and this->pushUpSet already contain the relevant chains, in the correct order.
+Assume that this->notAssigned and this->pushUpList already contain the relevant chains, in the correct order.
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpAsync ()
 {
 }
 
 /*************************************************************************************************************************************************
-Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpSet, and xmt it to my parent:
-- For each chain in this->pushUpSet:
-	- if the chain can be placed higher, include it in pushUpSet to be xmtd to prnt, and remove it from the this->pushUpSet.
+Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpList, and xmt it to my parent:
+- For each chain in this->pushUpList:
+	- if the chain can be placed higher, include it in pushUpList to be xmtd to prnt, and remove it from the this->pushUpList.
 For each chain in this->notAssigned:
 	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
 *************************************************************************************************************************************************/
@@ -551,9 +552,9 @@ void Datacenter::genNsndBottomUpPkt ()
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
-	pkt2send -> setPushUpVecArraySize (pushUpSet.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	pkt2send -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
 	uint16_t idixInPushUpVec = 0;
-	for (auto chainPtr=pushUpSet.begin(); chainPtr!=pushUpSet.end(); chainPtr++) {
+	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 			continue;
 		}
@@ -601,13 +602,13 @@ void Datacenter::prepareReshSync ()
 /*************************************************************************************************************************************************
 Clear all the resources currently allocated at this datastore:
 - Dis-place all the placed and pot-placed chains.
-- Clear notAssigned and pushUpSet.
+- Clear notAssigned and pushUpList.
 - reset availCpu.
 *************************************************************************************************************************************************/
 void Datacenter::clrRsrc () 
 {
 	notAssigned. 					clear ();
-	pushUpSet.   					clear ();
+	pushUpList.   					clear ();
 	placedChains.			 	  clear ();
 	potPlacedChains.			clear ();
 	newlyPlacedChainsIds.	clear ();

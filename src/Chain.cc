@@ -141,7 +141,7 @@ bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId)
 }
 
 /*************************************************************************************************************************************************
-* Given a chain id, finding the respective chain within a given set of chains.
+* Given a chain id, find the respective chain within a given set of chains.
 * The chain is written to foundChain.
 * Output: true iff the requested chain was found.
 **************************************************************************************************************************************************/
@@ -206,11 +206,23 @@ inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 	return lhsCpu > rhsCpu;
 }
 
+/*************************************************************************************************************************************************
+insert a chain to its correct location in a sorted list.
+If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
+**************************************************************************************************************************************************/
 void insertSorted (list <Chain> &sortedList, const Chain chain)
 {
+
+	for (auto chainPtr = sortedList.begin(); chainPtr!=sortedList.end(); ) {
+		if (chainPtr->id == chain.id) {
+			sortedList.erase (chainPtr);
+			break;
+		}
+		chainPtr++;
+	}
+
 	auto begin 	= sortedList.begin();
   auto end 		= sortedList.end();
-  
   while ((begin != end) && CompareChainsByDecCpuUsage (*begin, chain)) { // skip all chains in the list which use more cpu than me
   	begin++;
   }
