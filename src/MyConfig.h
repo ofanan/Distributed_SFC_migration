@@ -31,7 +31,7 @@ const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 
 const int16_t chainMigCost = 600;
 
-const int32_t DUMMY  		= -1;
+const ChainId_t DUMMY_ID  = -1;
 const int16_t UNPLACED  = -1;
 extern const int8_t  UNPLACED_;
 

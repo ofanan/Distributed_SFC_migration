@@ -18,7 +18,7 @@ const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (No
 
 Chain::Chain () 
 {
-	this->id = DUMMY; // Should change id to be int32_6
+	this->id = DUMMY_ID; 
 	this->curLvl = UNPLACED_;
 	this->S_u = {};
 	this->isRT_Chain = false;
