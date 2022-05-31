@@ -46,7 +46,7 @@ void Datacenter::initialize()
   numChildren = (uint8_t)  (par("numChildren"));
   numParents  = (uint8_t)  (par("numParents"));
   lvl				  = (uint8_t)  (par("lvl"));
-  dcId					= (uint16_t) (par("dcId"));
+  dcId				= (DcId_t) (par("dcId"));
   availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
 
   numPorts    = numParents + numChildren;
@@ -64,14 +64,14 @@ void Datacenter::initialize()
 	  xmtChnl[portNum]  = outGate->getTransmissionChannel();
 	  cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
 	  if (isRoot) {
-	    idOfChildren[portNum] = int16_t (nghbr -> par ("dcId"));
+	    idOfChildren[portNum] = DcId_t (nghbr -> par ("dcId"));
 	  }
 	  else {
 	    if (portNum==0) { // port 0 is towards the parents
-	      idOfParent = uint16_t (nghbr -> par ("dcId"));
+	      idOfParent = DcId_t (nghbr -> par ("dcId"));
 	    }
 	    else { // ports 1...numChildren are towards the children
-	      idOfChildren[portNum-1] = uint16_t (nghbr -> par ("dcId"));
+	      idOfChildren[portNum-1] = DcId_t (nghbr -> par ("dcId"));
 	    }
   	}       
   }
@@ -104,7 +104,7 @@ void Datacenter::print ()
 	MyConfig::printToLog (pushUpList);
 }
 
-void Datacenter::setLeafId (uint16_t leafId)
+void Datacenter::setLeafId (DcId_t leafId)
 {
 	this->leafId = leafId;
 }
@@ -117,7 +117,7 @@ void Datacenter::setLeafId (uint16_t leafId)
 void Datacenter::handleEndXmtMsg ()
 {
   EndXmtMsg *endXmtMsg = (EndXmtMsg*) curHandledMsg;
-  int16_t portNum 		 = endXmtMsg -> getPortNum();
+  DcId_t portNum 		 = endXmtMsg -> getPortNum();
   endXmtEvents[portNum] = nullptr;
   if (outputQ[portNum].isEmpty()) {
       return;

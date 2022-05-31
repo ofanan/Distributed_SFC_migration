@@ -10,6 +10,7 @@
 #include <unordered_set>
 
 #include "MyConfig.h"
+
 using namespace std;
 
 extern const int8_t UNPLACED_;

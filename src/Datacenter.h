@@ -36,8 +36,8 @@ class Datacenter : public cSimpleModule
     uint8_t 	numChildren;
     uint8_t 	numParents;
     uint8_t 	numPorts;
-    uint16_t idOfParent;
-    vector <uint16_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
+    DcId_t idOfParent;
+    vector <DcId_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
     bool isLeaf;
     int16_t dcId;
@@ -54,7 +54,7 @@ class Datacenter : public cSimpleModule
 		uint8_t numBuPktsRcvd; 
 		
 		//getter
-		void setLeafId (uint16_t leafId);
+		void setLeafId (DcId_t leafId);
 		
     Datacenter();
     ~Datacenter();

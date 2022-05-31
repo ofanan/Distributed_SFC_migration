@@ -27,6 +27,8 @@ class Chain;
 class ChainHash;
 typedef int32_t ChainId_t;
 
+typedef int16_t DcId_t;
+
 const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 
 const int16_t chainMigCost = 600;

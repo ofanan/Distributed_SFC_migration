@@ -13,7 +13,7 @@ Controller of the simulation:
 class Datacenter;
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
-inline bool isDelayFeasibleForChain (uint16_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
+inline bool isDelayFeasibleForChain (DcId_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
 
 Define_Module(SimController);
 
@@ -28,8 +28,8 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
-		numDatacenters  = (uint16_t) (network -> par ("numDatacenters"));
-		numLeaves       = (uint16_t) (network -> par ("numLeaves"));
+		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
+		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (uint8_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		return;
@@ -43,7 +43,7 @@ void SimController::initialize (int stage)
 	std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
-	uint16_t leafId = 0;
+	DcId_t leafId = 0;
 	for (int dc(0); dc<numDatacenters; dc++) {
 	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
 	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
