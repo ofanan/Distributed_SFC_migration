@@ -80,18 +80,6 @@ void Datacenter::initialize()
 
 }
 
-void Datacenter::printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains)
-{
-	vector <ChainId_t> vec;
-	
-	for (Chain chain : setOfChains) {
-		vec.insert (vec.begin(), chain.id);
-	}
-	
-	MyConfig::printToLog (vec);
-}
-
-
 // Print all the chains placed and pot-placed in this DC.
 void Datacenter::print ()
 {
@@ -194,7 +182,6 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 		error ("Non-leaf DC %d was called by initBottomUp");
 	}
 	pushUpList.clear ();	
-	placedChains.clear ();
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainThatJoined;
 

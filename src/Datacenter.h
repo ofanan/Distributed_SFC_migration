@@ -9,7 +9,6 @@
 #include "MyConfig.h"
 #include "SimController.h"
 #include "Chain.h"
-#include "SetsOfChains.h"
 
 #include "EndXmtMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
@@ -65,8 +64,6 @@ class Datacenter : public cSimpleModule
 
     // Log / debug funcs
     void print ();
-		void				printToLog 								 (SetOfChainsOrderedByDecCpuUsage setOfChains);	
-    
     
   private:
   	static const uint8_t portToPrnt=0;
