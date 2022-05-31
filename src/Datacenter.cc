@@ -226,7 +226,7 @@ void Datacenter::handlePushUpPkt ()
 			printBufToLog ();
 		}
 		else {
-			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0].id=%d pushUpSet[0].curLvl = %d", dcId, pkt->getPushUpVec(0).id, pkt->getPushUpVec(0).curLvl);
+			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0].id=%d pushUpVec[0].curLvl = %d", dcId, pkt->getPushUpVec(0).id, pkt->getPushUpVec(0).curLvl);
 			printBufToLog ();
 		}
 	}
@@ -256,14 +256,17 @@ void Datacenter::pushUpSync ()
 {
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		if (pushUpSet.empty()) {
-			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", dcId);
-		}
-		else {
-			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", dcId);
-		}
+		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpList=", dcId);
 		printBufToLog ();
-		printToLog (pushUpSet);
+		MyConfig::printToLog (pushUpList);
+//		if (pushUpSet.empty()) {
+//			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet is empty", dcId);
+//		}
+//		else {
+//			snprintf (buf, bufSize, "\nDC %d begins PU. pushUpSet=", dcId);
+//		}
+//		printBufToLog ();
+//		printToLog (pushUpSet);
 	}
 	reshuffled = false;
 	
