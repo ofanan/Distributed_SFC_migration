@@ -217,7 +217,7 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
 			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
@@ -252,7 +252,7 @@ Assume that this->pushUpList already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
@@ -342,10 +342,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
 				chainPtr = pushUpList.erase (chainPtr);
-				if (MyConfig::LOG_LVL==VERY_DETAILED_LOG && dcId==2) { //$$$
-					snprintf (buf, bufSize, "\nDC %d chainId=%d, pushUpVec[0].curLvl = %d", dcId, (pkt->getPushUpVec (idxInPushUpVec-1)).id, (pkt->getPushUpVec (idxInPushUpVec-1)).curLvl);
-					printBufToLog ();
-				}
 			}
 			else {
 				chainPtr++;
@@ -379,7 +375,7 @@ Assume that this->notAssigned and this->pushUpList already contain the relevant 
 void Datacenter::bottomUpSync ()
 {
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
@@ -417,7 +413,7 @@ void Datacenter::bottomUpSync ()
 		}
 	}
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL==DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d finished BU sync.", dcId);
 		printBufToLog ();
 		print ();
@@ -500,13 +496,9 @@ void Datacenter::handleBottomUpPktSync ()
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
 	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
         insertSorted (pushUpList, pkt->getPushUpVec(i));
-		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\nDC %d inserted chain %d to pushUpList. pushUpListSize=%d", dcId, pkt->getPushUpVec(i).id, (int)pushUpList.size());
-			printBufToLog ();
-		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-        snprintf (buf, bufSize, "\nDC %d pushUpList=", dcId);
+    snprintf (buf, bufSize, "\nDC %d pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
 	}

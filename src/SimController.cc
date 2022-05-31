@@ -502,7 +502,7 @@ void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", dcId, leafId);
 		MyConfig::printToLog (buf);
 	}
@@ -516,6 +516,7 @@ void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves");
+			printAllDatacenters ();
 		}
 		
 		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
