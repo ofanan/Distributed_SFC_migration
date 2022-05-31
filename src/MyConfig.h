@@ -71,6 +71,7 @@ class MyConfig {
 		static void printToLog (vector <uint16_t> vec); // print a vec of integers to the log file
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
+		static void printToLog (list <Chain> list2print, bool printLvl=true);
 /*		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);*/
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printSuToLog (Chain chain);

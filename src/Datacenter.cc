@@ -100,8 +100,10 @@ void Datacenter::print ()
 	MyConfig::printToLog (placedChains);	
 	MyConfig::printToLog ("pot. placed chains: ");
 	MyConfig::printToLog (potPlacedChains);
-	MyConfig::printToLog ("pushUpSet: ");
-	printToLog (pushUpSet);
+//	MyConfig::printToLog ("pushUpSet: ");
+//	printToLog (pushUpSet);
+	MyConfig::printToLog ("pushUpList: ");
+	MyConfig::printToLog (pushUpList);
 }
 
 void Datacenter::setLeafId (uint16_t leafId)
@@ -194,6 +196,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
 		error ("Non-leaf DC %d was called by initBottomUp");
 	}
 	pushUpSet.clear ();	
+	pushUpList.clear ();	
 	placedChains.clear ();
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainThatJoined;
@@ -217,12 +220,6 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG && dcId==5 && pkt->getPushUpVecArraySize()>0) { //$$$
-//		snprintf (buf, bufSize, "\nDC %d chainId=%d, pushUpSet[0].curLvl = %d", dcId, (pkt->getPushUpVec (0)).id, (pkt->getPushUpVec (0)).curLvl);
-//		printBufToLog ();
-//	}
-
-
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
 			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
@@ -240,6 +237,7 @@ void Datacenter::handlePushUpPkt ()
 			printBufToLog ();
 		}
 		pushUpSet.insert (chain2pushUp);
+		insertSorted (pushUpList, chain2pushUp); 
 	} 
 
 	if (MyConfig::mode==SYNC){ 

@@ -53,6 +53,14 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
+	Chain c1 (1, {}, 1);
+	Chain c2 (2, {}, 2);
+	list <Chain>  pushUpList;
+	insertSorted (pushUpList, c1);
+	insertSorted (pushUpList, c2);
+	MyConfig::printToLog (pushUpList);
+	endSimulation ();
+	
 //	// $$$$
 //	SetOfChainsOrderedByDecCpuUsage pushUpSet; 
 //	Chain c1 (1, {}, 1);

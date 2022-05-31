@@ -24,6 +24,21 @@ void MyConfig::printSuToLog (Chain chain)
 }
 
 // print the IDs of all the chains in the set 
+void MyConfig::printToLog (list <Chain> list2print, bool printLvl)
+{
+	if (printLvl) {
+		for (auto chain : list2print) {
+			logFile << "id=" << chain.id << " l=" << (int)chain.curLvl << ", ";
+		}	
+	}
+	else {
+		for (auto chain : list2print) {
+			logFile << chain.id << ",";
+		}
+	}
+}
+
+// print the IDs of all the chains in the set 
 void MyConfig::printToLog (UnorderedSetOfChains set2print)
 {
 	for (auto chain : set2print) {

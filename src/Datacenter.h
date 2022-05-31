@@ -76,6 +76,7 @@ class Datacenter : public cSimpleModule
     vector <EndXmtMsg*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 		SetOfChainsOrderedByDecCpuUsage pushUpSet;
+		list <Chain> pushUpList;
 
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);
