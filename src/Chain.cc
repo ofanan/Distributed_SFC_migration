@@ -2,7 +2,7 @@
 #include <type_traits>
 #include "Chain.h"
 
-extern const int8_t UNPLACED_;
+extern const int8_t UNPLACED_LVL;
 
 const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
@@ -19,7 +19,7 @@ const vector <uint16_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (No
 Chain::Chain () 
 {
 	this->id = DUMMY_CHAIN_ID; 
-	this->curLvl = UNPLACED_;
+	this->curLvl = UNPLACED_LVL;
 	this->S_u = {};
 	this->isRT_Chain = false;
 };
@@ -56,14 +56,14 @@ Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
 RT_Chain::RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
   this->id        	= id;
   this->S_u       	= S_u;
-	this->curLvl = UNPLACED_;
+	this->curLvl = UNPLACED_LVL;
   this->isRT_Chain 	= true;
 };
 
 Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
-	this->curLvl = UNPLACED_;
+	this->curLvl = UNPLACED_LVL;
   this->isRT_Chain 	= false;
 };
 
@@ -159,23 +159,23 @@ bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t cha
 	}
 }
 
-// returns the id of the datacenter currently hosting "this"; or UNPLACED, if this chain isn't placed
-int16_t Chain::getCurDatacenter () const 
+// returns the id of the datacenter currently hosting "this"; or UNPLACED_DC, if this chain isn't placed
+DcId_t Chain::getCurDatacenter () const 
 {
-	return (curLvl==UNPLACED_)? UNPLACED : S_u[curLvl];
+	return (curLvl==UNPLACED_LVL)? UNPLACED_DC : S_u[curLvl];
 } 
 
-// returns UNPLACED if the chain isn't placed; and the cpu cost at the current place
-uint16_t Chain::getCpuCost () const
+// returns UNPLACED_COST if the chain isn't placed; and the cpu cost at the current place
+Cost_t Chain::getCpuCost () const
 {
-	return (curLvl==UNPLACED_)? UNPLACED : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
+	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
 }
 
-// return the current cpu consumption of the chain if it's already placed; UNPLACED_ otherwise
-uint16_t Chain::getCpu () const
+// return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise
+Cpu_t Chain::getCpu () const
 {
-	if (curLvl==UNPLACED_) {
-		return UNPLACED;
+	if (curLvl==UNPLACED_LVL) {
+		return UNPLACED_CPU;
 	}
 	else {
 	  return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
@@ -200,7 +200,7 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 	int16_t lhsCpu = lhs.getCpu ();
 	int16_t rhsCpu = rhs.getCpu ();
-	if (lhsCpu==UNPLACED ||  rhsCpu==UNPLACED) {  // break ties
+	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties
 		return true;
 	}
 	return lhsCpu > rhsCpu;
