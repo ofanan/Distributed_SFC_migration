@@ -53,20 +53,6 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-//	Chain c1 (1, {}, 1);
-//	Chain c2 (2, {}, 2);
-//	list <Chain>  pushUpList;
-//	insertSorted (pushUpList, c1);
-//	insertSorted (pushUpList, c2);
-//	MyConfig::printToLog (pushUpList);
-//	endSimulation ();
-//	// $$$$
-//	SetOfChainsOrderedByDecCpuUsage pushUpSet; 
-//	Chain c1 (1, {}, 1);
-//	pushUpSet.insert (c1);
-//	Chain c2 (1, {}, 1);
-//	pushUpSet.insert (c2);
-//	endSimulation ();
 	runTrace ();
 }
 
@@ -328,7 +314,7 @@ void SimController::rdNewUsrsLine (string line)
 			}
 		}
 		
-//		insertSorted (chainsThatJoinedLeaf[poaId], chainId); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
+		insertSorted (chainsThatJoinedLeaf[poaId], chainId); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
 		ChainsMaster::allChains.insert (chain); 
 	}	
 }
@@ -359,7 +345,7 @@ void SimController::rdOldUsrsLine (string line)
 		vector <DcId_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
 		Chain modifiedChain (chainId, S_u, chain.curLvl); // will hold the modified chain to be inserted each time
 		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, modifiedChain)) { // if the current place of this chain isn't delay-feasible for it anymore
-//			insertSorted (chainsThatJoinedLeaf[poaId], chainId); // need to inform the chain's new poa that it has to place it
+			insertSorted (chainsThatJoinedLeaf[poaId], chainId); // need to inform the chain's new poa that it has to place it
 			chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId); // need to rlz this chain's rsrcs from its current place
 		}
 		ChainsMaster::allChains.erase  (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
