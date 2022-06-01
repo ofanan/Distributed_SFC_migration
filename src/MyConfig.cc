@@ -95,7 +95,7 @@ void MyConfig::printToLog (unordered_set <ChainId_t> set2print)
 	}
 }
 
-vector<Cost_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 
+vector<Cost_t> MyConfig::scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2) 
 {
 
 	uint8_t size = min (vec1.size(), vec2.size()); 

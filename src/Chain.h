@@ -23,7 +23,7 @@ class Chain
     ChainId_t id;
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
-		const static vector<uint16_t> costOfCpuUnitAtLvl; 
+		const static vector<Cost_t> costOfCpuUnitAtLvl; 
 		int8_t curLvl;        // Level of the datacenter currently hosting me 
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). 
 
@@ -51,7 +51,7 @@ class Chain
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
 		*/		
-    uint16_t mu_u_at_lvl (uint8_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
+    Cpu_t mu_u_at_lvl (uint8_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     uint16_t mu_u_len () const;
 /*    bool isDelayFeasible (uint16_t dcId) const;*/
 };
@@ -59,7 +59,7 @@ class Chain
 class RT_Chain : public Chain
 {
 public:
-  static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
+  static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const uint8_t mu_u_len;
 	static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
 	RT_Chain (const RT_Chain &c);
@@ -69,7 +69,7 @@ public:
 class Non_RT_Chain: public Chain
 {
   public:
-	  static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
+	  static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const uint8_t  mu_u_len;
 		static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
     Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u);
@@ -98,13 +98,13 @@ inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
 void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 bool findChainInSet 	 (set<Chain> setOfChains, ChainId_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
 /*bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)*/
-bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId); // Given chainId, erases the respective chain from the set. 
+bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); // Given chainId, erases the respective chain from the set. 
 
 /*************************************************************************************************************************************************
 Find a chain (given by its id) in a given set of chains.
 **************************************************************************************************************************************************/
 bool 					findChainInSet  (UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
-vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, uint16_t poa);
+vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, DcId_t poa);
 
 #endif
 

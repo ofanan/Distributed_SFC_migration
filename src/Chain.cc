@@ -4,10 +4,10 @@
 
 extern const int8_t UNPLACED_LVL;
 
-const vector<uint16_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
+const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
-const vector<uint16_t> RT_Chain		 ::mu_u = {1, 1};
-const vector<uint16_t> Non_RT_Chain::mu_u = {1, 1};
+const vector<Cpu_t> RT_Chain		 ::mu_u = {1, 1};
+const vector<Cpu_t> Non_RT_Chain::mu_u = {1, 1};
 
 const uint8_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
 const uint8_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
@@ -90,7 +90,7 @@ uint16_t Chain::mu_u_len () const
 
 
 // returns the mu_u (amount of cpu required by the chain) at a given level in the tree
-uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
+Cpu_t Chain::mu_u_at_lvl (uint8_t lvl) const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }
@@ -110,7 +110,7 @@ uint16_t Chain::mu_u_at_lvl (uint8_t lvl) const
 /*************************************************************************************************************************************************
 * Given a set of chains and a poa, return all the chains in the set associated with this poa.
 **************************************************************************************************************************************************/
-vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, uint16_t poa)
+vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcId_t poa)
 {
 	vector<Chain> res;
 	
@@ -126,7 +126,7 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, uin
 * Given a chain id, if that chain is found in the given set - erase it from the set.
 * Returns true iff the requested chain was found (and erased) from the set.
 **************************************************************************************************************************************************/
-bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, uint16_t chainId)
+bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId)
 {
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);
@@ -198,8 +198,8 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 }
 
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
-	int16_t lhsCpu = lhs.getCpu ();
-	int16_t rhsCpu = rhs.getCpu ();
+	Cpu_t lhsCpu = lhs.getCpu ();
+	Cpu_t rhsCpu = rhs.getCpu ();
 	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties
 		return true;
 	}
