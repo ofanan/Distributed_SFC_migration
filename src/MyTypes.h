@@ -16,5 +16,10 @@ const Cpu_t		  UNPLACED_CPU   = -1;
 const bool SYNC  = true;
 const bool ASYNC = false;
 
+class ChainIdAndLvl {
+	ChainId_t chainId;
+	Lvl_t			lvl;
+};
+
 #endif
 
