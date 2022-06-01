@@ -181,13 +181,13 @@ Cpu_t Chain::getCpu () const
 }
 
 /*************************************************************************************************************************************************
-Insert a chain to its correct order in the (ordered) vector of chains.
+Insert a chainId to its correct order in the (ordered) vector of chains' Ids.
 We currently use only RT, and we assume that the input vector is sorted. 
 Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
 **************************************************************************************************************************************************/
-void insertSorted (vector <ChainId_t> &vec, const ChainId_t chaiId)
+void insertSorted (vector <ChainId_t> &vec, const ChainId_t chainId)
 {
-	if (isRT_Chain(chainId)) {
+	if (ChainsMaster::isRT_Chain(chainId)) {
 		vec.insert (vec.begin(), chainId);
 	}
 	else {

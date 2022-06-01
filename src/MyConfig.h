@@ -28,6 +28,7 @@ using namespace std;
 class Chain;
 class ChainHash;
 class ChainIdAndLvl;
+class ChainsMaster;
 
 const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 

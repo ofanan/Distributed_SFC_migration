@@ -173,7 +173,7 @@ Initiate the bottomUpSyncAlg:
 - Schedule a self-msg to call0 bottomUp, for running the BU alg'.
 * Note: this func to be called only when the Datacenter is a leaf.
 *************************************************************************************************************************************************/
-void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
+void Datacenter::initBottomUp (vector<ChainId_t>& vecOfChainThatJoined)
 {
 
 //	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainThatJoined)");

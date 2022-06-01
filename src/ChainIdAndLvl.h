@@ -4,13 +4,16 @@
 #include "MyTypes.h"
 #include "ChainsMaster.h"
 
+using namespace std;
+
 class ChainIdAndLvl {
 	public:
 	ChainId_t chainId;
 	Lvl_t			lvl;
 	
-	ChainIdAndLvl (ChainId_t chainId, Lvl_t lvl);
-	inline Cpu_t getCpu () const {return ChainsMaster::getCpu (this->chainId, this->lvl);}
+/*	ChainIdAndLvl ();*/
+	ChainIdAndLvl (ChainId_t chainId=DUMMY_CHAIN_ID, Lvl_t lvl=UNPLACED_LVL);
+	inline Cpu_t getCpu () const {return 7;} //{return ChainsMaster::getCpu (this->chainId, this->lvl);} //$$$
 };
 
 inline bool compareChainsIdsByDecCpuUsage (const ChainIdAndLvl &lhs, const ChainIdAndLvl &rhs) {

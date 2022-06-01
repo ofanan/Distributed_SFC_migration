@@ -11,6 +11,7 @@
 
 #include "MyTypes.h"
 #include "MyConfig.h"
+#include "ChainsMaster.h"
 
 using namespace std;
 
