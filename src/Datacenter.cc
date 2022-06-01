@@ -176,14 +176,14 @@ Initiate the bottomUpSyncAlg:
 void Datacenter::initBottomUp (vector<ChainId_t>& vecOfChainThatJoined)
 {
 
-//	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainThatJoined)");
+	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainThatJoined)");
 
-//	if (!isLeaf) { 
-//		error ("Non-leaf DC %d was called by initBottomUp");
-//	}
-//	pushUpList.clear ();	
-//	potPlacedChains.clear ();
-// 	notAssigned = vecOfChainThatJoined;
+	if (!isLeaf) { 
+		error ("Non-leaf DC %d was called by initBottomUp");
+	}
+	pushUpList.clear ();	
+	potPlacedChains.clear ();
+ 	notAssigned = vecOfChainThatJoined;
 
 // 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 //		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", dcId);

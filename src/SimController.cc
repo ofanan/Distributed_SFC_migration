@@ -1,6 +1,5 @@
 //$$$ ToDo:
 // Set numMigs in MyConfig.
-// Check why at t=1 chain 3 is placed in both DC 2 and DC 5.
 
 /*************************************************************************************************************************************************
 Controller of the simulation:
