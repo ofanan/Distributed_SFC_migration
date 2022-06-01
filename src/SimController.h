@@ -45,8 +45,8 @@ class SimController : public cSimpleModule
   private:
     cModule* network; // Pointer to the network on which the simulation is running
     string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
-    uint16_t numDatacenters;
-    uint16_t numLeaves;
+    DcId_t numDatacenters;
+    DcId_t numLeaves;
     uint8_t  height; // height of the tree
     uint32_t t; //sim time (in seconds)
     bool isFirstPeriod = true; 
@@ -61,11 +61,11 @@ class SimController : public cSimpleModule
 		string line; //current line being read from the tracefile
 		
 		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
-    unordered_map <uint16_t, vector<int32_t> > chainsThatLeftDatacenter;
-    unordered_map <uint16_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
+    unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDatacenter;
+    unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
     vector <bool> rcvdFinishedAlgMsgFromLeaves; //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
-    vector <vector<uint16_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
+    vector <vector<DcId_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
 
 		// Init Functions
     void initialize(int stage);
@@ -83,7 +83,7 @@ class SimController : public cSimpleModule
 		void rdUsrsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void rdNewUsrsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
 		void rdOldUsrsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
-		void rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
+		void rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
 		void initAlg (); // init a placement alg'
   	void initAlgSync (); // init a sync placement alg'
   	void initAlgAsync (); // init an async placement alg'
@@ -94,7 +94,7 @@ class SimController : public cSimpleModule
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
 		int calcSolCpuCost (); // returns the overall CPU cost
-    void parseChainPoaToken (string const token, ChainId_t &chainId, uint16_t &poaId);
+    void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
     
     // Functions used for debugging
 		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
@@ -114,8 +114,8 @@ class SimController : public cSimpleModule
     ~SimController ();
     void checkParams (); // Sanity checks for various parameters
 		void updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl);
-		void finishedAlg (uint16_t dcId, uint16_t leafId);
-		void prepareReshSync (uint16_t dcId, uint16_t leafId);
+		void finishedAlg 		 (DcId_t dcId, DcId_t leafId);
+		void prepareReshSync (DcId_t dcId, DcId_t leafId);
 };
 
 #endif

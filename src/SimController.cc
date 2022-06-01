@@ -91,7 +91,7 @@ void SimController::checkParams ()
 // pathToRoot[i] will hold the path from leaf i to the root.
 void SimController::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
-	uint16_t dcId;
+	DcId_t dcId;
 	for (uint16_t leafId(0) ; leafId < numLeaves; leafId++)  {
 		pathToRoot[leafId].resize (height);
 		dcId = leaves[leafId]->dcId;
@@ -186,7 +186,7 @@ void SimController::concludeTimeStep ()
 {
 	if (MyConfig::DEBUG_LVL>0) {
 		for (auto const &chain : MyConfig::allChains) {
-			if (chain.curLvl==UNPLACED_) {
+			if (chain.curLvl==UNPLACED_LVL) {
 				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
 				printBufToLog ();
 				printAllDatacenters ();
@@ -212,7 +212,7 @@ void SimController::printAllDatacentersByMyDatabase ()
 	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
 	for (const auto &chain : MyConfig::allChains) {
 		int16_t chainCurDatacenter = chain.getCurDatacenter();
-		if (chainCurDatacenter==UNPLACED) {
+		if (chainCurDatacenter==UNPLACED_DC) {
 			continue;
 		}
 		chainsPlacedOnDatacenter [chainCurDatacenter].push_back (chain.id);
@@ -241,7 +241,7 @@ int SimController::calcSolCpuCost ()
 	int totCpuCost = 0;
 	for (auto const &chain : MyConfig::allChains) {	
 		int16_t cpuCost = chain.getCpuCost ();
-		if (MyConfig::mode==SYNC && cpuCost == UNPLACED) {
+		if (MyConfig::mode==SYNC && cpuCost == UNPLACED_COST) {
 			error ("calcSolCpuCost Sync encountered a chain that isn't placed yet");
 		}
 		cpuCost += cpuCost;
@@ -251,7 +251,7 @@ int SimController::calcSolCpuCost ()
 
 
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
-void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, uint16_t &poaId)
+void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId)
 {
 	istringstream newChainToken(token); 
   string numStr; 
@@ -277,7 +277,7 @@ void SimController::rdUsrsThatLeftLine (string line)
   char_separator<char> sep(" ");
   tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
-  int32_t chainId;
+  ChainId_t chainId;
   int16_t chainCurDatacenter;
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
@@ -288,7 +288,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 	  }
 	  else {
 	  	chainCurDatacenter = chain.getCurDatacenter();
-	  	if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED) {
+	  	if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED_DC) {
 				error ("Note: this chain was not placed before leaving\n"); 
 	  	}
   		chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
@@ -309,17 +309,17 @@ void SimController::rdNewUsrsLine (string line)
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
-  uint16_t poaId; 
+  DcId_t 		poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
   
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		if (rand () < RT_chain_rand_int) {
-			chain = RT_Chain (chainId, vector<uint16_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len}); 
+			chain = RT_Chain (chainId, vector<DcId_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len}); 
 		}
 		else {
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
-			chain = Non_RT_Chain (chainId, vector<uint16_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
+			chain = Non_RT_Chain (chainId, vector<DcId_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
 		}
 		
 		if (MyConfig::DEBUG_LVL>0) {
@@ -345,7 +345,7 @@ void SimController::rdOldUsrsLine (string line)
   char_separator<char> sep("() ");
   tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
-  uint16_t poaId;
+  DcId_t poaId;
 	Chain chain; // will hold the chain found in MyConfig::allChains
 	int16_t chainCurDatacenter;
 
@@ -356,7 +356,7 @@ void SimController::rdOldUsrsLine (string line)
 			error ("t=%d: didn't find chain id %d in allChains, in rdOldUsrsLine", t, chainId);
 	  }
 		chainCurDatacenter = chain.getCurDatacenter();
-		vector <uint16_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
+		vector <DcId_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
 		Chain modifiedChain (chainId, S_u, chain.curLvl); // will hold the modified chain to be inserted each time
 		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, modifiedChain)) { // if the current place of this chain isn't delay-feasible for it anymore
 			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain); // need to inform the chain's new poa that it has to place it
@@ -365,7 +365,7 @@ void SimController::rdOldUsrsLine (string line)
 		MyConfig::allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
 		MyConfig::allChains.insert (modifiedChain);
 
-		if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED) {
+		if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED_DC) {
 			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			continue;
 		}
@@ -378,7 +378,7 @@ void SimController::rdOldUsrsLine (string line)
 - Call each datacenter to inform it of all chains that left it - due to either leaving the sim', moving to another poa, or due to a preparation
   for reshuffle.
 **************************************************************************************************************************************************/
-void SimController::rlzRsrcOfChains (unordered_map <uint16_t, vector<int32_t> > ChainsToRlzFromDc) 
+void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > ChainsToRlzFromDc) 
 {
 
 	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
@@ -401,17 +401,17 @@ The function does the following:
 - rlz the rsrscs of all the chains associated with this poa.
 - Initiate a placement alg' from this poa .
 **************************************************************************************************************************************************/
-void SimController::prepareReshSync (uint16_t dcId, uint16_t leafId)
+void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 {
 
-//	uint16_t dcId = ((Datacenter*) (msg->getSenderModule()))->dcId;
-//  unordered_map <uint16_t, vector<int32_t> > chainsToReplace;
+//	DcId dcId = ((Datacenter*) (msg->getSenderModule()))->dcId;
+//  unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
 //	uint16_t numOfChainsToReplace = 0;
 
 //	for (auto chain : MyConfig::allChains) {
 //		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
-//			int16_t chainCurDatacenter = chain.getCurDatacenter();
-//			if (chainCurDatacenter == UNPLACED) { // if this chain isn't already placed, no need to release it.
+//			DcId_t chainCurDatacenter = chain.getCurDatacenter();
+//			if (chainCurDatacenter == UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
 //			  continue;
 //			}
 //			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
@@ -441,7 +441,7 @@ void SimController::initAlgSync ()
 	}
 
 	// Next, initiate the alg' in the remainder leaves, just to initiate sync' BUPU.
-	for (uint16_t leafId(0); leafId < numLeaves; leafId++) {
+	for (DcId_t leafId(0); leafId < numLeaves; leafId++) {
 		if (!(initAlgAtLeaf[leafId])) {
 			vector<Chain> emptyVecOfChains = {};
 			leaves[leafId]->initBottomUp (emptyVecOfChains);
@@ -471,7 +471,7 @@ void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedCh
 
 		}
 		else {
-			if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
+			if (chain.getCurDatacenter()!=UNPLACED_DC) { // was it an old chain that migrated?
 				numMigs++; // Yep --> inc. the mig. cntr.
 			}
 			Chain modifiedChain (chainId, chain.S_u); // will hold the modified chain to be inserted each time
@@ -494,10 +494,10 @@ This func' is called on sync' mode, when a leaf finishes the alg'. The func'
 - Update MyConfig::allChains db.
 - If all leaves finished, conclude this time step.
 **************************************************************************************************************************************************/
-void SimController::finishedAlg (uint16_t dcId, uint16_t leafId)
+void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
-	Enter_Method ("finishedAlg (uint16_t dcId, uint16_t leafId)");
+	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
 	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==ASYNC) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}

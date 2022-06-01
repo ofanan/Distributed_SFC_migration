@@ -5,8 +5,6 @@
 using namespace omnetpp;
 using namespace std;
 
-extern const int8_t  UNPLACED_ = -1;
-
 string 														MyConfig::LogFileName;
 ofstream 													MyConfig::logFile;
 unordered_set <Chain, ChainHash> 	MyConfig::allChains;
@@ -76,7 +74,7 @@ void MyConfig::printToLog (vector <Chain> vec)
 	}
 }
 
-void MyConfig::printToLog (vector <uint16_t> vec) 
+void MyConfig::printToLog (vector <DcId_t> vec) 
 {
 	for (const auto i : vec) {
 		logFile << i << ",";

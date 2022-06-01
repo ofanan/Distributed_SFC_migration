@@ -24,7 +24,7 @@ Chain::Chain ()
 	this->isRT_Chain = false;
 };
 
-Chain::Chain (ChainId_t id, vector <uint16_t> S_u, int8_t curLvl) 
+Chain::Chain (ChainId_t id, vector <DcId_t> S_u, int8_t curLvl) 
 {
 	this->id = id;
 	this->S_u = S_u;
@@ -53,14 +53,14 @@ Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
   this->isRT_Chain 	= c.isRT_Chain;
 }
 
-RT_Chain::RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
+RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> S_u) {
   this->id        	= id;
   this->S_u       	= S_u;
 	this->curLvl = UNPLACED_LVL;
   this->isRT_Chain 	= true;
 };
 
-Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <uint16_t> S_u) {
+Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
 	this->curLvl = UNPLACED_LVL;

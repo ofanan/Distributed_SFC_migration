@@ -14,8 +14,6 @@
 
 using namespace std;
 
-extern const int8_t  UNPLACED_;
-
 typedef int32_t ChainId_t;
 
 
@@ -23,7 +21,7 @@ class Chain
 {
   public:
     ChainId_t id;
-    vector <uint16_t> S_u;         // List of delay-feasible datacenters for this chain
+    vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
 		const static vector<uint16_t> costOfCpuUnitAtLvl; 
 		int8_t curLvl;        // Level of the datacenter currently hosting me 
@@ -32,7 +30,7 @@ class Chain
 		// C'tors
     Chain ();
 		Chain (const Chain &c);
-    Chain (ChainId_t id, vector <uint16_t> S_u, int8_t curLvl=UNPLACED_);
+    Chain (ChainId_t id, vector <DcId_t> S_u, Lvl_t curLvl=UNPLACED_LVL);
             
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
@@ -41,7 +39,7 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED, if this chain isn't placed
+		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED_DC, if this chain isn't placed
     Cost_t getCpuCost () const;
     Cpu_t  getCpu     () const; 
     
@@ -65,7 +63,7 @@ public:
   static const uint8_t mu_u_len;
 	static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
 	RT_Chain (const RT_Chain &c);
-  RT_Chain (ChainId_t id, vector <uint16_t> S_u);
+  RT_Chain (ChainId_t id, vector <DcId_t> S_u);
 };
 
 class Non_RT_Chain: public Chain
@@ -74,7 +72,7 @@ class Non_RT_Chain: public Chain
 	  static const vector<uint16_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const uint8_t  mu_u_len;
 		static const vector<uint16_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
-    Non_RT_Chain (ChainId_t id, vector <uint16_t> S_u);
+    Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u);
 	  Non_RT_Chain (const Non_RT_Chain &c);
 };
 

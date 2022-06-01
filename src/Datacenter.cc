@@ -432,7 +432,7 @@ void Datacenter::updatePlacementInfo ()
 
 		}
 		else {
-			if (chain.getCurDatacenter()!=UNPLACED) { // was it an old chain that migrated?
+			if (chain.getCurDatacenter()!=UNPLACED_DC) { // was it an old chain that migrated?
 //				numMigs++; // Yep --> inc. the mig. cntr.
 			}
 			Chain modifiedChain (chainId, chain.S_u); // will hold the modified chain to be inserted each time
