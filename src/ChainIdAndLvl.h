@@ -23,7 +23,7 @@ inline bool compareChainsIdsByDecCpuUsage (const ChainIdAndLvl &lhs, const Chain
 }
 
 /*************************************************************************************************************************************************
-insert a chain to its correct location in a sorted list.
+insert a ChainIdAndLvl to its correct location in a sorted list.
 If the chainId is already found in the list, the old occurance in the list is deleted.
 **************************************************************************************************************************************************/
 void insertSorted (list <ChainIdAndLvl> &sortedList, const ChainIdAndLvl element)

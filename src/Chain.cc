@@ -185,6 +185,21 @@ Insert a chain to its correct order in the (ordered) vector of chains.
 We currently use only RT, and we assume that the input vector is sorted. 
 Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
 **************************************************************************************************************************************************/
+void insertSorted (vector <ChainId_t> &vec, const ChainId_t chaiId)
+{
+	if isRT_Chain(chainId) {
+		vec.insert (vec.begin(), chainId);
+	}
+	else {
+		vec.push_back (chainId);
+	}
+}
+
+/*************************************************************************************************************************************************
+Insert a chain to its correct order in the (ordered) vector of chains.
+We currently use only RT, and we assume that the input vector is sorted. 
+Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
+**************************************************************************************************************************************************/
 void insertSorted (vector <Chain> &vec, const Chain c)
 {
 	if (c.isRT_Chain) {
