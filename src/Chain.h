@@ -14,8 +14,6 @@
 
 using namespace std;
 
-/*const int32_t DUMMY  		= -1;*/
-/*const int16_t UNPLACED  = -1;*/
 extern const int8_t  UNPLACED_;
 
 typedef int32_t ChainId_t;
