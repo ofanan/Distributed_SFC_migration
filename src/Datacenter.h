@@ -10,6 +10,7 @@
 #include "SimController.h"
 #include "Chain.h"
 #include "MyTypes.h"
+#include "ChainIdAndLvl.h"
 
 #include "EndXmtMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
@@ -48,6 +49,7 @@ class Datacenter : public cSimpleModule
     // Dynamic
     uint16_t  availCpu;
     vector<Chain> notAssigned, pushUpVec; 
+    list <ChainIdAndLvl> pushUpList;
     UnorderedSetOfChains     placedChains, potPlacedChains; 
     unordered_set <ChainId_t> newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
     unordered_set <ChainId_t> newlyDisplacedChainsIds; // IDs of the chains that I have displaceed after the last update I had sent to SimCtrlr.
@@ -73,7 +75,6 @@ class Datacenter : public cSimpleModule
     vector <cChannel*>  xmtChnl;
     vector <EndXmtMsg*> endXmtEvents; 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
-		list <Chain> pushUpList;
 
     virtual void initialize();
     virtual void handleMessage (cMessage *msg);

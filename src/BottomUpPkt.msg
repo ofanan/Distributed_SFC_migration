@@ -8,7 +8,7 @@ class noncobject Chain;
 
 packet BottomUpPkt
 {
-    Chain notAssigned[];
-    Chain pushUpVec  [];
+	Chain notAssigned[];
+	ChainIdAndLvl pushUpVec  [];
 }
 

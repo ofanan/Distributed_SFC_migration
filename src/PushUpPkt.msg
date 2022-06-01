@@ -7,6 +7,6 @@ class noncobject Chain;
 
 packet PushUpPkt
 {
-    Chain pushUpVec [];
+	ChainIdAndLvl pushUpVec [];
 }
 

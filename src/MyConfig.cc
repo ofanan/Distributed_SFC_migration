@@ -120,6 +120,10 @@ bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id)
 	}
 }
 
+static void MyConfig::printToLog (list <ChainIdAndLvl> chainIdAndLvl)
+{
+}
+
 // Print the PoA of each currently-active user
 void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {

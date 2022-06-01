@@ -1,6 +1,8 @@
 #ifndef MY_TYPES_H
 #define MY_TYPES_H
 
+#include <sys/types.h>
+
 typedef int32_t ChainId_t;
 typedef int16_t DcId_t;
 typedef int8_t  Lvl_t;
@@ -15,10 +17,5 @@ const Cpu_t		  UNPLACED_CPU   = -1;
 
 const bool SYNC  = true;
 const bool ASYNC = false;
-
-class ChainIdAndLvl {
-	ChainId_t chainId;
-	Lvl_t			lvl;
-};
 
 #endif
