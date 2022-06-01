@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from BottomUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from src/BottomUpPkt.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -218,7 +218,7 @@ void BottomUpPkt::copy(const BottomUpPkt& other)
     for (unsigned int i=0; i<notAssigned_arraysize; i++)
         this->notAssigned[i] = other.notAssigned[i];
     delete [] this->pushUpVec;
-    this->pushUpVec = (other.pushUpVec_arraysize==0) ? nullptr : new Chain[other.pushUpVec_arraysize];
+    this->pushUpVec = (other.pushUpVec_arraysize==0) ? nullptr : new ChainIdAndLvl[other.pushUpVec_arraysize];
     pushUpVec_arraysize = other.pushUpVec_arraysize;
     for (unsigned int i=0; i<pushUpVec_arraysize; i++)
         this->pushUpVec[i] = other.pushUpVec[i];
@@ -249,7 +249,7 @@ void BottomUpPkt::parsimUnpack(omnetpp::cCommBuffer *b)
     if (pushUpVec_arraysize==0) {
         this->pushUpVec = 0;
     } else {
-        this->pushUpVec = new Chain[pushUpVec_arraysize];
+        this->pushUpVec = new ChainIdAndLvl[pushUpVec_arraysize];
         doParsimArrayUnpacking(b,this->pushUpVec,pushUpVec_arraysize);
     }
 }
@@ -284,7 +284,7 @@ void BottomUpPkt::setNotAssigned(unsigned int k, const Chain& notAssigned)
 
 void BottomUpPkt::setPushUpVecArraySize(unsigned int size)
 {
-    Chain *pushUpVec2 = (size==0) ? nullptr : new Chain[size];
+    ChainIdAndLvl *pushUpVec2 = (size==0) ? nullptr : new ChainIdAndLvl[size];
     unsigned int sz = pushUpVec_arraysize < size ? pushUpVec_arraysize : size;
     for (unsigned int i=0; i<sz; i++)
         pushUpVec2[i] = this->pushUpVec[i];
@@ -298,13 +298,13 @@ unsigned int BottomUpPkt::getPushUpVecArraySize() const
     return pushUpVec_arraysize;
 }
 
-Chain& BottomUpPkt::getPushUpVec(unsigned int k)
+ChainIdAndLvl& BottomUpPkt::getPushUpVec(unsigned int k)
 {
     if (k>=pushUpVec_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpVec_arraysize, k);
     return this->pushUpVec[k];
 }
 
-void BottomUpPkt::setPushUpVec(unsigned int k, const Chain& pushUpVec)
+void BottomUpPkt::setPushUpVec(unsigned int k, const ChainIdAndLvl& pushUpVec)
 {
     if (k>=pushUpVec_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", pushUpVec_arraysize, k);
     this->pushUpVec[k] = pushUpVec;
@@ -427,7 +427,7 @@ const char *BottomUpPktDescriptor::getFieldTypeString(int field) const
     }
     static const char *fieldTypeStrings[] = {
         "Chain",
-        "Chain",
+        "ChainIdAndLvl",
     };
     return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
 }
@@ -528,7 +528,7 @@ const char *BottomUpPktDescriptor::getFieldStructName(int field) const
     }
     switch (field) {
         case 0: return omnetpp::opp_typename(typeid(Chain));
-        case 1: return omnetpp::opp_typename(typeid(Chain));
+        case 1: return omnetpp::opp_typename(typeid(ChainIdAndLvl));
         default: return nullptr;
     };
 }
