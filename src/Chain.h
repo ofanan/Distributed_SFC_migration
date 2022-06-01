@@ -15,9 +15,6 @@
 
 using namespace std;
 
-typedef int32_t ChainId_t;
-
-
 class Chain
 {
   public:
