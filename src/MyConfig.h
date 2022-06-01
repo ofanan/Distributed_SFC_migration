@@ -19,6 +19,7 @@
 
 #include "MyTypes.h"
 #include "Chain.h"
+#include "ChainsMaster.h"
 
 using namespace omnetpp;
 using namespace std;

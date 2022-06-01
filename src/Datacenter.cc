@@ -427,7 +427,7 @@ void Datacenter::updatePlacementInfo ()
 	
 	Chain 	   chain;
 	for (auto chainId : newlyPlacedChainsIds) {
-		if (!(findChainInSet (MyConfig::allChains, chainId, chain))) {
+		if (!(findChainInSet (ChainsMaster::allChains, chainId, chain))) {
 			error ("didn't find placed chain id %d that appeared in a call to updatePlacementInfo", chainId);
 
 		}
@@ -442,8 +442,8 @@ void Datacenter::updatePlacementInfo ()
 				snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[lvl]);
 				printBufToLog ();
 			}
-			MyConfig::allChains.erase (chain); 					// remove the old chain from our DB
-			MyConfig::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
+			ChainsMaster::allChains.erase (chain); 					// remove the old chain from our DB
+			ChainsMaster::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
 		}
 	}
 
