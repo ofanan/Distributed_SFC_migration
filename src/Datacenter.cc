@@ -358,11 +358,11 @@ Assume that this->notAssigned and this->pushUpList already contain the relevant 
 void Datacenter::bottomUpSync ()
 {
 
-//	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-//		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", dcId);
-//		printBufToLog ();
-//		MyConfig::printToLog (notAssigned);
-//	}
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+	}
 
 //	for (auto chainIdPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 //		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToPlaceChain ( 
