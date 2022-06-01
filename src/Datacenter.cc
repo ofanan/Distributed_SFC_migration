@@ -13,7 +13,6 @@ inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= 
 
 inline bool Datacenter::cannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
 inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
-
 inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
@@ -149,21 +148,21 @@ release resources of chains that left "this".
 void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz) 
 {
 
-	for (auto chainId : IdsOfChainsToRlz) {
+//	for (auto chainId : IdsOfChainsToRlz) {
 
-		Chain chain;
-		if (findChainInSet (potPlacedChains, chainId, chain)) {
-			regainRsrcOfChain (chain);
-			eraseChainFromSet (potPlacedChains,	chainId);
-			continue; // if the chain was found in the potPlacedChains db, it's surely not in the placedChains and newlyPlacedChains
-		}
-		if (findChainInSet (placedChains, chainId, chain)) {
-			regainRsrcOfChain (chain);
-			eraseChainFromSet (placedChains, chainId);
-		}
-		MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
-		
-	}
+//		Chain chain;
+//		if (findChainInSet (potPlacedChains, chainId, chain)) {
+//			regainRsrcOfChain (chain);
+//			eraseChainFromSet (potPlacedChains,	chainId);
+//			continue; // if the chain was found in the potPlacedChains db, it's surely not in the placedChains and newlyPlacedChains
+//		}
+//		if (findChainInSet (placedChains, chainId, chain)) {
+//			regainRsrcOfChain (chain);
+//			eraseChainFromSet (placedChains, chainId);
+//		}
+//		MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
+//		
+//	}
 }
 
 /*************************************************************************************************************************************************
@@ -364,38 +363,35 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-//	for (auto chainIdPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
-//		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToPlaceChain ( 
-//		requiredCpuToLocallyPlaceChain(*chainPtr); 
-//		Chain modifiedChain; // the modified chain, to be pushed to datastructures
-//		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
-//				availCpu -= requiredCpuToLocallyPlaceThisChain;
-//				modifiedChain = *chainPtr;
-//				modifiedChain.curLvl = lvl;
-//				chainPtr = notAssigned.erase (chainPtr);
-//				if (cannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
-//					placedChains.				 insert (modifiedChain);
-//					newlyPlacedChainsIds.insert (modifiedChain.id);
-//				}
-//				else {
-//					potPlacedChains.insert (modifiedChain);
-//					insertSorted (pushUpList, modifiedChain); 
-//				}
-//		}
-//		else { 
-//			if (cannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-//				if (reshuffled) {
-//					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", dcId);
-//					printBufToLog ();
-//					PrintAllDatacenters ();
-//					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
-//					printStateAndEndSim  ();
-//				}
-//				return prepareReshSync ();
-//			}
-//			chainPtr++; // I don't have enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain. But maybe I've enough availCpu for the next notAssigned chain  
-//		}
-//	}
+	for (auto chainIdPtr=notAssigned.begin(); chainIdPtr!=notAssigned.end(); ) {
+		Chain chain = ChainsMaster::getChain (*chainIdPtr); // get copy of the chain
+		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (chain); 
+		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
+				availCpu -= requiredCpuToLocallyPlaceThisChain;
+				if (cannotPlaceThisChainHigher(chain)) { // Am I the highest delay-feasible DC of this chain?
+					placedChains.				 insert (*chainIdPtr);
+					newlyPlacedChainsIds.insert (*chainIdPtr);
+				}
+				else {
+					potPlacedChains.insert (*chainIdPtr);
+					insertSorted (pushUpList, ChainIdAndLvl(*chainIdPtr, lvl)); 
+				}
+				chainIdPtr = notAssigned.erase (chainIdPtr);
+		}
+		else { 
+			if (cannotPlaceThisChainHigher(chain)) { // Am I the highest delay-feasible DC of this chain?
+					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", dcId);
+				if (reshuffled) {
+					printBufToLog ();
+					PrintAllDatacenters ();
+					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
+					printStateAndEndSim  ();
+				}
+				return prepareReshSync ();
+			}
+			chainIdPtr++; // I don't have enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain. But maybe I've enough availCpu for the next notAssigned chain  
+		}
+	}
 
 //	if (MyConfig::LOG_LVL==DETAILED_LOG) {
 //		snprintf (buf, bufSize, "\nDC %d finished BU sync.", dcId);
