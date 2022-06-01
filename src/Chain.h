@@ -93,10 +93,11 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 **************************************************************************************************************************************************/
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
-// Insert a chain in its correct place to a sorted datastructure
+// Insert a chain, or a chainId, into its correct place to a sorted datastructure
+void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+void insertSorted (vector <ChainId_t> &vec, const ChainId_t chainId);
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
-void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 bool findChainInSet 	 (set<Chain> setOfChains, ChainId_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
 /*bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)*/
 bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); // Given chainId, erases the respective chain from the set. 

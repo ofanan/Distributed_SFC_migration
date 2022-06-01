@@ -187,12 +187,12 @@ Hence, the chain should be inserted either to the head if it's a RT chain, of to
 **************************************************************************************************************************************************/
 void insertSorted (vector <ChainId_t> &vec, const ChainId_t chainId)
 {
-	if (ChainsMaster::isRT_Chain(chainId)) {
-		vec.insert (vec.begin(), chainId);
-	}
-	else {
-		vec.push_back (chainId);
-	}
+//	if (ChainsMaster::isRT_Chain(chainId)) {
+//		vec.insert (vec.begin(), chainId);
+//	}
+//	else {
+//		vec.push_back (chainId);
+//	}
 }
 
 /*************************************************************************************************************************************************
