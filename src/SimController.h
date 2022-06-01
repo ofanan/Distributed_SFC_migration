@@ -24,6 +24,7 @@ Controller of the simulation:
 #include <unordered_set>
 #include <typeinfo>
 
+#include "MyTypes.h"
 #include "Datacenter.h"
 #include "Chain.h"
 #include "MyConfig.h"
