@@ -185,13 +185,13 @@ void Datacenter::initBottomUp (vector<ChainId_t>& vecOfChainThatJoined)
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainThatJoined;
 
-// 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-//		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", dcId);
-//		printBufToLog (); 
-//		MyConfig::printToLog(vecOfChainThatJoined);
-//		print (); 
-//	}
-//  if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
+ 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", dcId);
+		printBufToLog (); 
+		MyConfig::printToLog(vecOfChainThatJoined);
+		print (); 
+	}
+  if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
 }
 
 /*************************************************************************************************************************************************
