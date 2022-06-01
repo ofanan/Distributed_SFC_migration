@@ -30,9 +30,6 @@ const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 
 const int16_t chainMigCost = 600;
 
-const bool SYNC  = true;
-const bool ASYNC = false;
-
 const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 
 const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
@@ -71,7 +68,7 @@ class MyConfig {
 		
 		// Other accessories funcs'
 		static ofstream getLogFile ();
-		static vector<uint16_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2); // returns the scalar product of two vectors
+		static vector<Cost_t> scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2); // returns the scalar product of two vectors
 		static bool eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id);
 /*		static bool eraseKeyFromSet (unordered_set <ChainId_t> set, uint16_t id); // erase the given key from the given set. Returns true iff the requested key was indeed found in the set*/
 };

@@ -13,5 +13,8 @@ const Lvl_t   	UNPLACED_LVL	 = -1;
 const Cost_t	  UNPLACED_COST  = -1;
 const Cpu_t		  UNPLACED_CPU   = -1;
 
+const bool SYNC  = true;
+const bool ASYNC = false;
+
 #endif
 

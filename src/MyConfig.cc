@@ -95,11 +95,11 @@ void MyConfig::printToLog (unordered_set <ChainId_t> set2print)
 	}
 }
 
-vector<uint16_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 
+vector<Cost_t> MyConfig::scalarProdcut (const vector<uint16_t> &vec1, const vector<uint16_t> &vec2) 
 {
 
 	uint8_t size = min (vec1.size(), vec2.size()); 
-	vector <uint16_t> res; // = {size};
+	vector <Cost_t> res; 
 	for (uint8_t i(0); i<size; i++) {
 		res.insert(res.begin()+i, vec1[i] * vec2[i]);
 	}
