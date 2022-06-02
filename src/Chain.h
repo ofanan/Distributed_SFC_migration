@@ -94,14 +94,15 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
 void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-bool findChainInSet 	 (set<Chain> setOfChains, ChainId_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
+
+/*************************************************************************************************************************************************
+// Given chainId, assigns to chain the respective chain from the set. returns true iff the requested chain Id was found in the set.
+**************************************************************************************************************************************************/
+bool findChainInSet   (const UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c); 
+bool findChainInSet 	(const set<Chain> setOfChains, ChainId_t id, Chain& foundChain); 
 /*bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)*/
 bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); // Given chainId, erases the respective chain from the set. 
 
-/*************************************************************************************************************************************************
-Find a chain (given by its id) in a given set of chains.
-**************************************************************************************************************************************************/
-bool 					findChainInSet  (UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, DcId_t poa);
 
 #endif

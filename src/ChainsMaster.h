@@ -2,7 +2,7 @@
 #define CHAINS_MASTER_H
 
 #include <stdio.h>
-#include <stdint.h>
+#include <string.h>
 
 #include <vector>
 #include <set>
@@ -30,7 +30,7 @@ class ChainsMaster {
 /*  static Cpu_t  getCpu     								  (const ChainId_t chainId); */
 /*  static Cpu_t  getCpu     								  (const ChainId_t chainId, const Lvl_t lvl); */
 /*	static bool 	isRT_Chain									(const ChainId_t chainId);*/
-	static Chain  getChain										(const ChainId_t chainId);
+	static bool 	getChain 											(const ChainId_t chainId, Chain &chain);
 	
 	friend class SimController;
 	friend class MyConfig;

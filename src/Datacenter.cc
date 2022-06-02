@@ -23,7 +23,7 @@ inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, si
 
 inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
 
-inline void Datacenter::regainRsrcOfChain (const Chain chain)   	 {availCpu += chain.mu_u_at_lvl(lvl); }
+inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
 Datacenter::Datacenter()
 {
@@ -151,16 +151,26 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 
 	for (auto chainId : IdsOfChainsToRlz) {
 
-		Chain chain;
-		if (findChainInSet (potPlacedChains, chainId, chain)) {
+		// First, remove the chain from the list of potPlacedChains
+		auto search = potPlacedChains.find (chainId);
+		if (search!=potPlacedChains.end()) { 
+			Chain chain;
+		ChainsMaster::getChain (chainId, chain);
 			regainRsrcOfChain (chain);
-			eraseChainFromSet (potPlacedChains,	chainId);
-			continue; // if the chain was found in the potPlacedChains db, it's surely not in the placedChains and newlyPlacedChains
+			potPlacedChains.erase (chainId);
+			continue; // this chainId was potentially-placed. Hence, it's surely not in the placedChains and newlyPlacedChains
 		}
-		if (findChainInSet (placedChains, chainId, chain)) {
+		
+		// Next, remove the chain from the list of placedChains
+		search = placedChains.find (chainId);
+		if (search!=placedChains.end()) { 
+			Chain chain;
+			ChainsMaster::getChain (chainId, chain);
 			regainRsrcOfChain (chain);
-			eraseChainFromSet (placedChains, chainId);
+			potPlacedChains.erase (chainId);
 		}
+
+		// Finally, remove the chain from the list of newlyPlacedChains
 		MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
 		
 	}
@@ -246,28 +256,26 @@ void Datacenter::pushUpSync ()
 	}
 	reshuffled = false;
 	
-	Chain chainInPotPlacedChains;
-	
-	for (auto chainInPushUpList=pushUpList.begin(); chainInPushUpList!=pushUpList.end(); ) { // for each chain in pushUpList
-		if (!findChainInSet (potPlacedChains, chainInPushUpList->id, chainInPotPlacedChains)) { // If this chain doesn't appear in my potPlacedChains, nothing to do
-			chainInPushUpList++;
+	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
+		auto search = potPlacedChains.find (chainPtr->id);
+		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do
+			chainPtr++;
 			continue;
 		}	
 		
-		if (chainInPushUpList->curLvl>(this->lvl) ) { // was the chain pushed-up?
-			regainRsrcOfChain (*chainInPushUpList); // Yes --> regain its resources
+		if (chainPtr->curLvl > (this->lvl) ) { // was the chain pushed-up?
+			regainRsrcOfChain (*chainPtr); // Yes --> regain its resources
 		}
 		else { //the chain wasn't pushed-up --> need to locally place it
-			chainInPotPlacedChains.curLvl = this->lvl;
-			placedChains.				 insert (chainInPotPlacedChains);
-			newlyPlacedChainsIds.insert (chainInPotPlacedChains.id);
+			placedChains.				 insert (chainPtr->id);
+			newlyPlacedChainsIds.insert (chainPtr->id);
 		}
-		eraseChainFromSet (potPlacedChains, chainInPotPlacedChains.id);
-		chainInPushUpList = pushUpList.erase (chainInPushUpList);
+		potPlacedChains.erase (chainPtr->id);
+		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
 	}
 
 	// Next, try to push-up chains of my descendants
-	uint16_t requiredCpuToLocallyPlaceThisChain;
+	Cpu_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
@@ -280,8 +288,8 @@ void Datacenter::pushUpSync ()
 			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
 			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpList
 			pushedUpChain.curLvl = lvl;
-			chainPtr 						 = pushUpList.erase (chainPtr); // remove the push-upped chain from the set of potentially pushed-up chains; to be replaced by a modified chain
-			placedChains.				 insert (pushedUpChain);
+			chainPtr 						 = pushUpList.erase (chainPtr); // remove the push-upped chain from the list of potentially pushed-up chains; to be replaced by a modified chain
+			placedChains.				 insert (pushedUpChain.id);
 			newlyPlacedChainsIds.insert (pushedUpChain.id);
 			insertSorted 								(pushUpList, pushedUpChain);
 		}
@@ -369,19 +377,19 @@ void Datacenter::bottomUpSync ()
 	}
 
 	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
-		uint16_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
-		Chain modifiedChain; // the modified chain, to be pushed to datastructures
+		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 				availCpu -= requiredCpuToLocallyPlaceThisChain;
-				modifiedChain = *chainPtr;
-				modifiedChain.curLvl = lvl;
-				chainPtr = notAssigned.erase (chainPtr);
-				if (cannotPlaceThisChainHigher(modifiedChain)) { // Am I the highest delay-feasible DC of this chain?
-					placedChains.				 insert (modifiedChain);
-					newlyPlacedChainsIds.insert (modifiedChain.id);
+				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+					placedChains.				 insert  (chainPtr->id);
+					newlyPlacedChainsIds.insert  (chainPtr->id);
+					chainPtr = notAssigned.erase (chainPtr);
 				}
-				else {
-					potPlacedChains.insert (modifiedChain);
+				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
+					potPlacedChains.insert (chainPtr->id);
+					Chain modifiedChain = *chainPtr;
+					modifiedChain.curLvl = lvl;
+					chainPtr = notAssigned.erase (chainPtr); 
 					insertSorted (pushUpList, modifiedChain); 
 				}
 		}

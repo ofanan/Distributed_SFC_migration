@@ -141,7 +141,7 @@ bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId)
 * The chain is written to foundChain.
 * Output: true iff the requested chain was found.
 **************************************************************************************************************************************************/
-bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)
+bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)
 {
 	Chain dummy (chainId, {});
 	auto search = setOfChains.find (dummy);
