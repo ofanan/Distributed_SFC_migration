@@ -7,7 +7,7 @@ using namespace std;
 
 string 														MyConfig::LogFileName;
 ofstream 													MyConfig::logFile;
-unordered_set <Chain, ChainHash> 	MyConfig::allChains;
+unordered_set <Chain, ChainHash> 	ChainsMaster::allChains;
 char 															MyConfig::buf[MyConfig::bufSize];
 
 void MyConfig::openFiles()
@@ -126,7 +126,7 @@ void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, boo
 	printToLog ("\nallChains\n*******************\n");
 	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current DC\n");
 	
-	for (auto chain : MyConfig::allChains) {
+	for (auto chain : ChainsMaster::allChains) {
 		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());
 		printToLog (buf);
 	}
@@ -138,7 +138,7 @@ void MyConfig::printAllChainsPoas () //(bool printSu=true, bool printleaf=false,
 	printToLog ("\nallChains\n*******************\n");
 	printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
 	
-	for (auto chain : allChains) {
+	for (auto chain : ChainsMaster::allChains) {
 		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
 		printToLog (buf);
 	}

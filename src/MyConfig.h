@@ -19,6 +19,7 @@
 
 #include "MyTypes.h"
 #include "Chain.h"
+#include "ChainsMaster.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -42,7 +43,7 @@ class MyConfig {
 
 	public:
 	
-		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
+/*		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. */
  		static string LogFileName;
     static ofstream logFile;
 		const static bool mode=SYNC;

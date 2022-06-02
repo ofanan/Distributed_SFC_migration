@@ -25,9 +25,10 @@ Controller of the simulation:
 #include <typeinfo>
 
 #include "MyTypes.h"
+#include "MyConfig.h"
 #include "Datacenter.h"
 #include "Chain.h"
-#include "MyConfig.h"
+#include "ChainsMaster.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
 

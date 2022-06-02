@@ -6,10 +6,11 @@
 #include <vector>
 #include <set>
 
+#include "MyTypes.h"
 #include "MyConfig.h"
 #include "SimController.h"
 #include "Chain.h"
-#include "MyTypes.h"
+#include "ChainsMaster.h"
 
 #include "EndXmtMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
