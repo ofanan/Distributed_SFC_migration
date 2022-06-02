@@ -5,13 +5,13 @@
 #include <omnetpp.h>
 
 #include <vector>
+#include <type_traits>
 #include <set>
 #include <algorithm>
 #include <unordered_set>
 
 #include "MyTypes.h"
 #include "MyConfig.h"
-#include "ChainsMaster.h"
 
 using namespace std;
 
@@ -22,7 +22,7 @@ class Chain
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
 		const static vector<Cost_t> costOfCpuUnitAtLvl; 
-		int8_t curLvl;        // Level of the datacenter currently hosting me 
+		Lvl_t curLvl;        // Level of the datacenter currently hosting me 
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). 
 
 		// C'tors
@@ -49,8 +49,8 @@ class Chain
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
 		*/		
-    Cpu_t mu_u_at_lvl (uint8_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
-    uint16_t mu_u_len () const;
+    Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
+    Lvl_t mu_u_len () const;
 /*    bool isDelayFeasible (uint16_t dcId) const;*/
 };
 
@@ -58,7 +58,7 @@ class RT_Chain : public Chain
 {
 public:
   static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
-  static const uint8_t mu_u_len;
+  static const Lvl_t mu_u_len;
 	static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
 	RT_Chain (const RT_Chain &c);
   RT_Chain (ChainId_t id, vector <DcId_t> S_u);
@@ -68,7 +68,7 @@ class Non_RT_Chain: public Chain
 {
   public:
 	  static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
-	  static const uint8_t  mu_u_len;
+	  static const Lvl_t  mu_u_len;
 		static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
     Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u);
 	  Non_RT_Chain (const Non_RT_Chain &c);
@@ -90,11 +90,10 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 **************************************************************************************************************************************************/
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
-// Insert a chain, or a chainId, into its correct place to a sorted datastructure
-void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (vector <ChainId_t> &vec, const ChainId_t chainId);
+// Insert a chain in its correct place to a sorted datastructure
 void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
+void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 bool findChainInSet 	 (set<Chain> setOfChains, ChainId_t id, Chain& foundChain); // Given chainId, assigns to chain the respective chain from the set. 
 /*bool findChainInSet (unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)*/
 bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); // Given chainId, erases the respective chain from the set. 

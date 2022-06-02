@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/BottomUpPkt.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from BottomUpPkt.msg.
 //
 
 #ifndef __BOTTOMUPPKT_M_H
@@ -21,17 +21,15 @@
 // cplusplus {{
 #pragma once
 #include "Chain.h"
-#include "MyTypes.h"
-#include "ChainIdAndLvl.h"
 // }}
 
 /**
- * Class generated from <tt>src/BottomUpPkt.msg:13</tt> by nedtool.
+ * Class generated from <tt>BottomUpPkt.msg:10</tt> by nedtool.
  * <pre>
  * packet BottomUpPkt
  * {
  *     Chain notAssigned[];
- *     ChainIdAndLvl pushUpVec[];
+ *     Chain pushUpVec[];
  * }
  * </pre>
  */
@@ -40,7 +38,7 @@ class BottomUpPkt : public ::omnetpp::cPacket
   protected:
     Chain *notAssigned; // array ptr
     unsigned int notAssigned_arraysize;
-    ChainIdAndLvl *pushUpVec; // array ptr
+    Chain *pushUpVec; // array ptr
     unsigned int pushUpVec_arraysize;
 
   private:
@@ -67,9 +65,9 @@ class BottomUpPkt : public ::omnetpp::cPacket
     virtual void setNotAssigned(unsigned int k, const Chain& notAssigned);
     virtual void setPushUpVecArraySize(unsigned int size);
     virtual unsigned int getPushUpVecArraySize() const;
-    virtual ChainIdAndLvl& getPushUpVec(unsigned int k);
-    virtual const ChainIdAndLvl& getPushUpVec(unsigned int k) const {return const_cast<BottomUpPkt*>(this)->getPushUpVec(k);}
-    virtual void setPushUpVec(unsigned int k, const ChainIdAndLvl& pushUpVec);
+    virtual Chain& getPushUpVec(unsigned int k);
+    virtual const Chain& getPushUpVec(unsigned int k) const {return const_cast<BottomUpPkt*>(this)->getPushUpVec(k);}
+    virtual void setPushUpVec(unsigned int k, const Chain& pushUpVec);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const BottomUpPkt& obj) {obj.parsimPack(b);}

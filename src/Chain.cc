@@ -1,16 +1,12 @@
-#include <vector>
-#include <type_traits>
 #include "Chain.h"
-
-extern const int8_t UNPLACED_LVL;
 
 const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
 const vector<Cpu_t> RT_Chain		 ::mu_u = {1, 1};
 const vector<Cpu_t> Non_RT_Chain::mu_u = {1, 1};
 
-const uint8_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
-const uint8_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
+const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
+const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
 
 const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
@@ -24,7 +20,7 @@ Chain::Chain ()
 	this->isRT_Chain = false;
 };
 
-Chain::Chain (ChainId_t id, vector <DcId_t> S_u, int8_t curLvl) 
+Chain::Chain (ChainId_t id, vector <DcId_t> S_u, Lvl_t curLvl) 
 {
 	this->id = id;
 	this->S_u = S_u;
@@ -83,14 +79,14 @@ void Chain::print (bool printS_u)
 }
 
 // returns the number of datacenters which are delay-feasible for this chain
-uint16_t Chain::mu_u_len () const
+Lvl_t Chain::mu_u_len () const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
 }
 
 
 // returns the mu_u (amount of cpu required by the chain) at a given level in the tree
-Cpu_t Chain::mu_u_at_lvl (uint8_t lvl) const
+Cpu_t Chain::mu_u_at_lvl (Lvl_t lvl) const
 {
 	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }
@@ -179,21 +175,6 @@ Cpu_t Chain::getCpu () const
 	}
 	else {
 	  return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
-	}
-}
-
-/*************************************************************************************************************************************************
-Insert a chainId to its correct order in the (ordered) vector of chains' Ids.
-We currently use only RT, and we assume that the input vector is sorted. 
-Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
-**************************************************************************************************************************************************/
-void insertSorted (vector <ChainId_t> &vec, const ChainId_t chainId)
-{
-	if (ChainsMaster::isRT_Chain(chainId)) {
-		vec.insert (vec.begin(), chainId);
-	}
-	else {
-		vec.push_back (chainId);
 	}
 }
 

@@ -18,17 +18,13 @@
 #include <unordered_set>
 
 #include "MyTypes.h"
-#include "ChainIdAndLvl.h"
 #include "Chain.h"
-#include "ChainsMaster.h"
 
 using namespace omnetpp;
 using namespace std;
 
 class Chain;
 class ChainHash;
-class ChainIdAndLvl;
-class ChainsMaster;
 
 const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 
@@ -68,7 +64,6 @@ class MyConfig {
 		static void printToLog (list <Chain> list2print, bool printLvl=true);
 /*		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);*/
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
-		static void printToLog (list <ChainIdAndLvl> chainIdAndLvl);
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'

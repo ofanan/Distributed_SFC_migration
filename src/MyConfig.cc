@@ -7,7 +7,7 @@ using namespace std;
 
 string 														MyConfig::LogFileName;
 ofstream 													MyConfig::logFile;
-unordered_set <Chain, ChainHash> 	ChainsMaster::allChains;
+unordered_set <Chain, ChainHash> 	MyConfig::allChains;
 char 															MyConfig::buf[MyConfig::bufSize];
 
 void MyConfig::openFiles()
@@ -120,17 +120,13 @@ bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id)
 	}
 }
 
-void MyConfig::printToLog (list <ChainIdAndLvl> chainIdAndLvl)
-{
-}
-
 // Print the PoA of each currently-active user
 void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {
 	printToLog ("\nallChains\n*******************\n");
 	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current DC\n");
 	
-	for (auto chain : ChainsMaster::allChains) {
+	for (auto chain : MyConfig::allChains) {
 		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());
 		printToLog (buf);
 	}
@@ -142,7 +138,7 @@ void MyConfig::printAllChainsPoas () //(bool printSu=true, bool printleaf=false,
 	printToLog ("\nallChains\n*******************\n");
 	printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
 	
-	for (auto chain : ChainsMaster::allChains) {
+	for (auto chain : allChains) {
 		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
 		printToLog (buf);
 	}

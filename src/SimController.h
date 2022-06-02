@@ -27,7 +27,6 @@ Controller of the simulation:
 #include "MyTypes.h"
 #include "Datacenter.h"
 #include "Chain.h"
-#include "ChainsMaster.h"
 #include "MyConfig.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
@@ -62,8 +61,8 @@ class SimController : public cSimpleModule
 		string line; //current line being read from the tracefile
 		
 		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
-		// chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i    
-		unordered_map <DcId_t, vector<ChainId_t> > chainsThatJoinedLeaf, chainsThatLeftDatacenter; 
+    unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDatacenter;
+    unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
     vector <bool> rcvdFinishedAlgMsgFromLeaves; //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
     vector <vector<DcId_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
