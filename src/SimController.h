@@ -110,7 +110,6 @@ class SimController : public cSimpleModule
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 				 
   public:
-    string traceFileName = "results/poa_files/Tree_shorter.poa";
     ifstream traceFile;
  		string LogFileName   = "example.txt";
 		static const uint16_t bufSize = 128;

@@ -42,6 +42,8 @@ class MyConfig {
 		static char buf[bufSize];
 
 	public:
+
+    static string traceFileName;;
 	
 /*		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. */
  		static string LogFileName;

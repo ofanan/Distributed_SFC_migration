@@ -52,20 +52,6 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-//	Chain c1 (1, {}, 1);
-//	Chain c2 (2, {}, 2);
-//	list <Chain>  pushUpList;
-//	insertSorted (pushUpList, c1);
-//	insertSorted (pushUpList, c2);
-//	MyConfig::printToLog (pushUpList);
-//	endSimulation ();
-//	// $$$$
-//	SetOfChainsOrderedByDecCpuUsage pushUpSet; 
-//	Chain c1 (1, {}, 1);
-//	pushUpSet.insert (c1);
-//	Chain c2 (1, {}, 1);
-//	pushUpSet.insert (c2);
-//	endSimulation ();
 	runTrace ();
 }
 
@@ -159,7 +145,7 @@ void SimController::runTimeStep ()
 
 
 void SimController::runTrace () {
-	traceFile = ifstream (traceFileName);
+	traceFile = ifstream (MyConfig::traceFileName);
 	isFirstPeriod = true;
 	
   numMigs         = 0; // will cnt the # of migrations in the current run

@@ -15,6 +15,6 @@ new_usrs: (3,2)
 old_usrs: (1,1)(2,0)
 t = 2
 usrs_that_left: 
-new_usrs: 
+new_usrs: (4,0)
 old_usrs: 
 
