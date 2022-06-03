@@ -185,24 +185,24 @@ void SimController::concludeTimeStep ()
 {
 	if (MyConfig::DEBUG_LVL>0) {
 		checkChainsMasterData ();
-		for (auto const &chain : ChainsMaster::allChains) {
-			if (chain.curLvl==UNPLACED_LVL) {
-				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
-				printBufToLog ();
-				printAllDatacenters ();
-				MyConfig::printAllChains ();
-				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
-			}
-		}
+//		for (auto const &chain : ChainsMaster::allChains) {
+//			if (chain.curLvl==UNPLACED_LVL) {
+//				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
+//				printBufToLog ();
+//				printAllDatacenters ();
+//				MyConfig::printAllChains ();
+//				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
+//			}
+//		}
 		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 			printAllDatacenters ();
 		}
 	}
 
-//	uint16_t numMigsSinceLastStep = 0;
+	//	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
-	std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	
 }
 // print all the placed (and possibly, the pot-placed) chains on each DC by ChainsMaster::allChains DB.
