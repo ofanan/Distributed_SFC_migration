@@ -130,10 +130,8 @@ bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId)
 	if (search==setOfChains.end()) {
 		return false;
 	}
-	else {
-		setOfChains.erase(search);
-		return true;
-	}
+	setOfChains.erase(search);
+	return true;
 }
 
 /*************************************************************************************************************************************************

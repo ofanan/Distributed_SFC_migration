@@ -437,28 +437,15 @@ void Datacenter::updatePlacementInfo ()
 		return;
 	}
 	
-	Chain 	   chain;
 	for (auto chainId : newlyPlacedChainsIds) {
-		if (!(findChainInSet (ChainsMaster::allChains, chainId, chain))) {
-			error ("didn't find placed chain id %d that appeared in a call to updatePlacementInfo", chainId);
-
+		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
+			printBufToLog ();
 		}
-		else {
-			if (chain.getCurDatacenter()!=UNPLACED_DC) { // was it an old chain that migrated?
-//				numMigs++; // Yep --> inc. the mig. cntr.
-			}
-			Chain modifiedChain (chainId, chain.S_u); // will hold the modified chain to be inserted each time
-			modifiedChain.curLvl = lvl;
-			
-			if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-				snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[lvl]);
-				printBufToLog ();
-			}
-			ChainsMaster::allChains.erase (chain); 					// remove the old chain from our DB
-			ChainsMaster::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
+		if (!(ChainsMaster::modifyLvl (chainId, lvl))) { // Change the lvl of this chain written in our DB
+			error ("chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster", chainId);
 		}
 	}
-
 
 	newlyPlacedChainsIds.		clear ();
 	newlyDisplacedChainsIds.clear ();
