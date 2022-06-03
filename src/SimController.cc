@@ -184,6 +184,7 @@ void SimController::finish ()
 void SimController::concludeTimeStep ()
 {
 	if (MyConfig::DEBUG_LVL>0) {
+		checkChainsMasterData ();
 		for (auto const &chain : ChainsMaster::allChains) {
 			if (chain.curLvl==UNPLACED_LVL) {
 				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
