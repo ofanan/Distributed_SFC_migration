@@ -408,7 +408,7 @@ void Datacenter::bottomUpSync ()
 				}
 				return prepareReshSync ();
 			}
-			chainPtr++; // I don't have enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain. But maybe I've enough availCpu for the next notAssigned chain  
+			chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  
 		}
 	}
 
@@ -446,7 +446,6 @@ void Datacenter::updatePlacementInfo ()
 			error ("chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster", chainId);
 		}
 	}
-
 	newlyPlacedChainsIds.		clear ();
 }
 
@@ -596,7 +595,7 @@ void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
 }
 
 /*************************************************************************************************************************************************
- * Xmt self.pkt2send to the given output port; schedule a self msg for the end of transmission.
+ * Xmt the given pkt to the given output port; schedule a self msg for the end of transmission.
 *************************************************************************************************************************************************/
 void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
 {
