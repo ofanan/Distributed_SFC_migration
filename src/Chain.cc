@@ -2,13 +2,14 @@
 
 const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
-const vector<Cpu_t> RT_Chain		 ::mu_u = {1, 1};
+// mu_u[i] is the amount of CPU required for placing a chain in a datacenter at level i
+const vector<Cpu_t> RT_Chain		::mu_u = {1, 1}; 
 const vector<Cpu_t> Non_RT_Chain::mu_u = {1, 1};
 
 const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
 const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
-
+// cpuCostAtLvl[i] is the cost of placing a chain on a datacenter at level i
 const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
 const vector <Cost_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
 
@@ -191,6 +192,7 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 	}
 }
 
+// the compare function used by pushUpList: sort two chains in a decreasing order of the cpu they current use.
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 	Cpu_t lhsCpu = lhs.getCpu ();
 	Cpu_t rhsCpu = rhs.getCpu ();
@@ -240,8 +242,4 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
 		}
 	}
 }
-
-//typedef unordered_set <Chain, ChainHash>                 UnorderedSetOfChains;
-//typedef set <Chain, sortTwoChainsByCpuUsage> SetOfChainsOrderedByCpuUsage; 
-
 

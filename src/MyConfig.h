@@ -63,15 +63,15 @@ class MyConfig {
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
 		static void printToLog (list <Chain> list2print, bool printLvl=true);
-/*		static void printToLog (SetOfChainsOrderedByDecCpuUsage setOfChains, bool printS_u=false);*/
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'
 		static ofstream getLogFile ();
 		static vector<Cost_t> scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2); // returns the scalar product of two vectors
-		static bool eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id);
-/*		static bool eraseKeyFromSet (unordered_set <ChainId_t> set, uint16_t id); // erase the given key from the given set. Returns true iff the requested key was indeed found in the set*/
+
+		// erase the given key from the given set. Returns true iff the requested key was indeed found in the set
+		static bool eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id); 
 };
 
 #endif

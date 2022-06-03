@@ -144,7 +144,6 @@ void MyConfig::printAllChainsPoas () //(bool printSu=true, bool printleaf=false,
 	}
 }
 
-
 //ofstream MyConfig::getLogFile ()
 //{
 //	return logFile;
