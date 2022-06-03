@@ -319,12 +319,6 @@ void SimController::rdNewUsrsLine (string line)
 		ChainsMaster::allChains.insert (chain); 
 	}	
 	
-	if (MyConfig::LOG_LVL>=DETAILED_LOG && t==2) {
-		snprintf (buf, bufSize, "\nt=%d, after reading newUsrsLine", t);
-		printBufToLog();
-		MyConfig::printAllChains ();
-	} 
-
 }
 
 /*************************************************************************************************************************************************
