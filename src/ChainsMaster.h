@@ -24,7 +24,7 @@ class ChainsMaster {
 
 	static void eraseChains (vector <ChainId_t> vec); // a vector of chains ids to erase 
 	static bool modifyLvl   (ChainId_t chainId, Lvl_t newLvl); // Change the level of the given chain
-/*	inline static void eraseChain  (ChainId_t chainId); // a chain ids to erase */
+	// inline static void eraseChain  (ChainId_t chainId); // a chain ids to erase 
 	static bool 	getChain 											(const ChainId_t chainId, Chain &chain);
 	
 	friend class SimController;

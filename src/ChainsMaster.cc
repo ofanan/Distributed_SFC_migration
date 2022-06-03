@@ -32,12 +32,6 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 
 }
 
-//inline void ChainsMaster::eraseChain (ChainId_t chainId)
-//{
-//	eraseChainFromSet (ChainsMaster::allChains, chainId);
-//}
-
-
 /*************************************************************************************************************************************************
 * Given a chain id, find the respective chain within a given set of chains.
 * The chain is written to foundChain.
