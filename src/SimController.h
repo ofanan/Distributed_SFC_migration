@@ -63,17 +63,20 @@ class SimController : public cSimpleModule
 		
 		string line; //current line being read from the tracefile
 		
-		//chainsThatLeftDC[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
+		//chainsThatLeftDatacenter[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
     unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDatacenter;
     unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
-    vector <bool> rcvdFinishedAlgMsgFromLeaves; //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
-    vector <vector<DcId_t>> pathToRoot; //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
+    
+    //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
+    vector <bool> rcvdFinishedAlgMsgFromLeaves; 
+    
+    //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
+    vector <vector<DcId_t>> pathToRoot; 
 
 		// Init Functions
     void initialize(int stage);
-    virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
-		void openFiles ();
+/*    virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.*/
 		void discoverPathsToRoot ();
 
 		// Termination functions
@@ -100,11 +103,11 @@ class SimController : public cSimpleModule
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
     
     // Functions used for debugging
-		void printChain (ofstream &outFile, const Chain &chain, bool printSu);
-		void printAllDatacenters ();
+		void printChain 					(ofstream &outFile, const Chain &chain, bool printSu);
+		void printAllDatacenters 	();
 		void printAllDatacentersByMyDatabase ();
-    void printAllChainsPoas  (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
-    void PrintStateAndEndSim (); // print the system's state, and end the simulation. 
+    void printAllChainsPoas  	(); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
+    void PrintStateAndEndSim 	(); // print the system's state, and end the simulation. 
 				 
   public:
     string traceFileName = "results/poa_files/Tree_shorter.poa";
@@ -115,8 +118,7 @@ class SimController : public cSimpleModule
 		ofstream logFile;
     SimController ();
     ~SimController ();
-    void checkParams (); // Sanity checks for various parameters
-		void updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl);
+    void checkParams (); // Sanity checks for various parameters    
 		void finishedAlg 		 (DcId_t dcId, DcId_t leafId);
 		void prepareReshSync (DcId_t dcId, DcId_t leafId);
 };

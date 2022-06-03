@@ -456,38 +456,6 @@ void SimController::initAlgAsync ()
 }
 
 /*************************************************************************************************************************************************
-Update chains' placement info, by the data sent from a datacenter.
-- Increase the cntrs of the number of migs as required.
-- Update ChainsMaster::allChains db.
-**************************************************************************************************************************************************/
-void SimController::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl)
-{
-	Enter_Method ("updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChainsIds, int8_t lvl)");
-	Chain 	   chain;
-	for (auto chainId : newlyPlacedChainsIds) {
-		if (!(findChainInSet (ChainsMaster::allChains, chainId, chain))) {
-			error ("t=%d: didn't find chain id %d that appeared in a call to updatePlacementInfo", t, chainId);
-
-		}
-		else {
-			if (chain.getCurDatacenter()!=UNPLACED_DC) { // was it an old chain that migrated?
-				numMigs++; // Yep --> inc. the mig. cntr.
-			}
-			Chain modifiedChain (chainId, chain.S_u); // will hold the modified chain to be inserted each time
-			modifiedChain.curLvl = lvl;
-			
-			if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-				snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", modifiedChain.id, modifiedChain.curLvl, modifiedChain.S_u[lvl]);
-				printBufToLog ();
-			}
-			ChainsMaster::allChains.erase (chain); 					// remove the old chain from our DB
-			ChainsMaster::allChains.insert (modifiedChain); // insert the modified chain, with the updated place (level) into our DB
-		}
-	}
-	MyConfig::printAllChains();
-}
-
-/*************************************************************************************************************************************************
 This func' is called on sync' mode, when a leaf finishes the alg'. The func'
 - Increase the cntrs of the number of migs as required.
 - Update ChainsMaster::allChains db.
