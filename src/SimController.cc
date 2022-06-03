@@ -205,7 +205,7 @@ void SimController::concludeTimeStep ()
 	
 }
 // print all the placed (and possibly, the pot-placed) chains on each DC by ChainsMaster::allChains DB.
-void SimController::printAllDatacentersByMyDatabase ()
+void SimController::printAllDatacentersByChainsMaster ()
 {
 	// gather the required data
 	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
@@ -397,7 +397,7 @@ void SimController::initAlg () {
 Compare the chainsManager's chains' location data to the datacenters' placedChains data.
 Raise an error in case of data inconsistency.
 **************************************************************************************************************************************************/
-void SimController::checkChainsManagerData ()
+void SimController::checkChainsMasterData ()
 {
 	for (auto chain : ChainsMaster::allChains) {
 		DcId_t curDatacenter = chain.getCurDatacenter();

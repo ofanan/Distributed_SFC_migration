@@ -103,12 +103,11 @@ class SimController : public cSimpleModule
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
     
     // Functions used for debugging
-		void printChain 					(ofstream &outFile, const Chain &chain, bool printSu);
-		void printAllDatacenters 	();
-		void printAllDatacentersByMyDatabase ();
-    void printAllChainsPoas  	(); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
-    void PrintStateAndEndSim 	(); // print the system's state, and end the simulation. 
-    void checkChainsManagerData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
+    void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
+		void printAllDatacenters 	 ();
+		void printAllDatacentersByChainsMaster ();
+    void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
+    void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 				 
   public:
     string traceFileName = "results/poa_files/Tree_shorter.poa";
