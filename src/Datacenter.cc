@@ -171,7 +171,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 				error ("placed chain %d was not found in ChainMaster", chainId);
 			}
 			regainRsrcOfChain (chain);
-			potPlacedChains.erase (chainId);
+			placedChains.erase (chainId);
 		}
 
 		// Finally, remove the chain from the list of newlyPlacedChains
