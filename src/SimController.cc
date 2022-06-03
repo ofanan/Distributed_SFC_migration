@@ -146,13 +146,12 @@ void SimController::runTimeStep ()
 		else if ( (line.substr(0,8)).compare("old_usrs")==0) {
 			rdOldUsrsLine (line.substr(9));
 			
-			// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
-			// place all the new / critical chains.
+			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			ChainsMaster::eraseChains (UsrsThatLeft);
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
-			scheduleAt (simTime() + period, new cMessage); //$$$
+			scheduleAt (simTime() + period, new cMessage); 
 			break;
 		}
   }
