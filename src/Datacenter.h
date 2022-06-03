@@ -56,7 +56,7 @@ class Datacenter : public cSimpleModule
     void initBottomUp (vector<Chain>& vecOfChainThatJoined);
 
     // Log / debug funcs
-    void print ();
+    void print (); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
     
   private:
   	static const uint8_t 	portToPrnt=0;
