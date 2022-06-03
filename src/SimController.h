@@ -57,7 +57,7 @@ class SimController : public cSimpleModule
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
 
-		vector <ChainId_t> UsrsThatLeft; // the users that left at the current period
+		vector <ChainId_t> usrsThatLeft; // the users that left at the current period
 		uint32_t numMigs=0; // number of migration performed		
 		float period=1.0;
 		

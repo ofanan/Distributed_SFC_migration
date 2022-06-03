@@ -134,7 +134,7 @@ void SimController::runTimeStep ()
 			
 			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
-			ChainsMaster::eraseChains (UsrsThatLeft);
+			ChainsMaster::eraseChains (usrsThatLeft);
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
 			scheduleAt (simTime() + period, new cMessage); 
@@ -188,6 +188,7 @@ void SimController::concludeTimeStep ()
 	//	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
+	usrsThatLeft						.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	
 }
@@ -278,7 +279,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 				error ("Note: this chain was not placed before leaving\n"); 
 	  	}
   		chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-  		UsrsThatLeft.push_back (chainId);
+  		usrsThatLeft.push_back (chainId);
 	  }
   }
 }
@@ -314,9 +315,16 @@ void SimController::rdNewUsrsLine (string line)
 			}
 		}
 		
-		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].
+		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].		
 		ChainsMaster::allChains.insert (chain); 
 	}	
+	
+	if (MyConfig::LOG_LVL>=DETAILED_LOG && t==2) {
+		snprintf (buf, bufSize, "\nt=%d, after reading newUsrsLine", t);
+		printBufToLog();
+		MyConfig::printAllChains ();
+	} 
+
 }
 
 /*************************************************************************************************************************************************
@@ -428,6 +436,12 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 // Initiate the run of an Sync placement alg'
 void SimController::initAlgSync () 
 {  	
+
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
+		printBufToLog();
+		MyConfig::printAllChains ();
+	} 
 
 	bool *initAlgAtLeaf { new bool[numLeaves]{} }; // initAlgAtLeaf[i] will be true iff we already initiated a run of BUPU in leaf i
 
