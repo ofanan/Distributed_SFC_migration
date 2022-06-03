@@ -21,7 +21,8 @@ class ChainsMaster {
 		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 
 	public:
-	
+
+	static void eraseChains (vector <ChainId_t> vec); // a vector of chains ids to be removed 
 	static bool 	getChain 											(const ChainId_t chainId, Chain &chain);
 	
 	friend class SimController;

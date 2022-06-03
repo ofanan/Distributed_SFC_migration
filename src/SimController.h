@@ -56,6 +56,8 @@ class SimController : public cSimpleModule
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
+
+		vector <ChainId_t> UsrsThatLeft; // the users that left at the current period
 		uint32_t numMigs=0; // number of migration performed		
 		float period=1.0;
 		

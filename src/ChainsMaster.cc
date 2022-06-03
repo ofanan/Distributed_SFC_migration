@@ -1,6 +1,14 @@
 #include "ChainsMaster.h"
 
-//		error ("the requested chainId %d is not found", chainId);
+void ChainsMaster::eraseChains (vector <ChainId_t> vec)
+{
+	for (auto chainId : vec) {
+		eraseChainFromSet (allChains, chainId);
+	}
+}
+
+
+
 /*************************************************************************************************************************************************
 * Given a chain id, find the respective chain within a given set of chains.
 * The chain is written to foundChain.

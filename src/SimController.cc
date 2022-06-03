@@ -1,7 +1,6 @@
 //$$$ ToDo:
 // Set numMigs in MyConfig.
 // Check why at t=1 chain 3 is placed in both DC 2 and DC 5.
-
 /*************************************************************************************************************************************************
 Controller of the simulation:
 - reads the trace.
@@ -150,6 +149,7 @@ void SimController::runTimeStep ()
 			// Now, that we finished reading and parsing all the data about new / old critical chains, rlz the rsrcs of chains that left their current location, and then call a placement algorithm to 
 			// place all the new / critical chains.
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
+			ChainsMaster::eraseChains (UsrsThatLeft);
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
 			scheduleAt (simTime() + period, new cMessage); //$$$
@@ -292,7 +292,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 				error ("Note: this chain was not placed before leaving\n"); 
 	  	}
   		chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-  		eraseChainFromSet (ChainsMaster::allChains, chainId);
+  		UsrsThatLeft.push_back (chainId);
 	  }
   }
 }
