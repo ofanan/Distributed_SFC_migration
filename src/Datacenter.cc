@@ -406,6 +406,10 @@ void Datacenter::bottomUpSync ()
 					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
 					printStateAndEndSim  ();
 				}
+				if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+					snprintf (buf, bufSize, "\n************** DC %d initiating a reshuffle", dcId);
+					printBufToLog();
+				}
 				return prepareReshSync ();
 			}
 			chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  

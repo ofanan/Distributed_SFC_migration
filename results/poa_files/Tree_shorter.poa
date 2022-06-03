@@ -10,11 +10,11 @@ usrs_that_left:
 new_usrs: (0,0)(1,0)
 old_usrs: 
 t = 1
-usrs_that_left: 1  
+usrs_that_left: 0
 new_usrs: 
 old_usrs: 
 t = 2
 usrs_that_left: 
-new_usrs: (1,1)(2,1)
+new_usrs: (0,1)(2,1)
 old_usrs: 
 

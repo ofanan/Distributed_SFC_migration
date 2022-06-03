@@ -308,7 +308,6 @@ void SimController::rdNewUsrsLine (string line)
 			// Generate a non-RT (lowest-priority) chain, and insert it to the end of the vector of chains that joined the relevant leaf (leaf DC)
 			chain = Non_RT_Chain (chainId, vector<DcId_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
 		}
-		
 		if (MyConfig::DEBUG_LVL>0) {
 			if (findChainInSet (ChainsMaster::allChains, chainId, chain)) {
 				error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
