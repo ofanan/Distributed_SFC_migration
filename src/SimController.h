@@ -89,7 +89,7 @@ class SimController : public cSimpleModule
 		void rdUsrsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void rdNewUsrsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.
 		void rdOldUsrsLine (string line); // read a trace line, containing a list of old, moved chain and their updated PoAs.
-		void rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
+		void rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > &ChainsToRlzFromDc); // Send a direct msg to each DC whose chains left, so that it releases its resources.
 		void initAlg (); // init a placement alg'
   	void initAlgSync (); // init a sync placement alg'
   	void initAlgAsync (); // init an async placement alg'

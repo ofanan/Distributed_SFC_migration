@@ -377,7 +377,7 @@ void SimController::rdOldUsrsLine (string line)
 - Call each datacenter to inform it of all chains that left it - due to either leaving the sim', moving to another poa, or due to a preparation
   for reshuffle.
 **************************************************************************************************************************************************/
-void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > ChainsToRlzFromDc) 
+void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > &ChainsToRlzFromDc) 
 {
 
 	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
@@ -398,29 +398,27 @@ void SimController::initAlg () {
 Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.
 The function does the following:
 - rlz the rsrscs of all the chains associated with this poa.
-- Initiate a placement alg' from this poa .
+- Initiate a placement alg' from this poa, where notAssigned=all users currently associated with this PoA.
 **************************************************************************************************************************************************/
 void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 {
 
-//	DcId dcId = ((Datacenter*) (msg->getSenderModule()))->dcId;
-//  unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
-//	uint16_t numOfChainsToReplace = 0;
+  unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
+  vector<Chain> vecOfUsrsOfThisPoA; 
+	uint16_t numOfChainsToReplace = 0;
 
-//	for (auto chain : ChainsMaster::allChains) {
-//		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
-//			DcId_t chainCurDatacenter = chain.getCurDatacenter();
-//			if (chainCurDatacenter == UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
-//			  continue;
-//			}
-//			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
-//			msg2snd -> setNotAssignedArraySize (++numOfChainsToReplace);
-//			msg2snd -> setNotAssigned 			   (numOfChainsToReplace-1, chain);
-//		}
-//	}
-//	rlzRsrcOfChains (chainsToReplace);
-
-//	sendDirect (msg2snd, (cModule*)(datacenters[dcId]), "directMsgsPort");
+	for (auto chain : ChainsMaster::allChains) {
+		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
+			DcId_t chainCurDatacenter = chain.getCurDatacenter();
+			if (chainCurDatacenter == UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
+			  continue;
+			}
+			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
+			vecOfUsrsOfThisPoA.push_back (chain);
+		}
+	}
+	rlzRsrcOfChains (chainsToReplace);
+	datacenters[dcId]->initBottomUp (vecOfUsrsOfThisPoA);
 }
 
 // Initiate the run of an Sync placement alg'

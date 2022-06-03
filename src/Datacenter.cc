@@ -545,6 +545,9 @@ void Datacenter::PrintAllDatacenters ()
 	sendDirect (msg2snd, simController, "directMsgsPort");
 }
 
+/*************************************************************************************************************************************************
+Prepare a reshuffle in Sync mode.
+*************************************************************************************************************************************************/
 void Datacenter::prepareReshSync () 
 {
 	if (reshuffled) {
