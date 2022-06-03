@@ -611,3 +611,11 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
   endXmtEvents[portNum]->setPortNum (portNum);
   scheduleAt(xmtChnl[portNum]->getTransmissionFinishTime(), endXmtEvents[portNum]);
 }
+
+// return true iff the queried chain id is locally placed
+bool Datacenter::checkIfChainIsPlaced (ChainId_t chainId) 
+{
+	auto search = placedChains.find (chainId);
+	return (search!=placedChains.end()); 	
+}
+

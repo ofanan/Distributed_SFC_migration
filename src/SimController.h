@@ -108,6 +108,7 @@ class SimController : public cSimpleModule
 		void printAllDatacentersByMyDatabase ();
     void printAllChainsPoas  	(); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim 	(); // print the system's state, and end the simulation. 
+    void checkChainsManagerData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
 				 
   public:
     string traceFileName = "results/poa_files/Tree_shorter.poa";

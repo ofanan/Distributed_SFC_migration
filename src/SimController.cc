@@ -393,6 +393,23 @@ void SimController::initAlg () {
 	return (MyConfig::mode==SYNC)? initAlgSync() : initAlgAsync();
 }
 
+/*************************************************************************************************************************************************
+Compare the chainsManager's chains' location data to the datacenters' placedChains data.
+Raise an error in case of data inconsistency.
+**************************************************************************************************************************************************/
+void SimController::checkChainsManagerData ()
+{
+	for (auto chain : ChainsMaster::allChains) {
+		DcId_t curDatacenter = chain.getCurDatacenter();
+		if (curDatacenter == UNPLACED_DC) { // chain is unplaced
+			error ("t=% by chainsManager, chain %d is unplaced in the end of period", t, chain.id);
+		}
+		if (!(datacenters[curDatacenter]->checkIfChainIsPlaced (chain.id)) ) {
+			error ("t=% chainsManager says that chain %d is placed in DC %d while it's not placed there", t, chain.id, curDatacenter);
+		}
+	}
+}
+
 
 /*************************************************************************************************************************************************
 Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.

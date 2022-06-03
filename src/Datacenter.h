@@ -54,6 +54,7 @@ class Datacenter : public cSimpleModule
 		// Functions called by the sim controller
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
     void initBottomUp (vector<Chain> &vecOfChainThatJoined);
+    bool checkIfChainIsPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
 
     // Log / debug funcs
     void print (); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
