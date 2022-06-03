@@ -29,7 +29,6 @@ class ChainsMaster {
 	
 	friend class SimController;
 	friend class MyConfig;
-	friend class Datacenter;
 };
 
 #endif
