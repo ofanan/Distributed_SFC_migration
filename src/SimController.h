@@ -76,7 +76,7 @@ class SimController : public cSimpleModule
 
 		// Init Functions
     void initialize(int stage);
-/*    virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.*/
+    virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
 		void discoverPathsToRoot ();
 
 		// Termination functions

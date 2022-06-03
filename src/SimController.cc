@@ -39,7 +39,7 @@ void SimController::initialize (int stage)
 	checkParams ();
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
-	std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	leaves.resize (numLeaves);
 	datacenters.resize (numDatacenters);
 	DcId_t leafId = 0;
