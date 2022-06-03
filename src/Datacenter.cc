@@ -433,7 +433,7 @@ Later, clear newlyPlacedChainsIds.
 void Datacenter::updatePlacementInfo ()
 {
 
-	if (newlyPlacedChainsIds.empty () && newlyDisplacedChainsIds.empty()) {
+	if (newlyPlacedChainsIds.empty ()) {
 		return;
 	}
 	
@@ -448,7 +448,6 @@ void Datacenter::updatePlacementInfo ()
 	}
 
 	newlyPlacedChainsIds.		clear ();
-	newlyDisplacedChainsIds.clear ();
 }
 
 

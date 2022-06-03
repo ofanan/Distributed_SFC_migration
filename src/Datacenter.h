@@ -30,7 +30,7 @@ class Datacenter : public cSimpleModule
 
   public:
   
-  	// topology
+  	// topology (fixed for a given simulation)
     cModule 				*network; // Pointer to the network on which the simulation is running
     SimController 	*simController;
   	string 					networkName;
@@ -45,14 +45,6 @@ class Datacenter : public cSimpleModule
     int16_t dcId;
     int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1
     
-    // Dynamic
-    uint16_t  availCpu;
-    vector<Chain> notAssigned, pushUpVec; 
-    unordered_set <ChainId_t> placedChains, potPlacedChains; 
-    unordered_set <ChainId_t> newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
-    unordered_set <ChainId_t> newlyDisplacedChainsIds; // IDs of the chains that I have displaceed after the last update I had sent to SimCtrlr.
-		uint8_t numBuPktsRcvd; 
-		
 		//getter
 		void setLeafId (DcId_t leafId);
 		
@@ -74,6 +66,13 @@ class Datacenter : public cSimpleModule
     vector <EndXmtMsg*> 	endXmtEvents; // Indicates when the currently xmtd packet will finish
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the BUPU alg'
+		
+    // Dynamic
+    uint16_t  								 availCpu;
+    vector<Chain> notAssigned, pushUpVec; 
+    unordered_set <ChainId_t>  placedChains, potPlacedChains; 
+    unordered_set <ChainId_t>  newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
+		uint8_t numBuPktsRcvd; 
 		
 		// A small buffer, used for printing results / log
 		static const uint16_t bufSize = 128;
