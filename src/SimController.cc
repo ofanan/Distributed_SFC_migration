@@ -1,6 +1,6 @@
 //$$$ ToDo:
+// Tree_shorter.poa, t==2: check why RT chain is inserted at the beginning of the vec, instead of in the end.
 // Set numMigs in MyConfig.
-// Check why at t=1 chain 3 is placed in both DC 2 and DC 5.
 /*************************************************************************************************************************************************
 Controller of the simulation:
 - reads the trace.
@@ -301,7 +301,8 @@ void SimController::rdNewUsrsLine (string line)
   
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
-		if (rand () < RT_chain_rand_int) {
+		if (chainId==1 || chainId==2 || chainId==3) {
+//		if (rand () < RT_chain_rand_int) { //$$$$
 			chain = RT_Chain (chainId, vector<DcId_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len}); 
 		}
 		else {
