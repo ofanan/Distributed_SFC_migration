@@ -14,7 +14,7 @@ inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= 
 inline bool Datacenter::cannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
 inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
 
-inline uint16_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
+inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
 inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
@@ -42,12 +42,14 @@ void Datacenter::initialize()
 {
 	network     	= (cModule*) (getParentModule ()); 
 	simController = (SimController*) network->getSubmodule("sim_controller");
-	networkName = (network -> par ("name")).stdstringValue();
-  numChildren = (uint8_t)  (par("numChildren"));
-  numParents  = (uint8_t)  (par("numParents"));
-  lvl				  = (uint8_t)  (par("lvl"));
-  dcId				= (uint16_t) (par("dcId"));
-  availCpu    = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?
+	networkName 	= (network -> par ("name")).stdstringValue();
+  numChildren 	= (uint8_t)  (par("numChildren"));
+  numParents  	= (uint8_t)  (par("numParents"));
+  lvl				  	= (uint8_t)  (par("lvl"));
+  dcId					= (uint16_t) (par("dcId"));
+  cpuCapacity   = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?;}
+  availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
+  numBuPktsRcvd = 0;
 
   numPorts    = numParents + numChildren;
   isRoot      = (numParents==0);
@@ -56,7 +58,6 @@ void Datacenter::initialize()
   xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
   endXmtEvents.   resize (numPorts);
   idOfChildren.   resize (numChildren);
-  numBuPktsRcvd = 0;
   
   // Discover the xmt channels to the neighbors, and the neighbors' id's.
 	for (int portNum (0); portNum < numPorts; portNum++) {
@@ -200,7 +201,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
  	notAssigned = vecOfChainThatJoined;
 
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d received vecOfChainThatJoined=", dcId);
+		snprintf (buf, bufSize, "\nDC %d rcvd vecOfChainThatJoined=", dcId);
 		printBufToLog (); 
 		MyConfig::printToLog(vecOfChainThatJoined);
 		print (); 
@@ -577,16 +578,16 @@ void Datacenter::prepareReshSync ()
 Clear all the resources currently allocated at this datastore:
 - Dis-place all the placed and pot-placed chains.
 - Clear notAssigned and pushUpList.
-- reset availCpu.
+- set availCpu to the initial value.
 *************************************************************************************************************************************************/
 void Datacenter::clrRsrc () 
 {
 	notAssigned. 					clear ();
-	pushUpList.   					clear ();
+	pushUpList.   				clear ();
 	placedChains.			 	  clear ();
 	potPlacedChains.			clear ();
 	newlyPlacedChainsIds.	clear ();
-	availCpu 									 = 0;
+	availCpu 				 = cpuCapacity;
 }
 
 /*************************************************************************************************************************************************

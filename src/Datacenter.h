@@ -44,6 +44,7 @@ class Datacenter : public cSimpleModule
     bool isLeaf;
     int16_t dcId;
     int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1
+		Cpu_t cpuCapacity;
     
 		//getter
 		void setLeafId (DcId_t leafId);
@@ -83,13 +84,14 @@ class Datacenter : public cSimpleModule
     virtual void handleMessage (cMessage *msg);
 
 		// Functions related to the alg' running    
-    inline uint16_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
-		inline bool 		isDelayFeasibleForThisChain 		(const Chain chain) const;
-		inline uint8_t 	portOfChild 									 	(const uint8_t child) const; 
-		inline void     sndDirectToSimCtrlr 						(cMessage* msg);
-		inline void 		regainRsrcOfChain 							(const Chain  chain);
-    void sndViaQ         														(int16_t portNum, cPacket* pkt2send);
-    void xmt              													(int16_t portNum, cPacket *pkt2send);
+    
+    Cpu_t requiredCpuToLocallyPlaceChain 				(const Chain chain) const;
+		inline bool 		isDelayFeasibleForThisChain (const Chain chain) const;
+		inline uint8_t 	portOfChild 								(const uint8_t child) const; 
+		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
+		inline void 		regainRsrcOfChain 					(const Chain  chain);
+    void sndViaQ         												(int16_t portNum, cPacket* pkt2send);
+    void xmt              											(int16_t portNum, cPacket *pkt2send);
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();

@@ -410,19 +410,22 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 
   unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
   vector<Chain> vecOfUsrsOfThisPoA; 
-	uint16_t numOfChainsToReplace = 0;
 
 	for (auto chain : ChainsMaster::allChains) {
-		if (chain.S_u[0] == dcId) { // if the datacenterId of the chain's poa is the src of the msg that requested to prepare a sync resh...
+		if (chain.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
 			DcId_t chainCurDatacenter = chain.getCurDatacenter();
-			if (chainCurDatacenter == UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
-			  continue;
+			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
+				chainsToReplace[chainCurDatacenter].push_back (chain.id); // If this chain's PoA is the leaf that requested resh, the chain should be released
 			}
-			chainsToReplace[chainCurDatacenter].push_back (chain.id); // insert the id of any such chain to the vector of chains that the datacenter that curently host this chain should rlz
 			vecOfUsrsOfThisPoA.push_back (chain);
 		}
 	}
 	rlzRsrcOfChains (chainsToReplace);
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nSimCtrlr calling DC %d.initBOttomUp with vecOfChainsThatJoined=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (vecOfUsrsOfThisPoA);
+	}
 	datacenters[dcId]->initBottomUp (vecOfUsrsOfThisPoA);
 }
 
