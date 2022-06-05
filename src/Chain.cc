@@ -92,16 +92,17 @@ void Chain::print (bool printS_u)
 //}
 
 // returns the mu_u (amount of cpu required by the chain) at a given level in the tree
+Cpu_t RT_Chain::mu_u_at_lvl (Lvl_t lvl) const
+{
+	return RT_Chain::mu_u[lvl];
+}
+
+// returns the mu_u (amount of cpu required by the chain) at a given level in the tree
 Cpu_t Non_RT_Chain::mu_u_at_lvl (Lvl_t lvl) const
 {
 	return Non_RT_Chain::mu_u[lvl];
 }
 
-// returns the mu_u (amount of cpu required by the chain) at a given level in the tree
-Cpu_t RT_Chain::mu_u_at_lvl (Lvl_t lvl) const
-{
-	return RT_Chain::mu_u[lvl];
-}
 //// returns true iff the given datacenter id is delay-feasible for this chain (namely, appears in its S_u)
 //bool Chain::isDelayFeasible (uint16_t dcId) const 
 //{
@@ -121,7 +122,7 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcI
 {
 	vector<Chain> res;
 	
-	for (auto chain : setOfChains) {
+	for (auto &chain : setOfChains) {
 		if (chain.S_u[0] == poa) {
 			res.push_back (chain);
 		}
@@ -200,20 +201,20 @@ Cpu_t Non_RT_Chain::getCpu () const
 	return Non_RT_Chain::mu_u[curLvl];
 }
 
-/*************************************************************************************************************************************************
-Insert a chain to its correct order in the (ordered) vector of chains.
-We currently use only RT, and we assume that the input vector is sorted. 
-Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
-**************************************************************************************************************************************************/
-void insertSorted (vector <Chain> &vec, Chain c)
-{
-	if (c.isRT_Chain) {
-		vec.insert (vec.begin(), c);
-	}
-	else {
-		vec.push_back (c);
-	}
-}
+///*************************************************************************************************************************************************
+//Insert a chain to its correct order in the (ordered) vector of chains.
+//We currently use only RT, and we assume that the input vector is sorted. 
+//Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
+//**************************************************************************************************************************************************/
+//void insertSorted (vector <Chain> &vec, Chain c)
+//{
+//	if (c.isRT_Chain) {
+//		vec.insert (vec.begin(), c);
+//	}
+//	else {
+//		vec.push_back (c);
+//	}
+//}
 
 
 /*************************************************************************************************************************************************
@@ -221,12 +222,12 @@ Insert a chain to its correct order in the (ordered) vector of chains.
 We currently use only RT, and we assume that the input vector is sorted. 
 Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
 **************************************************************************************************************************************************/
-void insertSorted (vector <Chain> &vec, const RT_Chain c)
+void insertSorted (vector <Chain> &vec, const RT_Chain &c)
 {
 	vec.insert (vec.begin(), c);
 }
 
-void insertSorted (vector <Chain> &vec, const Non_RT_Chain c)
+void insertSorted (vector <Chain> &vec, const Non_RT_Chain &c)
 {
 	vec.push_back (c);
 }
@@ -245,7 +246,7 @@ inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 insert a chain to its correct location in a sorted list.
 If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
 **************************************************************************************************************************************************/
-void insertSorted (list <Chain> &sortedList, const Chain chain)
+void insertSorted (list <Chain> &sortedList, const Chain &chain)
 {
 
 	for (auto chainPtr = sortedList.begin(); chainPtr!=sortedList.end(); ) {

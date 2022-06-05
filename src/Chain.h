@@ -101,11 +101,11 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 // Insert a chain in its correct place to a sorted datastructure
-void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (vector <Chain> &vec, const RT_Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (vector <Chain> &vec, const Non_RT_Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+/*void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.*/
+void insertSorted (vector <Chain> &vec, const RT_Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+void insertSorted (vector <Chain> &vec, const Non_RT_Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+void insertSorted (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 /*void insertSorted (list <Chain> &sortedList, const RT_Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.*/
 /*void insertSorted (list <Chain> &sortedList, const Non_RT_Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.*/
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
