@@ -188,22 +188,22 @@ Initiate the bottomUpSyncAlg:
 - Schedule a self-msg to call0 bottomUp, for running the BU alg'.
 * Note: this func to be called only when the Datacenter is a leaf.
 *************************************************************************************************************************************************/
-void Datacenter::initBottomUp (vector<Chain>& vecOfChainThatJoined)
+void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 {
 
-	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainThatJoined)");
+	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainsThatJoined)");
 
 	if (!isLeaf) { 
 		error ("Non-leaf DC %d was called by initBottomUp");
 	}
 	pushUpList.clear ();	
 	potPlacedChains.clear ();
- 	notAssigned = vecOfChainThatJoined;
+ 	notAssigned = vecOfChainsThatJoined;
 
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d rcvd vecOfChainThatJoined=", dcId);
+		snprintf (buf, bufSize, "\nDC %d rcvd vecOfChainsThatJoined=", dcId);
 		printBufToLog (); 
-		MyConfig::printToLog(vecOfChainThatJoined);
+		MyConfig::printToLog(vecOfChainsThatJoined);
 		print (); 
 	}
   if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
