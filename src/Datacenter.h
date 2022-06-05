@@ -34,7 +34,7 @@ class Datacenter : public cSimpleModule
     cModule 				*network; // Pointer to the network on which the simulation is running
     SimController 	*simController;
   	string 					networkName;
-  	Lvl_t   				lvl; // level in the tree (leaf's lvl is 0).
+  	uint8_t   			lvl; // level in the tree (leaf's lvl is 0).
     uint8_t 				numChildren;
     uint8_t 				numParents;
     uint8_t 				numPorts;
