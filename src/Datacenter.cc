@@ -417,7 +417,7 @@ void Datacenter::bottomUpSync ()
 		}
 	}
 
-	if (MyConfig::LOG_LVL==DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d finished BU sync.", dcId);
 		printBufToLog ();
 		print ();

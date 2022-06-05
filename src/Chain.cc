@@ -40,28 +40,28 @@ RT_Chain::RT_Chain (const RT_Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
-  this->isRT_Chain 	= c.isRT_Chain;
+//  this->isRT_Chain 	= true;
 }
 
 Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
-  this->isRT_Chain 	= c.isRT_Chain;
+//  this->isRT_Chain 	= false;
 }
 
 RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> S_u) {
   this->id        	= id;
   this->S_u       	= S_u;
 	this->curLvl = UNPLACED_LVL;
-  this->isRT_Chain 	= true;
+//  this->isRT_Chain 	= true;
 };
 
 Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
 	this->curLvl = UNPLACED_LVL;
-  this->isRT_Chain 	= false;
+//  this->isRT_Chain 	= false;
 };
 
 void Chain::print (bool printS_u)
@@ -79,19 +79,29 @@ void Chain::print (bool printS_u)
 	}
 }
 
-// returns the number of datacenters which are delay-feasible for this chain
-Lvl_t Chain::mu_u_len () const
-{
-	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
-}
+//// returns the number of datacenters which are delay-feasible for this chain
+//Lvl_t RT_Chain::mu_u_len () const
+//{
+//	return RT_Chain::mu_u_len;
+//}
 
+//// returns the number of datacenters which are delay-feasible for this chain
+//Lvl_t Non_RT_Chain::mu_u_len () const
+//{
+//	return Non_RT_Chain::mu_u_len;
+//}
 
 // returns the mu_u (amount of cpu required by the chain) at a given level in the tree
-Cpu_t Chain::mu_u_at_lvl (Lvl_t lvl) const
+Cpu_t Non_RT_Chain::mu_u_at_lvl (Lvl_t lvl) const
 {
-	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
+	return Non_RT_Chain::mu_u[lvl];
 }
 
+// returns the mu_u (amount of cpu required by the chain) at a given level in the tree
+Cpu_t RT_Chain::mu_u_at_lvl (Lvl_t lvl) const
+{
+	return RT_Chain::mu_u[lvl];
+}
 //// returns true iff the given datacenter id is delay-feasible for this chain (namely, appears in its S_u)
 //bool Chain::isDelayFeasible (uint16_t dcId) const 
 //{
@@ -161,20 +171,33 @@ DcId_t Chain::getCurDatacenter () const
 } 
 
 // returns UNPLACED_COST if the chain isn't placed; and the cpu cost at the current place
-Cost_t Chain::getCpuCost () const
+Cost_t RT_Chain::getCpuCost () const
 {
-	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
+	return RT_Chain::cpuCostAtLvl[curLvl];
+}
+
+// returns UNPLACED_COST if the chain isn't placed; and the cpu cost at the current place
+Cost_t Non_RT_Chain::getCpuCost () const
+{
+	return Non_RT_Chain::cpuCostAtLvl[curLvl];
 }
 
 // return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise
-Cpu_t Chain::getCpu () const
+Cpu_t RT_Chain::getCpu () const
 {
 	if (curLvl==UNPLACED_LVL) {
 		return UNPLACED_CPU;
 	}
-	else {
-	  return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
+	return RT_Chain::mu_u[curLvl];
+}
+
+// return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise
+Cpu_t Non_RT_Chain::getCpu () const
+{
+	if (curLvl==UNPLACED_LVL) {
+		return UNPLACED_CPU;
 	}
+	return Non_RT_Chain::mu_u[curLvl];
 }
 
 /*************************************************************************************************************************************************
@@ -182,7 +205,7 @@ Insert a chain to its correct order in the (ordered) vector of chains.
 We currently use only RT, and we assume that the input vector is sorted. 
 Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
 **************************************************************************************************************************************************/
-void insertSorted (vector <Chain> &vec, const Chain c)
+void insertSorted (vector <Chain> &vec, Chain c)
 {
 	if (c.isRT_Chain) {
 		vec.insert (vec.begin(), c);
@@ -190,6 +213,22 @@ void insertSorted (vector <Chain> &vec, const Chain c)
 	else {
 		vec.push_back (c);
 	}
+}
+
+
+/*************************************************************************************************************************************************
+Insert a chain to its correct order in the (ordered) vector of chains.
+We currently use only RT, and we assume that the input vector is sorted. 
+Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
+**************************************************************************************************************************************************/
+void insertSorted (vector <Chain> &vec, const RT_Chain c)
+{
+	vec.insert (vec.begin(), c);
+}
+
+void insertSorted (vector <Chain> &vec, const Non_RT_Chain c)
+{
+	vec.push_back (c);
 }
 
 // the compare function used by pushUpList: sort two chains in a decreasing order of the cpu they current use.
@@ -226,20 +265,20 @@ void insertSorted (list <Chain> &sortedList, const Chain chain)
 }
 
 
-/*************************************************************************************************************************************************
-Rcvs 2 sorted vectors of chains. 
-Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
-Currently unused.
-**************************************************************************************************************************************************/
-void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
-{
-	for (auto const &chain : vec) {
-		if (chain.isRT_Chain) {
-			vec.insert (vec.begin(), chain);
-		}
-		else {
-			vec.push_back (chain);
-		}
-	}
-}
+///*************************************************************************************************************************************************
+//Rcvs 2 sorted vectors of chains. 
+//Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
+//Currently unused.
+//**************************************************************************************************************************************************/
+//void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
+//{
+//	for (auto const &chain : vec) {
+//		if (chain.isRT_Chain) {
+//			vec.insert (vec.begin(), chain);
+//		}
+//		else {
+//			vec.push_back (chain);
+//		}
+//	}
+//}
 

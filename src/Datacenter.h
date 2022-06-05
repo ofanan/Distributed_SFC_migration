@@ -70,10 +70,10 @@ class Datacenter : public cSimpleModule
 		list <Chain> 					pushUpList;     // Used by the BUPU alg'
 		
     // Dynamic
-    uint16_t  								 availCpu;
+    Cpu_t  								 availCpu;
     vector<Chain> notAssigned, pushUpVec; 
     unordered_set <ChainId_t>  placedChains, potPlacedChains; 
-    unordered_set <ChainId_t>  newlyPlacedChainsIds;    // IDs of the chains that I have placed 		 after the last update I had sent to SimCtrlr.
+    unordered_set <ChainId_t>  newlyPlacedChainsIds;    // IDs of the chains that I have placed after the last update I had sent to SimCtrlr.
 		uint8_t numBuPktsRcvd; 
 		
 		// A small buffer, used for printing results / log
