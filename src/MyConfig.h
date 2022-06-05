@@ -27,6 +27,8 @@ using namespace std;
 class Chain;
 class ChainHash;
 
+const bool randomlySetChainType = false;
+
 const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 
 const int16_t chainMigCost = 600;

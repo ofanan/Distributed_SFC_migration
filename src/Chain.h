@@ -1,4 +1,3 @@
-
 #ifndef CHAIN_H
 #define CHAIN_H
 #include <stdio.h>
@@ -19,9 +18,9 @@ using namespace std;
 class Chain
 {
   public:
-	  bool isRT_Chain;
     ChainId_t id;
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
+    bool isRT_Chain;
 		const static vector<Cost_t> costOfCpuUnitAtLvl; 
 		Lvl_t curLvl;        // Level of the datacenter currently hosting me 
 		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). 
@@ -39,11 +38,8 @@ class Chain
 	
 		// Getters
 		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED_DC, if this chain isn't placed
-    virtual Cpu_t  getCpu     () const = 0; 
-    virtual Cost_t getCpuCost () const = 0;
-    virtual Cpu_t mu_u_at_lvl (Lvl_t lvl) const = 0; // returns the amount of cpu required for placing this chain at level lvl
-    virtual Lvl_t mu_u_len () const = 0;
-/*    bool isDelayFeasible (uint16_t dcId) const;*/
+    Cost_t getCpuCost () const;
+    Cpu_t  getCpu     () const; 
     
 		/* 
 		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 
@@ -53,36 +49,29 @@ class Chain
       return (this->isRT_Chain && !(right.isRT_Chain));
     }
 		*/		
+    Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
+    Lvl_t mu_u_len () const;
+/*    bool isDelayFeasible (uint16_t dcId) const;*/
 };
 
 class RT_Chain : public Chain
 {
 public:
-  bool isRT_Chain = true;
   static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const Lvl_t mu_u_len;
 	static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
 	RT_Chain (const RT_Chain &c);
   RT_Chain (ChainId_t id, vector <DcId_t> S_u);
-  Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
-  Cpu_t  getCpu     () const; 
-  Cost_t getCpuCost () const;
-/*  Lvl_t mu_u_len () const;*/
 };
 
 class Non_RT_Chain: public Chain
 {
   public:
-	  bool isRT_Chain = false;
 	  static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const Lvl_t  mu_u_len;
 		static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
     Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u);
 	  Non_RT_Chain (const Non_RT_Chain &c);
-	  Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
-    Cpu_t  getCpu     () const; 
-    Cost_t getCpuCost () const;
-/*	  Lvl_t mu_u_len () const;*/
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
@@ -102,14 +91,9 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 // Insert a chain in its correct place to a sorted datastructure
-/*void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.*/
-void insertSorted (vector <Chain> &vec, const RT_Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (vector <Chain> &vec, const Non_RT_Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-void insertSorted (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
-/*void insertSorted (list <Chain> &sortedList, const RT_Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.*/
-/*void insertSorted (list <Chain> &sortedList, const Non_RT_Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.*/
+void insertSorted (vector <Chain> &vec, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
+void insertSorted (list <Chain> &sortedList, const Chain c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 
 /*************************************************************************************************************************************************
 // Given chainId, assigns to chain the respective chain from the set. returns true iff the requested chain Id was found in the set.
@@ -122,5 +106,6 @@ bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); /
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, DcId_t poa);
 
 #endif
+
 
 
