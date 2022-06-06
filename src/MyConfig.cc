@@ -8,7 +8,6 @@ using namespace std;
 string 														MyConfig::LogFileName;
 string 														MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
 ofstream 													MyConfig::logFile;
-unordered_set <Chain, ChainHash> 	ChainsMaster::allChains;
 char 															MyConfig::buf[MyConfig::bufSize];
 
 void MyConfig::openFiles()

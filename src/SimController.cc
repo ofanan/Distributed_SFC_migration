@@ -52,6 +52,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
+	ChainsMaster::allChains.clear ();
 	runTrace ();
 }
 
@@ -303,18 +304,22 @@ void SimController::rdNewUsrsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
 		if (randomlySetChainType) {
 			if (rand () < RT_chain_rand_int) {
-				chain = RT_Chain (chainId, vector<DcId_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len}); 
+				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
+				chain = RT_Chain (chainId, S_u); 
 			}
 			else {
-				chain = Non_RT_Chain (chainId, vector<DcId_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
+				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
+				chain = Non_RT_Chain (chainId, S_u); 
 			}
 		}
 		else { // this option is used for debugging: a chain is RT iff its chainId is even.
 			if (chainId%2==0) {
-				chain = RT_Chain (chainId, vector<DcId_t> {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len}); 
+				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
+				chain = RT_Chain (chainId, S_u); 
 			}
 			else {
-				chain = Non_RT_Chain (chainId, vector<DcId_t> (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len)); 
+				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
+				chain = Non_RT_Chain (chainId, S_u); 
 			}		
 		}
 		if (MyConfig::DEBUG_LVL>0) {

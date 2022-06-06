@@ -21,7 +21,15 @@ Chain::Chain ()
 	this->isRT_Chain 	= false;
 };
 
-Chain::Chain (ChainId_t id, vector <DcId_t> S_u, Lvl_t curLvl) 
+Chain::Chain (ChainId_t id) 
+{
+	this->id 					= id; 
+	this->curLvl 			= UNPLACED_LVL;
+	this->S_u 			 	= {};
+	this->isRT_Chain 	= false;
+};
+
+Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl) 
 {
 	this->id = id;
 	this->S_u = S_u;
@@ -50,14 +58,14 @@ Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
   this->isRT_Chain 	= false;
 }
 
-RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> S_u) {
+RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id        	= id;
   this->S_u       	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
   this->isRT_Chain 	= true;
 };
 
-Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u) {
+Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
@@ -125,7 +133,7 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcI
 **************************************************************************************************************************************************/
 bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId)
 {
-	Chain dummy (chainId, {});
+	Chain dummy (chainId);
 	auto search = setOfChains.find (dummy);
 
 	if (search==setOfChains.end()) {
@@ -142,7 +150,7 @@ bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId)
 **************************************************************************************************************************************************/
 bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)
 {
-	Chain dummy (chainId, {});
+	Chain dummy (chainId);
 	auto search = setOfChains.find (dummy);
 
 	if (search==setOfChains.end()) {

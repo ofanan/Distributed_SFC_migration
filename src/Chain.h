@@ -28,7 +28,8 @@ class Chain
 		// C'tors
     Chain ();
 		Chain (const Chain &c);
-    Chain (ChainId_t id, vector <DcId_t> S_u, Lvl_t curLvl=UNPLACED_LVL);
+    Chain (ChainId_t id);
+    Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl=UNPLACED_LVL);
             
     bool operator== (const Chain &right) const {
       return (this->id == right.id);
@@ -61,7 +62,7 @@ public:
   static const Lvl_t mu_u_len;
 	static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
 	RT_Chain (const RT_Chain &c);
-  RT_Chain (ChainId_t id, vector <DcId_t> S_u);
+  RT_Chain (ChainId_t id, vector <DcId_t> &S_u);
 };
 
 class Non_RT_Chain: public Chain
@@ -70,7 +71,7 @@ class Non_RT_Chain: public Chain
 	  static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const Lvl_t  mu_u_len;
 		static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
-    Non_RT_Chain (ChainId_t id, vector <DcId_t> S_u);
+    Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u);
 	  Non_RT_Chain (const Non_RT_Chain &c);
 };
 
