@@ -84,7 +84,7 @@ class SimController : public cSimpleModule
 
 		// Other Functions
 		void runTrace  ();
-		void runTimeStep ();
+		void runTimePeriod ();
 		void readTraceLine ();
 		void rdUsrsThatLeftLine (string line); // read a trace line, containing a list of chains that left the simulation
 		void rdNewUsrsLine (string line); // read a trace line, containing a list of new chain and their updated PoAs.

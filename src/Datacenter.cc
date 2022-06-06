@@ -176,7 +176,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		}
 
 		// Finally, remove the chain from the list of newlyPlacedChains
-		MyConfig::eraseKeyFromSet (newlyPlacedChainsIds, 	chainId);
+		MyConfig::eraseKeyFromSet (newlyPlacedChains, 	chainId);
 		
 	}
 }
@@ -273,7 +273,7 @@ void Datacenter::pushUpSync ()
 		}
 		else { //the chain wasn't pushed-up --> need to locally place it
 			placedChains.				 insert (chainPtr->id);
-			newlyPlacedChainsIds.insert (chainPtr->id);
+			newlyPlacedChains.insert (chainPtr->id);
 		}
 		potPlacedChains.erase (chainPtr->id);
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
@@ -295,13 +295,13 @@ void Datacenter::pushUpSync ()
 			pushedUpChain.curLvl = lvl;
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the push-upped chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
-			newlyPlacedChainsIds.insert (pushedUpChain.id);
+			newlyPlacedChains.insert (pushedUpChain.id);
 			insertSorted 								(pushUpList, pushedUpChain);
 		}
 	}
 	
 	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
-	if (newlyPlacedChainsIds.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
+	if (newlyPlacedChains.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
 		updatePlacementInfo ();
 	}
 
@@ -387,7 +387,7 @@ void Datacenter::bottomUpSync ()
 				availCpu -= requiredCpuToLocallyPlaceThisChain;
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.				 insert  (chainPtr->id);
-					newlyPlacedChainsIds.insert  (chainPtr->id);
+					newlyPlacedChains.insert  (chainPtr->id);
 					chainPtr = notAssigned.erase (chainPtr);
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
@@ -432,17 +432,17 @@ void Datacenter::bottomUpSync ()
 }
 
 /*************************************************************************************************************************************************
-Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChainsIds.
-Later, clear newlyPlacedChainsIds.
+Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChains.
+Later, clear newlyPlacedChains.
 *************************************************************************************************************************************************/
 void Datacenter::updatePlacementInfo ()
 {
 
-	if (newlyPlacedChainsIds.empty ()) {
+	if (newlyPlacedChains.empty ()) {
 		return;
 	}
 	
-	for (auto chainId : newlyPlacedChainsIds) {
+	for (auto chainId : newlyPlacedChains) {
 		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
 			printBufToLog ();
@@ -454,7 +454,7 @@ void Datacenter::updatePlacementInfo ()
 			error ("chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster", chainId);
 		}
 	}
-	newlyPlacedChainsIds.		clear ();
+	newlyPlacedChains.		clear ();
 }
 
 
@@ -559,7 +559,7 @@ Prepare a reshuffle in Sync mode.
 void Datacenter::prepareReshSync () 
 {
 	if (reshuffled) {
-		genNsndBottomUpPkt ();	
+		return genNsndBottomUpPkt ();	
 	}
 	reshuffled = true;
 	clrRsrc ();
@@ -586,7 +586,7 @@ void Datacenter::clrRsrc ()
 	pushUpList.   				clear ();
 	placedChains.			 	  clear ();
 	potPlacedChains.			clear ();
-	newlyPlacedChainsIds.	clear ();
+	newlyPlacedChains.	clear ();
 	availCpu 				 = cpuCapacity;
 }
 

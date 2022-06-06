@@ -95,7 +95,7 @@ Run a single time step. Such a time step is assumed to include (at most) a singl
 - A "new_usrs" line
 - An "old_usrs" line. This should be the last line for the time step.
 **************************************************************************************************************************************************/
-void SimController::runTimeStep () 
+void SimController::runTimePeriod () 
 {
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
@@ -152,7 +152,7 @@ void SimController::runTrace () {
   if (!traceFile.is_open ()) {
   	error (".poa file was not found -> finishing simulation"); 
   }
-	runTimeStep ();
+	runTimePeriod ();
 }
 
 void SimController::finish () 
@@ -431,7 +431,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 	}
 	rlzRsrcOfChains (chainsToReplace);
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nSimCtrlr calling DC %d.initBOttomUp with vecOfChainsThatJoined=", dcId);
+		snprintf (buf, bufSize, "\nSimCtrlr calling DC %d.initBottomUp with vecOfChainsThatJoined=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (vecOfUsrsOfThisPoA);
 	}
@@ -532,7 +532,7 @@ void SimController::handleMessage (cMessage *msg)
   if (msg -> isSelfMessage()) {
 		isFirstPeriod = false;
 		if (!isLastPeriod) {
-			runTimeStep ();
+			runTimePeriod ();
 		}
   }
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
