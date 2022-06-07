@@ -38,7 +38,7 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED_DC, if this chain isn't placed
+/*		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED_DC, if this chain isn't placed*/
     Cost_t getCpuCost () const;
     Cost_t getCost 		() const;
     Cpu_t  getCpu     () const; 
@@ -55,6 +55,7 @@ class Chain
     Lvl_t mu_u_len () const;
     void  setS_u (const vector <DcId_t> &S_u);
 /*    bool isDelayFeasible (uint16_t dcId) const;*/
+		bool datacenterIsDelayFeasible (DcId_t dcId, uint8_t dcLvl) {return this->S_u[dcLvl]==dcId;}
 };
 
 class RT_Chain : public Chain

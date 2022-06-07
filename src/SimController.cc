@@ -199,7 +199,7 @@ void SimController::printAllDatacentersByChainsMaster ()
 	// gather the required data
 	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
 	for (const auto &chain : ChainsMaster::allChains) {
-		int16_t chainCurDatacenter = chain.getCurDatacenter();
+		int16_t chainCurDatacenter = chain.curDc;
 		if (chainCurDatacenter==UNPLACED_DC) {
 			continue;
 		}
@@ -275,7 +275,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
 	  else {
-	  	chainCurDatacenter = chain.getCurDatacenter();
+	  	chainCurDatacenter = chain.curDc;
 	  	if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED_DC) {
 				error ("Note: this chain was not placed before leaving\n"); 
 	  	}
@@ -399,7 +399,7 @@ Raise an error in case of data inconsistency.
 void SimController::checkChainsMasterData ()
 {
 	for (auto chain : ChainsMaster::allChains) {
-		DcId_t curDatacenter = chain.getCurDatacenter();
+		DcId_t curDatacenter = chain.curDc;
 		if (curDatacenter == UNPLACED_DC) { // chain is unplaced
 			error ("t=% by chainsManager, chain %d is unplaced in the end of period", t, chain.id);
 		}
@@ -424,7 +424,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 
 	for (auto chain : ChainsMaster::allChains) {
 		if (chain.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
-			DcId_t chainCurDatacenter = chain.getCurDatacenter();
+			DcId_t chainCurDatacenter = chain.curDc;
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
 				chainsToReplace[chainCurDatacenter].push_back (chain.id); // If this chain's PoA is the leaf that requested resh, the chain should be released
 			}

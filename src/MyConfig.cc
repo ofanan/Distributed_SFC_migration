@@ -127,7 +127,7 @@ void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, boo
 	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current DC\n");
 	
 	for (auto chain : ChainsMaster::allChains) {
-		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.getCurDatacenter());
+		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.curDc);
 		printToLog (buf);
 	}
 }

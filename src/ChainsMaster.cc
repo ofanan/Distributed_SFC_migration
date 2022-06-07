@@ -28,15 +28,13 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 	modifiedChain.curLvl 	= newLvl;
 	ChainsMaster::allChains.erase  (search);
 	ChainsMaster::allChains.insert (modifiedChain);
-	if (chain.getCurDatacenter()!=UNPLACED_DC) { // was it an old chain that migrated?
-		ChainsMaster::numInstantMigs++;
-	}		
+	ChainsMaster::numInstantMigs++; // assume that every change in the lvl implies an "instantaneous migration" (several inst' mig' may happen per period).
 	return true;
 }
 
 /*************************************************************************************************************************************************
 * Given a chain id, update the curLvl field of the respective chain to the given newLvl.
-* Output: true if the requested chain was found AND it is already placed.
+* Output: true if the requested chain was found.
 **************************************************************************************************************************************************/
 bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain, DcId_t &curDatacenter)
 {
@@ -47,7 +45,7 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 		return false;
 	}
 	
-	curDatacenter = chainPtr->getCurDatacenter();
+//	curDatacenter = chainPtr->getCurDatacenter();
 	if (MyConfig::DEBUG_LVL>0 && curDatacenter==UNPLACED_DC) {
 		return false;
 	}

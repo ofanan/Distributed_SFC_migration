@@ -177,11 +177,11 @@ void Chain::setS_u (const vector <DcId_t> &S_u)
 
 }
     
-// returns the id of the datacenter currently hosting "this"; or UNPLACED_DC, if this chain isn't placed
-DcId_t Chain::getCurDatacenter () const 
-{
-	return (curLvl==UNPLACED_LVL)? UNPLACED_DC : S_u[curLvl];
-} 
+//// returns the id of the datacenter currently hosting "this"; or UNPLACED_DC, if this chain isn't placed
+//DcId_t Chain::getCurDatacenter () const 
+//{
+//	return (curLvl==UNPLACED_LVL)? UNPLACED_DC : S_u[curLvl];
+//} 
 
 // returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
 Cost_t Chain::getCost () const
