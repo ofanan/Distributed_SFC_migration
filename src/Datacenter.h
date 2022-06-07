@@ -86,7 +86,6 @@ class Datacenter : public cSimpleModule
 		// Functions related to the alg' running    
     
     Cpu_t requiredCpuToLocallyPlaceChain 				(const Chain chain) const;
-		inline bool 		isDelayFeasibleForThisChain (const Chain chain) const;
 		inline uint8_t 	portOfChild 								(const uint8_t child) const; 
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);

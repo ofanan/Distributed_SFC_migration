@@ -12,8 +12,6 @@ Define_Module(Datacenter);
 inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= rhs.getCpu();}
 
 inline bool Datacenter::cannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
-inline bool Datacenter::isDelayFeasibleForThisChain (const Chain chain) const {return chain.mu_u_len() >= this->lvl+1;}
-
 inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
@@ -285,7 +283,7 @@ void Datacenter::pushUpSync ()
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
 				requiredCpuToLocallyPlaceThisChain > availCpu || // or because not enough avail' cpu for pushing-up, ...
-				!this->isDelayFeasibleForThisChain (*chainPtr)) { // or because I'm not delay-feasible for this chain  
+				chainPtr->dcIsDelayFeasible (dcId, lvl)) { // or because I'm not delay-feasible for this chain  
 			chainPtr++;
 			continue;
 		}

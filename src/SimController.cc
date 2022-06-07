@@ -12,7 +12,6 @@ Controller of the simulation:
 class Datacenter;
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
-inline bool isDelayFeasibleForChain (DcId_t dcId, uint8_t lvl, Chain chain) {return chain.S_u[lvl]==dcId;}
 
 Define_Module(SimController);
 
@@ -100,7 +99,7 @@ void SimController::runTimePeriod ()
 {
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
-	  concludeTimeStep (); // gather and print the results of the alg' in the previous time step
+	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 	}
 	
   string line;
@@ -168,10 +167,10 @@ void SimController::finish ()
 - Inc. numMigs for every chain where curDC!=nxtDc.
 - If running in sync mode: calculate and print the total cost
 **************************************************************************************************************************************************/
-void SimController::concludeTimeStep ()
+void SimController::concludeTimePeriod ()
 {
 	if (MyConfig::DEBUG_LVL>0) {
-		checkChainsMasterData ();
+//		checkChainsMasterData ();
 //		for (auto const &chain : ChainsMaster::allChains) {
 //			if (chain.curLvl==UNPLACED_LVL) {
 //				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
@@ -180,19 +179,25 @@ void SimController::concludeTimeStep ()
 //				MyConfig::printAllChains ();
 //				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
 //			}
-//		}
-		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			printAllDatacenters ();
-		}
 	}
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		printAllDatacenters ();
+	}
+	
+	int numMigs;
+	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
+		error ("error occured during run of ChainsMaster::concludeTimePeriod");
+	}
+	
+	int periodCost = numMigs * uniformChainMisgCost + calcNonMigCost ();
 
 	//	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
 	usrsThatLeft						.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	
 }
+
 // print all the placed (and possibly, the pot-placed) chains on each DC by ChainsMaster::allChains DB.
 void SimController::printAllDatacentersByChainsMaster ()
 {
@@ -223,18 +228,33 @@ void SimController::printAllDatacenters ()
 }
 
 // Returns the overall cpu cost at its current location.
-int SimController::calcSolCpuCost () 
+int SimController::calcMigCost () 
 {
 	
-	int totCpuCost = 0;
+	int totNonMigCost = 0;
 	for (auto const &chain : ChainsMaster::allChains) {	
-		int16_t cpuCost = chain.getCpuCost ();
-		if (MyConfig::mode==SYNC && cpuCost == UNPLACED_COST) {
+		int16_t chainNonMigCost = chain.getCost ();
+		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
 			error ("calcSolCpuCost Sync encountered a chain that isn't placed yet");
 		}
-		cpuCost += cpuCost;
+		totNonMigCost += chainNonMigCost;
 	}
-	return totCpuCost;
+	return totNonMigCost;
+}
+
+// Returns the overall cpu cost at its current location.
+int SimController::calcNonMigCost () 
+{
+	
+	int totNonMigCost = 0;
+	for (auto const &chain : ChainsMaster::allChains) {	
+		int16_t chainNonMigCost = chain.getCost ();
+		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
+			error ("calcSolCpuCost Sync encountered a chain that isn't placed yet");
+		}
+		totNonMigCost += chainNonMigCost;
+	}
+	return totNonMigCost;
 }
 
 
@@ -392,7 +412,7 @@ void SimController::initAlg () {
 }
 
 /*************************************************************************************************************************************************
-Compare the chainsManager's chains' location data to the datacenters' placedChains data.
+Compare the chainsMaster's chains' location data to the datacenters' placedChains data.
 Raise an error in case of data inconsistency.
 **************************************************************************************************************************************************/
 void SimController::checkChainsMasterData ()
@@ -400,7 +420,7 @@ void SimController::checkChainsMasterData ()
 	for (auto chain : ChainsMaster::allChains) {
 		DcId_t curDatacenter = chain.curDc;
 		if (curDatacenter == UNPLACED_DC) { // chain is unplaced
-			error ("t=% by chainsManager, chain %d is unplaced in the end of period", t, chain.id);
+			error ("t=% by chainsMaster, chain %d is unplaced in the end of period", t, chain.id);
 		}
 		if (!(datacenters[curDatacenter]->checkIfChainIsPlaced (chain.id)) ) {
 			error ("t=% chainsManager says that chain %d is placed in DC %d while it's not placed there", t, chain.id, curDatacenter);

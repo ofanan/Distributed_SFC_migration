@@ -98,8 +98,9 @@ class SimController : public cSimpleModule
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleAlgMsg (cMessage *msg);
-		void concludeTimeStep (); // calc costs, move cur<--nxt in state variables, etc.
-		int calcSolCpuCost (); // returns the overall CPU cost
+		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
+		int calcNonMigCost (); // returns the overall non-migration cost. This includes cpu+link cost
+		int calcMigCost    (); // returns the overall mig cost
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
     
     // Functions used for debugging

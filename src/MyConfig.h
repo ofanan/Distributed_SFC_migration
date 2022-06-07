@@ -37,6 +37,7 @@ const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 
 const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
+const int uniformChainMisgCost = 600;
 
 class MyConfig { 
 

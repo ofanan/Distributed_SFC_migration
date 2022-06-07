@@ -11,6 +11,26 @@ void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 	}
 }
 
+/*************************************************************************************************************************************************
+* Fill within numMigs the overall num of migrations in the last time period.
+* If any chain is unplaced, return false. Else, return true.
+**************************************************************************************************************************************************/
+bool ChainsMaster::concludeTimePeriod (int &numMigs)
+{
+
+	numMigs = 0;
+	for (auto chain : allChains) {
+		if (chain.curLvl == UNPLACED_LVL) {
+			return false;
+		}
+		if (chain.curDc != chain.S_u[chain.curLvl]) { // Was the chain migrated?
+			numMigs++;
+			chain.curDc = chain.S_u[chain.curLvl];
+		}
+	}
+	return true;
+}
+
 
 /*************************************************************************************************************************************************
 * Given a chain id, update the curLvl field of the respective chain to the given newLvl.
