@@ -12,7 +12,6 @@ void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 }
 
 
-// Change the level of the given chain
 /*************************************************************************************************************************************************
 * Given a chain id, update the curLvl field of the respective chain to the given newLvl.
 * Output: true iff the requested chain was found.
@@ -33,7 +32,30 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 		ChainsMaster::numInstantMigs++;
 	}		
 	return true;
+}
 
+/*************************************************************************************************************************************************
+* Given a chain id, update the curLvl field of the respective chain to the given newLvl.
+* Output: true if the requested chain was found AND it is already placed.
+**************************************************************************************************************************************************/
+bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain, DcId_t &curDatacenter)
+{
+	Chain dummy (chainId);
+	auto chainPtr = ChainsMaster::allChains.find (dummy);
+
+	if (MyConfig::DEBUG_LVL>0 && chainPtr==ChainsMaster::allChains.end()) {
+		return false;
+	}
+	
+	curDatacenter = chainPtr->getCurDatacenter();
+	if (MyConfig::DEBUG_LVL>0 && curDatacenter==UNPLACED_DC) {
+		return false;
+	}
+	modifiedChain = *chainPtr; // copy the modified chain
+	modifiedChain.S_u = {pathToRoot.begin(), pathToRoot.begin()+chainPtr->mu_u_len ()}; //update the chain's S_u
+	allChains.erase (chainPtr); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+	allChains.insert (modifiedChain);
+	return true;
 }
 
 /*************************************************************************************************************************************************

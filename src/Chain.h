@@ -52,6 +52,7 @@ class Chain
 		*/		
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;
+    void  setS_u (const vector <DcId_t> &S_u);
 /*    bool isDelayFeasible (uint16_t dcId) const;*/
 };
 
@@ -61,6 +62,7 @@ public:
   static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static const Lvl_t mu_u_len;
 	static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
+	static const vector<Cost_t> costAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
 	RT_Chain (const RT_Chain &c);
   RT_Chain (ChainId_t id, vector <DcId_t> &S_u);
 };
@@ -71,6 +73,7 @@ class Non_RT_Chain: public Chain
 	  static const vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static const Lvl_t  mu_u_len;
 		static const vector<Cost_t> cpuCostAtLvl; // cpuCostAtLvl[i] will hold the cost of placing a non- RT chain on a DC in level i
+		static const vector<Cost_t> costAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
     Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u);
 	  Non_RT_Chain (const Non_RT_Chain &c);
 };

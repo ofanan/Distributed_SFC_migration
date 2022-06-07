@@ -347,30 +347,27 @@ void SimController::rdOldUsrsLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
   DcId_t poaId;
-	Chain chain; // will hold the chain found in ChainsMaster::allChains
-	int16_t chainCurDatacenter;
+	Chain chain; 
+	DcId_t chainCurDatacenter;
 
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
-  	if (!(findChainInSet (ChainsMaster::allChains, chainId, chain))) {
-			error ("t=%d: didn't find chain id %d in allChains, in rdOldUsrsLine", t, chainId);
-	  }
-		chainCurDatacenter = chain.getCurDatacenter();
-		vector <DcId_t> S_u (pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+chain.mu_u_len ());
-		Chain modifiedChain (chainId, S_u, chain.curLvl); // will hold the modified chain to be inserted each time
-		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, modifiedChain)) { // if the current place of this chain isn't delay-feasible for it anymore
-			insertSorted (chainsThatJoinedLeaf[poaId], modifiedChain); // need to inform the chain's new poa that it has to place it
-			chainsThatLeftDatacenter[chainCurDatacenter].push_back (modifiedChain.id); // need to rlz this chain's rsrcs from its current place
+  	
+  	if (!ChainsMaster::modifyS_u (chainId, pathToRoot[poaId], chain, chainCurDatacenter))
+  	{
+			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
+  	}
+		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, chain)) { // if the current place of this chain isn't delay-feasible for it anymore
+			insertSorted (chainsThatJoinedLeaf[poaId], chain); // need to inform the chain's new poa that it has to place it
+			chainsThatLeftDatacenter[chainCurDatacenter].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
-		ChainsMaster::allChains.erase (chain); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-		ChainsMaster::allChains.insert (modifiedChain);
-
 		if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED_DC) {
 			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 			continue;
 		}
 	}
+
 	
 }
 

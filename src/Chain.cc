@@ -11,7 +11,9 @@ const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
 // cpuCostAtLvl[i] is the cost of placing a chain on a datacenter at level i
 const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
+const vector <Cost_t> RT_Chain		::costAtLvl 	 = {4, 3, 2, 1}; 
 const vector <Cost_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
+const vector <Cost_t> Non_RT_Chain::costAtLvl 	 = {4, 3, 2, 1}; 
 
 Chain::Chain () 
 {
@@ -162,13 +164,18 @@ bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId
 	}
 }
 
+void Chain::setS_u (const vector <DcId_t> &S_u)
+{
+
+}
+    
 // returns the id of the datacenter currently hosting "this"; or UNPLACED_DC, if this chain isn't placed
 DcId_t Chain::getCurDatacenter () const 
 {
 	return (curLvl==UNPLACED_LVL)? UNPLACED_DC : S_u[curLvl];
 } 
 
-// returns UNPLACED_COST if the chain isn't placed; and the cpu cost at the current place
+// returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
 Cost_t Chain::getCpuCost () const
 {
 	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
