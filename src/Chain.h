@@ -22,8 +22,8 @@ class Chain
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
 		const static vector<Cost_t> costOfCpuUnitAtLvl; 
-		Lvl_t curLvl;        // Level of the datacenter currently hosting me 
-		//    bool isNew;        // When true, this chain is new (not currently scheduled to any datacenter). 
+		Lvl_t curLvl;        // Level of the datacenter currently assigned to host me. This may change a few times until the real placement as curDatacenter
+		DcId_t curDc; // 
 
 		// C'tors
     Chain ();

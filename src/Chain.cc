@@ -18,8 +18,9 @@ const vector <Cost_t> Non_RT_Chain::costAtLvl 	 = {4, 3, 2, 1};
 Chain::Chain () 
 {
 	this->id 					= DUMMY_CHAIN_ID; 
-	this->curLvl 			= UNPLACED_LVL;
-	this->S_u 			 	= {};
+	this->curLvl			= UNPLACED_LVL;
+	this->curDc 			= UNPLACED_DC;
+	this->S_u 				= {};
 	this->isRT_Chain 	= false;
 };
 
@@ -27,22 +28,25 @@ Chain::Chain (ChainId_t id)
 {
 	this->id 					= id; 
 	this->curLvl 			= UNPLACED_LVL;
+	this->curDc 			= UNPLACED_DC;
 	this->S_u 			 	= {};
 	this->isRT_Chain 	= false;
 };
 
 Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl) 
 {
-	this->id = id;
-	this->S_u = S_u;
-	this->curLvl = curLvl;
-	this->isRT_Chain = false;
+	this->id 					= id;
+	this->S_u 				= S_u;
+	this->curLvl 			= curLvl;
+	this->curDc 			= UNPLACED_DC;
+	this->isRT_Chain 	= false;
 };
 
 Chain::Chain (const Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
+  this->curDc 			= UNPLACED_DC;
   this->isRT_Chain 	= c.isRT_Chain;
 }
 
@@ -50,6 +54,7 @@ RT_Chain::RT_Chain (const RT_Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
+  this->curDc 			= c.curDc;
   this->isRT_Chain 	= true;
 }
 
@@ -57,6 +62,7 @@ Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
+  this->curDc 			= c.curDc;
   this->isRT_Chain 	= false;
 }
 
@@ -64,6 +70,7 @@ RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id        	= id;
   this->S_u       	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
+  this->curDc 			= UNPLACED_DC;
   this->isRT_Chain 	= true;
 };
 
@@ -71,6 +78,7 @@ Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
+  this->curDc 			= UNPLACED_DC;
   this->isRT_Chain 	= false;
 };
 
