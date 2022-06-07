@@ -3,6 +3,8 @@
 unordered_set <Chain, ChainHash> 	ChainsMaster::allChains;
 int ChainsMaster::numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 int ChainsMaster::numMigs;
+const uint16_t ChainsMaster::bufSize;
+char ChainsMaster::buf[bufSize];
 
 void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 {
@@ -25,10 +27,36 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 		}
 		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
-			chain.curDc = chain.S_u[chain.curLvl];
 		}
+		chain.curDc = chain.S_u[chain.curLvl];
 	}
 	return true;
+}
+
+/*************************************************************************************************************************************************
+* Print to the log for every datacenter, the list of chains currently placed on it.
+**************************************************************************************************************************************************/
+void ChainsMaster::printAllDatacenters (int numDatacenters) 
+{
+	// gather the required data
+	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
+	for (const auto &chain : ChainsMaster::allChains) {
+		DcId_t curDc = chain.curDc;
+		if (curDc==UNPLACED_DC) {
+			continue;
+		}
+		chainsPlacedOnDatacenter [curDc].push_back (chain.id);
+	}
+	
+	// print the data
+	for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
+		snprintf (ChainsMaster::buf, ChainsMaster::bufSize, "DC %d, placed chains: ", dcId);
+		MyConfig::printToLog(buf);
+//		printBufToLog ();
+		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
+		MyConfig::printToLog ("\n");
+	}
+	
 }
 
 

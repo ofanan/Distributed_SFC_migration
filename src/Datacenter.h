@@ -58,7 +58,7 @@ class Datacenter : public cSimpleModule
     bool checkIfChainIsPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
 
     // Log / debug funcs
-    void print (); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
+    void print (bool printPotPlaced=true, bool printPushUpList=true); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
     
   private:
   	static const uint8_t 	portToPrnt=0;

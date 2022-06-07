@@ -17,9 +17,16 @@ usrs_that_left:
 new_usrs: (0,0)
 old_usrs: 
 
-// Would need local resh in the left sub-tree; and later a whole resh.
+// Would need local resh in the left sub-tree; and later a whole resh. 
+// However, these all are only inst' mig', and not real migs', as chains don't change place w.r.t the previous period
 t = 2
 usrs_that_left: 
 new_usrs: (2,1)(3,1)(4,1)
 old_usrs: 
+
+// Requires 2 migs
+t = 3
+usrs_that_left: 
+new_usrs: 
+old_usrs: (0,1)(4,0)
 

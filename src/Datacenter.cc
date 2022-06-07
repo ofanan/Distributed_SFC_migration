@@ -80,15 +80,19 @@ void Datacenter::initialize()
 }
 
 // Print all the chains placed and pot-placed in this DC.
-void Datacenter::print ()
+void Datacenter::print (bool printPotPlaced, bool printPushUpList)
 {
 	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", dcId, lvl);
 	printBufToLog ();
 	MyConfig::printToLog (placedChains);	
-	MyConfig::printToLog ("pot. placed chains: ");
-	MyConfig::printToLog (potPlacedChains);
-	MyConfig::printToLog ("pushUpList: ");
-	MyConfig::printToLog (pushUpList);
+	if (printPotPlaced) {
+		MyConfig::printToLog ("pot. placed chains: ");
+		MyConfig::printToLog (potPlacedChains);
+	}
+	if (printPushUpList) {
+		MyConfig::printToLog ("pushUpList: ");
+		MyConfig::printToLog (pushUpList);
+	}
 }
 
 void Datacenter::setLeafId (DcId_t leafId)

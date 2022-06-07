@@ -49,7 +49,7 @@ class SimController : public cSimpleModule
     DcId_t numDatacenters;
     DcId_t numLeaves;
     uint8_t  height; // height of the tree
-    uint32_t t; //sim time (in seconds)
+    int t=-1; //sim time (in seconds)
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
     uint32_t seed = 42;
@@ -59,7 +59,7 @@ class SimController : public cSimpleModule
 
 		vector <ChainId_t> usrsThatLeft; // the users that left at the current period
 		uint32_t numMigs=0; // number of migration performed		
-		float period=1.0;
+		float     period=1.0;
 		
 		string line; //current line being read from the tracefile
 		

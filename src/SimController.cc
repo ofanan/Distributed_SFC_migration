@@ -116,7 +116,11 @@ void SimController::runTimePeriod ()
 			char lineAsCharArray[line.length()+1];
 			strcpy (lineAsCharArray, line.c_str());
 			strtok (lineAsCharArray, " = ");
-			t = atoi (strtok (NULL, " = "));
+			int new_t = atoi (strtok (NULL, " = "));
+			if (MyConfig::DEBUG_LVL>0 && new_t <= t) {
+				error ("error in trace file: t is not incremented. t=%d, new_t=%d", t, new_t);
+			}
+			t = new_t;
 
 			if (MyConfig::LOG_LVL>0) {
 				snprintf (buf, bufSize, "\n\nt = %d\n********************", t);
@@ -169,21 +173,6 @@ void SimController::finish ()
 **************************************************************************************************************************************************/
 void SimController::concludeTimePeriod ()
 {
-	if (MyConfig::DEBUG_LVL>0) {
-//		checkChainsMasterData ();
-//		for (auto const &chain : ChainsMaster::allChains) {
-//			if (chain.curLvl==UNPLACED_LVL) {
-//				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
-//				printBufToLog ();
-//				printAllDatacenters ();
-//				MyConfig::printAllChains ();
-//				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
-//			}
-	}
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		printAllDatacenters ();
-	}
-	
 	int numMigs;
 	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
 		error ("error occured during run of ChainsMaster::concludeTimePeriod");
@@ -196,7 +185,24 @@ void SimController::concludeTimePeriod ()
 		printBufToLog();
 	}
 
-	//	uint16_t numMigsSinceLastStep = 0;
+	if (MyConfig::DEBUG_LVL>0) {
+		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+			MyConfig::printToLog ("\nBy DCs:");
+			printAllDatacenters ();
+			MyConfig::printToLog ("\nBy ChainsMaster:\n");
+			printAllDatacentersByChainsMaster ();
+		}
+//		checkChainsMasterData ();
+//		for (auto const &chain : ChainsMaster::allChains) {
+//			if (chain.curLvl==UNPLACED_LVL) {
+//				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
+//				printBufToLog ();
+//				printAllDatacenters ();
+//				MyConfig::printAllChains ();
+//				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
+//			}
+	}
+	
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
 	usrsThatLeft						.clear ();
@@ -205,30 +211,32 @@ void SimController::concludeTimePeriod ()
 
 // print all the placed (and possibly, the pot-placed) chains on each DC by ChainsMaster::allChains DB.
 void SimController::printAllDatacentersByChainsMaster ()
-{
-	// gather the required data
-	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
-	for (const auto &chain : ChainsMaster::allChains) {
-		int16_t chainCurDatacenter = chain.curDc;
-		if (chainCurDatacenter==UNPLACED_DC) {
-			continue;
-		}
-		chainsPlacedOnDatacenter [chainCurDatacenter].push_back (chain.id);
-	}
-	
-	// print the data
-	for (uint16_t dcId(0); dcId<numDatacenters; dcId++) {
-		snprintf (buf, bufSize, "DC %d, placed chains: ", dcId);
-		printBufToLog ();
-		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
-	}
+{	
+	ChainsMaster::printAllDatacenters (numDatacenters);
+//	// gather the required data
+//	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
+//	for (const auto &chain : ChainsMaster::allChains) {
+//		DcId_t chainCurDatacenter = chain.curDc;
+//		if (chainCurDatacenter==UNPLACED_DC) {
+//			continue;
+//		}
+//		chainsPlacedOnDatacenter [chainCurDatacenter].push_back (chain.id);
+//	}
+//	
+//	// print the data
+//	for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
+//		snprintf (buf, bufSize, "DC %d, placed chains: ", dcId);
+//		printBufToLog ();
+//		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
+//		MyConfig::printToLog ("\n");
+//	}
 }
 
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
 void SimController::printAllDatacenters ()
 {
 	for (const auto datacenter : datacenters) {
-		datacenter -> print ();
+		datacenter -> print (false, false);
 	}
 }
 
@@ -514,7 +522,6 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves");
-			printAllDatacenters ();
 		}
 		
 		std::fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
