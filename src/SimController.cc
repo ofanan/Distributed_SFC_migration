@@ -190,6 +190,11 @@ void SimController::concludeTimePeriod ()
 	}
 	
 	int periodCost = numMigs * uniformChainMisgCost + calcNonMigCost ();
+	
+	if (MyConfig::LOG_LVL > 0) {
+		snprintf (buf, bufSize, "\ntot cost = %d", periodCost);
+		printBufToLog();
+	}
 
 	//	uint16_t numMigsSinceLastStep = 0;
 	chainsThatJoinedLeaf.    clear ();
@@ -228,21 +233,6 @@ void SimController::printAllDatacenters ()
 }
 
 // Returns the overall cpu cost at its current location.
-int SimController::calcMigCost () 
-{
-	
-	int totNonMigCost = 0;
-	for (auto const &chain : ChainsMaster::allChains) {	
-		int16_t chainNonMigCost = chain.getCost ();
-		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
-			error ("calcSolCpuCost Sync encountered a chain that isn't placed yet");
-		}
-		totNonMigCost += chainNonMigCost;
-	}
-	return totNonMigCost;
-}
-
-// Returns the overall cpu cost at its current location.
 int SimController::calcNonMigCost () 
 {
 	
@@ -256,7 +246,6 @@ int SimController::calcNonMigCost ()
 	}
 	return totNonMigCost;
 }
-
 
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
 void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId)

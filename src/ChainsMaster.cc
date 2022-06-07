@@ -23,7 +23,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 		if (chain.curLvl == UNPLACED_LVL) {
 			return false;
 		}
-		if (chain.curDc != chain.S_u[chain.curLvl]) { // Was the chain migrated?
+		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
 			chain.curDc = chain.S_u[chain.curLvl];
 		}
