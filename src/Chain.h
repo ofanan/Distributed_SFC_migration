@@ -40,6 +40,7 @@ class Chain
 		// Getters
 		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED_DC, if this chain isn't placed
     Cost_t getCpuCost () const;
+    Cost_t getCost 		() const;
     Cpu_t  getCpu     () const; 
     
 		/* 

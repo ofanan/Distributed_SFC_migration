@@ -59,16 +59,16 @@ void SimController::initialize (int stage)
 void SimController::checkParams ()
 {
 
-	for (uint16_t lvl(0); lvl < RT_Chain::cpuCostAtLvl.size()-1; lvl++) {
-		if ((int)(RT_Chain::cpuCostAtLvl[lvl]) <= (int)(RT_Chain::cpuCostAtLvl[lvl+1])) {
-			error ("RT_Chain::cpuCostAtLvl[] should be decreasing. However, RT_Chain::cpuCostAtLvl[%d]=%d, RT_Chain::cpuCostAtLvl[%d]=%d\n", 
-							lvl, RT_Chain::cpuCostAtLvl[lvl], lvl+1, RT_Chain::cpuCostAtLvl[lvl+1]);
+	for (uint16_t lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
+		if ((int)(RT_Chain::costAtLvl[lvl]) <= (int)(RT_Chain::costAtLvl[lvl+1])) {
+			error ("RT_Chain::costAtLvl[] should be decreasing. However, RT_Chain::costAtLvl[%d]=%d, RT_Chain::costAtLvl[%d]=%d\n", 
+							lvl, RT_Chain::costAtLvl[lvl], lvl+1, RT_Chain::costAtLvl[lvl+1]);
 		}
 	}
-	for (uint16_t lvl(0); lvl < RT_Chain::cpuCostAtLvl.size()-1; lvl++) {
-		if ((int)(Non_RT_Chain::cpuCostAtLvl[lvl]) <= (int)(Non_RT_Chain::cpuCostAtLvl[lvl+1])) {
-			error ("Non_RT_Chain::cpuCostAtLvl[] should be decreasing. However, Non_RT_Chain::cpuCostAtLvl[%d]=%d, Non_RT_Chain::cpuCostAtLvl[%d]=%d\n", 
-							lvl, Non_RT_Chain::cpuCostAtLvl[lvl], lvl+1, Non_RT_Chain::cpuCostAtLvl[lvl+1]);
+	for (uint16_t lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
+		if ((int)(Non_RT_Chain::costAtLvl[lvl]) <= (int)(Non_RT_Chain::costAtLvl[lvl+1])) {
+			error ("Non_RT_Chain::costAtLvl[] should be decreasing. However, Non_RT_Chain::costAtLvl[%d]=%d, Non_RT_Chain::costAtLvl[%d]=%d\n", 
+							lvl, Non_RT_Chain::costAtLvl[lvl], lvl+1, Non_RT_Chain::costAtLvl[lvl+1]);
 		}
 	}
 }

@@ -176,6 +176,12 @@ DcId_t Chain::getCurDatacenter () const
 } 
 
 // returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
+Cost_t Chain::getCost () const
+{
+	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::costAtLvl[curLvl] : Non_RT_Chain::costAtLvl[curLvl]);
+}
+
+// returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
 Cost_t Chain::getCpuCost () const
 {
 	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
