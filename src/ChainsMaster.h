@@ -28,7 +28,7 @@ class ChainsMaster {
 	public:
 
 	static void eraseChains (vector <ChainId_t> vec); // a vector of chains ids to erase 
-	static bool modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain, DcId_t &curDatacenter);
+	static bool modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain);
 	static bool modifyLvl   (ChainId_t chainId, Lvl_t newLvl); // Change the level of the given chain
 	// inline static void eraseChain  (ChainId_t chainId); // a chain ids to erase 
 	static bool 	getChain 											(const ChainId_t chainId, Chain &chain);

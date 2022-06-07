@@ -354,17 +354,16 @@ void SimController::rdOldUsrsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	
-  	if (!ChainsMaster::modifyS_u (chainId, pathToRoot[poaId], chain, chainCurDatacenter))
+  	if (!ChainsMaster::modifyS_u (chainId, pathToRoot[poaId], chain))
   	{
 			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
   	}
-		if (!isDelayFeasibleForChain (chainCurDatacenter, chain.curLvl, chain)) { // if the current place of this chain isn't delay-feasible for it anymore
-			insertSorted (chainsThatJoinedLeaf[poaId], chain); // need to inform the chain's new poa that it has to place it
-			chainsThatLeftDatacenter[chainCurDatacenter].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
-		}
-		if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED_DC) {
+		if (MyConfig::DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
-			continue;
+		}
+		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore
+			insertSorted (chainsThatJoinedLeaf[poaId], chain); // need to inform the chain's new poa that it has to place it
+			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
 	}
 

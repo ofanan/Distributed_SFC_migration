@@ -33,10 +33,15 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 }
 
 /*************************************************************************************************************************************************
-* Given a chain id, update the curLvl field of the respective chain to the given newLvl.
+* Given a chain id:
+* - find the chain c having this Id. 
+* - update c.S_u field according to the input pathToRoot, reflecting the up-to-date path from the user's PoA to the root.
+* - If the c.curDc (current Datacenter) is still delay-feasible for this chain, leave it unchanged. Else, set c.curDc=UNPLACED_DC
+* - write chain to the input by-ref parameter &modifiedChain.
 * Output: true if the requested chain was found.
+* 
 **************************************************************************************************************************************************/
-bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain, DcId_t &curDatacenter)
+bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain)
 {
 	Chain dummy (chainId);
 	auto chainPtr = ChainsMaster::allChains.find (dummy);
@@ -45,12 +50,14 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 		return false;
 	}
 	
-//	curDatacenter = chainPtr->getCurDatacenter();
-	if (MyConfig::DEBUG_LVL>0 && curDatacenter==UNPLACED_DC) {
+	if (MyConfig::DEBUG_LVL>0) {
 		return false;
 	}
 	modifiedChain = *chainPtr; // copy the modified chain
 	modifiedChain.S_u = {pathToRoot.begin(), pathToRoot.begin()+chainPtr->mu_u_len ()}; //update the chain's S_u
+	if (!(modifiedChain.dcIsDelayFeasible (modifiedChain.curDc, modifiedChain.curLvl))) {
+		modifiedChain.curLvl = UNPLACED_LVL;
+	}
 	allChains.erase (chainPtr); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
 	allChains.insert (modifiedChain);
 	return true;
