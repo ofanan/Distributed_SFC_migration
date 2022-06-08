@@ -1,6 +1,7 @@
 #include "ChainsMaster.h"
 
-unordered_set <Chain, ChainHash> 	ChainsMaster::allChains;
+unordered_set <Chain, ChainHash> ChainsMaster::allChains;
+unordered_map <ChainId_t, Chain> ChainsMaster::allChains_; // All the currently active chains. 
 int ChainsMaster::numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 int ChainsMaster::numMigs;
 const int ChainsMaster::bufSize;
@@ -11,6 +12,21 @@ void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 	for (auto chainId : vec) {
 		eraseChainFromSet (allChains, chainId);
 	}
+}
+
+
+/*************************************************************************************************************************************************
+* Inserts the chain, given its id, into the by-ref argument chain.
+* Returns true iff the ChainId_t is found in allChains.
+**************************************************************************************************************************************************/
+bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
+{
+	auto it = ChainsMaster::allChains_.find(chainId);
+	if (it == ChainsMaster::allChains_.end()) { 
+		return false;
+  }
+  chain = it->second;
+  return true;
 }
 
 /*************************************************************************************************************************************************
@@ -71,6 +87,8 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 		Chain modifiedChain = chain; 
 		modifiedChain.curDc = chain.S_u[chain.curLvl];
 		allChains.erase  (chain);
+		MyConfig::printToLog ("\nprinting modified chain here1\n");
+		MyConfig::printToLog (modifiedChain);
 		allChains.insert (modifiedChain);
 	}
 	return true;
@@ -133,6 +151,8 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 	Chain modifiedChain 	= *search;
 	modifiedChain.curLvl 	= newLvl;
 	ChainsMaster::allChains.erase  (search);
+		MyConfig::printToLog ("\nprinting modified chain here2\n");
+		MyConfig::printToLog (modifiedChain);
 	ChainsMaster::allChains.insert (modifiedChain);
 	ChainsMaster::numInstantMigs++; // assume that every change in the lvl implies an "instantaneous migration" (several inst' mig' may happen per period).
 	return true;
@@ -165,6 +185,8 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 		modifiedChain.curLvl = UNPLACED_LVL;
 	}
 	allChains.erase (chainPtr); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
+		MyConfig::printToLog ("\nprinting modified chain here3\n");
+		MyConfig::printToLog (modifiedChain);
 	allChains.insert (modifiedChain);
 	return true;
 }

@@ -48,7 +48,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-	ChainsMaster::allChains.clear ();
+	ChainsMaster::allChains_.clear ();
 	runTrace ();
 }
 
@@ -96,6 +96,9 @@ void SimController::runTimePeriod ()
 {
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
+		if (t==2) {
+			error ("t=%d", t);
+		}
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 	}
 	
@@ -136,6 +139,7 @@ void SimController::runTimePeriod ()
 			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			ChainsMaster::eraseChains (usrsThatLeft);
+
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
 			scheduleAt (simTime() + period, new cMessage); 
@@ -171,6 +175,8 @@ void SimController::finish ()
 void SimController::concludeTimePeriod ()
 {
 	int numMigs;
+	MyConfig::printToLog ("\nprinting allChains\n");
+	ChainsMaster::printAllChains ();
 	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
 		error ("error occured during run of ChainsMaster::concludeTimePeriod");
 	}
@@ -194,14 +200,6 @@ void SimController::concludeTimePeriod ()
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
 		}
-//		checkChainsMasterData ();
-//		for (auto const &chain : ChainsMaster::allChains) {
-//			if (chain.curLvl==UNPLACED_LVL) {
-//				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
-//				printBufToLog ();
-//				printAllDatacenters ();
-//				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
-//			}
 	}
 	
 	chainsThatJoinedLeaf.    clear ();
@@ -246,22 +244,22 @@ void SimController::rdUsrsThatLeftLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
   ChainId_t chainId;
-  DcId_t chainCurDatacenter;
+  DcId_t chainCurDc;
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
 	for (const auto& token : tokens) {
   	chainId = stoi (token);
-  	if (MyConfig::DEBUG_LVL>0 && !(findChainInSet (ChainsMaster::allChains, chainId, chain))) {
+
+		if (ChainsMaster::findChain (chainId, chain)) { 
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
-	  else {
-	  	chainCurDatacenter = chain.curDc;
-	  	if (MyConfig::DEBUG_LVL>0 && chainCurDatacenter == UNPLACED_DC) {
-				error ("Note: this chain was not placed before leaving\n"); 
-	  	}
-  		chainsThatLeftDatacenter[chainCurDatacenter].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-  		usrsThatLeft.push_back (chainId);
-	  }
+    
+  	chainCurDc = chain.curDc;
+  	if (MyConfig::DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
+			error ("Note: this chain was not placed before leaving\n"); 
+  	}
+		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
+		usrsThatLeft.push_back (chainId);
   }
 }
 
@@ -481,6 +479,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 		}
 	}
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
+
 		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves");
 		}
