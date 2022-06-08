@@ -305,7 +305,9 @@ void SimController::rdNewUsrsLine (string line)
 		}
 		
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].		
-		ChainsMaster::allChains.insert (chain); 
+		if (!ChainsMaster::insert (chainId, chain)) {
+			error ("t=%d new chain %d was already found in ChainsMaster", t, chainId);
+		}
 	}	
 	
 }

@@ -14,9 +14,25 @@ void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 	}
 }
 
-
 /*************************************************************************************************************************************************
 * Inserts the chain, given its id, into the by-ref argument chain.
+* Returns false the ChainId_t was already found in allChains.
+**************************************************************************************************************************************************/
+bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
+{
+	if (MyConfig::DEBUG_LVL>1) {
+		auto it = ChainsMaster::allChains_.find(chainId);
+		if (it == ChainsMaster::allChains_.end()) { 
+			return false;
+		}
+	}
+	ChainsMaster::allChains_.insert ({chainId, chain}); 
+	return true;
+}
+
+
+/*************************************************************************************************************************************************
+* Finds the chain, given its id, into the by-ref argument chain.
 * Returns true iff the ChainId_t is found in allChains.
 **************************************************************************************************************************************************/
 bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)

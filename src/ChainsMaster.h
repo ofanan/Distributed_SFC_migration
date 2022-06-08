@@ -44,6 +44,7 @@ class ChainsMaster {
 	static void printAllChainsPoas (); //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 	static int calcNonMigCost ();
 	static bool findChain (ChainId_t chainId, Chain &chain);
+	static bool insert (ChainId_t chainId, Chain chain);
 	friend class SimController;
 /*	friend class MyConfig;*/
 };
