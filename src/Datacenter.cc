@@ -158,7 +158,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		auto search = potPlacedChains.find (chainId);
 		if (search!=potPlacedChains.end()) { 
 			Chain chain;
-			if (!ChainsMaster::getChain (chainId, chain)) {
+			if (!ChainsMaster::findChain (chainId, chain)) {
 				error ("pot-placed chain %d was not found in ChainMaster", chainId);
 			}
 			regainRsrcOfChain (chain);
@@ -170,7 +170,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		search = placedChains.find (chainId);
 		if (search!=placedChains.end()) { 
 			Chain chain;
-			if (!ChainsMaster::getChain (chainId, chain)) {
+			if (!ChainsMaster::findChain (chainId, chain)) {
 				error ("placed chain %d was not found in ChainMaster", chainId);
 			}
 			regainRsrcOfChain (chain);

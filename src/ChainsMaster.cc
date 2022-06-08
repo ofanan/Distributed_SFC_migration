@@ -45,6 +45,22 @@ bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
   return true;
 }
 
+
+/*************************************************************************************************************************************************
+* Given a chain id, update the curLvl field of the respective chain to the given newLvl.
+* Output: true iff the requested chain was found.
+**************************************************************************************************************************************************/
+bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
+{
+	auto it = ChainsMaster::allChains_.find(chainId);
+	if (it == ChainsMaster::allChains_.end()) { 
+		return false;
+  }
+  it->second.curLvl = newLvl;
+	ChainsMaster::numInstantMigs++; // assume that every change in the lvl implies an "instantaneous migration" (several inst' mig' may happen per period).
+  return true;
+}
+
 /*************************************************************************************************************************************************
 * Returns the overall cpu cost at its current location.
 **************************************************************************************************************************************************/
@@ -148,31 +164,6 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 	
 }
 
-
-/*************************************************************************************************************************************************
-* Given a chain id, update the curLvl field of the respective chain to the given newLvl.
-* Output: true iff the requested chain was found.
-**************************************************************************************************************************************************/
-bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
-{
-	Chain chain (chainId);
-	auto search = ChainsMaster::allChains.find (chain);
-
-	if (search==ChainsMaster::allChains.end()) {
-		return false; // chain not found - nothing to do
-	}
-	// $$$$$$$$$$$$$$$
-	snprintf (buf, bufSize, "modifyLvl was called with newLvl=%d", newLvl);
-	MyConfig::printToLog (buf);
-	Chain modifiedChain 	= *search;
-	modifiedChain.curLvl 	= newLvl;
-	ChainsMaster::allChains.erase  (search);
-		MyConfig::printToLog ("\nprinting modified chain here2\n");
-		MyConfig::printToLog (modifiedChain);
-	ChainsMaster::allChains.insert (modifiedChain);
-	ChainsMaster::numInstantMigs++; // assume that every change in the lvl implies an "instantaneous migration" (several inst' mig' may happen per period).
-	return true;
-}
 
 /*************************************************************************************************************************************************
 * Given a chain id:
