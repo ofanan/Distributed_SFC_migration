@@ -10,7 +10,7 @@ char ChainsMaster::buf[bufSize];
 void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 {
 	for (auto chainId : vec) {
-		eraseChainFromSet (allChains, chainId);
+		ChainsMaster::allChains_.erase (chainId);
 	}
 }
 
