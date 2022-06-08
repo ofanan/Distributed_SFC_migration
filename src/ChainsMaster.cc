@@ -61,6 +61,33 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
   return true;
 }
 
+
+/*************************************************************************************************************************************************
+* Given a chain id:
+* - find the chain c having this Id. 
+* - update c.S_u field according to the input pathToRoot, reflecting the up-to-date path from the user's PoA to the root.
+* - If current datacenter hosting this chain is still delay-feasible for this it, leave it unchanged. Else, set c.curLvl=UNPLACED_LVL, to  indicate
+		that this chain should be migrated.
+* - write chain to the input by-ref parameter &modifiedChain.
+* Output: true if the requested chain was found.
+* 
+**************************************************************************************************************************************************/
+bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain)
+{
+
+	auto it = ChainsMaster::allChains_.find(chainId);
+	if (it == ChainsMaster::allChains_.end()) { 
+		return false;
+  }
+
+	it->second.S_u = {pathToRoot.begin(), pathToRoot.begin()+it->second.mu_u_len ()}; //update the chain's S_u
+	if (!(it->second.dcIsDelayFeasible (it->second.curDc, it->second.curLvl))) {
+		it->second.curLvl = UNPLACED_LVL;
+	}
+	modifiedChain = it->second;
+	return true;
+}
+
 /*************************************************************************************************************************************************
 * Returns the overall cpu cost at its current location.
 **************************************************************************************************************************************************/
@@ -162,40 +189,6 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 		MyConfig::printToLog ("\n");
 	}
 	
-}
-
-
-/*************************************************************************************************************************************************
-* Given a chain id:
-* - find the chain c having this Id. 
-* - update c.S_u field according to the input pathToRoot, reflecting the up-to-date path from the user's PoA to the root.
-* - If the c.curDc (current Datacenter) is still delay-feasible for this chain, leave it unchanged. Else, set c.curDc=UNPLACED_DC
-* - write chain to the input by-ref parameter &modifiedChain.
-* Output: true if the requested chain was found.
-* 
-**************************************************************************************************************************************************/
-bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain)
-{
-	Chain dummy (chainId);
-	auto chainPtr = ChainsMaster::allChains.find (dummy);
-
-	if (MyConfig::DEBUG_LVL>0 && chainPtr==ChainsMaster::allChains.end()) {
-		return false;
-	}
-	
-	if (MyConfig::DEBUG_LVL>0) {
-		return false;
-	}
-	modifiedChain = *chainPtr; // copy the modified chain
-	modifiedChain.S_u = {pathToRoot.begin(), pathToRoot.begin()+chainPtr->mu_u_len ()}; //update the chain's S_u
-	if (!(modifiedChain.dcIsDelayFeasible (modifiedChain.curDc, modifiedChain.curLvl))) {
-		modifiedChain.curLvl = UNPLACED_LVL;
-	}
-	allChains.erase (chainPtr); // remove the chain from our DB; will soon re-write it to the DB, having updated fields
-		MyConfig::printToLog ("\nprinting modified chain here3\n");
-		MyConfig::printToLog (modifiedChain);
-	allChains.insert (modifiedChain);
-	return true;
 }
 
 /*************************************************************************************************************************************************
