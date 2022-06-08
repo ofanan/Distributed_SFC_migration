@@ -28,13 +28,11 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
 		}
-		//$$$ is it necessary to erase and re-insert?
 		Chain modifiedChain = chain; 
 		modifiedChain.curDc = chain.S_u[chain.curLvl];
 		allChains.erase  (chain);
 		allChains.insert (modifiedChain);
 	}
-	printAllDatacenters (7);
 	return true;
 }
 

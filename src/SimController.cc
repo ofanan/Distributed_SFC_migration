@@ -52,31 +52,31 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot ();
 	ChainsMaster::allChains.clear ();
-	// $$$$
-	vector <DcId_t> S_u = {1,2,3};
-	Chain c1 (1, S_u);
-	ChainsMaster::allChains.insert (c1);
-	ChainsMaster::printAllChains ();
-//	Chain c2 (2, S_u);
-//	c2.setDc (2);
-//	c2.id = 7;
-//	c2.curDc = 7;
-//	c2.curLvl = 7;
-//		c1.curDc = 7;
-//		c1.curLvl = 7;
-//	snprintf (buf, bufSize, "chain %d curDc=%d curLvl=%d\n", c2.id, c2.curDc, c2.curLvl);
-//	MyConfig::printToLog (buf);
-//	ChainsMaster::allChains.erase (c1);
-//	ChainsMaster::allChains.insert (c2);
+//	// $$$$
+//	vector <DcId_t> S_u = {1,2,3};
+//	Chain c1 (1, S_u);
+//	ChainsMaster::allChains.insert (c1);
 //	ChainsMaster::printAllChains ();
-	
+////	Chain c2 (2, S_u);
+////	c2.setDc (2);
+////	c2.id = 7;
+////	c2.curDc = 7;
+////	c2.curLvl = 7;
+////		c1.curDc = 7;
+////		c1.curLvl = 7;
+////	snprintf (buf, bufSize, "chain %d curDc=%d curLvl=%d\n", c2.id, c2.curDc, c2.curLvl);
+////	MyConfig::printToLog (buf);
+////	ChainsMaster::allChains.erase (c1);
+////	ChainsMaster::allChains.insert (c2);
+////	ChainsMaster::printAllChains ();
+//	
 
-	ChainsMaster::printAllDatacenters (numDatacenters);
-	ChainsMaster::modifyLvl (1, 1);
-	int numMigs;
-	ChainsMaster::concludeTimePeriod (numMigs);
-	ChainsMaster::printAllDatacenters (numDatacenters);
-	endSimulation ();
+//	ChainsMaster::printAllDatacenters (numDatacenters);
+//	ChainsMaster::modifyLvl (1, 1);
+//	int numMigs;
+//	ChainsMaster::concludeTimePeriod (numMigs);
+//	ChainsMaster::printAllDatacenters (numDatacenters);
+//	endSimulation ();
 	runTrace ();
 }
 
