@@ -39,9 +39,10 @@ class ChainsMaster {
 	static bool getChain 											(const ChainId_t chainId, Chain &chain);
 	static void printAllDatacenters (int numDatacenters);
 	static void printAllChains ();
-	
+	static void printAllChainsPoas (); //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
+	static int calcNonMigCost ();
 	friend class SimController;
-	friend class MyConfig;
+/*	friend class MyConfig;*/
 };
 
 #endif

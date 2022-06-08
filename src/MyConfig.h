@@ -58,8 +58,6 @@ class MyConfig {
 		static void openFiles ();
 		
 		//print
-		static void printAllChains ();
-		static void printAllChainsPoas ();
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
 		static void printToLog (int d); // print "d,", where d is the integer, to the log file

@@ -52,31 +52,6 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot ();
 	ChainsMaster::allChains.clear ();
-//	// $$$$
-//	vector <DcId_t> S_u = {1,2,3};
-//	Chain c1 (1, S_u);
-//	ChainsMaster::allChains.insert (c1);
-//	ChainsMaster::printAllChains ();
-////	Chain c2 (2, S_u);
-////	c2.setDc (2);
-////	c2.id = 7;
-////	c2.curDc = 7;
-////	c2.curLvl = 7;
-////		c1.curDc = 7;
-////		c1.curLvl = 7;
-////	snprintf (buf, bufSize, "chain %d curDc=%d curLvl=%d\n", c2.id, c2.curDc, c2.curLvl);
-////	MyConfig::printToLog (buf);
-////	ChainsMaster::allChains.erase (c1);
-////	ChainsMaster::allChains.insert (c2);
-////	ChainsMaster::printAllChains ();
-//	
-
-//	ChainsMaster::printAllDatacenters (numDatacenters);
-//	ChainsMaster::modifyLvl (1, 1);
-//	int numMigs;
-//	ChainsMaster::concludeTimePeriod (numMigs);
-//	ChainsMaster::printAllDatacenters (numDatacenters);
-//	endSimulation ();
 	runTrace ();
 }
 
@@ -203,7 +178,12 @@ void SimController::concludeTimePeriod ()
 		error ("error occured during run of ChainsMaster::concludeTimePeriod");
 	}
 	
-	int periodCost = numMigs * uniformChainMisgCost + calcNonMigCost ();
+	int nonMigCost = ChainsMaster::calcNonMigCost ();
+	if (nonMigCost < 0) {
+		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
+	}
+
+	int periodCost = numMigs * uniformChainMisgCost + nonMigCost;
 	
 	if (MyConfig::LOG_LVL > 0) {
 		snprintf (buf, bufSize, "\ntot cost = %d", periodCost);
@@ -215,7 +195,7 @@ void SimController::concludeTimePeriod ()
 			MyConfig::printToLog ("\nBy DCs:");
 			printAllDatacenters ();
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
-			printAllDatacentersByChainsMaster ();
+			ChainsMaster::printAllDatacenters (numDatacenters);
 		}
 //		checkChainsMasterData ();
 //		for (auto const &chain : ChainsMaster::allChains) {
@@ -223,7 +203,6 @@ void SimController::concludeTimePeriod ()
 //				snprintf (buf, bufSize, "\nt=%d: chain %d is unplaced at the end of cycle. Printing state and exiting\n", t, chain.id);
 //				printBufToLog ();
 //				printAllDatacenters ();
-//				MyConfig::printAllChains ();
 //				error ("t=%d: chain %d is unplaced at the end of cycle\n", chain.id);
 //			}
 	}
@@ -234,50 +213,12 @@ void SimController::concludeTimePeriod ()
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 }
 
-// print all the placed (and possibly, the pot-placed) chains on each DC by ChainsMaster::allChains DB.
-void SimController::printAllDatacentersByChainsMaster ()
-{	
-	ChainsMaster::printAllDatacenters (numDatacenters);
-//	// gather the required data
-//	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
-//	for (const auto &chain : ChainsMaster::allChains) {
-//		DcId_t chainCurDatacenter = chain.curDc;
-//		if (chainCurDatacenter==UNPLACED_DC) {
-//			continue;
-//		}
-//		chainsPlacedOnDatacenter [chainCurDatacenter].push_back (chain.id);
-//	}
-//	
-//	// print the data
-//	for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
-//		snprintf (buf, bufSize, "DC %d, placed chains: ", dcId);
-//		printBufToLog ();
-//		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
-//		MyConfig::printToLog ("\n");
-//	}
-}
-
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
 void SimController::printAllDatacenters ()
 {
 	for (const auto datacenter : datacenters) {
 		datacenter -> print (false, false);
 	}
-}
-
-// Returns the overall cpu cost at its current location.
-int SimController::calcNonMigCost () 
-{
-	
-	int totNonMigCost = 0;
-	for (auto const &chain : ChainsMaster::allChains) {	
-		int16_t chainNonMigCost = chain.getCost ();
-		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
-			error ("calcSolCpuCost Sync encountered a chain that isn't placed yet");
-		}
-		totNonMigCost += chainNonMigCost;
-	}
-	return totNonMigCost;
 }
 
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
@@ -487,7 +428,6 @@ void SimController::initAlgSync ()
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
 		printBufToLog();
-		MyConfig::printAllChains ();
 	} 
 
 	bool *initAlgAtLeaf { new bool[numLeaves]{} }; // initAlgAtLeaf[i] will be true iff we already initiated a run of BUPU in leaf i
@@ -563,7 +503,7 @@ void SimController::PrintStateAndEndSim ()
 	MyConfig::printToLog ("Printing state and finishing simulation\n");
 	printAllDatacenters ();
 	MyConfig::printToLog ("Printing the PoAs of each chain\n");
-  MyConfig::printAllChainsPoas  (); 
+  ChainsMaster::printAllChainsPoas  (); 
 	MyConfig::printToLog ("simulation abnormally terminated by SimController.PrintStateAndEndSim");
 	error ("simulation abnormally terminated by SimController.PrintStateAndEndSim. Check the log file for details.");
 }

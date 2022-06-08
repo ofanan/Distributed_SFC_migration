@@ -120,30 +120,6 @@ bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, uint16_t id)
 	}
 }
 
-// Print the PoA of each currently-active user
-void MyConfig::printAllChains () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
-{
-	printToLog ("\nallChains\n*******************\n");
-	printToLog ("format: (c,d), where c is the chain id, and d is the id of its current DC\n");
-	
-	for (auto chain : ChainsMaster::allChains) {
-		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.curDc);
-		printToLog (buf);
-	}
-}
-
-// Print the PoA of each currently-active user
-void MyConfig::printAllChainsPoas () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
-{
-	printToLog ("\nallChains\n*******************\n");
-	printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
-	
-	for (auto chain : ChainsMaster::allChains) {
-		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
-		printToLog (buf);
-	}
-}
-
 //ofstream MyConfig::getLogFile ()
 //{
 //	return logFile;

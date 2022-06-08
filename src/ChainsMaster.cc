@@ -14,6 +14,39 @@ void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 }
 
 /*************************************************************************************************************************************************
+* Returns the overall cpu cost at its current location.
+**************************************************************************************************************************************************/
+int ChainsMaster::calcNonMigCost () 
+{
+	
+	int totNonMigCost = 0;
+	for (auto const &chain : ChainsMaster::allChains) {	
+		int16_t chainNonMigCost = chain.getCost ();
+		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
+			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: chain %d isn't placed yet", chain.id);
+			MyConfig::printToLog (buf);
+			return -1;
+		}
+		totNonMigCost += chainNonMigCost;
+	}
+	return totNonMigCost;
+}
+
+
+// Print the PoA of each currently-active user
+void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
+{
+	MyConfig::printToLog ("\nallChains\n*******************\n");
+	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
+	
+	for (auto chain : ChainsMaster::allChains) {
+		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
+		MyConfig::printToLog (buf);
+	}
+}
+
+
+/*************************************************************************************************************************************************
 * Fill within numMigs the overall num of migrations in the last time period.
 * If any chain is unplaced, return false. Else, return true.
 **************************************************************************************************************************************************/
@@ -22,7 +55,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 
 	numMigs = 0;
 	for (auto chain : allChains) {
-		if (chain.curLvl == UNPLACED_LVL) {
+		if (chain.curLvl == UNPLACED_LVL || chain.S_u.size()<(chain.curLvl-1)) {
 			return false;
 		}
 		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
