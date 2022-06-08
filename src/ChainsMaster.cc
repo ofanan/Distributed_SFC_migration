@@ -29,15 +29,30 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 			numMigs++;
 		}
 		chain.curDc = chain.S_u[chain.curLvl];
+//		Chain modifiedChain = chain; $$$ is it necessary to erase and re-insert?
+//		modifiedChain.curDc = chain.S_u[chain.curLvl];
+//		allChains.erase  (chain);
+//		allChains.insert (modifiedChain);
 	}
+	printAllDatacenters (7);
 	return true;
 }
+
+void ChainsMaster::printAllChains ()
+{
+	for (auto chain : allChains) {
+		snprintf (buf, bufSize, "chain %d, curDc=%d, curLvl=%d\n", chain.id, chain.curDc, chain.curLvl);
+		MyConfig::printToLog (buf);
+	}
+}
+
 
 /*************************************************************************************************************************************************
 * Print to the log for every datacenter, the list of chains currently placed on it.
 **************************************************************************************************************************************************/
 void ChainsMaster::printAllDatacenters (int numDatacenters) 
 {
+	MyConfig::printToLog ("in ChainsMaster::printAllDatacenters\n");
 	// gather the required data
 	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
 	for (const auto &chain : ChainsMaster::allChains) {
@@ -46,6 +61,8 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 			continue;
 		}
 		chainsPlacedOnDatacenter [curDc].push_back (chain.id);
+		snprintf (buf, bufSize, "pushed chain % d on chainsPlacedOnDatacenter[%d]\n", chain.id, curDc);
+		MyConfig::printToLog(buf);
 	}
 	
 	// print the data

@@ -46,7 +46,7 @@ Chain::Chain (const Chain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
-  this->curDc 			= UNPLACED_DC;
+  this->curDc 			= c.curDc;
   this->isRT_Chain 	= c.isRT_Chain;
 }
 

@@ -38,6 +38,7 @@ class ChainsMaster {
 	// inline static void eraseChain  (ChainId_t chainId); // a chain ids to erase 
 	static bool getChain 											(const ChainId_t chainId, Chain &chain);
 	static void printAllDatacenters (int numDatacenters);
+	static void printAllChains ();
 	
 	friend class SimController;
 	friend class MyConfig;
