@@ -263,6 +263,7 @@ void Datacenter::pushUpSync ()
 	}
 	reshuffled = false;
 	
+	// First, check if this is a chain that was pushed-up for me, and therefore I can regain resources for it.
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
 		auto search = potPlacedChains.find (chainPtr->id);
 		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do
@@ -287,7 +288,7 @@ void Datacenter::pushUpSync ()
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
 				requiredCpuToLocallyPlaceThisChain > availCpu || // or because not enough avail' cpu for pushing-up, ...
-				chainPtr->dcIsDelayFeasible (dcId, lvl)) { // or because I'm not delay-feasible for this chain  
+				!chainPtr->dcIsDelayFeasible (dcId, lvl)) { // or because I'm not delay-feasible for this chain  
 			chainPtr++;
 			continue;
 		}
