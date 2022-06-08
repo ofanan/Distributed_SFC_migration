@@ -374,15 +374,15 @@ Raise an error in case of data inconsistency.
 **************************************************************************************************************************************************/
 void SimController::checkChainsMasterData ()
 {
-	for (auto chain : ChainsMaster::allChains) {
-		DcId_t curDatacenter = chain.curDc;
-		if (curDatacenter == UNPLACED_DC) { // chain is unplaced
-			error ("t=% by chainsMaster, chain %d is unplaced in the end of period", t, chain.id);
-		}
-		if (!(datacenters[curDatacenter]->checkIfChainIsPlaced (chain.id)) ) {
-			error ("t=% chainsManager says that chain %d is placed in DC %d while it's not placed there", t, chain.id, curDatacenter);
-		}
-	}
+//	for (auto chain : ChainsMaster::allChains) {
+//		DcId_t curDatacenter = chain.curDc;
+//		if (curDatacenter == UNPLACED_DC) { // chain is unplaced
+//			error ("t=% by chainsMaster, chain %d is unplaced in the end of period", t, chain.id);
+//		}
+//		if (!(datacenters[curDatacenter]->checkIfChainIsPlaced (chain.id)) ) {
+//			error ("t=% chainsManager says that chain %d is placed in DC %d while it's not placed there", t, chain.id, curDatacenter);
+//		}
+//	}
 }
 
 
@@ -398,13 +398,13 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
   unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
   vector<Chain> vecOfUsrsOfThisPoA; 
 
-	for (auto chain : ChainsMaster::allChains) {
-		if (chain.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
-			DcId_t chainCurDatacenter = chain.curDc;
+	for (auto it : ChainsMaster::allChains_) {
+		if (it.second.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
+			DcId_t chainCurDatacenter = (it.second).curDc;
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
-				chainsToReplace[chainCurDatacenter].push_back (chain.id); // If this chain's PoA is the leaf that requested resh, the chain should be released
+				chainsToReplace[chainCurDatacenter].push_back (it.first); // If this chain's PoA is the leaf that requested resh, the chain should be released
 			}
-			insertSorted (vecOfUsrsOfThisPoA, chain);
+			insertSorted (vecOfUsrsOfThisPoA, it.second);
 		}
 	}
 	rlzRsrcOfChains (chainsToReplace);
