@@ -128,7 +128,9 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 bool ChainsMaster::concludeTimePeriod (int &numMigs)
 {
 
+	Need to adapt this to allChains_, which is a map.
 	numMigs = 0;
+	
 	for (auto chain : allChains) {
 		if (chain.curLvl == UNPLACED_LVL) {
 			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", chain.id);
