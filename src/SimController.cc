@@ -300,10 +300,8 @@ void SimController::rdNewUsrsLine (string line)
 				chain = Non_RT_Chain (chainId, S_u); 
 			}		
 		}
-		if (MyConfig::DEBUG_LVL>0) {
-			if (findChainInSet (ChainsMaster::allChains, chainId, chain)) {
-				error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
-			}
+		if (MyConfig::DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
+			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 		}
 		
 		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].		
