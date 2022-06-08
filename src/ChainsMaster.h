@@ -26,7 +26,7 @@ class ChainsMaster {
 		static int numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 		static int numMigs;
 /*  	inline void printBufToLog () {MyConfig::printToLog(buf);}*/
-		static const uint16_t bufSize = 128;
+		static const int bufSize = 128;
 		static char buf[bufSize];
 
 	public:

@@ -34,10 +34,10 @@ class Datacenter : public cSimpleModule
     cModule 				*network; // Pointer to the network on which the simulation is running
     SimController 	*simController;
   	string 					networkName;
-  	uint8_t   			lvl; // level in the tree (leaf's lvl is 0).
-    uint8_t 				numChildren;
-    uint8_t 				numParents;
-    uint8_t 				numPorts;
+  	Lvl_t   			lvl; // level in the tree (leaf's lvl is 0).
+    Lvl_t 				numChildren;
+    Lvl_t 				numParents;
+    Lvl_t 				numPorts;
     DcId_t 					idOfParent;
     vector <DcId_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
     bool isRoot;
@@ -61,7 +61,7 @@ class Datacenter : public cSimpleModule
     void print (bool printPotPlaced=true, bool printPushUpList=true); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
     
   private:
-  	static const uint8_t 	portToPrnt=0;
+  	static const Lvl_t 	portToPrnt=0;
   	bool 									reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
@@ -74,10 +74,10 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned; 
     unordered_set <ChainId_t>  placedChains, potPlacedChains; 
     unordered_set <ChainId_t>  newlyPlacedChains;    // IDs of the chains that I have placed after the last update I had sent to SimCtrlr.
-		uint8_t numBuPktsRcvd; 
+		int numBuPktsRcvd; 
 		
 		// A small buffer, used for printing results / log
-		static const uint16_t bufSize = 128;
+		static const int bufSize = 128;
 		char 	 buf[bufSize];
 
     virtual void initialize();
@@ -85,8 +85,8 @@ class Datacenter : public cSimpleModule
 
 		// Functions related to the alg' running    
     
-    Cpu_t requiredCpuToLocallyPlaceChain 				(const Chain chain) const;
-		inline uint8_t 	portOfChild 								(const uint8_t child) const; 
+    Cpu_t requiredCpuToLocallyPlaceChain 			(const Chain chain) const;
+		inline Lvl_t 	portOfChild 								(const Lvl_t child) const; 
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);
     void sndViaQ         												(int16_t portNum, cPacket* pkt2send);

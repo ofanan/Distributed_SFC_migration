@@ -1,6 +1,3 @@
-//$$$ ToDo:
-// Set numMigs in MyConfig.
-// Check why at t=1 chain 3 is placed in both DC 2 and DC 5.
 /*************************************************************************************************************************************************
 Controller of the simulation:
 - reads the trace.
@@ -28,7 +25,7 @@ void SimController::initialize (int stage)
 		networkName 		= (network -> par ("name")).stdstringValue();
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
-		height       		= (uint8_t) (network -> par ("height"));
+		height       		= (Lvl_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		return;
 	}
@@ -58,13 +55,13 @@ void SimController::initialize (int stage)
 void SimController::checkParams ()
 {
 
-	for (uint16_t lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
+	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
 		if ((int)(RT_Chain::costAtLvl[lvl]) <= (int)(RT_Chain::costAtLvl[lvl+1])) {
 			error ("RT_Chain::costAtLvl[] should be decreasing. However, RT_Chain::costAtLvl[%d]=%d, RT_Chain::costAtLvl[%d]=%d\n", 
 							lvl, RT_Chain::costAtLvl[lvl], lvl+1, RT_Chain::costAtLvl[lvl+1]);
 		}
 	}
-	for (uint16_t lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
+	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
 		if ((int)(Non_RT_Chain::costAtLvl[lvl]) <= (int)(Non_RT_Chain::costAtLvl[lvl+1])) {
 			error ("Non_RT_Chain::costAtLvl[] should be decreasing. However, Non_RT_Chain::costAtLvl[%d]=%d, Non_RT_Chain::costAtLvl[%d]=%d\n", 
 							lvl, Non_RT_Chain::costAtLvl[lvl], lvl+1, Non_RT_Chain::costAtLvl[lvl+1]);
@@ -77,7 +74,7 @@ void SimController::checkParams ()
 void SimController::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
 	DcId_t dcId;
-	for (uint16_t leafId(0) ; leafId < numLeaves; leafId++)  {
+	for (int leafId(0) ; leafId < numLeaves; leafId++)  {
 		pathToRoot[leafId].resize (height);
 		dcId = leaves[leafId]->dcId;
 	  int height = 0;
@@ -249,7 +246,7 @@ void SimController::rdUsrsThatLeftLine (string line)
   tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
   ChainId_t chainId;
-  int16_t chainCurDatacenter;
+  DcId_t chainCurDatacenter;
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
 	for (const auto& token : tokens) {
@@ -478,7 +475,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 	}
 	
 	bool rcvdFinishedAlgMsgFromAllLeaves = true;
-	for (uint16_t i(0); i < numLeaves; i++) {
+	for (int i(0); i < numLeaves; i++) {
 		if (!rcvdFinishedAlgMsgFromLeaves[i]) {
 			rcvdFinishedAlgMsgFromAllLeaves = false;
 		}

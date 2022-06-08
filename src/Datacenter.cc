@@ -15,7 +15,7 @@ inline bool Datacenter::cannotPlaceThisChainHigher 	(const Chain chain) const {r
 inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
-inline uint8_t Datacenter::portOfChild (const uint8_t child) const {if (isRoot) return child; else return child+1;} 
+inline Lvl_t Datacenter::portOfChild (const Lvl_t child) const {if (isRoot) return child; else return child+1;} 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
@@ -41,10 +41,10 @@ void Datacenter::initialize()
 	network     	= (cModule*) (getParentModule ()); 
 	simController = (SimController*) network->getSubmodule("sim_controller");
 	networkName 	= (network -> par ("name")).stdstringValue();
-  numChildren 	= (uint8_t)  (par("numChildren"));
-  numParents  	= (uint8_t)  (par("numParents"));
-  lvl				  	= (uint8_t)  (par("lvl"));
-  dcId					= (uint16_t) (par("dcId"));
+  numChildren 	= (Lvl_t)  (par("numChildren"));
+  numParents  	= (Lvl_t)  (par("numParents"));
+  lvl				  	= (Lvl_t)  (par("lvl"));
+  dcId					= (DcId_t) (par("dcId"));
   cpuCapacity   = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?;}
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   numBuPktsRcvd = 0;
@@ -336,10 +336,10 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
 	
-	for (uint8_t child(0); child<numChildren; child++) { // for each child...
+	for (int child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
 		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
-		uint16_t idxInPushUpVec = 0;
+		int idxInPushUpVec = 0;
 		for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {	// consider all the chains in pushUpVec
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
@@ -483,12 +483,12 @@ void Datacenter::handleBottomUpPktSync ()
 	BottomUpPkt *pkt = (BottomUpPkt*)(curHandledMsg);
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
-	for (uint16_t i(0); i < (pkt->getNotAssignedArraySize ());i++) {
+	for (int i(0); i < (pkt->getNotAssignedArraySize ());i++) {
 		insertSorted (notAssigned, pkt->getNotAssigned(i));
 	}
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
-	for (uint16_t i(0); i<pkt -> getPushUpVecArraySize (); i++) {
+	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
         insertSorted (pushUpList, pkt->getPushUpVec(i));
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
@@ -522,12 +522,12 @@ void Datacenter::genNsndBottomUpPkt ()
 	BottomUpPkt* pkt2send = new BottomUpPkt;
 
 	pkt2send -> setNotAssignedArraySize (notAssigned.size());
-	for (uint16_t i=0; i<notAssigned.size(); i++) {
+	for (int i=0; i<notAssigned.size(); i++) {
 		pkt2send->setNotAssigned (i, notAssigned[i]);
 	}
 
 	pkt2send -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
-	uint16_t idixInPushUpVec = 0;
+	int idixInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 			continue;
@@ -565,7 +565,7 @@ void Datacenter::prepareReshSync ()
 	}
 	reshuffled = true;
 	clrRsrc ();
-	for (uint8_t child(0); child<numChildren; child++) { // for each child...
+	for (int child(0); child<numChildren; child++) { // for each child...
 		PrepareReshSyncPkt *pkt = new PrepareReshSyncPkt;
 		sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 	}

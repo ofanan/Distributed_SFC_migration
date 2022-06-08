@@ -48,17 +48,17 @@ class SimController : public cSimpleModule
     string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
     DcId_t numDatacenters;
     DcId_t numLeaves;
-    uint8_t  height; // height of the tree
+    Lvl_t  height; // height of the tree
     int t=-1; //sim time (in seconds)
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
-    uint32_t seed = 42;
+    int seed = 42;
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
 
 		vector <ChainId_t> usrsThatLeft; // the users that left at the current period
-		uint32_t numMigs=0; // number of migration performed		
+		int numMigs=0; // number of migration performed		
 		float     period=1.0;
 		
 		string line; //current line being read from the tracefile
@@ -111,7 +111,7 @@ class SimController : public cSimpleModule
   public:
     ifstream traceFile;
  		string LogFileName   = "example.txt";
-		static const uint16_t bufSize = 128;
+		static const int bufSize = 128;
 		char buf[bufSize];
 		ofstream logFile;
     SimController ();

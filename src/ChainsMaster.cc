@@ -3,7 +3,7 @@
 unordered_set <Chain, ChainHash> 	ChainsMaster::allChains;
 int ChainsMaster::numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 int ChainsMaster::numMigs;
-const uint16_t ChainsMaster::bufSize;
+const int ChainsMaster::bufSize;
 char ChainsMaster::buf[bufSize];
 
 void ChainsMaster::eraseChains (vector <ChainId_t> vec)
@@ -56,6 +56,8 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 	numMigs = 0;
 	for (auto chain : allChains) {
 		if (chain.curLvl == UNPLACED_LVL || chain.S_u.size()<(chain.curLvl-1)) {
+			MyConfig::printToLog ("\nERROR: ChainsMaster::concludeTimePeriod encountered the following problemeatic chain:\n");
+			MyConfig::printToLog (chain);
 			return false;
 		}
 		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
@@ -120,6 +122,9 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 	if (search==ChainsMaster::allChains.end()) {
 		return false; // chain not found - nothing to do
 	}
+	// $$$$$$$$$$$$$$$
+	snprintf (buf, bufSize, "modifyLvl was called with newLvl=%d", newLvl);
+	MyConfig::printToLog (buf);
 	Chain modifiedChain 	= *search;
 	modifiedChain.curLvl 	= newLvl;
 	ChainsMaster::allChains.erase  (search);

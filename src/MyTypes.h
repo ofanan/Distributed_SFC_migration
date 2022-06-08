@@ -2,10 +2,10 @@
 #define MY_TYPES_H
 
 typedef int32_t ChainId_t;
-typedef int16_t DcId_t;
-typedef int8_t  Lvl_t;
-typedef int16_t Cpu_t;
-typedef int16_t Cost_t;
+typedef int32_t DcId_t;
+typedef int32_t  Lvl_t;
+typedef int32_t Cpu_t;
+typedef int32_t Cost_t;
 
 const ChainId_t DUMMY_CHAIN_ID = -1;
 const DcId_t  	UNPLACED_DC  	 = -1;

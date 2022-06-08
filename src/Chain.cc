@@ -84,7 +84,7 @@ Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
 
 void Chain::print (bool printS_u)
 {
-	uint8_t bufSize = 128;
+	int bufSize = 128;
 	char buf[bufSize];
 	if (printS_u) {
 		snprintf (buf, bufSize, "chain %d: S_u=", id);
@@ -111,7 +111,7 @@ Cpu_t Chain::mu_u_at_lvl (Lvl_t lvl) const
 }
 
 //// returns true iff the given datacenter id is delay-feasible for this chain (namely, appears in its S_u)
-//bool Chain::isDelayFeasible (uint16_t dcId) const 
+//bool Chain::isDelayFeasible (DcId_t dcId) const 
 //{
 //	for (auto const dc : S_u) {
 //		if (dc==dcId) { // the suggested datacenter appears in my vector of delay-feasible datacenters

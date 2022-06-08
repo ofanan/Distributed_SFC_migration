@@ -55,8 +55,7 @@ class Chain
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;
     void  setS_u (const vector <DcId_t> &S_u);
-/*    bool isDelayFeasible (uint16_t dcId) const;*/
-		bool dcIsDelayFeasible (DcId_t dcId, uint8_t dcLvl) {return this->S_u[dcLvl]==dcId;}
+		bool dcIsDelayFeasible (DcId_t dcId, Lvl_t dcLvl) {return this->S_u[dcLvl]==dcId;}
 };
 
 class RT_Chain : public Chain
