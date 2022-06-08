@@ -55,11 +55,16 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 
 	numMigs = 0;
 	for (auto chain : allChains) {
-		if (chain.curLvl == UNPLACED_LVL || chain.S_u.size()<(chain.curLvl-1)) {
-			MyConfig::printToLog ("\nERROR: ChainsMaster::concludeTimePeriod encountered the following problemeatic chain:\n");
-			MyConfig::printToLog (chain);
+		if (chain.curLvl == UNPLACED_LVL) {
+			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", chain.id);
+			MyConfig::printToLog (buf); 
 			return false;
 		}
+        if ((int)(chain.S_u).size()<(chain.curLvl-1)) {
+            MyConfig::printToLog ("\nERROR: ChainsMaster::concludeTimePeriod encountered the following problematic chain:\n");
+            MyConfig::printToLog (chain);
+            return false;
+        }
 		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
 		}
