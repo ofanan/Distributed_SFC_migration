@@ -23,7 +23,6 @@ using namespace std;
 class ChainsMaster {
 
 	private:
-		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. 
 		static unordered_map <ChainId_t, Chain> allChains_; // All the currently active chains. 
 		static int numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 		static int numMigs;

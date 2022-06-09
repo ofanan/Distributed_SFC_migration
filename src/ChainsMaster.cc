@@ -1,6 +1,5 @@
 #include "ChainsMaster.h"
 
-unordered_set <Chain, ChainHash> ChainsMaster::allChains;
 unordered_map <ChainId_t, Chain> ChainsMaster::allChains_; // All the currently active chains. 
 int ChainsMaster::numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 int ChainsMaster::numMigs;
