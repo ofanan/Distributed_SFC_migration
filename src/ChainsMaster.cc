@@ -94,6 +94,11 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 int ChainsMaster::calcNonMigCost () 
 {
 	
+//	for (auto it=ChainsMaster::allChain.begin(); it!=allChains.end(); it++) {
+//		
+//	}
+	
+	
 	int totNonMigCost = 0;
 	for (auto const &chain : ChainsMaster::allChains) {	
 		int16_t chainNonMigCost = chain.getCost ();
@@ -127,31 +132,23 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 **************************************************************************************************************************************************/
 bool ChainsMaster::concludeTimePeriod (int &numMigs)
 {
-
-	Need to adapt this to allChains_, which is a map.
 	numMigs = 0;
-	
-	for (auto chain : allChains) {
-		if (chain.curLvl == UNPLACED_LVL) {
-			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", chain.id);
+	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+		if (MyConfig::DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
+			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", it->second.id);
 			MyConfig::printToLog (buf); 
 			return false;
 		}
-        if ((int)(chain.S_u).size()<(chain.curLvl-1)) {
-            MyConfig::printToLog ("\nERROR: ChainsMaster::concludeTimePeriod encountered the following problematic chain:\n");
-            MyConfig::printToLog (chain);
-            return false;
-        }
-		if ( (chain.curDc != UNPLACED_DC) && (chain.curDc != chain.S_u[chain.curLvl]) ) { // Was the chain migrated?
+    if ((int)(it->second.S_u).size()<(it->second.curLvl-1)) {
+        MyConfig::printToLog ("\nERROR: ChainsMaster::concludeTimePeriod encountered the following problematic chain:\n");
+        MyConfig::printToLog (it->second);
+        return false;
+    }
+		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
 		}
-		Chain modifiedChain = chain; 
-		modifiedChain.curDc = chain.S_u[chain.curLvl];
-		allChains.erase  (chain);
-		MyConfig::printToLog ("\nprinting modified chain here1\n");
-		MyConfig::printToLog (modifiedChain);
-		allChains.insert (modifiedChain);
-	}
+		it->second.curDc = it->second.S_u[it->second.curLvl];
+	}	
 	return true;
 }
 
