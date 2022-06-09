@@ -113,8 +113,8 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 	MyConfig::printToLog ("\nallChains\n*******************\n");
 	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
 	
-	for (auto chain : ChainsMaster::allChains) {
-		snprintf (buf, bufSize, "(%d,%d)", chain.id, chain.S_u[0]);
+	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+		snprintf (buf, bufSize, "(%d,%d)", it->second.id, it->second.S_u[0]);
 		MyConfig::printToLog (buf);
 	}
 }
@@ -160,27 +160,26 @@ void ChainsMaster::printAllChains ()
 **************************************************************************************************************************************************/
 void ChainsMaster::printAllDatacenters (int numDatacenters) 
 {
-//	MyConfig::printToLog ("in ChainsMaster::printAllDatacenters\n");
-//	// gather the required data
-//	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
-//	for (const auto &chain : ChainsMaster::allChains) {
-//		DcId_t curDc = chain.curDc;
-//		if (curDc==UNPLACED_DC) {
-//			continue;
-//		}
-//		chainsPlacedOnDatacenter [curDc].push_back (chain.id);
-//		snprintf (buf, bufSize, "pushed chain % d on chainsPlacedOnDatacenter[%d]\n", chain.id, curDc);
-//		MyConfig::printToLog(buf);
-//	}
-//	
-//	// print the data
-//	for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
-//		snprintf (ChainsMaster::buf, ChainsMaster::bufSize, "DC %d, placed chains: ", dcId);
-//		MyConfig::printToLog(buf);
-////		printBufToLog ();
-//		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
-//		MyConfig::printToLog ("\n");
-//	}
+	MyConfig::printToLog ("in ChainsMaster::printAllDatacenters\n");
+	// gather the required data
+	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
+	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+		DcId_t curDc = it->second.curDc;
+		if (curDc==UNPLACED_DC) {
+			continue;
+		}
+		chainsPlacedOnDatacenter [curDc].push_back (it->first);
+		snprintf (buf, bufSize, "pushed chain % d on chainsPlacedOnDatacenter[%d]\n", it->first, curDc);
+		MyConfig::printToLog(buf);
+	}
+	
+	// print the data
+	for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
+		snprintf (ChainsMaster::buf, ChainsMaster::bufSize, "DC %d, placed chains: ", dcId);
+		MyConfig::printToLog(buf);
+		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
+		MyConfig::printToLog ("\n");
+	}
 	
 }
 
