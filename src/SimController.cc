@@ -48,7 +48,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-	ChainsMaster::allChains_.clear ();
+	ChainsMaster::allChains.clear ();
 	runTrace ();
 }
 
@@ -398,7 +398,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
   unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
   vector<Chain> vecOfUsrsOfThisPoA; 
 
-	for (auto it : ChainsMaster::allChains_) {
+	for (auto it : ChainsMaster::allChains) {
 		if (it.second.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
 			DcId_t chainCurDatacenter = (it.second).curDc;
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.

@@ -1,6 +1,6 @@
 #include "ChainsMaster.h"
 
-unordered_map <ChainId_t, Chain> ChainsMaster::allChains_; // All the currently active chains. 
+unordered_map <ChainId_t, Chain> ChainsMaster::allChains; // All the currently active chains. 
 int ChainsMaster::numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 int ChainsMaster::numMigs;
 const int ChainsMaster::bufSize;
@@ -9,7 +9,7 @@ char ChainsMaster::buf[bufSize];
 void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 {
 	for (auto chainId : vec) {
-		ChainsMaster::allChains_.erase (chainId);
+		ChainsMaster::allChains.erase (chainId);
 	}
 }
 
@@ -20,12 +20,12 @@ void ChainsMaster::eraseChains (vector <ChainId_t> vec)
 bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 {
 	if (MyConfig::DEBUG_LVL>1) {
-		auto it = ChainsMaster::allChains_.find(chainId);
-		if (it == ChainsMaster::allChains_.end()) { 
+		auto it = ChainsMaster::allChains.find(chainId);
+		if (it == ChainsMaster::allChains.end()) { 
 			return false;
 		}
 	}
-	ChainsMaster::allChains_.insert ({chainId, chain}); 
+	ChainsMaster::allChains.insert ({chainId, chain}); 
 	return true;
 }
 
@@ -36,8 +36,8 @@ bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 **************************************************************************************************************************************************/
 bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
 {
-	auto it = ChainsMaster::allChains_.find(chainId);
-	if (it == ChainsMaster::allChains_.end()) { 
+	auto it = ChainsMaster::allChains.find(chainId);
+	if (it == ChainsMaster::allChains.end()) { 
 		return false;
   }
   chain = it->second;
@@ -51,8 +51,8 @@ bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
 **************************************************************************************************************************************************/
 bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 {
-	auto it = ChainsMaster::allChains_.find(chainId);
-	if (it == ChainsMaster::allChains_.end()) { 
+	auto it = ChainsMaster::allChains.find(chainId);
+	if (it == ChainsMaster::allChains.end()) { 
 		return false;
   }
   it->second.curLvl = newLvl;
@@ -74,8 +74,8 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain)
 {
 
-	auto it = ChainsMaster::allChains_.find(chainId);
-	if (it == ChainsMaster::allChains_.end()) { 
+	auto it = ChainsMaster::allChains.find(chainId);
+	if (it == ChainsMaster::allChains.end()) { 
 		return false;
   }
 
@@ -93,7 +93,7 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 int ChainsMaster::calcNonMigCost () 
 {
 	int totNonMigCost = 0;
-	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		int16_t chainNonMigCost = it->second.getCost ();
 		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
 			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: chain %d isn't placed yet", it->second.id);
@@ -112,7 +112,7 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 	MyConfig::printToLog ("\nallChains\n*******************\n");
 	MyConfig::printToLog ("format: (c,p), where c is the chain id, and p is the dcId of its poa\n");
 	
-	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		snprintf (buf, bufSize, "(%d,%d)", it->second.id, it->second.S_u[0]);
 		MyConfig::printToLog (buf);
 	}
@@ -126,7 +126,7 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 bool ChainsMaster::concludeTimePeriod (int &numMigs)
 {
 	numMigs = 0;
-	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		if (MyConfig::DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
 			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", it->second.id);
 			MyConfig::printToLog (buf); 
@@ -147,7 +147,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 
 void ChainsMaster::printAllChains ()
 {
-	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		snprintf (buf, bufSize, "chain %d, curDc=%d, curLvl=%d\n", it->second.id, it->second.curDc, it->second.curLvl);
 		MyConfig::printToLog (buf);
 	}
@@ -162,7 +162,7 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 	MyConfig::printToLog ("in ChainsMaster::printAllDatacenters\n");
 	// gather the required data
 	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
-	for (auto it=ChainsMaster::allChains_.begin(); it!=allChains_.end(); it++) {
+	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		DcId_t curDc = it->second.curDc;
 		if (curDc==UNPLACED_DC) {
 			continue;
