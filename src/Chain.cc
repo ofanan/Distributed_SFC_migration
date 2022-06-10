@@ -3,17 +3,19 @@
 const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
 // mu_u[i] is the amount of CPU required for placing a chain in a datacenter at level i
-const vector<Cpu_t> RT_Chain::mu_u = RT_ChainMu_u[NET_TYP];
+
+
+const vector <Cost_t> RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [NET_TYP];
+const vector <Cost_t> Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[NET_TYP];
+
+const vector<Cpu_t> RT_Chain::		mu_u = RT_ChainMu_u		 [NET_TYP];
 const vector<Cpu_t> Non_RT_Chain::mu_u = Non_RT_ChainMu_u[NET_TYP];
 
 const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
 const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
-const vector <Cost_t> RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [NET_TYP];
-const vector <Cost_t> Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[NET_TYP];
-
-const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
-const vector <Cost_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
+//const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
+//const vector <Cost_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
 
 Chain::Chain () 
 {
@@ -189,11 +191,15 @@ Cost_t Chain::getCost () const
 	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::costAtLvl[curLvl] : Non_RT_Chain::costAtLvl[curLvl]);
 }
 
-// returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
-Cost_t Chain::getCpuCost () const
-{
-	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
-}
+
+/*************************************************************************************************************************************************
+* Returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
+* Currently unused, as we currently used directly cpu+link cost.
+**************************************************************************************************************************************************/
+//Cost_t Chain::getCpuCost () const
+//{
+//	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
+//}
 
 // return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise
 Cpu_t Chain::getCpu () const

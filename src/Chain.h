@@ -38,9 +38,7 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-/*		DcId_t getCurDatacenter () const; // returns the id of the datacenter currently hosting this; or UNPLACED_DC, if this chain isn't placed*/
-/*		void setDc (DcId_t dcId) {this->id = dcId;};*/
-    Cost_t getCpuCost () const;
+//    Cost_t getCpuCost () const; //Currently unused.
     Cost_t getCost 		() const;
     Cpu_t  getCpu     () const; 
     
