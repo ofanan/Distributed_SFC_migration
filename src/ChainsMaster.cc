@@ -6,11 +6,20 @@ int ChainsMaster::numMigs;
 const int ChainsMaster::bufSize;
 char ChainsMaster::buf[bufSize];
 
-void ChainsMaster::eraseChains (vector <ChainId_t> vec)
+/*************************************************************************************************************************************************
+* Erases chains (given by a vector of chainIds) from allChains.
+* Returns false if one of the chains to erase wasn't found in allChains, else treu.
+**************************************************************************************************************************************************/
+bool ChainsMaster::eraseChains (vector <ChainId_t> vec)
 {
 	for (auto chainId : vec) {
-		ChainsMaster::allChains.erase (chainId);
+		auto it = ChainsMaster::allChains.find(chainId);
+		if (it == ChainsMaster::allChains.end()) { 
+			return false;
+		}
+		ChainsMaster::allChains.erase (it);
 	}
+	return true;
 }
 
 /*************************************************************************************************************************************************
@@ -47,7 +56,8 @@ bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
 
 /*************************************************************************************************************************************************
 * Given a chain id, update the curLvl field of the respective chain to the given newLvl.
-* Output: true iff the requested chain was found.
+* Output: true iff the requested chain was found, and its level was updated to newLvl.
+* The function also increments the number of inst' migrations (numInstantMigs).
 **************************************************************************************************************************************************/
 bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 {
@@ -106,7 +116,10 @@ int ChainsMaster::calcNonMigCost ()
 }
 
 
-// Print the PoA of each currently-active user
+
+/*************************************************************************************************************************************************
+* Print the PoA of each currently-active user.
+**************************************************************************************************************************************************/
 void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=false, bool printCurDatacenter=false)
 {
 	MyConfig::printToLog ("\nallChains\n*******************\n");
@@ -120,7 +133,8 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 
 
 /*************************************************************************************************************************************************
-* Fill within numMigs the overall num of migrations in the last time period.
+* Writes into numMigs the overall num of migrations in the last time period.
+* Update for each chain c: c.curDc to be its currently hosting datacenter.
 * If any chain is unplaced, return false. Else, return true.
 **************************************************************************************************************************************************/
 bool ChainsMaster::concludeTimePeriod (int &numMigs)
@@ -145,6 +159,11 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 	return true;
 }
 
+/*************************************************************************************************************************************************
+* Writes into numMigs the overall num of migrations in the last time period.
+* Update for each chain c: c.curDc to be its currently hosting datacenter.
+* If any chain is unplaced, return false. Else, return true.
+**************************************************************************************************************************************************/
 void ChainsMaster::printAllChains ()
 {
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
@@ -178,7 +197,14 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 		MyConfig::printToLog(buf);
 		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
 		MyConfig::printToLog ("\n");
-	}
-	
+	}	
 }
+
+/*************************************************************************************************************************************************
+* clear the db
+**************************************************************************************************************************************************/
+void ChainsMaster::clear ()
+{
+	ChainsMaster::allChains.clear ();
+} 
 
