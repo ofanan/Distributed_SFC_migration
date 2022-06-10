@@ -12,11 +12,23 @@ string 					MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
 ofstream 				MyConfig::logFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 
- // set the parameters of chains - e.g., required CPU, and cost.
-void MyConfig::setChainsParams (string netType, vector<Cpu_t>  &RT_ChainMu_u, 		 vector<Cpu_t>  &Non_RT_ChainMu_u, 
-																								vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl) 
+// set the parameters of chains - e.g., required CPU, and cost.
+void MyConfig::setChainsParams (string netType) 
 {
-	MyConfig::RT_ChainCostAtLvl = {1,2,3,4};
+	
+	if (netType.substr(0,4).compare("city")==0) {
+	}
+	else if (netType.substr(0,3).compare("toy")==0) {
+		MyConfig::RT_ChainCostAtLvl 		= {1,2,3,4};
+		MyConfig::Non_RT_ChainCostAtLvl = {1,2,3,4};
+	}
+}
+
+// set the parameters of chains - e.g., required CPU, and cost.
+void MyConfig::setChainsParams (vector<Cpu_t>  &RT_ChainMu_u, 		 vector<Cpu_t>  &Non_RT_ChainMu_u, 
+																vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl) 
+{
+	MyConfig::RT_ChainCostAtLvl 		= {1,2,3,4};
 	MyConfig::Non_RT_ChainCostAtLvl = {1,2,3,4};
 }
 
