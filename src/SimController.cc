@@ -40,7 +40,7 @@ void SimController::initialize (int stage)
 //		error ("inal abuck");
 //	}
 
-//	checkParams (); //$$$$$$$$$$$$
+	checkParams (); //$$$$$$$$$$$$
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
