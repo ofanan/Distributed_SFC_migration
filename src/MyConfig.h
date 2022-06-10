@@ -57,8 +57,10 @@ class MyConfig {
 
 		//Init
 		static void openFiles ();
-		static void setChainsParams (); // set the parameters of chains - e.g., required CPU, and cost.
 		
+		// set the parameters of chains - e.g., required CPU, and cost.
+		static void setChainsParams (string netType, vector<Cpu_t>  &RT_ChainMu_u, 		  vector<Cpu_t>  &Non_RT_ChainMu_u, 
+																								 vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl); 
 		//print
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
