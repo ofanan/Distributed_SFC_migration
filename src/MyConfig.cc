@@ -5,12 +5,12 @@
 using namespace omnetpp;
 using namespace std;
 
-vector<Cost_t> MyConfig::RT_ChainCostAtLvl;
-vector<Cost_t> MyConfig::Non_RT_ChainCostAtLvl;
-string 														MyConfig::LogFileName;
-string 														MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
-ofstream 													MyConfig::logFile;
-char 															MyConfig::buf[MyConfig::bufSize];
+vector<Cost_t> 	MyConfig::RT_ChainCostAtLvl;
+vector<Cost_t> 	MyConfig::Non_RT_ChainCostAtLvl;
+string 					MyConfig::LogFileName;
+string 					MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
+ofstream 				MyConfig::logFile;
+char 						MyConfig::buf[MyConfig::bufSize];
 
  // set the parameters of chains - e.g., required CPU, and cost.
 void MyConfig::setChainsParams () 
