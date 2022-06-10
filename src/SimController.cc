@@ -61,7 +61,6 @@ void SimController::initialize (int stage)
 	RT_Chain c1 (1, Su); //$$$
 	snprintf (buf, bufSize, "costAtLvl[0]=%d\n", c1.costAtLvl[0]);
 	printBufToLog();
-	endSimulation ();
 	runTrace ();
 }
 
