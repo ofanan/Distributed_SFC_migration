@@ -221,7 +221,7 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
 			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
@@ -233,12 +233,7 @@ void Datacenter::handlePushUpPkt ()
 	}
 	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		Chain chain2pushUp = pkt->getPushUpVec (i);
-		if (dcId==5) {
-			snprintf (buf, bufSize, "\nchain2pushUp.id=%d, chain2pushUp.curLvl=%d", chain2pushUp.id, chain2pushUp.curLvl);
-			printBufToLog ();
-		}
-		insertSorted (pushUpList, chain2pushUp); 
+		insertSorted (pushUpList, pkt->getPushUpVec (i)); 
 	} 
 
 	if (MyConfig::mode==SYNC){ 

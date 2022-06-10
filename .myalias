@@ -30,4 +30,5 @@ alias runcm='cd $PROJ_PATH; c; ./Distributed_SFC_migration -f MonacoC.ini -u Cmd
 alias commit='c; git add -A; git commit'
 alias compush='commit; pusher'
 alias Gen='$EDITOR $PROJ_PATH/Omnet_Generations.txt &'
+alias lex='c; l $PROJ_PATH/example.txt'
 

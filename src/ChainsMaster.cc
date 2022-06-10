@@ -189,8 +189,6 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 			continue;
 		}
 		chainsPlacedOnDatacenter [curDc].push_back (it->first);
-		snprintf (buf, bufSize, "pushed chain % d on chainsPlacedOnDatacenter[%d]\n", it->first, curDc);
-		MyConfig::printToLog(buf);
 	}
 	
 	// print the data
