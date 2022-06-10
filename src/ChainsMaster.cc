@@ -15,6 +15,8 @@ bool ChainsMaster::eraseChains (vector <ChainId_t> vec)
 	for (auto chainId : vec) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
+			snprintf (buf, bufSize, "\nERROR: ChainsMaster::eraseChains didn't find chain %d", chainId);
+			MyConfig::printToLog (buf);
 			return false;
 		}
 		ChainsMaster::allChains.erase (it);

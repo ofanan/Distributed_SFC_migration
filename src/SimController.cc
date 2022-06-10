@@ -96,9 +96,6 @@ void SimController::runTimePeriod ()
 {
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
-		if (t==2) {
-			error ("t=%d", t);
-		}
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 	}
 	
@@ -138,7 +135,9 @@ void SimController::runTimePeriod ()
 			
 			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
-			ChainsMaster::eraseChains (usrsThatLeft);
+			if (ChainsMaster::eraseChains (usrsThatLeft)){
+				error ("ChainsMaster::eraseChains didn't find a chain to delete.");
+			}
 
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
