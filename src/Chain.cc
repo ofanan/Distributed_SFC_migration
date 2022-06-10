@@ -9,13 +9,8 @@ const vector<Cpu_t> Non_RT_Chain::mu_u = {1, 1, 1};
 const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
 const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
-// cpuCostAtLvl[i] is the cost of placing a chain on a datacenter at level i
-//const vector <Cost_t> RT_Chain		::costAtLvl 	 = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl);
-//MyConfig::getRT_ChainCostAtLvl ();
-//const vector <Cost_t> Non_RT_Chain::costAtLvl 	 = MyConfig::Non_RT_ChainCostAtLvl; 
-//const vector <Cost_t> vec1[2]; // = {{4, 3, 2, 1}, {7,7,7,7}};
-const vector <Cost_t> RT_Chain		::costAtLvl 	 = RT_ChainCostAtLvl[CITY]; //{4, 3, 2, 1};  //$$$
-const vector <Cost_t> Non_RT_Chain::costAtLvl 	 = {4, 3, 2, 1};  //$$$
+const vector <Cost_t> RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [NET_TYP];
+const vector <Cost_t> Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[NET_TYP];
 
 const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
 const vector <Cost_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
