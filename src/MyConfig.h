@@ -38,24 +38,26 @@ const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
 const int uniformChainMisgCost = 600;
-
+										 
 class MyConfig { 
 
+		// A buffer for print-outs
 		static const int bufSize = 128;
-		static char buf[bufSize];
+		static char 		 buf[bufSize];
 
 	public:
 
-    static string traceFileName;;
-	
-/*		static unordered_set <Chain, ChainHash> allChains; // All the currently active chains. */
- 		static string LogFileName;
-    static ofstream logFile;
+    static string 		traceFileName;;	
+ 		static string 		LogFileName;
+    static ofstream 	logFile;
 		const static bool mode=SYNC;
-		static const int DEBUG_LVL=1, LOG_LVL=DETAILED_LOG;
+		static const int 	DEBUG_LVL=1, LOG_LVL=DETAILED_LOG;
+		static vector<Cost_t> RT_ChainCostAtLvl;
+		static vector<Cost_t> Non_RT_ChainCostAtLvl;
 
 		//Init
 		static void openFiles ();
+		static void setChainsParams (); // set the parameters of chains - e.g., required CPU, and cost.
 		
 		//print
 		static void printToLog (char* buf); 
