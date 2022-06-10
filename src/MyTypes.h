@@ -2,7 +2,6 @@
 #define MY_TYPES_H
 using namespace std;
 
-
 typedef int32_t ChainId_t;
 typedef int32_t DcId_t;
 typedef int32_t  Lvl_t;
@@ -17,9 +16,6 @@ const Cpu_t		  UNPLACED_CPU   = -1;
 
 const bool SYNC  = true;
 const bool ASYNC = false;
-
-const string netType = "city";
-const vector <Cost_t> RT_ChainCostAtLvl[2] = {{4, 3, 2, 1}, {7,7,7,7}};
 
 #endif
 
