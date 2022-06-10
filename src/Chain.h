@@ -38,18 +38,10 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-//    Cost_t getCpuCost () const; //Currently unused.
+		// Cost_t getCpuCost () const; //Currently unused.
     Cost_t getCost 		() const;
     Cpu_t  getCpu     () const; 
     
-		/* 
-		We order chain by non-increasing order of |S_u|, namely how high they can be located in the tree; iteratively breaking ties by decreasing mu_u[l] for each level \ell, namely, the amount of CPU 
-		rsrcs required for locating the chain at a certain lvl.
-		However, in our current sim settings, all of this is degenerated to the fast and efficient rule that an RT chain has higher priority (==smaller #), over a non-RT chain.
-    bool operator< (const Chain &right) const {
-      return (this->isRT_Chain && !(right.isRT_Chain));
-    }
-		*/		
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;
     void  setS_u (const vector <DcId_t> &S_u);

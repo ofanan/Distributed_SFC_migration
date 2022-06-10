@@ -28,16 +28,16 @@ class Chain;
 class ChainHash;
 
 const int TOY=0, CITY=1;
-const int NET_TYP = TOY;
+const int NET_TYPE = TOY;
 const string netType = "city";
-const vector <Cost_t> RT_ChainCostAtLvl    [] = {{4, 3, 2, 1}, {7,7,7,7}};
-const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{4, 3, 2, 1}, {7,7,7,7}};
+const vector <Cost_t> RT_ChainCostAtLvl    [] = {{3, 2, 1}, {7,7,7,7}};
+const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{3, 2, 1}, {7,7,7,7}};
 const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{1, 1}, {1, 1}};
 const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{1, 1, 1}, {1, 1, 1}};
+const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, {1,1,1}};
 
 const bool randomlySetChainType = false;
 
-const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
 
 const int16_t chainMigCost = 600;
 

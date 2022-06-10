@@ -45,7 +45,7 @@ void Datacenter::initialize()
   numParents  	= (Lvl_t)  (par("numParents"));
   lvl				  	= (Lvl_t)  (par("lvl"));
   dcId					= (DcId_t) (par("dcId"));
-  cpuCapacity   = nonAugmentedCpuAtLvl[lvl]; // Consider rsrc aug here?;}
+  cpuCapacity   = nonAugmentedCpuAtLvl[NET_TYPE][lvl]; // Consider rsrc aug here?;}
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   numBuPktsRcvd = 0;
 
