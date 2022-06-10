@@ -9,11 +9,11 @@
 #include <set>
 #include <algorithm>
 #include <unordered_set>
+using namespace std;
 
 #include "MyTypes.h"
 #include "MyConfig.h"
 
-using namespace std;
 
 class Chain
 {

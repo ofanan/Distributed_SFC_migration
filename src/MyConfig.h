@@ -27,6 +27,8 @@ using namespace std;
 class Chain;
 class ChainHash;
 
+/*const int netTypeInt = 1;*/
+
 const bool randomlySetChainType = false;
 
 const int16_t nonAugmentedCpuAtLvl[] = {1,1,1};
@@ -52,6 +54,7 @@ class MyConfig {
     static ofstream 	logFile;
 		const static bool mode=SYNC;
 		static const int 	DEBUG_LVL=1, LOG_LVL=DETAILED_LOG;
+		static const string netType;
 		static vector<Cost_t> RT_ChainCostAtLvl;
 		static vector<Cost_t> Non_RT_ChainCostAtLvl;
 
@@ -59,9 +62,11 @@ class MyConfig {
 		static void openFiles ();
 		
 		// set the parameters of chains - e.g., required CPU, and cost.
-		static void setChainsParams (string netType); 
-		static void setChainsParams (vector<Cpu_t>  &RT_ChainMu_u, 		  vector<Cpu_t>  &Non_RT_ChainMu_u, 
-																 vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl); 
+/*		static void setChainsParams (string netType); */
+/*		static void setChainsParams (vector<Cpu_t>  &RT_ChainMu_u, 		  vector<Cpu_t>  &Non_RT_ChainMu_u, */
+/*																 vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl); */
+		static vector<Cost_t> getRT_ChainCostAtLvl ();
+		
 		//print
 		static void printToLog (char* buf); 
 		static void printToLog (string str);

@@ -1,5 +1,7 @@
 #ifndef MY_TYPES_H
 #define MY_TYPES_H
+using namespace std;
+
 
 typedef int32_t ChainId_t;
 typedef int32_t DcId_t;
@@ -15,6 +17,7 @@ const Cpu_t		  UNPLACED_CPU   = -1;
 
 const bool SYNC  = true;
 const bool ASYNC = false;
+
 
 #endif
 

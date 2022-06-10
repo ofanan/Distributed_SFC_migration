@@ -27,12 +27,20 @@ void SimController::initialize (int stage)
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
+//		MyConfig::setChainsParams ("toy"); //$$$
 		return;
 	}
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	MyConfig::openFiles ();
-	checkParams ();
+//	if (MyConfig::netType.substr(0,4).compare("city")==0) {
+//		error ("city");
+//	}
+//	else {
+//		error ("inal abuck");
+//	}
+
+//	checkParams (); //$$$$$$$$$$$$
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
@@ -49,6 +57,11 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot ();
 	ChainsMaster::clear ();
+	vector <DcId_t> Su = {1,1,1};
+	RT_Chain c1 (1, Su); //$$$
+	snprintf (buf, bufSize, "costAtLvl[0]=%d\n", c1.costAtLvl[0]);
+	printBufToLog();
+	endSimulation ();
 	runTrace ();
 }
 

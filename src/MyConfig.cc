@@ -5,32 +5,38 @@
 using namespace omnetpp;
 using namespace std;
 
-vector<Cost_t> 	MyConfig::RT_ChainCostAtLvl;
+class MyConfig;
+
+const int netTypeInt = 1;
+const string netType = "city";
+const string MyConfig::netType = "city";
+vector<Cost_t> 	MyConfig::RT_ChainCostAtLvl = {7,7,7,7};
 vector<Cost_t> 	MyConfig::Non_RT_ChainCostAtLvl;
 string 					MyConfig::LogFileName;
 string 					MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
 ofstream 				MyConfig::logFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 
-// set the parameters of chains - e.g., required CPU, and cost.
-void MyConfig::setChainsParams (string netType) 
-{
-	
-	if (netType.substr(0,4).compare("city")==0) {
-	}
-	else if (netType.substr(0,3).compare("toy")==0) {
-		MyConfig::RT_ChainCostAtLvl 		= {1,2,3,4};
-		MyConfig::Non_RT_ChainCostAtLvl = {1,2,3,4};
-	}
-}
 
-// set the parameters of chains - e.g., required CPU, and cost.
-void MyConfig::setChainsParams (vector<Cpu_t>  &RT_ChainMu_u, 		 vector<Cpu_t>  &Non_RT_ChainMu_u, 
-																vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl) 
-{
-	MyConfig::RT_ChainCostAtLvl 		= {1,2,3,4};
-	MyConfig::Non_RT_ChainCostAtLvl = {1,2,3,4};
-}
+
+//// set the parameters of chains - e.g., required CPU, and cost.
+//void MyConfig::setChainsParams (string netType) 
+//{
+////	if (netType.substr(0,4).compare("city")==0) {
+////	}
+////	else if (netType.substr(0,3).compare("toy")==0) {
+////		MyConfig::RT_ChainCostAtLvl 		= {1,2,3,4};
+////		MyConfig::Non_RT_ChainCostAtLvl = {1,2,3,4};
+////	}
+//}
+
+//// set the parameters of chains - e.g., required CPU, and cost.
+//void MyConfig::setChainsParams (vector<Cpu_t>  &RT_ChainMu_u, 		 vector<Cpu_t>  &Non_RT_ChainMu_u, 
+//																vector<Cost_t> &RT_ChainCostAtLvl, vector<Cost_t> &Non_RT_ChainCostAtLvl) 
+//{
+////	MyConfig::RT_ChainCostAtLvl 		= {4,3,2,1};
+////	MyConfig::Non_RT_ChainCostAtLvl = {16,8,4,2};
+//}
 
 void MyConfig::openFiles()
 {
@@ -127,6 +133,31 @@ vector<Cost_t> MyConfig::scalarProdcut (const vector<Cpu_t> &vec1, const vector<
 		res.insert(res.begin()+i, vec1[i] * vec2[i]);
 	}
 	return res;
+}
+
+vector<Cost_t> MyConfig::getRT_ChainCostAtLvl () 
+{
+
+//	if (netType.substr(0,4).compare("city")==0) {
+//		return MyConfig::RT_ChainCostAtLvl;
+//	}
+//	else {
+//		return {9,9,9,9}; //MyConfig::RT_ChainCostAtLvl;
+//	}
+//	if (netTypeInt==0) {
+//		return {9,9,9,9}; //MyConfig::RT_ChainCostAtLvl;
+//	}
+//	else {
+//		return {9,9,9,9}; //MyConfig::RT_ChainCostAtLvl;
+//	}
+
+	MyConfig::printToLog (MyConfig::netType);
+	if (MyConfig::netType.substr(0,4).compare("city")==0) {
+		return MyConfig::RT_ChainCostAtLvl;
+	}
+	else {
+		return {9,9,9,9}; //MyConfig::RT_ChainCostAtLvl;
+	}
 }
 
 // erase the given key from the given set. Returns true iff the requested key was indeed found in the set
