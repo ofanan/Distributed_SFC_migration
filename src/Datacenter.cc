@@ -127,14 +127,14 @@ void Datacenter::handleMessage (cMessage *msg)
   	handleEndXmtMsg ();
   }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
-  	if (MyConfig::mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
+  	if (mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
   {
-    if (MyConfig::mode==SYNC) { prepareReshSync ();} {reshuffleAsync();}
+    if (mode==SYNC) { prepareReshSync ();} {reshuffleAsync();}
   }
   else
   {
@@ -202,13 +202,13 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainsThatJoined;
 
- 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+ 	if (LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d rcvd vecOfChainsThatJoined=", dcId);
 		printBufToLog (); 
 		MyConfig::printToLog(vecOfChainsThatJoined);
 		print (); 
 	}
-  if (MyConfig::mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
+  if (mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
 }
 
 /*************************************************************************************************************************************************
@@ -221,7 +221,7 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+	if (LOG_LVL>=VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
 			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
@@ -236,7 +236,7 @@ void Datacenter::handlePushUpPkt ()
 		insertSorted (pushUpList, pkt->getPushUpVec (i)); 
 	} 
 
-	if (MyConfig::mode==SYNC){ 
+	if (mode==SYNC){ 
 		pushUpSync ();
 	}
 	else {
@@ -251,7 +251,7 @@ Assume that this->pushUpList already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 
-	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
@@ -303,7 +303,7 @@ void Datacenter::pushUpSync ()
 		updatePlacementInfo ();
 	}
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d finihsed PU.", dcId);
 		printBufToLog ();
 		print ();
@@ -313,7 +313,7 @@ void Datacenter::pushUpSync ()
 
 		simController->finishedAlg (dcId, leafId);
 		
-		if (MyConfig::DEBUG_LVL > 0) {
+		if (DEBUG_LVL > 0) {
 			if (!pushUpList.empty()) {
 				error ("pushUpList isn't empty after running pushUp() on a leaf");
 			}
@@ -349,11 +349,11 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		// shrink pushUpVec to its real size
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
-		if (MyConfig::mode==SYNC || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+		if (mode==SYNC || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
-	if (MyConfig::DEBUG_LVL>0 && !pushUpList.empty()) {
+	if (DEBUG_LVL>0 && !pushUpList.empty()) {
 		error ("pushUpList not empty after sending PU pkts to all children");
 	}
 }
@@ -373,7 +373,7 @@ Assume that this->notAssigned and this->pushUpList already contain the relevant 
 void Datacenter::bottomUpSync ()
 {
 
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+	if (LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
@@ -405,7 +405,7 @@ void Datacenter::bottomUpSync ()
 					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
 					printStateAndEndSim  ();
 				}
-				if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+				if (LOG_LVL>=DETAILED_LOG) {
 					snprintf (buf, bufSize, "\n************** DC %d initiating a reshuffle", dcId);
 					printBufToLog();
 				}
@@ -415,7 +415,7 @@ void Datacenter::bottomUpSync ()
 		}
 	}
 
-	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d finished BU sync.", dcId);
 		printBufToLog ();
 		print ();
@@ -441,7 +441,7 @@ void Datacenter::updatePlacementInfo ()
 	}
 	
 	for (auto chainId : newlyPlacedChains) {
-		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+		if (LOG_LVL == VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
 			printBufToLog ();
 		}
@@ -465,7 +465,7 @@ Handle a bottomUP pkt, when running in sync' mode.
 void Datacenter::handleBottomUpPktSync ()
 {
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nDC %d handling a BU pkt. src=%d", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 	}
@@ -487,7 +487,7 @@ void Datacenter::handleBottomUpPktSync ()
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
         insertSorted (pushUpList, pkt->getPushUpVec(i));
 	}
-	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+	if (LOG_LVL == VERY_DETAILED_LOG) {
     snprintf (buf, bufSize, "\nDC %d pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);

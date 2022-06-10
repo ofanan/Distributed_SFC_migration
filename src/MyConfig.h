@@ -36,10 +36,12 @@ const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{1, 1, 1}, {17, 17, 17, 17, 17, 
 const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, 	{1,1,1}};
 
 const bool randomlySetChainType = false;
+const bool mode=SYNC;
+const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
+const int  DEBUG_LVL=1, LOG_LVL=DETAILED_LOG;
 
 const int16_t chainMigCost = 600;
 
-const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 
 const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
 
@@ -56,8 +58,6 @@ class MyConfig {
     static string 		traceFileName;;	
  		static string 		LogFileName;
     static ofstream 	logFile;
-		const static bool mode=SYNC;
-		static const int 	DEBUG_LVL=1, LOG_LVL=DETAILED_LOG;
 		static const string netType;
 		static vector<Cost_t> Non_RT_ChainCostAtLvl;
 

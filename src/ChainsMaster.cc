@@ -30,7 +30,7 @@ bool ChainsMaster::eraseChains (vector <ChainId_t> vec)
 **************************************************************************************************************************************************/
 bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 {
-	if (MyConfig::DEBUG_LVL>1) {
+	if (DEBUG_LVL>1) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
 			return false;
@@ -107,7 +107,7 @@ int ChainsMaster::calcNonMigCost ()
 	int totNonMigCost = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		int16_t chainNonMigCost = it->second.getCost ();
-		if (MyConfig::mode==SYNC && chainNonMigCost == UNPLACED_COST) {
+		if (mode==SYNC && chainNonMigCost == UNPLACED_COST) {
 			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: chain %d isn't placed yet", it->second.id);
 			MyConfig::printToLog (buf);
 			return -1;
@@ -143,7 +143,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 {
 	numMigs = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
-		if (MyConfig::DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
+		if (DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
 			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", it->second.id);
 			MyConfig::printToLog (buf); 
 			return false;

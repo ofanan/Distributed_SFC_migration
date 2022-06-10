@@ -126,12 +126,12 @@ void SimController::runTimePeriod ()
 			strcpy (lineAsCharArray, line.c_str());
 			strtok (lineAsCharArray, " = ");
 			int new_t = atoi (strtok (NULL, " = "));
-			if (MyConfig::DEBUG_LVL>0 && new_t <= t) {
+			if (DEBUG_LVL>0 && new_t <= t) {
 				error ("error in trace file: t is not incremented. t=%d, new_t=%d", t, new_t);
 			}
 			t = new_t;
 
-			if (MyConfig::LOG_LVL>0) {
+			if (LOG_LVL>0) {
 				snprintf (buf, bufSize, "\n\nt = %d\n********************", t);
 				MyConfig::printToLog (buf); 
 			}
@@ -174,7 +174,7 @@ void SimController::runTrace () {
 void SimController::finish () 
 {
   traceFile.close ();
-	if (MyConfig::LOG_LVL>0) {
+	if (LOG_LVL>0) {
   	MyConfig::printToLog ("\nfinished sim\n");
   }
 }
@@ -199,13 +199,13 @@ void SimController::concludeTimePeriod ()
 
 	int periodCost = numMigs * uniformChainMisgCost + nonMigCost;
 	
-	if (MyConfig::LOG_LVL > 0) {
+	if (LOG_LVL > 0) {
 		snprintf (buf, bufSize, "\ntot cost = %d", periodCost);
 		printBufToLog();
 	}
 
-	if (MyConfig::DEBUG_LVL>0) {
-		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (DEBUG_LVL>0) {
+		if (LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nBy DCs:");
 			printAllDatacenters ();
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
@@ -266,7 +266,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 	  }
     
   	chainCurDc = chain.curDc;
-  	if (MyConfig::DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
+  	if (DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
 			error ("Note: this chain was not placed before leaving\n"); 
   	}
 		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
@@ -311,7 +311,7 @@ void SimController::rdNewUsrsLine (string line)
 				chain = Non_RT_Chain (chainId, S_u); 
 			}		
 		}
-		if (MyConfig::DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
+		if (DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
 			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 		}
 		
@@ -346,7 +346,7 @@ void SimController::rdOldUsrsLine (string line)
   	{
 			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
   	}
-		if (MyConfig::DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
+		if (DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore
@@ -376,7 +376,7 @@ void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > 
 // Initiate the run of placement alg'
 void SimController::initAlg () {  	
 
-	return (MyConfig::mode==SYNC)? initAlgSync() : initAlgAsync();
+	return (mode==SYNC)? initAlgSync() : initAlgAsync();
 }
 
 /*************************************************************************************************************************************************
@@ -419,7 +419,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 		}
 	}
 	rlzRsrcOfChains (chainsToReplace);
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+	if (LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nSimCtrlr calling DC %d.initBottomUp with vecOfChainsThatJoined=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (vecOfUsrsOfThisPoA);
@@ -431,7 +431,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 void SimController::initAlgSync () 
 {  	
 
-	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
 		printBufToLog();
 	} 
@@ -474,11 +474,11 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
-	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==ASYNC) {
+	if (DEBUG_LVL>0 && mode==ASYNC) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+	if (LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", dcId, leafId);
 		MyConfig::printToLog (buf);
 	}
@@ -491,7 +491,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 	}
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 
-		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+		if (LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves");
 		}
 		

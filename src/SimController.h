@@ -36,8 +36,7 @@ using namespace omnetpp;
 using namespace std;
 using namespace boost;
 
-const int16_t root_id = 0;
-const int8_t LOG_LVL = 1;
+const DcId_t root_id = 0;
 
 class Datacenter;
 
