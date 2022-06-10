@@ -48,7 +48,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot ();
-	ChainsMaster::allChains.clear ();
+	ChainsMaster::clear ();
 	runTrace ();
 }
 
@@ -135,8 +135,8 @@ void SimController::runTimePeriod ()
 			
 			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
-			if (ChainsMaster::eraseChains (usrsThatLeft)){
-				error ("ChainsMaster::eraseChains didn't find a chain to delete.");
+			if (!ChainsMaster::eraseChains (usrsThatLeft)){
+				error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
 			}
 
 			initAlg ();
@@ -174,7 +174,7 @@ void SimController::finish ()
 void SimController::concludeTimePeriod ()
 {
 	int numMigs;
-	MyConfig::printToLog ("\nprinting allChains\n");
+	MyConfig::printToLog ("\nprinting ChainsMaster db\n");
 	ChainsMaster::printAllChains ();
 	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
 		error ("error occured during run of ChainsMaster::concludeTimePeriod");
@@ -397,7 +397,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
   unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
   vector<Chain> vecOfUsrsOfThisPoA; 
 
-	for (auto it : ChainsMaster::allChains) {
+	for (const auto it : ChainsMaster::allChains) {
 		if (it.second.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
 			DcId_t chainCurDatacenter = (it.second).curDc;
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
