@@ -27,6 +27,7 @@ using namespace std;
 class Chain;
 class ChainHash;
 
+const int TOY=0, CITY=1;
 const string netType = "city";
 const vector <Cost_t> RT_ChainCostAtLvl[2] = {{4, 3, 2, 1}, {7,7,7,7}};
 
