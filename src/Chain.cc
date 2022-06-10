@@ -14,7 +14,7 @@ const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 //MyConfig::getRT_ChainCostAtLvl ();
 //const vector <Cost_t> Non_RT_Chain::costAtLvl 	 = MyConfig::Non_RT_ChainCostAtLvl; 
 //const vector <Cost_t> vec1[2]; // = {{4, 3, 2, 1}, {7,7,7,7}};
-const vector <Cost_t> RT_Chain		::costAtLvl 	 = vec1[1]; //{4, 3, 2, 1};  //$$$
+const vector <Cost_t> RT_Chain		::costAtLvl 	 = RT_ChainCostAtLvl[1]; //{4, 3, 2, 1};  //$$$
 const vector <Cost_t> Non_RT_Chain::costAtLvl 	 = {4, 3, 2, 1};  //$$$
 
 const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 

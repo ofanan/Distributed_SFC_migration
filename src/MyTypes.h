@@ -18,7 +18,8 @@ const Cpu_t		  UNPLACED_CPU   = -1;
 const bool SYNC  = true;
 const bool ASYNC = false;
 
-const vector <Cost_t> vec1[2] = {{4, 3, 2, 1}, {7,7,7,7}};
+const string netType = "city";
+const vector <Cost_t> RT_ChainCostAtLvl[2] = {{4, 3, 2, 1}, {7,7,7,7}};
 
 #endif
 
