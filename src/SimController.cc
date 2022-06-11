@@ -27,7 +27,6 @@ void SimController::initialize (int stage)
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
-//		MyConfig::setChainsParams ("toy"); //$$$
 		return;
 	}
 	

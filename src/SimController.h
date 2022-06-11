@@ -48,7 +48,7 @@ class SimController : public cSimpleModule
     DcId_t numDatacenters;
     DcId_t numLeaves;
     Lvl_t  height; // height of the tree
-    int t=-1; //sim time (in seconds)
+    int t=-1; //current discrete sim time (in seconds)
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
     int seed = 42;

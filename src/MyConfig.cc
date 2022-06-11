@@ -8,15 +8,17 @@ using namespace std;
 class MyConfig;
 
 vector<Cost_t> 	MyConfig::Non_RT_ChainCostAtLvl;
-string 					MyConfig::LogFileName;
+string 					MyConfig::LogFileName, MyConfig::ResFileName;
 string 					MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
-ofstream 				MyConfig::logFile;
+ofstream 				MyConfig::logFile, MyConfig::ResFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 
 void MyConfig::openFiles()
 {
 	LogFileName = "example.txt";
+	ResFileName = "res.res";
 	logFile.open (LogFileName);
+	ResFile.open (ResFileName);
 }
 
 
@@ -62,6 +64,16 @@ void MyConfig::printToLog (UnorderedSetOfChains set2print)
 //	}
 //}
 
+
+void MyConfig::printToRes (char* buf) 
+{
+	ResFile << buf; 
+}
+
+void MyConfig::printToRes (string str) 
+{
+	ResFile << str;
+}
 
 void MyConfig::printToLog (char* buf) 
 {

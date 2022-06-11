@@ -27,13 +27,13 @@ using namespace std;
 class Chain;
 class ChainHash;
 
-const int TOY=0, CITY=1;
+const int CITY=0, TOY=1;
 const int NET_TYPE = TOY;
-const vector <Cost_t> RT_ChainCostAtLvl    [] = {{3, 2, 1}, {544, 278, 164}};
-const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{3, 2, 1}, {544, 278, 148, 86, 58, 47}};
-const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{1, 1}, 		{17, 17, 19}};
-const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{1, 1, 1}, {17, 17, 17, 17, 17, 17}};
-const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, 	{1,1,1}};
+const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 						{3, 2, 1}};
+const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, {3, 2, 1}};
+const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{17, 17, 19}, 								{1, 1}};
+const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{17, 17, 17, 17, 17, 17},		{1, 1, 1}};
+const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, 										{1,1,1}};
 
 const bool randomlySetChainType = false;
 const bool mode=SYNC;
@@ -50,21 +50,23 @@ const int uniformChainMisgCost = 600;
 class MyConfig { 
 
 		// A buffer for print-outs
-		static const int bufSize = 128;
-		static char 		 buf[bufSize];
+		static const int 	bufSize = 128;
+		static char 			buf[bufSize];
+    static ofstream 	logFile, ResFile;
 
 	public:
 
-    static string 		traceFileName;;	
- 		static string 		LogFileName;
-    static ofstream 	logFile;
-		static const string netType;
+    static string 				traceFileName, LogFileName ResFileName;
+		static const string 	netType;
 		static vector<Cost_t> Non_RT_ChainCostAtLvl;
 
 		//Init
 		static void openFiles ();
 		
 		//print
+		static void printToRes (char* buf); 
+		static void printToRes (string str);
+
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
 		static void printToLog (int d); // print "d,", where d is the integer, to the log file
