@@ -32,6 +32,14 @@ void SimController::initialize (int stage)
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	MyConfig::openFiles ();
+	// $$$
+//	vector <DcId_t> S_u = {0,1,2};
+//	RT_Chain c1 (1, S_u);
+//	MyConfig::printToLog (c1);
+//	c1.curLvl=0;
+//	snprintf (buf, bufSize, "mu_u[0]=%d, cost=%d\n", c1.mu_u_at_lvl(0), c1.getCost ());
+//	printBufToLog ();
+//	endSimulation ();
 	checkParams (); 
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
@@ -55,12 +63,15 @@ void SimController::initialize (int stage)
 void SimController::checkParams ()
 {
 
-	int dynamicNetType = (networkName.compare("Lux")==0 || networkName.compare("Monaco")==0)? CITY : TOY; 
+	int dynamicNetType = -1;
+	if (networkName.compare("Lux")==0 || networkName.compare("Monaco")==0) {
+		dynamicNetType = CITY;
+	} 
 	if (dynamicNetType==CITY && NET_TYPE!=CITY) {
 		error ("For running the selected network please set in MyConfig.h: NET_TYPE=CITY");
 	} 
 	else if (dynamicNetType!=CITY && NET_TYPE==CITY) {
-		error ("If you run toy scneario, please set in MyConfig.h: NET_TYPE=TOY");
+		error ("If you run toy scneario, please set in MyConfig.h NET_TYPE to another value");
 	} 
 	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
 		if ((int)(RT_Chain::costAtLvl[lvl]) <= (int)(RT_Chain::costAtLvl[lvl+1])) {
@@ -184,7 +195,7 @@ void SimController::concludeTimePeriod ()
 	MyConfig::printToLog ("\nIn ChainsMaster:\n");
 	ChainsMaster::printAllChains ();
 	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
-		error ("error occured during run of ChainsMaster::concludeTimePeriod");
+		error ("error occured during run of ChainsMaster::concludeTimePeriod. Check log file for details.");
 	}
 	
 	if (DEBUG_LVL > 0) {

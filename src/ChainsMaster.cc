@@ -144,7 +144,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 	numMigs = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		if (DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
-			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered the %d which is unplaced\n", it->second.id);
+			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", it->second.id);
 			MyConfig::printToLog (buf); 
 			return false;
 		}

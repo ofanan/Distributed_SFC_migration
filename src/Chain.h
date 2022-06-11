@@ -38,7 +38,6 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-		// Cost_t getCpuCost () const; //Currently unused.
     Cost_t getCost 		() const;
     Cpu_t  getCpu     () const; 
     
