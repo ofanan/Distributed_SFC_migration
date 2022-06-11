@@ -7,7 +7,6 @@ using namespace std;
 
 class MyConfig;
 
-vector<Cost_t> 	MyConfig::Non_RT_ChainCostAtLvl;
 string 					MyConfig::LogFileName, MyConfig::ResFileName;
 string 					MyConfig::traceFileName = "results/poa_files/Tree_shorter.poa";
 ofstream 				MyConfig::logFile, MyConfig::ResFile;
