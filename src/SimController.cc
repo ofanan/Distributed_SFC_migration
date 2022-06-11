@@ -145,9 +145,6 @@ void SimController::runTimePeriod ()
 			
 			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
-			if (!ChainsMaster::eraseChains (usrsThatLeft)){
-				error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
-			}
 
 			initAlg ();
 			// Schedule a self-event for reading the handling the next time-step
@@ -215,7 +212,6 @@ void SimController::concludeTimePeriod ()
 	
 	chainsThatJoinedLeaf.    clear ();
 	chainsThatLeftDatacenter.clear ();
-	usrsThatLeft						.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 }
 
@@ -246,23 +242,24 @@ void SimController::parseChainPoaToken (string const token, ChainId_t &chainId, 
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
 - insert all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
-- remove each chain that left from ChainsMaster::allChains.
+- remove all the chains whose users left from ChainsMaster::allChains.
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 **************************************************************************************************************************************************/
 void SimController::rdUsrsThatLeftLine (string line)
 {
-  char_separator<char> sep(" ");
-  tokenizer<char_separator<char>> tokens(line, sep);
   Chain chain; // will hold the new chain to be inserted each time
   ChainId_t chainId;
   DcId_t chainCurDc;
+	vector <ChainId_t> usrsThatLeft; // the users that left at the current period
+  char_separator<char> sep(" ");
+  tokenizer<char_separator<char>> tokens(line, sep);
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
 	for (const auto& token : tokens) {
   	chainId = stoi (token);
 
-		if (ChainsMaster::findChain (chainId, chain)) { 
+		if (!ChainsMaster::findChain (chainId, chain)) { 
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
     
@@ -273,6 +270,10 @@ void SimController::rdUsrsThatLeftLine (string line)
 		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
 		usrsThatLeft.push_back (chainId);
   }
+	if (!ChainsMaster::eraseChains (usrsThatLeft)){
+		error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
+	}
+	usrsThatLeft.clear ();
 }
 
 /*************************************************************************************************************************************************
