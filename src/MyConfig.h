@@ -36,6 +36,7 @@ const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{17, 17, 17, 17, 17, 17},		{1, 	
 const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, 										{1,	  1,	1}};
 
 const bool randomlySetChainType = false;
+const bool evenChainsAreRt			= true;
 const bool mode=SYNC;
 const int  BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
 const int  DEBUG_LVL=1, LOG_LVL=DETAILED_LOG, RES_LVL=1;
@@ -43,7 +44,7 @@ const int  DEBUG_LVL=1, LOG_LVL=DETAILED_LOG, RES_LVL=1;
 const int16_t chainMigCost = 600;
 
 
-const float RT_chain_pr = 0.0; // prob' that a new chain is an RT chain
+const float RT_chain_pr = 0.5; // prob' that a new chain is an RT chain
 
 const int uniformChainMisgCost = 600;
 										 

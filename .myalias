@@ -31,4 +31,5 @@ alias commit='c; git add -A; git commit'
 alias compush='commit; pusher'
 alias Gen='$EDITOR $PROJ_PATH/Omnet_Generations.txt &'
 alias lex='c; l $PROJ_PATH/example.txt'
+alias rex='c; l $PROJ_PATH/res.res'
 

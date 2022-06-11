@@ -197,6 +197,7 @@ void SimController::concludeTimePeriod ()
 
 	int periodCost = numMigs * uniformChainMisgCost + nonMigCost;
 	
+	
 	if (RES_LVL > 0) {
 		snprintf (buf, bufSize, "\nt=%d, tot cost = %d", t, periodCost);
 		printBufToRes();
@@ -300,7 +301,7 @@ void SimController::rdNewUsrsLine (string line)
 				chain = Non_RT_Chain (chainId, S_u); 
 			}
 		}
-		else { // this option is used for debugging: a chain is RT iff its chainId is even.
+		else if (evenChainsAreRt) {
 			if (chainId%2==0) {
 				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
 				chain = RT_Chain (chainId, S_u); 
@@ -309,6 +310,17 @@ void SimController::rdNewUsrsLine (string line)
 				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
 				chain = Non_RT_Chain (chainId, S_u); 
 			}		
+		}
+		else {
+			if (((chainId % 10)/10) < RT_chain_pr) { // Pseudo-randomization
+				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
+				chain = RT_Chain (chainId, S_u); 
+			}
+			else {
+				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
+				chain = Non_RT_Chain (chainId, S_u); 
+			}		
+		
 		}
 		if (DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
 			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
