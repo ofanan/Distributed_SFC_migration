@@ -49,10 +49,6 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot ();
 	ChainsMaster::clear ();
-	vector <DcId_t> Su = {1,1,1};
-	RT_Chain c1 (1, Su); //$$$
-	snprintf (buf, bufSize, "costAtLvl[0]=%d\n", c1.costAtLvl[0]);
-	printBufToLog();
 	runTrace ();
 }
 
@@ -191,6 +187,9 @@ void SimController::concludeTimePeriod ()
 		error ("error occured during run of ChainsMaster::concludeTimePeriod");
 	}
 	
+	if (DEBUG_LVL > 0) {
+		checkChainsMasterData ();
+	}
 	int nonMigCost = ChainsMaster::calcNonMigCost ();
 	if (nonMigCost < 0) {
 		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
@@ -198,9 +197,9 @@ void SimController::concludeTimePeriod ()
 
 	int periodCost = numMigs * uniformChainMisgCost + nonMigCost;
 	
-	if (LOG_LVL > 0) {
-		snprintf (buf, bufSize, "\ntot cost = %d", periodCost);
-		printBufToLog();
+	if (RES_LVL > 0) {
+		snprintf (buf, bufSize, "\nt=%d, tot cost = %d", t, periodCost);
+		printBufToRes();
 	}
 
 	if (DEBUG_LVL>0) {
@@ -217,6 +216,7 @@ void SimController::concludeTimePeriod ()
 	usrsThatLeft						.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 }
+
 
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
 void SimController::printAllDatacenters ()
@@ -384,15 +384,17 @@ Raise an error in case of data inconsistency.
 **************************************************************************************************************************************************/
 void SimController::checkChainsMasterData ()
 {
-//	for (auto chain : ChainsMaster::allChains) {
-//		DcId_t curDatacenter = chain.curDc;
-//		if (curDatacenter == UNPLACED_DC) { // chain is unplaced
-//			error ("t=% by chainsMaster, chain %d is unplaced in the end of period", t, chain.id);
-//		}
-//		if (!(datacenters[curDatacenter]->checkIfChainIsPlaced (chain.id)) ) {
-//			error ("t=% chainsManager says that chain %d is placed in DC %d while it's not placed there", t, chain.id, curDatacenter);
-//		}
-//	}
+	Chain chain;
+	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
+		for (auto chainId : datacenters[dcId]->placedChains) {
+			if (!ChainsMaster::findChain (chainId, chain)) {
+				error ("\nchain %d found in DC's %d placedChain isn't found in ChainsMaster", chainId, dcId);
+			}
+			if (chain.curDc != dcId) {
+				error ("\nchain %d found in DC's %d placedChain is recorded in ChainsMaster as placed on DC %d", chainId, dcId, chain.curDc);
+			}
+		}
+	}
 }
 
 

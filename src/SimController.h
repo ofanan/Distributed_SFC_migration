@@ -93,6 +93,7 @@ class SimController : public cSimpleModule
   	void initAlgSync (); // init a sync placement alg'
   	void initAlgAsync (); // init an async placement alg'
   	inline void printBufToLog () {MyConfig::printToLog(buf);}
+  	inline void printBufToRes () {MyConfig::printToRes(buf);}
 		
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);

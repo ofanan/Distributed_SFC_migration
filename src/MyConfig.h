@@ -29,16 +29,16 @@ class ChainHash;
 
 const int CITY=0, TOY=1;
 const int NET_TYPE = TOY;
-const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 						{3, 2, 1}};
-const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, {3, 2, 1}};
-const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{17, 17, 19}, 								{1, 1}};
-const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{17, 17, 17, 17, 17, 17},		{1, 1, 1}};
-const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, 										{1,1,1}};
+const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 						{100, 10   }};
+const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, {100, 10, 1}};
+const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{17, 17, 19}, 								{1, 	1 	 }};
+const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{17, 17, 17, 17, 17, 17},		{1, 	1, 	1}};
+const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{1,1,1}, 										{1,	  1,	1}};
 
 const bool randomlySetChainType = false;
 const bool mode=SYNC;
-const int BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
-const int  DEBUG_LVL=1, LOG_LVL=DETAILED_LOG;
+const int  BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3;
+const int  DEBUG_LVL=1, LOG_LVL=DETAILED_LOG, RES_LVL=1;
 
 const int16_t chainMigCost = 600;
 
@@ -56,7 +56,7 @@ class MyConfig {
 
 	public:
 
-    static string 				traceFileName, LogFileName ResFileName;
+    static string 				traceFileName, LogFileName, ResFileName;
 		static const string 	netType;
 		static vector<Cost_t> Non_RT_ChainCostAtLvl;
 
