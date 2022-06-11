@@ -32,14 +32,6 @@ void SimController::initialize (int stage)
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	MyConfig::openFiles ();
-	// $$$
-//	vector <DcId_t> S_u = {0,1,2};
-//	RT_Chain c1 (1, S_u);
-//	MyConfig::printToLog (c1);
-//	c1.curLvl=0;
-//	snprintf (buf, bufSize, "mu_u[0]=%d, cost=%d\n", c1.mu_u_at_lvl(0), c1.getCost ());
-//	printBufToLog ();
-//	endSimulation ();
 	checkParams (); 
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
@@ -192,8 +184,6 @@ void SimController::finish ()
 void SimController::concludeTimePeriod ()
 {
 	int numMigs;
-	MyConfig::printToLog ("\nIn ChainsMaster:\n");
-	ChainsMaster::printAllChains ();
 	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
 		error ("error occured during run of ChainsMaster::concludeTimePeriod. Check log file for details.");
 	}
@@ -215,7 +205,7 @@ void SimController::concludeTimePeriod ()
 	}
 
 	if (DEBUG_LVL>0) {
-		if (LOG_LVL>=DETAILED_LOG) {
+		if (LOG_LVL>=BASIC_LOG) {
 			MyConfig::printToLog ("\nBy DCs:");
 			printAllDatacenters ();
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");

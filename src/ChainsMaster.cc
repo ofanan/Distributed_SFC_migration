@@ -180,7 +180,7 @@ void ChainsMaster::printAllChains ()
 **************************************************************************************************************************************************/
 void ChainsMaster::printAllDatacenters (int numDatacenters) 
 {
-	MyConfig::printToLog ("in ChainsMaster::printAllDatacenters\n");
+
 	// gather the required data
 	vector<ChainId_t> chainsPlacedOnDatacenter[numDatacenters]; //chainsPlacedOnDatacenter[dc] will hold a vector of the IDs of the chains currently placed on datacenter dc.
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
