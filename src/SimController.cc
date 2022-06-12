@@ -528,7 +528,7 @@ void SimController::PrintStateAndEndSim ()
 {
 	Enter_Method ("PrintStateAndEndSim ()");
 	MyConfig::printToLog ("Printing state and finishing simulation\n");
-	printAllDatacenters ();
+	printAllDatacenters (true, false);
 	MyConfig::printToLog ("Printing the PoAs of each chain\n");
   ChainsMaster::printAllChainsPoas  (); 
 	MyConfig::printToLog ("simulation abnormally terminated by SimController.PrintStateAndEndSim");

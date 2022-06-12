@@ -45,7 +45,7 @@ void Datacenter::initialize()
   numParents  	= (Lvl_t)  (par("numParents"));
   lvl				  	= (Lvl_t)  (par("lvl"));
   dcId					= (DcId_t) (par("dcId"));
-  cpuCapacity   = nonAugmentedCpuAtLvl[NET_TYPE][lvl]; // Consider rsrc aug here?;}
+  cpuCapacity   = nonAugmentedCpuAtLvl[MyConfig::netType][lvl]; // Consider rsrc aug here?;}
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   numBuPktsRcvd = 0;
 
@@ -401,7 +401,6 @@ void Datacenter::bottomUpSync ()
 				if (reshuffled) {
 					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", dcId);
 					printBufToLog ();
-					PrintAllDatacenters ();
 					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
 					printStateAndEndSim  ();
 				}
