@@ -19,4 +19,5 @@ Distributed_SFC_migration*
 example.txt
 src/*_m.h
 src/*_m.cc
+results/*
 
