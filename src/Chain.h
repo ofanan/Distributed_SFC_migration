@@ -19,7 +19,6 @@ class Chain
 {
 
   public:
-  	static unsigned int netType;
     ChainId_t id;
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
