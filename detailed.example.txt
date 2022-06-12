@@ -1,0 +1,125 @@
+const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 						{100, 10   }, {68, 40 ,31}, 		 {68, 40, 31}};
+const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}, 		 {68, 40, 29}};
+
+
+t = 0
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 1,0,2,4, // 31*4 = 124
+DC 1, lvl=1. placed chains: 5,6,8, 
+DC 2, lvl=1. placed chains: 3,      //40*4 = 160
+DC 3, lvl=0. placed chains: 9,      //68*2 = 136
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 1
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 2
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 3
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 4
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 5
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 6
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 7
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 0,1,2,4,
+DC 1, lvl=1. placed chains: 5,6,8,
+DC 2, lvl=1. placed chains: 10,3,
+DC 3, lvl=0. placed chains: 9,
+DC 4, lvl=0. placed chains: 7,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 8
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 4,0,7,3,
+DC 1, lvl=1. placed chains: 9,8,6,
+DC 2, lvl=1. placed chains: 2,10,
+DC 3, lvl=0. placed chains: 5,
+DC 4, lvl=0. placed chains: 1,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 9
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 4,0,7,3,
+DC 1, lvl=1. placed chains: 9,8,6,
+DC 2, lvl=1. placed chains: 2,10,
+DC 3, lvl=0. placed chains: 5,
+DC 4, lvl=0. placed chains: 1,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+
+t = 10
+********************
+BUPU results:
+DC 0, lvl=2. placed chains: 4,0,7,3,
+DC 1, lvl=1. placed chains: 9,8,6,
+DC 2, lvl=1. placed chains: 2,10,
+DC 3, lvl=0. placed chains: 5,
+DC 4, lvl=0. placed chains: 1,
+DC 5, lvl=0. placed chains: 
+DC 6, lvl=0. placed chains: 
+finished sim

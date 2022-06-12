@@ -8,7 +8,7 @@ using namespace std;
 class MyConfig;
 
 string 					MyConfig::LogFileName, MyConfig::ResFileName;
-string 					MyConfig::traceFileName = "results/poa_files/shorter.poa";
+//string 					MyConfig::traceFileName = "results/poa_files/Monaco_0829_0830_20secs_Telecom.poa";
 ofstream 				MyConfig::logFile, MyConfig::ResFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 

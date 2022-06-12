@@ -27,11 +27,13 @@ using namespace std;
 class Chain;
 class ChainHash;
 
+const string traceFileName = "results/poa_files/Monaco_0829_0830_20secs_Telecom.poa";
+
 const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // levels of log to be written to the log file.
 
 //costs and cpu demands of chains for different types of networks
 const int CITY=0, UNIFORM=1, TREE_SHORTER=2, SHORTER=3; // types of networks, defining costs and cpu demands of chains.
-const int NET_TYPE = SHORTER; 
+const int NET_TYPE = CITY; 
 const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 						{100, 10   }, {68, 40 ,31}, 		 {68, 40, 31}};
 const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}, 		 {68, 40, 29}};
 const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{17, 17, 19}, 								{1, 	1 	 }, {17, 17, 19}, 		 {17, 17, 19}};
@@ -48,10 +50,10 @@ const bool evenChainsAreRt			= false;
 const bool mode=SYNC;
 
 // Defines whether to print to the log and to the .res file the results of the BU stage of BUPU
-const bool printBuRes = true; 
+const bool printBuRes = false; 
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=NO_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, LOG_LVL=BASIC_LOG, RES_LVL=1;
 
 										 
 class MyConfig { 
@@ -63,9 +65,8 @@ class MyConfig {
 
 	public:
 
-    static string 				traceFileName, LogFileName, ResFileName;
-		static const string 	netType;
-		static vector<Cost_t> Non_RT_ChainCostAtLvl;
+/*    static string 				traceFileName, */
+    static string LogFileName, ResFileName;
 
 		//Init
 		static void openFiles ();

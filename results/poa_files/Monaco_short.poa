@@ -7,9 +7,10 @@
 
 t = 30540
 usrs_that_left: 
-new_usrs: (0,314)(1,497)(2,497)
+new_usrs: (0,31)(1,47)(2,197)
 old_usrs: 
 t = 30548
-usrs_that_left: 0 61 127 128 
-new_usrs: (0,1283)(61,1283)
-old_usrs: (1,473)(2,473)(3,813)
+usrs_that_left: 
+new_usrs: (3,128)(4,211)
+old_usrs: (0,111)
+

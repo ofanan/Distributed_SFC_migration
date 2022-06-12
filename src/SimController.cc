@@ -156,7 +156,7 @@ void SimController::runTimePeriod ()
 
 
 void SimController::runTrace () {
-	traceFile = ifstream (MyConfig::traceFileName);
+	traceFile = ifstream (traceFileName);
 	isFirstPeriod = true;
 	
   numMigs         = 0; // will cnt the # of migrations in the current run
@@ -195,8 +195,7 @@ void SimController::concludeTimePeriod ()
 
 	int periodCost = numMigs * uniformChainMisgCost + nonMigCost;
 	
-	
-	if (RES_LVL > 0) {
+		if (RES_LVL > 0) {
 		snprintf (buf, bufSize, "\nt=%d, tot cost = %d", t, periodCost);
 		printBufToRes();
 	}
