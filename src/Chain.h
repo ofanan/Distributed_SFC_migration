@@ -17,7 +17,9 @@ using namespace std;
 
 class Chain
 {
+
   public:
+  	static unsigned int netType;
     ChainId_t id;
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRT_Chain;
@@ -39,12 +41,13 @@ class Chain
 	
 		// Getters
     Cost_t getCost 		() const;
-    Cpu_t  getCpu     () const; 
-    
+    Cpu_t  getCpu     () const;     
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;
-    void  setS_u (const vector <DcId_t> &S_u);
 		bool dcIsDelayFeasible (DcId_t dcId, Lvl_t dcLvl) {return this->S_u[dcLvl]==dcId;}
+
+		// Setters
+/*		void setNetType (const unsigned int netType);*/
 };
 
 class RT_Chain : public Chain

@@ -33,6 +33,8 @@ const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // leve
 
 //costs and cpu demands of chains for different types of networks
 const int MONACO=0, LUX=1, UNIFORM=2, TREE_SHORTER=3, SHORTER=4; // types of networks, defining costs and cpu demands of chains.
+const int Monaco=0, Lux=1, Uniform=2;
+const int netType = MONACO; 
 const int NET_TYPE = MONACO; 
 const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 							{100, 10   }, {68, 40 ,31}, 		 {68, 40, 31}};
 const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, 	{100, 10, 1}, {68, 40, 29}, 		 {68, 40, 29}};

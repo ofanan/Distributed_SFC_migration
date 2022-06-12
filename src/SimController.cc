@@ -23,6 +23,15 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
+		if (networkName.compare("Monaco")==0) {
+			Chain::netType=Monaco;
+		}
+		else if (networkName.compare("Lux")==0) {
+			Chain::netType=Lux;
+		}
+		else if (networkName.compare("Tree")==0) {
+			Chain::netType=Uniform;
+		}
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));

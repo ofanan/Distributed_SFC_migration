@@ -4,11 +4,11 @@ const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
 // mu_u[i] is the amount of CPU required for placing a chain in a datacenter at level i
 
-
+unsigned int Chain::netType;
 const vector <Cost_t> RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [NET_TYPE];
 const vector <Cost_t> Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[NET_TYPE];
 
-const vector<Cpu_t> RT_Chain::		mu_u = RT_ChainMu_u		 [NET_TYPE];
+const vector<Cpu_t> RT_Chain::		mu_u = RT_ChainMu_u		 [Chain::netType];
 const vector<Cpu_t> Non_RT_Chain::mu_u = Non_RT_ChainMu_u[NET_TYPE];
 
 const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
@@ -174,11 +174,11 @@ bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId
 	}
 }
 
-void Chain::setS_u (const vector <DcId_t> &S_u)
-{
+//void Chain::setNetType (const unsigned int netType)
+//{
+//	Chain::netType = netType;
+//}
 
-}
-    
 //// returns the id of the datacenter currently hosting "this"; or UNPLACED_DC, if this chain isn't placed
 //DcId_t Chain::getCurDatacenter () const 
 //{
