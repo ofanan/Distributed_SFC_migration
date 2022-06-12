@@ -97,12 +97,10 @@ class SimController : public cSimpleModule
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
-		int calcMigCost    (); // returns the overall mig cost
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
-		void printAllDatacenters 	 ();
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 				 
@@ -117,6 +115,7 @@ class SimController : public cSimpleModule
     void checkParams (); // Sanity checks for various parameters    
 		void finishedAlg 		 (DcId_t dcId, DcId_t leafId);
 		void prepareReshSync (DcId_t dcId, DcId_t leafId);
+		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false);
 };
 
 #endif

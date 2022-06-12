@@ -201,10 +201,10 @@ void SimController::concludeTimePeriod ()
 		printBufToRes();
 	}
 
-	if (DEBUG_LVL>0) {
-		if (LOG_LVL>=BASIC_LOG) {
-			MyConfig::printToLog ("\nBy DCs:");
-			printAllDatacenters ();
+	if (LOG_LVL>=BASIC_LOG) {
+		MyConfig::printToLog ("\nBUPU results:");
+		printAllDatacenters ();
+		if (DEBUG_LVL>1) {
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
 		}
@@ -217,10 +217,10 @@ void SimController::concludeTimePeriod ()
 
 
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
-void SimController::printAllDatacenters ()
+void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpList)
 {
 	for (const auto datacenter : datacenters) {
-		datacenter -> print (false, false);
+		datacenter -> print (printPotPlaced, printPushUpList);
 	}
 }
 
@@ -303,7 +303,7 @@ void SimController::rdNewUsrsLine (string line)
 				chain = Non_RT_Chain (chainId, S_u); 
 			}
 		}
-		else if (evenChainsAreRt) {
+		else if (evenChainsAreRt) { // Pseudo-random generation, where a chain is RT iff its Id is even
 			if (chainId%2==0) {
 				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
 				chain = RT_Chain (chainId, S_u); 
@@ -314,7 +314,7 @@ void SimController::rdNewUsrsLine (string line)
 			}		
 		}
 		else {
-			if (((chainId % 10)/10) < RT_chain_pr) { // Pseudo-randomization
+			if (((chainId % 10)/10) < RT_chain_pr) { // Pseudo-random generation, based on the chain's
 				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
 				chain = RT_Chain (chainId, S_u); 
 			}
