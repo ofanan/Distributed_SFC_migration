@@ -37,7 +37,7 @@ const vector <Cost_t> RT_ChainCostAtLvl    [] = {{544, 278, 164}, 							{100, 1
 const vector <Cost_t> Non_RT_ChainCostAtLvl[] = {{544, 278, 148, 86, 58, 47}, 	{100, 10, 1}, {68, 40, 29}, 		 {68, 40, 29}};
 const vector <Cpu_t>  RT_ChainMu_u 				 [] = {{17, 17, 19}, 									{1, 	1 	 }, {17, 17, 19}, 		 {17, 17, 19}};
 const vector <Cpu_t>  Non_RT_ChainMu_u 		 [] = {{17, 17, 17, 17, 17, 17},			{1, 	1, 	1}, {17, 17, 17}, 		 {17, 17, 17}};
-const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{842, 1684, 2526, 3368, 4210, 5052}, {94, 188, 282, 376, 470, 564}, {1,	  1,	1}, {516, 1032, 1548}, {30, 60, 90}};
+const vector <Cpu_t>  nonAugmentedCpuAtLvl [] = {{11842, 111684, 112526, 113368, 114210, 115052}, {94, 188, 282, 376, 470, 564}, {1,	  1,	1}, {516, 1032, 1548}, {30, 60, 90}}; //$$ Monaco: 842, 1684, 2526, 3368, 4210, 5052
 const int uniformChainMisgCost = 600;
 
 // Parameters determining how to define whether a new generated chain is RT or not
