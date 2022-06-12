@@ -80,6 +80,7 @@ class SimController : public cSimpleModule
 		void finish ();
 
 		// Other Functions
+		bool genRtChain (ChainId_t chainId); // returns true iff the next generated chain should be an RT chain. This is based on rand', and the prob' of RT.
 		void runTrace  ();
 		void runTimePeriod ();
 		void readTraceLine ();

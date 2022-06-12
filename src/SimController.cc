@@ -285,6 +285,24 @@ void SimController::rdUsrsThatLeftLine (string line)
 }
 
 /*************************************************************************************************************************************************
+* Determine whether the generated chain would be RT, or Non_RT.
+* This is done based on either random selection, or pseudo-random, based on the chainId.
+**************************************************************************************************************************************************/
+bool SimController::genRtChain (ChainId_t chainId)
+{
+	if (randomlySetChainType) {
+		return (rand () < RT_chain_rand_int);
+	}
+	else if (evenChainsAreRt) {
+		return (chainId%2==0);
+	}
+	else {
+		return ((chainId % 10)/10) < RT_chain_pr;
+	}
+}			
+			
+
+/*************************************************************************************************************************************************
 Read a trace line that includes data about new chains.
 Generate a new chain, and add it to the ChainsMaster::allChains.
 Also, add the new generated chain to chainsThatJoinedLeaf[leaf], where leaf is the curent leaf, co-located with the poa of this new chain (poa is indicated in the trace, .poa file).
@@ -301,37 +319,16 @@ void SimController::rdNewUsrsLine (string line)
   
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
-		if (randomlySetChainType) {
-			if (rand () < RT_chain_rand_int) {
-				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
-				chain = RT_Chain (chainId, S_u); 
-			}
-			else {
-				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
-				chain = Non_RT_Chain (chainId, S_u); 
-			}
-		}
-		else if (evenChainsAreRt) { // Pseudo-random generation, where a chain is RT iff its Id is even
-			if (chainId%2==0) {
-				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
-				chain = RT_Chain (chainId, S_u); 
-			}
-			else {
-				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
-				chain = Non_RT_Chain (chainId, S_u); 
-			}		
+		
+		if (genRtChain(chainId)) {
+			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
+			chain = RT_Chain (chainId, S_u); 		
 		}
 		else {
-			if (((chainId % 10)/10) < RT_chain_pr) { // Pseudo-random generation, based on the chain's
-				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
-				chain = RT_Chain (chainId, S_u); 
-			}
-			else {
-				vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
-				chain = Non_RT_Chain (chainId, S_u); 
-			}		
-		
+			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
+			chain = Non_RT_Chain (chainId, S_u); 
 		}
+		
 		if (DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
 			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 		}
