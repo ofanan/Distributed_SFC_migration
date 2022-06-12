@@ -297,8 +297,6 @@ bool SimController::genRtChain (ChainId_t chainId)
 		return (chainId%2==0);
 	}
 	else {
-		snprintf (buf, bufSize, "\nchainId=%d, pseudo rand=%f", chainId, float(chainId % 10)/10);
-		printBufToLog ();
 		return (float(chainId % 10)/10) < RT_chain_pr;
 	}
 }			
@@ -327,7 +325,6 @@ void SimController::rdNewUsrsLine (string line)
 			chain = RT_Chain (chainId, S_u); 		
 		}
 		else {
-			error ("Hallelluah! generated a non-Rt chain");
 			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
 			chain = Non_RT_Chain (chainId, S_u); 
 		}
