@@ -55,16 +55,16 @@ void SimController::initialize (int stage)
 void SimController::checkParams ()
 {
 
-	int dynamicNetType = -1;
-	if (networkName.compare("Lux")==0 || networkName.compare("Monaco")==0) {
-		dynamicNetType = CITY;
-	} 
-	if (dynamicNetType==CITY && NET_TYPE!=CITY) {
-		error ("For running the selected network please set in MyConfig.h: NET_TYPE=CITY");
-	} 
-	else if (dynamicNetType!=CITY && NET_TYPE==CITY) {
-		error ("If you run toy scneario, please set in MyConfig.h NET_TYPE to another value");
-	} 
+//	int dynamicNetType = -1;
+//	if (networkName.compare("Lux")==0 || networkName.compare("Monaco")==0) {
+//		dynamicNetType = CITY;
+//	} 
+//	if (dynamicNetType==CITY && NET_TYPE!=CITY) {
+//		error ("For running the selected network please set in MyConfig.h: NET_TYPE=CITY");
+//	} 
+//	else if (dynamicNetType!=CITY && NET_TYPE==CITY) {
+//		error ("If you run toy scneario, please set in MyConfig.h NET_TYPE to another value");
+//	} 
 	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
 		if ((int)(RT_Chain::costAtLvl[lvl]) <= (int)(RT_Chain::costAtLvl[lvl+1])) {
 			error ("RT_Chain::costAtLvl[] should be decreasing. However, RT_Chain::costAtLvl[%d]=%d, RT_Chain::costAtLvl[%d]=%d\n", 
