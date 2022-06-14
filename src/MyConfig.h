@@ -69,7 +69,7 @@ class MyConfig {
     static string LogFileName, ResFileName;
 
 		//Init
-		static void openFiles ();
+		static bool openFiles ();
 		
 		//print
 		static void printToRes (char* buf); 

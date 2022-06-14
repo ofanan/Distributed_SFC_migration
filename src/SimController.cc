@@ -36,7 +36,9 @@ void SimController::initialize (int stage)
 	}
 	
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
-	MyConfig::openFiles ();
+	if (!MyConfig::openFiles ()) {
+		error ("Error in MyConfig::openFiles\n{");
+	}
 	checkParams (); 
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);

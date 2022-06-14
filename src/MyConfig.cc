@@ -15,16 +15,20 @@ char 						MyConfig::buf[MyConfig::bufSize];
 /*************************************************************************************************************************************************
 * Open the log and result files.
 * Check whether the actual traceFileName corresponds with the netType (set according to the .ini file). 
-* For instance, if the .ini file is "Lux.ini", then traceFileName must begin with "Lux_".
-* If the traceFileName is wrong, the simulation terminates with an error msg.
+* For instance, if the .ini file is "Lux.ini", then traceFileName must begin with "Lux".
+* Returns true iff the files where successfully opened, and the traceFileName staisfies a basic sanity check.
 **************************************************************************************************************************************************/
-void MyConfig::openFiles()
+bool MyConfig::openFiles()
 {
 	LogFileName = "example.txt";
 	ResFileName = "res.res";
 	logFile.open (LogFileName);
 	ResFile.open (ResFileName);
-	
+	int traceNetType = getNetTypeFromString (traceFileName);
+	if (traceNetType!=MyConfig::netType) {
+		return false;
+	}
+	return true;
 }
 
 /*************************************************************************************************************************************************
