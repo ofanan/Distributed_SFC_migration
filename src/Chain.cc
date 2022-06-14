@@ -14,9 +14,6 @@ const vector<Cpu_t> Non_RT_Chain::mu_u = Non_RT_ChainMu_u[MyConfig::netType];
 const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
 const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
 
-//const vector <Cost_t> RT_Chain	  ::cpuCostAtLvl = MyConfig::scalarProdcut (RT_Chain::mu_u, 	  Chain::costOfCpuUnitAtLvl); 
-//const vector <Cost_t> Non_RT_Chain::cpuCostAtLvl = MyConfig::scalarProdcut (Non_RT_Chain::mu_u, Chain::costOfCpuUnitAtLvl); 
-
 Chain::Chain () 
 {
 	this->id 					= DUMMY_CHAIN_ID; 
