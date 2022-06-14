@@ -80,17 +80,25 @@ void Datacenter::initialize()
 }
 
 /*************************************************************************************************************************************************
- * Print to the log file all the chains placed on this DC. 
- * If the input argument printPotPlaced is true and there're potPlacedChains to print - print them.
- * If the input argument printPushUpList is true and pushUpList isn't impty - print the pushUpList.
+ * Print to the log file data about chains on this DC. 
+ * Inputs: 
+ * - printInCntrFormat: when true, print in a format similar to that used in the centralized alg'.
+ * - printPotPlaced: when true and there're potPlacedChains to print - print them.
+ * - printPushUpList: when true and pushUpList isn't impty - print them.
 *************************************************************************************************************************************************/
 
-void Datacenter::print (bool printPotPlaced, bool printPushUpList)
+void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printInCntrFormat)
 {
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
 		return;
 	}
-	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", dcId, lvl);
+	if (printInCntrFormat) {
+		snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_chains=%d", 
+															dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()+potPlacedChains.size()) );
+		printBufToLog ();
+		return;
+	}
+	snprintf (buf, bufSize, "\ns%d : lvl=%d. placed chains: ", dcId, lvl);
 	printBufToLog ();
 	MyConfig::printToLog (placedChains);	
 	if (printPotPlaced) {
@@ -204,14 +212,14 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainsThatJoined)");
 
 	if (!isLeaf) { 
-		error ("Non-leaf DC %d was called by initBottomUp");
+		error ("Non-leaf s%d : was called by initBottomUp");
 	}
 	pushUpList.clear ();	
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainsThatJoined;
 
  	if (LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d rcvd vecOfChainsThatJoined=", dcId);
+		snprintf (buf, bufSize, "\ns%d : rcvd vecOfChainsThatJoined=", dcId);
 		printBufToLog (); 
 		MyConfig::printToLog(vecOfChainsThatJoined);
 		print (); 
@@ -231,11 +239,11 @@ void Datacenter::handlePushUpPkt ()
 	
 	if (LOG_LVL>=VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
-			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec rcvd is empty", dcId);
+			snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
 		}
 		else {
-			snprintf (buf, bufSize, "\nDC %d rcvd PU pkt. pushUpVec[0].id=%d pushUpVec[0].curLvl = %d", dcId, pkt->getPushUpVec(0).id, pkt->getPushUpVec(0).curLvl);
+			snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpVec[0].id=%d pushUpVec[0].curLvl = %d", dcId, pkt->getPushUpVec(0).id, pkt->getPushUpVec(0).curLvl);
 			printBufToLog ();
 		}
 	}
@@ -260,7 +268,7 @@ void Datacenter::pushUpSync ()
 {
 
 	if (LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d begins PU. pushUpList=", dcId);
+		snprintf (buf, bufSize, "\ns%d : begins PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
 	}
@@ -312,7 +320,7 @@ void Datacenter::pushUpSync ()
 	}
 
 	if (LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d finihsed PU.", dcId);
+		snprintf (buf, bufSize, "\ns%d : finihsed PU.", dcId);
 		printBufToLog ();
 		print ();
 	}
@@ -382,7 +390,7 @@ void Datacenter::bottomUpSync ()
 {
 
 	if (LOG_LVL>=VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d beginning BU sync. notAssigned=", dcId);
+		snprintf (buf, bufSize, "\ns%d : beginning BU sync. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
 	}
@@ -407,13 +415,13 @@ void Datacenter::bottomUpSync ()
 		else { 
 			if (cannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				if (reshuffled) {
-					snprintf (buf, bufSize, "\nDC %d: couldn't find a feasible sol' even after reshuffling", dcId);
+					snprintf (buf, bufSize, "\ns%d : : couldn't find a feasible sol' even after reshuffling", dcId);
 					printBufToLog ();
 					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
 					printStateAndEndSim  ();
 				}
 				if (LOG_LVL>=DETAILED_LOG) {
-					snprintf (buf, bufSize, "\n************** DC %d initiating a reshuffle", dcId);
+					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle", dcId);
 					printBufToLog();
 				}
 				return prepareReshSync ();
@@ -423,7 +431,7 @@ void Datacenter::bottomUpSync ()
 	}
 
 	if (LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d finished BU sync.", dcId);
+		snprintf (buf, bufSize, "\ns%d : finished BU sync.", dcId);
 		printBufToLog ();
 		print ();
 	}
@@ -458,7 +466,7 @@ void Datacenter::updatePlacementInfo ()
 			printBufToLog ();
 		}
 		if (!(ChainsMaster::modifyLvl (chainId, lvl))) { // Change the lvl of this chain written in our DB
-			snprintf (buf, bufSize, "\nError: DC %d chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster\n", dcId, chainId);
+			snprintf (buf, bufSize, "\nError: s%d : chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster\n", dcId, chainId);
 			printBufToLog ();
 			ChainsMaster::printAllChains ();
 			error ("chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster", chainId);
@@ -478,7 +486,7 @@ void Datacenter::handleBottomUpPktSync ()
 {
 
 	if (LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nDC %d handling a BU pkt. src=%d", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 	}
 
@@ -500,7 +508,7 @@ void Datacenter::handleBottomUpPktSync ()
         insertSorted (pushUpList, pkt->getPushUpVec(i));
 	}
 	if (LOG_LVL == VERY_DETAILED_LOG) {
-    snprintf (buf, bufSize, "\nDC %d pushUpList=", dcId);
+    snprintf (buf, bufSize, "\ns%d : pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
 	}

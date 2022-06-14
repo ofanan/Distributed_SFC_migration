@@ -32,11 +32,11 @@ const string traceFileName = "results/poa_files/Monaco_0829_0830_20secs_Telecom.
 const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // levels of log to be written to the log file.
 
 //costs and cpu demands of chains for different types of networks
-const int Monaco=0, Lux=1, Uniform=2, ToyTree=3; // Possible NetType values
-const vector <Cost_t> RT_ChainCostAtLvl     [] = {{544, 278, 164}, 							{100, 10   }, {68, 40 ,31}, 		 {68, 40, 31}};
-const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{100, 10, 1}, {68, 40, 29}, 		 {68, 40, 29}};
-const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 									{1, 	1 	 }, {17, 17, 19}, 		 {17, 17, 19}};
-const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{1, 	1, 	1}, {17, 17, 17}, 		 {17, 17, 17}};
+const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possible NetType values
+const vector <Cost_t> RT_ChainCostAtLvl     [] = {{544, 278, 164}, 							{544, 278, 164},						 {100, 10   }, {68, 40, 31}};
+const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
+const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
+const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 const vector <Cpu_t>  nonAugmentedCpuAtLeaf    = {842, 194, 1,	30,}; //{842, 94, 1,	30,}; 
 const int uniformChainMisgCost = 600;
 
@@ -87,6 +87,7 @@ class MyConfig {
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'
+		static int getNetTypeFromString (string str);
 		static ofstream getLogFile ();
 		static vector<Cost_t> scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2); // returns the scalar product of two vectors
 

@@ -12,14 +12,45 @@ string 					MyConfig::LogFileName, MyConfig::ResFileName;
 ofstream 				MyConfig::logFile, MyConfig::ResFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 
+/*************************************************************************************************************************************************
+* Open the log and result files.
+* Check whether the actual traceFileName corresponds with the netType (set according to the .ini file). 
+* For instance, if the .ini file is "Lux.ini", then traceFileName must begin with "Lux_".
+* If the traceFileName is wrong, the simulation terminates with an error msg.
+**************************************************************************************************************************************************/
 void MyConfig::openFiles()
 {
 	LogFileName = "example.txt";
 	ResFileName = "res.res";
 	logFile.open (LogFileName);
 	ResFile.open (ResFileName);
+	
 }
 
+/*************************************************************************************************************************************************
+* parses the given string, and extract the netType.
+* The currently used netTypes are: "Lux", "Monaco", "UniformTree" and "NonUniformTree". 
+* The string is assumed to begin with the NetType string. 
+* E.g., string "Lux_xyz_rrgrg___" will cause this function to return the netType Lux.
+* If the extracted value is unknown, the func' returns -1.
+* The netTypes are defined in MyConfig.h.
+**************************************************************************************************************************************************/
+int MyConfig::getNetTypeFromString (string str)
+{
+	if ( (str.substr(0,3)).compare("Lux")==0) {
+		return LuxIdx;
+	}	
+	if ( (str.substr(0,6)).compare("Monaco")==0) {
+		return MonacoIdx;
+	}	
+	if ( (str.substr(0,11)).compare("UniformTree")==0) {
+		return UniformTreeIdx;
+	}	
+	if ( (str.substr(0,14)).compare("NonUniformTree")==0) {
+		return NonUniformTreeIdx;
+	}	
+	return -1; // 
+}
 
 void MyConfig::printSuToLog (Chain chain)
 {

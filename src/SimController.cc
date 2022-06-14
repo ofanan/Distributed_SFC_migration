@@ -23,15 +23,11 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
-		if (networkName.compare("Monaco")==0) {
-			MyConfig::netType=Monaco;
+		int netType 		= MyConfig::getNetTypeFromString (networkName);
+		if (netType<0) {
+			error ("The .ini fileName you chose implies a wrong netType");
 		}
-		else if (networkName.compare("Lux")==0) {
-			MyConfig::netType=Lux;
-		}
-		else if (networkName.compare("Tree")==0) {
-			MyConfig::netType=Uniform;
-		}
+		MyConfig::netType=netType;
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));
@@ -64,16 +60,6 @@ void SimController::initialize (int stage)
 void SimController::checkParams ()
 {
 
-//	int dynamicNetType = -1;
-//	if (networkName.compare("Lux")==0 || networkName.compare("Monaco")==0) {
-//		dynamicNetType = CITY;
-//	} 
-//	if (dynamicNetType==CITY && NET_TYPE!=CITY) {
-//		error ("For running the selected network please set in MyConfig.h: NET_TYPE=CITY");
-//	} 
-//	else if (dynamicNetType!=CITY && NET_TYPE==CITY) {
-//		error ("If you run toy scneario, please set in MyConfig.h NET_TYPE to another value");
-//	} 
 	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
 		if ((int)(RT_Chain::costAtLvl[lvl]) <= (int)(RT_Chain::costAtLvl[lvl+1])) {
 			error ("RT_Chain::costAtLvl[] should be decreasing. However, RT_Chain::costAtLvl[%d]=%d, RT_Chain::costAtLvl[%d]=%d\n", 
@@ -88,8 +74,9 @@ void SimController::checkParams ()
 	}
 }
 
-// Fill this->pathToRoot.
-// pathToRoot[i] will hold the path from leaf i to the root.
+/*************************************************************************************************************************************************
+Fill this->pathToRoot. pathToRoot[i] will hold the path from leaf i to the root.
+**************************************************************************************************************************************************/
 void SimController::discoverPathsToRoot () {
 	pathToRoot.resize (numLeaves);
 	DcId_t dcId;
@@ -225,10 +212,10 @@ void SimController::concludeTimePeriod ()
 
 
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
-void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpList)
+void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpList, bool printInCntrFormat)
 {
 	for (const auto datacenter : datacenters) {
-		datacenter -> print (printPotPlaced, printPushUpList);
+		datacenter -> print (printPotPlaced, printPushUpList, printInCntrFormat);
 	}
 }
 
