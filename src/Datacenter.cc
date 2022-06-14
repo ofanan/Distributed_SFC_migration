@@ -79,9 +79,17 @@ void Datacenter::initialize()
 
 }
 
-// Print all the chains placed and pot-placed in this DC.
+/*************************************************************************************************************************************************
+ * Print to the log file all the chains placed on this DC. 
+ * If the input argument printPotPlaced is true and there're potPlacedChains to print - print them.
+ * If the input argument printPushUpList is true and pushUpList isn't impty - print the pushUpList.
+*************************************************************************************************************************************************/
+
 void Datacenter::print (bool printPotPlaced, bool printPushUpList)
 {
+	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
+		return;
+	}
 	snprintf (buf, bufSize, "\nDC %d, lvl=%d. placed chains: ", dcId, lvl);
 	printBufToLog ();
 	MyConfig::printToLog (placedChains);	
