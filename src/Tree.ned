@@ -4,7 +4,8 @@ package src;
 network Tree
 {
   parameters:
-  	string name     		= default("Tree");
+  	string name     		= default("UniformTree");
+//		int netType = default (int(UniformTreeIdx));
 		int height 					= default (3);
     int numChildren 		= default (4);
     int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
@@ -21,15 +22,6 @@ network Tree
   submodules:
 
 		sim_controller 	: SimController;
-
-//		my_config				: MyConfig;
-//		chain_generator : ChainGenerator;
-		
-//		cpu_augmenter 	: CpuAugmenter;
-
-//		sol_checker		: SolChecker;
-		
-//		param_checker 	: ParamChecker;//
 
     datacenters [numDatacenters] : Datacenter {
         parameters:

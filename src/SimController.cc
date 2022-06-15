@@ -24,8 +24,11 @@ void SimController::initialize (int stage)
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
 		int netType 		= MyConfig::getNetTypeFromString (networkName);
-		if (netType<0) {
-			error ("The .ini fileName you chose implies a wrong netType");
+		if (netType<0) {		
+			string errorMsgStr = "The .ini files assigns network.name=" + networkName + " This network name is currently not supported ";
+			char errorMsg[errorMsgStr.length() + 1];
+			strcpy(errorMsg, errorMsgStr.c_str());
+			error (errorMsg);
 		}
 		MyConfig::netType=netType;
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
@@ -64,13 +67,10 @@ void SimController::openFiles ()
 	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
 	if (traceNetType!=MyConfig::netType) {	
 //	results/poa_files/
-		string errorMsgStr = "traceFileName is " + traceFileName;
+		string errorMsgStr = "traceFileName " + traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini";
     char errorMsg[errorMsgStr.length() + 1];
     strcpy(errorMsg, errorMsgStr.c_str());
 		error (errorMsg);
-		  // declaring character array
-//		error ("traceFileName is " + traceFileName); //%s while .ini file is %s.ini", traceFileName, networkName);
-//		error ("traceFileName (aka .poa file) doesn't correspond .ini fileName");
 	}
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	if (!MyConfig::openFiles ()) {
