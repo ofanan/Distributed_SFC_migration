@@ -23,7 +23,7 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
-		int netType 		= MyConfig::getNetTypeFromString (networkName);
+		netType 		= MyConfig::getNetTypeFromString (networkName);
 		if (netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
 		}
@@ -60,10 +60,11 @@ void SimController::openFiles ()
 {
 	MyConfig::LogFileName = "example.txt";
 	MyConfig::ResFileName = "res.res";
-	
-	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
+	MyConfig::traceFileName = (netType==MonacoIdx)? "Monaco_0829_0830_20secs_Telecom.poa" : "Lux_0829_0830_60secs_post.poa";
+
+	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
 	if (traceNetType!=MyConfig::netType) {
-		printErrStrAndExit ("traceFileName " + traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
+		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
 	}
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	if (!MyConfig::openFiles ()) {
@@ -178,11 +179,11 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 * Run the trace
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
-	traceFile = ifstream (tracePath + traceFileName);
+	traceFile = ifstream (tracePath + MyConfig::traceFileName);
 	isFirstPeriod = true;
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
-  	printErrStrAndExit ("trace file " + tracePath + traceFileName + "was not found");
+  	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + "was not found");
   }
 	runTimePeriod ();
 }

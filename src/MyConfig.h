@@ -27,8 +27,6 @@ using namespace std;
 class Chain;
 class ChainHash;
 
-const string traceFileName = "Monaco_0829_0830_20secs_Telecom.poa";
-
 const string tracePath = "results/poa_files/";
 const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // levels of log to be written to the log file.
 
@@ -64,6 +62,8 @@ class MyConfig {
     static ofstream 	logFile, ResFile;
 
 	public:
+
+		static string traceFileName;
 
   	static unsigned int netType;
 /*    static string 				traceFileName, */

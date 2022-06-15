@@ -108,6 +108,7 @@ class SimController : public cSimpleModule
 		void printErrStrAndExit (const string &errorMsgStr);
 				 
   public:
+		int netType;
     ifstream traceFile;
  		string LogFileName   = "example.txt";
 		static const int bufSize = 128;
