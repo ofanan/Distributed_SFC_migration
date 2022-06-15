@@ -51,7 +51,7 @@ const bool mode=SYNC;
 const bool printBuRes = true; 
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=VERY_DETAILED_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, LOG_LVL=NO_LOG, RES_LVL=1;
 
 										 
 class MyConfig { 
