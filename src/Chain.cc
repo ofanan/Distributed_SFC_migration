@@ -193,7 +193,7 @@ Cost_t Chain::getCost () const
 **************************************************************************************************************************************************/
 Cost_t Chain::getCostAtLvl (const Lvl_t lvl) const
 {
-	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::costAtLvl[lvl] : Non_RT_Chain::costAtLvl[lvl]);
+	return (isRT_Chain)? RT_Chain::costAtLvl[lvl] : Non_RT_Chain::costAtLvl[lvl];
 }
 
 /*************************************************************************************************************************************************
