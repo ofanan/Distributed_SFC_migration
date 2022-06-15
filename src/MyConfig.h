@@ -48,7 +48,7 @@ const bool evenChainsAreRt			= false;
 const bool mode=SYNC;
 
 // Defines whether to print to the log and to the .res file the results of the BU stage of BUPU
-const bool printBuRes = false; 
+const bool printBuRes = true; 
 
 // Determining the level of debug and log.
 const int  DEBUG_LVL=1, LOG_LVL=BASIC_LOG, RES_LVL=1;

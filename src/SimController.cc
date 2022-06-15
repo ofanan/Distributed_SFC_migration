@@ -203,6 +203,7 @@ void SimController::finish ()
 **************************************************************************************************************************************************/
 void SimController::printBuCost ()
 {
+	Enter_Method ("SimController::printBuCost ()");
 	int 	nonMigCost = 0;
 	int   numMigs;
 	Chain chain;
@@ -229,7 +230,6 @@ void SimController::printBuCost ()
 		}
 
 	}
-	
 	snprintf (buf, bufSize, "\nt=%d, BU cost = %d", t, nonMigCost + numMigs * uniformChainMigCost);
 	printBufToLog();
 }

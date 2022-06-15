@@ -439,6 +439,7 @@ void Datacenter::bottomUpSync ()
   if (isRoot) { 
   	if (printBuRes) {
   		MyConfig::printToLog ("\nBU results:");
+  		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
   	}
   	
