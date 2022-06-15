@@ -65,8 +65,7 @@ void SimController::openFiles ()
 	MyConfig::ResFileName = "res.res";
 	
 	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
-	if (traceNetType!=MyConfig::netType) {	
-//	results/poa_files/
+	if (traceNetType!=MyConfig::netType) {
 		string errorMsgStr = "traceFileName " + traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini";
     char errorMsg[errorMsgStr.length() + 1];
     strcpy(errorMsg, errorMsgStr.c_str());
@@ -173,12 +172,14 @@ void SimController::runTimePeriod ()
 
 
 void SimController::runTrace () {
-	traceFile = ifstream (traceFileName);
+	traceFile = ifstream (tracePath + traceFileName);
 	isFirstPeriod = true;
-	
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
-  	error (".poa file was not found -> finishing simulation"); 
+		string errorMsgStr = "trace file " + tracePath + traceFileName + "was not found";
+		char errorMsg[errorMsgStr.length() + 1];
+		strcpy(errorMsg, errorMsgStr.c_str());
+  	error (errorMsg); 
   }
 	runTimePeriod ();
 }
