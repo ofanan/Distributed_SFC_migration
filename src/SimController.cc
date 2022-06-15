@@ -197,6 +197,44 @@ void SimController::finish ()
 }
 
 /*************************************************************************************************************************************************
+* Print to log the overall cost after running the BU stage.
+* This cost considers chains that are either placed, or only potentially-placed at each datacenter.
+* That is, it assumes that each potentially-placed chain is already placed, and considers its cost accordingly.
+**************************************************************************************************************************************************/
+void SimController::printBuCost ()
+{
+	int 	nonMigCost = 0;
+	int   numMigs;
+	Chain chain;
+
+	for (DcId_t dcId=0; dcId < numDatacenters; dcId++) {
+
+		for (const auto &chainId : datacenters[dcId]->placedChains) {
+			if (!ChainsMaster::findChain (chainId, chain)) {
+				error ("error in SimController::printBuCost");
+			}
+			nonMigCost += chain.getCostAtLvl (datacenters[dcId]->lvl);
+			if (chain.curDc!=dcId) {
+				numMigs++;
+			}
+		}
+		for (const auto &chainId : datacenters[dcId]->potPlacedChains) {
+			if (!ChainsMaster::findChain (chainId, chain)) {
+				error ("error in SimController::printBuCost");
+			}
+			nonMigCost += chain.getCostAtLvl (datacenters[dcId]->lvl);
+			if (chain.curDc!=dcId) {
+				numMigs++;
+			}
+		}
+
+	}
+	
+	snprintf (buf, bufSize, "\nt=%d, BU cost = %d", t, nonMigCost + numMigs * uniformChainMigCost);
+	printBufToLog();
+}
+
+/*************************************************************************************************************************************************
 - Inc. numMigs for every chain where curDC!=nxtDc.
 - If running in sync mode: calculate and print the total cost
 **************************************************************************************************************************************************/
@@ -215,7 +253,7 @@ void SimController::concludeTimePeriod ()
 		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
 	}
 
-	int periodCost = numMigs * uniformChainMisgCost + nonMigCost;
+	int periodCost = numMigs * uniformChainMigCost + nonMigCost;
 	
 		if (RES_LVL > 0) {
 		snprintf (buf, bufSize, "\nt=%d, tot cost = %d", t, periodCost);

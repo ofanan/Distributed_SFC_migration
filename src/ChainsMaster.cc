@@ -100,7 +100,8 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 }
 
 /*************************************************************************************************************************************************
-* Returns the overall cpu cost at its current location.
+* Returns the overall (cpu cost + link cost) of all chains.
+* Assuming that ChainsMaster::allChains includes the updated information w.r.t. where each chain is currently placed.
 **************************************************************************************************************************************************/
 int ChainsMaster::calcNonMigCost () 
 {

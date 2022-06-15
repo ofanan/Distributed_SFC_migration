@@ -37,7 +37,7 @@ const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	
 const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 const vector <Cpu_t>  nonAugmentedCpuAtLeaf    = {842, 94, 1,	30,}; //{842, 94, 1,	30,}; 
-const int uniformChainMisgCost = 600;
+const int uniformChainMigCost = 600;
 
 // Parameters determining how to define whether a new generated chain is RT or not
 const float RT_chain_pr = 0.3; // prob' that a new chain is an RT chain

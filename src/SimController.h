@@ -106,6 +106,7 @@ class SimController : public cSimpleModule
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 		void printErrStrAndExit (const string &errorMsgStr);
+		void printBuCost ();
 				 
   public:
 		int netType;

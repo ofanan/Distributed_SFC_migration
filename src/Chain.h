@@ -39,7 +39,8 @@ class Chain
 		void print (bool printS_u = true);	
 	
 		// Getters
-    Cost_t getCost 		() const;
+    Cost_t getCost 		() const; // non-mig' cost of the chain at its current place
+    Cost_t getCostAtLvl (const Lvl_t lvl) const; // non-mig' cost of the chain if placed in a certain given level
     Cpu_t  getCpu     () const;     
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;

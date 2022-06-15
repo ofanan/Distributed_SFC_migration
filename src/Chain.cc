@@ -182,22 +182,21 @@ bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId
 //	return (curLvl==UNPLACED_LVL)? UNPLACED_DC : S_u[curLvl];
 //} 
 
-// returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
+/*************************************************************************************************************************************************
+* Returns the non-mig' cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
+**************************************************************************************************************************************************/
 Cost_t Chain::getCost () const
 {
 	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::costAtLvl[curLvl] : Non_RT_Chain::costAtLvl[curLvl]);
 }
 
-
 /*************************************************************************************************************************************************
-* Returns the cpu cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
-* Currently unused, as we currently used directly cpu+link cost.
+* Returns the non-mig' cost if placed at a certain level.. If the chain isn't placed, the function returns UNPLACED_COST.
 **************************************************************************************************************************************************/
-//Cost_t Chain::getCpuCost () const
-//{
-//	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::cpuCostAtLvl[curLvl] : Non_RT_Chain::cpuCostAtLvl[curLvl]);
-//}
-
+Cost_t Chain::getCostAtLvl (const Lvl_t lvl) const
+{
+	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::costAtLvl[lvl] : Non_RT_Chain::costAtLvl[lvl]);
+}
 
 /*************************************************************************************************************************************************
 * Return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise

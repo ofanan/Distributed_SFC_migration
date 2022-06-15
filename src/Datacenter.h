@@ -59,7 +59,7 @@ class Datacenter : public cSimpleModule
 
     // Log / debug funcs
     void print (bool printPotPlaced=true, bool printPushUpList=true, bool printInCntrFormat=true); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
-    unordered_set <ChainId_t>  placedChains; 
+    unordered_set <ChainId_t>  placedChains, potPlacedChains;
     
   private:
   	static const Lvl_t 	portToPrnt=0;
@@ -73,7 +73,6 @@ class Datacenter : public cSimpleModule
     // Dynamic
     Cpu_t  								 availCpu;
     vector<Chain> notAssigned; 
-    unordered_set <ChainId_t>  potPlacedChains; 
     unordered_set <ChainId_t>  newlyPlacedChains;    // IDs of the chains that I have placed after the last update I had sent to SimCtrlr.
 		int numBuPktsRcvd; 
 		
