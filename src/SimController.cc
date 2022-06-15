@@ -64,10 +64,11 @@ void SimController::openFiles ()
 	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
 	if (traceNetType!=MyConfig::netType) {	
 //	results/poa_files/
-
-//		snprintf (buf, bufSize, "%s", networkName);
-//		snprintf (buf, bufSize, "traceFileName is " + traceFileName);
-		string str2print = "traceFileName is " + traceFileName;
+		string errorMsgStr = "traceFileName is " + traceFileName;
+    char errorMsg[errorMsgStr.length() + 1];
+    strcpy(errorMsg, errorMsgStr.c_str());
+		error (errorMsg);
+		  // declaring character array
 //		error ("traceFileName is " + traceFileName); //%s while .ini file is %s.ini", traceFileName, networkName);
 //		error ("traceFileName (aka .poa file) doesn't correspond .ini fileName");
 	}
