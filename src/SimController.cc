@@ -63,9 +63,13 @@ void SimController::openFiles ()
 	
 	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
 	if (traceNetType!=MyConfig::netType) {	
+//	results/poa_files/
+
 //		snprintf (buf, bufSize, "%s", networkName);
-//		error ("traceFileName is %s while .ini file is %s.ini", traceFileName, networkName);
-		error ("traceFileName (aka .poa file) doesn't correspond .ini fileName");
+//		snprintf (buf, bufSize, "traceFileName is " + traceFileName);
+		string str2print = "traceFileName is " + traceFileName;
+//		error ("traceFileName is " + traceFileName); //%s while .ini file is %s.ini", traceFileName, networkName);
+//		error ("traceFileName (aka .poa file) doesn't correspond .ini fileName");
 	}
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	if (!MyConfig::openFiles ()) {
@@ -168,7 +172,6 @@ void SimController::runTimePeriod ()
 
 
 void SimController::runTrace () {
-results/poa_files/
 	traceFile = ifstream (traceFileName);
 	isFirstPeriod = true;
 	
