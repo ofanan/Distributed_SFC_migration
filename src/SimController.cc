@@ -375,16 +375,15 @@ void SimController::rdNewUsrsLine (string line)
   DcId_t 		poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
 
-	//$$$
-	snprintf (buf, bufSize, "\nnetType is %d\n", MyConfig::netType);
-	printBufToLog ();
-	//const vector<Cpu_t> RT_Chain::		mu_u = RT_ChainMu_u		 [MyConfig::netType];
-	RT_Chain::		mu_u = RT_ChainMu_u		  [MyConfig::netType];
-	MyConfig::printToLog (RT_ChainMu_u		 [MyConfig::netType]);
-	MyConfig::printToLog (RT_Chain::mu_u);
+	RT_Chain::mu_u 		 = RT_ChainMu_u 		[MyConfig::netType];
+	Non_RT_Chain::mu_u = Non_RT_ChainMu_u [MyConfig::netType];
+	RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
+	Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
+//	MyConfig::printToLog (RT_ChainMu_u		 [MyConfig::netType]);
+//	MyConfig::printToLog (RT_Chain::mu_u);
 //	MyConfig::printToLog (RT_Chain::		mu_u);  
 //	MyConfig::printToLog (Non_RT_Chain::		mu_u);  
-	error ("rgrgrg");
+//	error ("rgrgrg");
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		

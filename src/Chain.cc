@@ -7,11 +7,10 @@ const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 const vector <Cost_t> RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [MyConfig::netType];
 const vector <Cost_t> Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[MyConfig::netType];
 
-vector<Cpu_t> RT_Chain::		mu_u; // = RT_ChainMu_u		  [MyConfig::netType];
-const vector<Cpu_t> Non_RT_Chain::mu_u = Non_RT_ChainMu_u [MyConfig::netType];
-
-const Lvl_t RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
-const Lvl_t Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
+vector<Cpu_t> RT_Chain::		mu_u; 
+vector<Cpu_t> Non_RT_Chain::mu_u; 
+Lvl_t RT_Chain	  ::mu_u_len; // = RT_Chain		 ::mu_u.size();
+Lvl_t Non_RT_Chain::mu_u_len; // = Non_RT_Chain::mu_u.size();
 
 Chain::Chain () 
 {
