@@ -99,6 +99,7 @@ class SimController : public cSimpleModule
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
+    void openFiles ();
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.

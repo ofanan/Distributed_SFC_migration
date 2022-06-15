@@ -20,14 +20,8 @@ char 						MyConfig::buf[MyConfig::bufSize];
 **************************************************************************************************************************************************/
 bool MyConfig::openFiles()
 {
-	LogFileName = "example.txt";
-	ResFileName = "res.res";
 	logFile.open (LogFileName);
 	ResFile.open (ResFileName);
-	int traceNetType = getNetTypeFromString (traceFileName);
-	if (traceNetType!=MyConfig::netType) {
-		return false;
-	}
 	return true;
 }
 

@@ -35,10 +35,7 @@ void SimController::initialize (int stage)
 		return;
 	}
 	
-	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
-	if (!MyConfig::openFiles ()) {
-		error ("Error in MyConfig::openFiles\n{");
-	}
+	openFiles ();
 	checkParams (); 
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
@@ -57,6 +54,23 @@ void SimController::initialize (int stage)
 	discoverPathsToRoot ();
 	ChainsMaster::clear ();
 	runTrace ();
+}
+
+void SimController::openFiles ()
+{
+	MyConfig::LogFileName = "example.txt";
+	MyConfig::ResFileName = "res.res";
+	
+	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
+	if (traceNetType!=MyConfig::netType) {	
+//		snprintf (buf, bufSize, "%s", networkName);
+//		error ("traceFileName is %s while .ini file is %s.ini", traceFileName, networkName);
+		error ("traceFileName (aka .poa file) doesn't correspond .ini fileName");
+	}
+	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
+	if (!MyConfig::openFiles ()) {
+		error ("MyConfig::openFiles failed");
+	}
 }
 
 void SimController::checkParams ()
@@ -154,6 +168,7 @@ void SimController::runTimePeriod ()
 
 
 void SimController::runTrace () {
+results/poa_files/
 	traceFile = ifstream (traceFileName);
 	isFirstPeriod = true;
 	

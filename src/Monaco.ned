@@ -21,14 +21,6 @@ network Monaco
 
 		sim_controller 	: SimController;
 
-//		chain_generator : ChainGenerator;
-		
-//		cpu_augmenter 	: CpuAugmenter;
-
-//		sol_checker		: SolChecker;
-		
-//		param_checker 	: ParamChecker;//
-
     datacenters [numDatacenters] : Datacenter {
         parameters:
           dcId = index;            
