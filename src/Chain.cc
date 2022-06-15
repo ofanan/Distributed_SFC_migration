@@ -4,8 +4,8 @@ const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 
 // mu_u[i] is the amount of CPU required for placing a chain in a datacenter at level i
 
-const vector <Cost_t> RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [MyConfig::netType];
-const vector <Cost_t> Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[MyConfig::netType];
+vector <Cost_t> RT_Chain		::costAtLvl; 
+vector <Cost_t> Non_RT_Chain::costAtLvl;
 
 vector<Cpu_t> RT_Chain::		mu_u; 
 vector<Cpu_t> Non_RT_Chain::mu_u; 

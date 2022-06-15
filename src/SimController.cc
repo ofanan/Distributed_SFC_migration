@@ -35,6 +35,13 @@ void SimController::initialize (int stage)
 	}
 	
 	openFiles ();
+	RT_Chain::mu_u 		 = RT_ChainMu_u 		[MyConfig::netType];
+	Non_RT_Chain::mu_u = Non_RT_ChainMu_u [MyConfig::netType];
+	RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
+	Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
+	RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [MyConfig::netType];
+	Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[MyConfig::netType];
+
 	checkParams (); 
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
@@ -375,15 +382,6 @@ void SimController::rdNewUsrsLine (string line)
   DcId_t 		poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
 
-	RT_Chain::mu_u 		 = RT_ChainMu_u 		[MyConfig::netType];
-	Non_RT_Chain::mu_u = Non_RT_ChainMu_u [MyConfig::netType];
-	RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
-	Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
-//	MyConfig::printToLog (RT_ChainMu_u		 [MyConfig::netType]);
-//	MyConfig::printToLog (RT_Chain::mu_u);
-//	MyConfig::printToLog (RT_Chain::		mu_u);  
-//	MyConfig::printToLog (Non_RT_Chain::		mu_u);  
-//	error ("rgrgrg");
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		
