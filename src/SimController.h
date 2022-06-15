@@ -105,6 +105,7 @@ class SimController : public cSimpleModule
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
+		void printErrStrAndExit (const string &errorMsgStr);
 				 
   public:
     ifstream traceFile;

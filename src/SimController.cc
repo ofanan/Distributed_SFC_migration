@@ -25,10 +25,7 @@ void SimController::initialize (int stage)
 		networkName 		= (network -> par ("name")).stdstringValue();
 		int netType 		= MyConfig::getNetTypeFromString (networkName);
 		if (netType<0) {		
-			string errorMsgStr = "The .ini files assigns network.name=" + networkName + " This network name is currently not supported ";
-			char errorMsg[errorMsgStr.length() + 1];
-			strcpy(errorMsg, errorMsgStr.c_str());
-			error (errorMsg);
+			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
 		}
 		MyConfig::netType=netType;
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
@@ -66,10 +63,7 @@ void SimController::openFiles ()
 	
 	int traceNetType = MyConfig::getNetTypeFromString (traceFileName);
 	if (traceNetType!=MyConfig::netType) {
-		string errorMsgStr = "traceFileName " + traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini";
-    char errorMsg[errorMsgStr.length() + 1];
-    strcpy(errorMsg, errorMsgStr.c_str());
-		error (errorMsg);
+		printErrStrAndExit ("traceFileName " + traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
 	}
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
 	if (!MyConfig::openFiles ()) {
@@ -170,16 +164,25 @@ void SimController::runTimePeriod ()
   }
 }
 
+/*************************************************************************************************************************************************
+* Print the given error msg, and call Omnet's "error" func' to exit with error.
+**************************************************************************************************************************************************/
+void SimController::printErrStrAndExit (const string &errorMsgStr)
+{
+	char errorMsg[errorMsgStr.length() + 1];
+	strcpy(errorMsg, errorMsgStr.c_str());
+	error (errorMsg); 
+}
 
+/*************************************************************************************************************************************************
+* Run the trace
+**************************************************************************************************************************************************/
 void SimController::runTrace () {
 	traceFile = ifstream (tracePath + traceFileName);
 	isFirstPeriod = true;
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
-		string errorMsgStr = "trace file " + tracePath + traceFileName + "was not found";
-		char errorMsg[errorMsgStr.length() + 1];
-		strcpy(errorMsg, errorMsgStr.c_str());
-  	error (errorMsg); 
+  	printErrStrAndExit ("trace file " + tracePath + traceFileName + "was not found");
   }
 	runTimePeriod ();
 }
