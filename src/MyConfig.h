@@ -36,7 +36,7 @@ const vector <Cost_t> RT_ChainCostAtLvl     [] = {{544, 278, 164}, 							{544, 
 const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
-const vector <Cpu_t>  nonAugmentedCpuAtLeaf    = {842, 194, 1,	30,}; //{842, 94, 1,	30,}; 
+const vector <Cpu_t>  nonAugmentedCpuAtLeaf    = {842, 94, 1,	30,}; //{842, 94, 1,	30,}; 
 const int uniformChainMisgCost = 600;
 
 // Parameters determining how to define whether a new generated chain is RT or not
@@ -59,7 +59,7 @@ class MyConfig {
 		// A buffer for print-outs
 		static const int 	bufSize = 128;
 		static char 			buf[bufSize];
-    static ofstream 	logFile, ResFile;
+    static ofstream 	logFile, resFile;
 
 	public:
 
@@ -67,7 +67,7 @@ class MyConfig {
 
   	static unsigned int netType;
 /*    static string 				traceFileName, */
-    static string LogFileName, ResFileName;
+    static string logFileName, resFileName;
 
 		//Init
 		static bool openFiles ();
@@ -89,7 +89,7 @@ class MyConfig {
 		
 		// Other accessories funcs'
 		static int getNetTypeFromString (string str);
-		static ofstream getLogFile ();
+		static ofstream getlogFile ();
 		static vector<Cost_t> scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2); // returns the scalar product of two vectors
 
 		// erase the given key from the given set. Returns true iff the requested key was indeed found in the set

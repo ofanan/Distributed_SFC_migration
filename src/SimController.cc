@@ -58,8 +58,8 @@ void SimController::initialize (int stage)
 
 void SimController::openFiles ()
 {
-	MyConfig::LogFileName = "example.txt";
-	MyConfig::ResFileName = "res.res";
+	MyConfig::logFileName = "example.txt";
+	MyConfig::resFileName = "res.res";
 	MyConfig::traceFileName = (netType==MonacoIdx)? "Monaco_0829_0830_20secs_Telecom.poa" : "Lux_0829_0830_60secs_post.poa";
 
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);

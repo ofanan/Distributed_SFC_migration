@@ -7,9 +7,9 @@ using namespace std;
 
 class MyConfig;
 
-string 					MyConfig::LogFileName, MyConfig::ResFileName;
+string 					MyConfig::logFileName, MyConfig::resFileName;
 string 					MyConfig::traceFileName; 
-ofstream 				MyConfig::logFile, MyConfig::ResFile;
+ofstream 				MyConfig::logFile, MyConfig::resFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 
 /*************************************************************************************************************************************************
@@ -20,8 +20,8 @@ char 						MyConfig::buf[MyConfig::bufSize];
 **************************************************************************************************************************************************/
 bool MyConfig::openFiles()
 {
-	logFile.open (LogFileName);
-	ResFile.open (ResFileName);
+	logFile.open (logFileName);
+	resFile.open (resFileName);
 	return true;
 }
 
@@ -95,12 +95,12 @@ void MyConfig::printToLog (UnorderedSetOfChains set2print)
 
 void MyConfig::printToRes (char* buf) 
 {
-	ResFile << buf; 
+	resFile << buf; 
 }
 
 void MyConfig::printToRes (string str) 
 {
-	ResFile << str;
+	resFile << str;
 }
 
 void MyConfig::printToLog (char* buf) 
