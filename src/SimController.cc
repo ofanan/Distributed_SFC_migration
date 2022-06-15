@@ -23,11 +23,10 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
-		netType 		= MyConfig::getNetTypeFromString (networkName);
-		if (netType<0) {		
+		MyConfig::setNetTypeFromString (networkName);
+		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
 		}
-		MyConfig::netType=netType;
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));
@@ -60,10 +59,18 @@ void SimController::openFiles ()
 {
 	MyConfig::logFileName = "example.txt";
 	MyConfig::resFileName = "res.res";
-	MyConfig::traceFileName = (netType==MonacoIdx)? "Monaco_0829_0830_20secs_Telecom.poa" : "Lux_0829_0830_60secs_post.poa";
+	if (MyConfig::netType==MonacoIdx) {
+		MyConfig::traceFileName = "Monaco_0829_0830_20secs_Telecom.poa";
+	}
+	else if (MyConfig::netType==LuxIdx) {
+		MyConfig::traceFileName = "Lux_0829_0830_60secs_post.poa";
+	}
+	else {
+		MyConfig::traceFileName = "UniformTree.poa";
+	}
 
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
-	if (traceNetType!=MyConfig::netType) {
+	if (traceNetType!=MyConfig::MyConfig::netType) {
 		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
 	}
 	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
@@ -205,7 +212,7 @@ void SimController::printBuCost ()
 {
 	Enter_Method ("SimController::printBuCost ()");
 	int 	nonMigCost = 0;
-	int   numMigs;
+	int   numMigs = 0;
 	Chain chain;
 
 	for (DcId_t dcId=0; dcId < numDatacenters; dcId++) {
@@ -215,7 +222,7 @@ void SimController::printBuCost ()
 				error ("error in SimController::printBuCost");
 			}
 			nonMigCost += chain.getCostAtLvl (datacenters[dcId]->lvl);
-			if (chain.curDc!=dcId) {
+			if (chain.curDc!=UNPLACED_DC && chain.curDc!=dcId) {
 				numMigs++;
 			}
 		}
@@ -224,13 +231,13 @@ void SimController::printBuCost ()
 				error ("error in SimController::printBuCost");
 			}
 			nonMigCost += chain.getCostAtLvl (datacenters[dcId]->lvl);
-			if (chain.curDc!=dcId) {
+			if (chain.curDc!=UNPLACED_DC && chain.curDc!=dcId) {
 				numMigs++;
 			}
 		}
 
 	}
-	snprintf (buf, bufSize, "\nt=%d, BU cost = %d", t, nonMigCost + numMigs * uniformChainMigCost);
+	snprintf (buf, bufSize, "\nt=%d, nonMigCost=%d, numMigs=%d, tot cost = %d", t, nonMigCost, numMigs, nonMigCost + numMigs * uniformChainMigCost);
 	printBufToLog();
 }
 
@@ -367,13 +374,24 @@ void SimController::rdNewUsrsLine (string line)
   ChainId_t chainId;
   DcId_t 		poaId; 
 	Chain chain; // will hold the new chain to be inserted each time
-  
+
+	//$$$
+	snprintf (buf, bufSize, "\nnetType is %d\n", MyConfig::netType);
+	printBufToLog ();
+	//const vector<Cpu_t> RT_Chain::		mu_u = RT_ChainMu_u		 [MyConfig::netType];
+	RT_Chain::		mu_u = RT_ChainMu_u		  [MyConfig::netType];
+	MyConfig::printToLog (RT_ChainMu_u		 [MyConfig::netType]);
+	MyConfig::printToLog (RT_Chain::mu_u);
+//	MyConfig::printToLog (RT_Chain::		mu_u);  
+//	MyConfig::printToLog (Non_RT_Chain::		mu_u);  
+	error ("rgrgrg");
 	for (const auto& token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		
 		if (genRtChain(chainId)) {
 			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
-			chain = RT_Chain (chainId, S_u); 		
+			chain = RT_Chain (chainId, S_u);
+
 		}
 		else {
 			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
@@ -578,7 +596,7 @@ Print the "state" (PoAs of active users, and current placement of chains), and e
 void SimController::PrintStateAndEndSim () 
 {
 	Enter_Method ("PrintStateAndEndSim ()");
-	MyConfig::printToLog ("Printing state and finishing simulation\n");
+	MyConfig::printToLog ("\nPrinting state and finishing simulation\n");
 	printAllDatacenters (true, false);
 	if (LOG_LVL >= DETAILED_LOG) {
 		MyConfig::printToLog ("Printing the PoAs of each chain\n");

@@ -9,6 +9,7 @@ class MyConfig;
 
 string 					MyConfig::logFileName, MyConfig::resFileName;
 string 					MyConfig::traceFileName; 
+int							MyConfig::netType;
 ofstream 				MyConfig::logFile, MyConfig::resFile;
 char 						MyConfig::buf[MyConfig::bufSize];
 
@@ -24,6 +25,30 @@ bool MyConfig::openFiles()
 	resFile.open (resFileName);
 	return true;
 }
+
+/*************************************************************************************************************************************************
+* parses the given string, and set MyConfig::netType accordingly.
+* The currently used netTypes are: "Lux", "Monaco", "UniformTree" and "NonUniformTree". 
+* The string is assumed to begin with the NetType string. 
+* E.g., string "Lux_xyz_rrgrg___" will cause this function to return the netType Lux.
+* If the extracted value is unknown, the func' returns -1.
+* The netTypes are defined in MyConfig.h.
+**************************************************************************************************************************************************/
+void MyConfig::setNetTypeFromString (string str)
+{
+	if ( (str.substr(0,3)).compare("Lux")==0) {
+		MyConfig::netType = LuxIdx;
+	}	
+	if ( (str.substr(0,6)).compare("Monaco")==0) {
+		MyConfig::netType = MonacoIdx;
+	}	
+	if ( (str.substr(0,11)).compare("UniformTree")==0) {
+		MyConfig::netType = UniformTreeIdx;
+	}	
+	if ( (str.substr(0,14)).compare("NonUniformTree")==0) {
+		MyConfig::netType = NonUniformTreeIdx;
+	}	
+} 
 
 /*************************************************************************************************************************************************
 * parses the given string, and extract the netType.
@@ -47,9 +72,8 @@ int MyConfig::getNetTypeFromString (string str)
 	if ( (str.substr(0,14)).compare("NonUniformTree")==0) {
 		return NonUniformTreeIdx;
 	}	
-	return -1; 
+	return -1;
 }
-
 void MyConfig::printSuToLog (Chain chain)
 {
 	printToLog (chain.S_u);

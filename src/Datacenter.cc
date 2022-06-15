@@ -417,7 +417,8 @@ void Datacenter::bottomUpSync ()
 				if (reshuffled) {
 					snprintf (buf, bufSize, "\ns%d : : couldn't find a feasible sol' even after reshuffling", dcId);
 					printBufToLog ();
-					MyConfig::printToLog ("\n\nError: couldn't find a feasible sol' even after reshuffling");
+					snprintf (buf, bufSize, "\ncpuCapacity=%d chain required cpu=%d", cpuCapacity, chainPtr->mu_u_at_lvl(lvl));
+					printBufToLog ();
 					printStateAndEndSim  ();
 				}
 				if (LOG_LVL>=DETAILED_LOG) {

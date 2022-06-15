@@ -36,7 +36,7 @@ const vector <Cost_t> RT_ChainCostAtLvl     [] = {{544, 278, 164}, 							{544, 
 const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
-const vector <Cpu_t>  nonAugmentedCpuAtLeaf    = {842, 94, 1,	30,}; //{842, 94, 1,	30,}; 
+const vector <Cpu_t>  nonAugmentedCpuAtLeaf    = {842, 94, 1,	30,}; 
 const int uniformChainMigCost = 600;
 
 // Parameters determining how to define whether a new generated chain is RT or not
@@ -51,7 +51,7 @@ const bool mode=SYNC;
 const bool printBuRes = true; 
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=BASIC_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, LOG_LVL=VERY_DETAILED_LOG, RES_LVL=1;
 
 										 
 class MyConfig { 
@@ -64,8 +64,8 @@ class MyConfig {
 	public:
 
 		static string traceFileName;
+		static int netType;
 
-  	static unsigned int netType;
 /*    static string 				traceFileName, */
     static string logFileName, resFileName;
 
@@ -88,7 +88,8 @@ class MyConfig {
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'
-		static int getNetTypeFromString (string str);
+		static void setNetTypeFromString (string str);
+		static int  getNetTypeFromString (string str);
 		static ofstream getlogFile ();
 		static vector<Cost_t> scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2); // returns the scalar product of two vectors
 
