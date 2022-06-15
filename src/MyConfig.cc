@@ -47,7 +47,7 @@ int MyConfig::getNetTypeFromString (string str)
 	if ( (str.substr(0,14)).compare("NonUniformTree")==0) {
 		return NonUniformTreeIdx;
 	}	
-	return -1; // 
+	return -1; 
 }
 
 void MyConfig::printSuToLog (Chain chain)
