@@ -139,13 +139,14 @@ Calculate the distance (in num of hops) between each pair of datacenters.
 void SimController::calcDistances () {
 	distTable.resize (numDatacenters);
 	for (DcId_t i(0) ; i < numDatacenters; i++)  {
+		distTable[i].resize (numDatacenters-i-1);
 		for (DcId_t j(i+1); j<numDatacenters-i-1; j++) {
 			for (Lvl_t idxOfSplitDcInI(0); idxOfSplitDcInI<pathToRoot[i].size(); idxOfSplitDcInI++) {	
 				auto search = find(pathToRoot[j].begin(), pathToRoot[j].end(), pathToRoot[i][idxOfSplitDcInI]); // look for the splitting node in j's path to root
-				if (search == pathToRoot[j].end() ) { // Didn't find the splitting node also in the path from j to the root
-					continue;
+				if (search != pathToRoot[j].end() ) { // Found the splitting node also in the path from j to the root
+					distTable[i].push_back (7); //idxOfSplitDcInI + (search-pathToRoot[j].begin());
+					break;
 				}
-				distTable[i][j-i] = idxOfSplitDcInI + (search-pathToRoot[j].begin());
 			}
 		}
 	}
