@@ -75,16 +75,17 @@ class MyConfig {
 		//print
 		static void printToRes (char* buf); 
 		static void printToRes (string str);
-
 		static void printToLog (char* buf); 
 		static void printToLog (string str);
-		static void printToLog (int d); // print "d,", where d is the integer, to the log file
+		static void printToLog (const int d); // print "d,", where d is the integer, to the log file
 		static void printToLog (vector <Chain> vec); // print all the IDs of the chains in the vec.
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
 		static void printToLog (unordered_set <ChainId_t> set2print);
 		static void printToLog (list <Chain> list2print, bool printLvl=true);
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);
 		static void printToLog (Chain chain);
+		static void printToLog (const int *ar);
+		static void printToLog (const int **ar);
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'

@@ -54,6 +54,7 @@ class SimController : public cSimpleModule
     int seed = 42;
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
+    Lvl_t* dist; // dist[i][j] will hold the distance (in # of hosts) from DC i to DC j
 
 		int numMigs=0; // number of migration performed		
 		float     period=1.0;
@@ -99,6 +100,7 @@ class SimController : public cSimpleModule
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
+		void calcDistances (); // Calculate the distance (in num of hops) between each pair of datacenters.
     void openFiles ();
     
     // Functions used for debugging

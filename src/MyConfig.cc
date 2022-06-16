@@ -50,6 +50,27 @@ void MyConfig::setNetTypeFromString (string str)
 	}	
 } 
 
+///*************************************************************************************************************************************************
+//Calculate the distance (in num of hops) between each pair of datacenters.
+//**************************************************************************************************************************************************/
+void MyConfig::printToLog (const int **ar) {
+
+	for (int row(0); row<(sizeof ar / sizeof ar[0]); row++) {
+//		MyConfig::printToLog (ar[row]);
+	}
+}
+
+
+/*************************************************************************************************************************************************
+Calculate the distance (in num of hops) between each pair of datacenters.
+**************************************************************************************************************************************************/
+void MyConfig::printToLog (const int *ar) {
+
+	for (int idx(0); idx<sizeof ar;  idx++) {
+		MyConfig::printToLog (ar[idx]);
+	}
+}
+
 /*************************************************************************************************************************************************
 * parses the given string, and extract the netType.
 * The currently used netTypes are: "Lux", "Monaco", "UniformTree" and "NonUniformTree". 
@@ -137,7 +158,7 @@ void MyConfig::printToLog (string str)
 	logFile << str;
 }
 
-void MyConfig::printToLog (int d) 
+void MyConfig::printToLog (const int d) 
 {
 	logFile << d << ",";
 }

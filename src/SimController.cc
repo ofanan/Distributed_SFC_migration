@@ -35,12 +35,12 @@ void SimController::initialize (int stage)
 	}
 	
 	openFiles ();
-	RT_Chain::mu_u 		 = RT_ChainMu_u 		[MyConfig::netType];
-	Non_RT_Chain::mu_u = Non_RT_ChainMu_u [MyConfig::netType];
-	RT_Chain	  ::mu_u_len = RT_Chain		 ::mu_u.size();
-	Non_RT_Chain::mu_u_len = Non_RT_Chain::mu_u.size();
-	RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 [MyConfig::netType];
-	Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl[MyConfig::netType];
+	RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 	[MyConfig::netType];
+	Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl	[MyConfig::netType];
+	RT_Chain::mu_u 		 			= RT_ChainMu_u 					[MyConfig::netType];
+	Non_RT_Chain::mu_u 			= Non_RT_ChainMu_u 			[MyConfig::netType];
+	RT_Chain	  ::mu_u_len 	= RT_Chain		::mu_u.size();
+	Non_RT_Chain::mu_u_len 	= Non_RT_Chain::mu_u.size();
 
 	checkParams (); 
 	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
@@ -116,6 +116,24 @@ void SimController::discoverPathsToRoot () {
 		while (dcId != root_id) {
 		 	pathToRoot[leafId][height++] = dcId;
 		 	dcId = datacenters[dcId]->idOfParent;
+		}
+	}
+}
+
+/*************************************************************************************************************************************************
+Calculate the distance (in num of hops) between each pair of datacenters.
+**************************************************************************************************************************************************/
+void SimController::calcDistances () {
+	DcId_t src, dst;
+	dist = new Lvl_t [numDatacenters^2];
+	for (DcId_t src(0) ; src < numDatacenters; src++)  {
+		for (DcId_t dst (0); dst<numDatacenters; dst++) {
+			for (Lvl_t lvl=0; lvl<height; lvl++) {
+				if (pathToRoot[src][lvl] == pathToRoot[dst][lvl]) {
+					dist[src][dist] = 2*lvl;
+				}
+				error ("didn't find any path from DC %d to DC %d", src, dst);
+			}
 		}
 	}
 }
