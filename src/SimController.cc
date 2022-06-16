@@ -57,8 +57,11 @@ void SimController::initialize (int stage)
 	    leafId++;
 	  }
 	}
-	discoverPathsToRoot ();
-	ChainsMaster::clear ();
+	discoverPathsToRoot  ();
+	calcDistances				 ();
+	endSimulation (); ///$$$
+//	MyConfig::printToLog (dist);
+	ChainsMaster::clear  ();
 	runTrace ();
 }
 
@@ -121,21 +124,33 @@ void SimController::discoverPathsToRoot () {
 }
 
 /*************************************************************************************************************************************************
+Returns the distance (in num of hops) between DC i and DC j
+**************************************************************************************************************************************************/
+Lvl_t SimController::dist (DcId_t i, DcId_t j) {
+	if (i==j) {
+		return 0;
+	}
+	return (i<j)? distTable[i][j-i] : distTable[j][i-j];
+}
+
+/*************************************************************************************************************************************************
 Calculate the distance (in num of hops) between each pair of datacenters.
 **************************************************************************************************************************************************/
 void SimController::calcDistances () {
-	DcId_t src, dst;
-	dist = new Lvl_t [numDatacenters^2];
-	for (DcId_t src(0) ; src < numDatacenters; src++)  {
-		for (DcId_t dst (0); dst<numDatacenters; dst++) {
-			for (Lvl_t lvl=0; lvl<height; lvl++) {
-				if (pathToRoot[src][lvl] == pathToRoot[dst][lvl]) {
-					dist[src][dist] = 2*lvl;
-				}
-				error ("didn't find any path from DC %d to DC %d", src, dst);
-			}
-		}
-	}
+//	dist.resize (numLeaves);
+//	DcId_t src, dst;
+//	dist = new Lvl_t [numDatacenters*numDatacenters];
+//	for (DcId_t src(0) ; src < numDatacenters; src++)  {
+//		for (DcId_t dst (0); dst<numDatacenters; dst++) {
+//			for (Lvl_t lvl=0; lvl<height; lvl++) {
+//				if (pathToRoot[src][lvl] == pathToRoot[dst][lvl]) {
+//					dist[src][dist] = 2*lvl;
+//					break;
+//				}
+//				error ("didn't find any path from DC %d to DC %d", src, dst);
+//			}
+//		}
+//	}
 }
 
 /*************************************************************************************************************************************************

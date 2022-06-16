@@ -54,7 +54,6 @@ class SimController : public cSimpleModule
     int seed = 42;
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
-    Lvl_t* dist; // dist[i][j] will hold the distance (in # of hosts) from DC i to DC j
 
 		int numMigs=0; // number of migration performed		
 		float     period=1.0;
@@ -71,11 +70,13 @@ class SimController : public cSimpleModule
     
     //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
     vector <vector<DcId_t>> pathToRoot; 
+    vector <vector <Lvl_t>> distTable; // dist[i][j] will hold the distance (in # of hosts) from DC i to DC i+j, where j>0
 
 		// Init Functions
     void initialize(int stage);
     virtual int numInitStages() const {return 2;}; //Use 2nd init stage, after all DCs are already initialized, for discovering the path from each leaf to the root.
 		void discoverPathsToRoot ();
+		Lvl_t dist (DcId_t i, DcId_t j);
 
 		// Termination functions
 		void finish ();
