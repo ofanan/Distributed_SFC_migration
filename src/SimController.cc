@@ -137,20 +137,18 @@ Lvl_t SimController::dist (DcId_t i, DcId_t j) {
 Calculate the distance (in num of hops) between each pair of datacenters.
 **************************************************************************************************************************************************/
 void SimController::calcDistances () {
-//	dist.resize (numLeaves);
-//	DcId_t src, dst;
-//	dist = new Lvl_t [numDatacenters*numDatacenters];
-//	for (DcId_t src(0) ; src < numDatacenters; src++)  {
-//		for (DcId_t dst (0); dst<numDatacenters; dst++) {
-//			for (Lvl_t lvl=0; lvl<height; lvl++) {
-//				if (pathToRoot[src][lvl] == pathToRoot[dst][lvl]) {
-//					dist[src][dist] = 2*lvl;
-//					break;
+	distTable.resize (numDatacenters);
+	for (DcId_t i(0) ; i < numDatacenters; i++)  {
+		for (DcId_t j(i+1); j<numDatacenters-i-1; j++) {
+			for (Lvl_t idxOfSplitDcInI(0); idxOfSplitDcInI<pathToRoot[i].size(); idxOfSplitDcInI++) {	
+//				auto idxOfSplitDcInJ = find(pathToRoot[j].begin(), pathToRoot[j].end(), pathToRoot[idxOfSplitDcInI]); // look for the splitting node in j's path to root
+//				if (idxOfSplitDcInJ == vec.end() ) { // Didn't find the splitting node also in the path from j to the root
+//					continue;
 //				}
-//				error ("didn't find any path from DC %d to DC %d", src, dst);
-//			}
-//		}
-//	}
+//				distTable[i].insert (idxOfSplitDcInI + idxOfSplitDcInJ);
+			}
+		}
+	}
 }
 
 /*************************************************************************************************************************************************
