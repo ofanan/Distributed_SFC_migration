@@ -141,11 +141,11 @@ void SimController::calcDistances () {
 	for (DcId_t i(0) ; i < numDatacenters; i++)  {
 		for (DcId_t j(i+1); j<numDatacenters-i-1; j++) {
 			for (Lvl_t idxOfSplitDcInI(0); idxOfSplitDcInI<pathToRoot[i].size(); idxOfSplitDcInI++) {	
-				auto idxOfSplitDcInJ = find(pathToRoot[j].begin(), pathToRoot[j].end(), pathToRoot[i][idxOfSplitDcInI]); // look for the splitting node in j's path to root
-//				if (idxOfSplitDcInJ == vec.end() ) { // Didn't find the splitting node also in the path from j to the root
-//					continue;
-//				}
-//				distTable[i].insert (idxOfSplitDcInI + idxOfSplitDcInJ);
+				auto search = find(pathToRoot[j].begin(), pathToRoot[j].end(), pathToRoot[i][idxOfSplitDcInI]); // look for the splitting node in j's path to root
+				if (search == pathToRoot[j].end() ) { // Didn't find the splitting node also in the path from j to the root
+					continue;
+				}
+				distTable[i][j-i] = idxOfSplitDcInI + (search-pathToRoot[j].begin());
 			}
 		}
 	}
