@@ -59,8 +59,6 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot  ();
 	calcDistBetweenAllDcs				 ();
-	MyConfig::printToLog (distTable);
-	endSimulation ();
 	ChainsMaster::clear  ();
 	runTrace ();
 }
@@ -122,7 +120,6 @@ void SimController::discoverPathsToRoot () {
 		 	dcId = datacenters[dcId]->idOfParent;
 		}
 	}
-	MyConfig::printToLog (pathFromLeafToRoot);
 	pathFromDcToRoot.resize (numDatacenters);
 	for (int leafId(0) ; leafId < numLeaves; leafId++)  {
 		for (Lvl_t lvl (0); lvl<height; lvl++) {
@@ -131,13 +128,9 @@ void SimController::discoverPathsToRoot () {
 				if (pathFromDcToRoot[dcId].size() < height - datacenters[dcId]->lvl) { // this path is not full yet -- need to add DCs to it.
 					pathFromDcToRoot[pathFromLeafToRoot[leafId][lvl]].push_back(pathFromLeafToRoot[leafId][lvl+i]);
 				}
-//				snprintf (buf, bufSize, "\nleafId=%d, lvl=%d, i=%d", leafId, lvl, i);
-//				printBufToLog();
 			}
 		}
 	}
-	MyConfig::printToLog (pathFromDcToRoot);
-	endSimulation ();
 }
 
 /*************************************************************************************************************************************************
@@ -168,11 +161,6 @@ Lvl_t SimController::calcDistBetweenTwoDcs (DcId_t i, DcId_t j)
 		error ("calcDistBetweenTwoDcs cannot calculate the dist between i and j when j is in higher level than i");
 	}
 	for (Lvl_t lvl=datacenters[i]->lvl; lvl<height; lvl++) {
-			//$$$
-			snprintf (buf, bufSize, "pathFromDcToRoot[%d][%d]=%d,  pathFromDcToRoot[%d][%d]=%d", i, idxInpathFromDcToRoot(i, lvl), pathFromDcToRoot[i][idxInpathFromDcToRoot(i, lvl)],
-																																							 j, idxInpathFromDcToRoot(j, lvl), pathFromDcToRoot[j][idxInpathFromDcToRoot(j, lvl)]	);
-			printBufToLog ();
-			endSimulation ();
 		if (pathFromDcToRoot[i][idxInpathFromDcToRoot(i, lvl)]==pathFromDcToRoot[j][idxInpathFromDcToRoot(j, lvl)]) {
 			return idxInpathFromDcToRoot(i, lvl) + idxInpathFromDcToRoot(j, lvl);
 		}
