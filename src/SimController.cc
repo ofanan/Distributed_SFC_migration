@@ -58,7 +58,7 @@ void SimController::initialize (int stage)
 	  }
 	}
 	discoverPathsToRoot  ();
-	calcDistances				 ();
+	calcDistBetweenAllDcs				 ();
 	endSimulation (); ///$$$
 //	MyConfig::printToLog (dist);
 	ChainsMaster::clear  ();
@@ -133,21 +133,27 @@ Lvl_t SimController::dist (DcId_t i, DcId_t j) {
 	return (i<j)? distTable[i][j-i] : distTable[j][i-j];
 }
 
+Lvl_t SimController::idxInPathToRoot (DcId_t i, Lvl_t lvl) {return lvl - datacenters[i]->lvl;}
+
+/*************************************************************************************************************************************************
+Calculate the distance (in num of hops) beween node i and node j
+**************************************************************************************************************************************************/
+Lvl_t SimController::calcDistBetweenTwoDcs (DcId_t i, DcId_t j)
+{
+	return 7;
+} 
+
 /*************************************************************************************************************************************************
 Calculate the distance (in num of hops) between each pair of datacenters.
 **************************************************************************************************************************************************/
-void SimController::calcDistances () {
+inline
+
+void SimController::calcDistBetweenAllDcs () {
 	distTable.resize (numDatacenters);
 	for (DcId_t i(0) ; i < numDatacenters; i++)  {
 		distTable[i].resize (numDatacenters-i-1);
-		for (DcId_t j(i+1); j<numDatacenters-i-1; j++) {
-			for (Lvl_t idxOfSplitDcInI(0); idxOfSplitDcInI<pathToRoot[i].size(); idxOfSplitDcInI++) {	
-				auto search = find(pathToRoot[j].begin(), pathToRoot[j].end(), pathToRoot[i][idxOfSplitDcInI]); // look for the splitting node in j's path to root
-				if (search != pathToRoot[j].end() ) { // Found the splitting node also in the path from j to the root
-					distTable[i].push_back (7); //idxOfSplitDcInI + (search-pathToRoot[j].begin());
-					break;
-				}
-			}
+		for (DcId_t j=1; i+j < numDatacenters; j++) {
+			distTable[i][j] = calcDistBetweenTwoDcs (i, i+j);
 		}
 	}
 }

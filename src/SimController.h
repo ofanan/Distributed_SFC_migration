@@ -101,7 +101,9 @@ class SimController : public cSimpleModule
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
-		void calcDistances (); // Calculate the distance (in num of hops) between each pair of datacenters.
+		void calcDistBetweenAllDcs (); // Calculate the distance (in num of hops) between each pair of datacenters.
+		Lvl_t calcDistBetweenTwoDcs (DcId_t i, DcId_t); // Calculate the distance (in num of hops) between Dc i and Dc j
+		inline Lvl_t idxInPathToRoot (DcId_t i, Lvl_t lvl);
     void openFiles ();
     
     // Functions used for debugging
