@@ -133,6 +133,9 @@ Lvl_t SimController::dist (DcId_t i, DcId_t j) {
 	return (i<j)? distTable[i][j-i] : distTable[j][i-j];
 }
 
+/*************************************************************************************************************************************************
+returns the index of the Dc of level lvl in the path from Dc i to the root
+**************************************************************************************************************************************************/
 Lvl_t SimController::idxInPathToRoot (DcId_t i, Lvl_t lvl) {return lvl - datacenters[i]->lvl;}
 
 /*************************************************************************************************************************************************
@@ -151,9 +154,8 @@ inline
 void SimController::calcDistBetweenAllDcs () {
 	distTable.resize (numDatacenters);
 	for (DcId_t i(0) ; i < numDatacenters; i++)  {
-		distTable[i].resize (numDatacenters-i-1);
 		for (DcId_t j=1; i+j < numDatacenters; j++) {
-			distTable[i][j] = calcDistBetweenTwoDcs (i, i+j);
+			distTable[i].push_back (calcDistBetweenTwoDcs (i, i+j));
 		}
 	}
 }
