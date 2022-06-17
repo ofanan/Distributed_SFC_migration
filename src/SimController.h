@@ -68,8 +68,10 @@ class SimController : public cSimpleModule
     //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
     vector <bool> rcvdFinishedAlgMsgFromLeaves; 
     
-    //pathToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. In particular, pathToRoot[i][0] will hold the datacenter dcId of leaf # i.
-    vector <vector<DcId_t>> pathToRoot; 
+    //pathFromLeafToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. E.g., pathFromLeafToRoot[i][0] will hold the dcId of leaf # i.
+    vector <vector<DcId_t>> pathFromLeafToRoot; 
+    //pathFromDcToRoot[i][j] will hold the j-th hop in the path from Dc i to the root. 
+    vector <vector<DcId_t>> pathFromDcToRoot; 
     vector <vector <Lvl_t>> distTable; // dist[i][j] will hold the distance (in # of hosts) from DC i to DC i+j, where j>0
 
 		// Init Functions
@@ -103,7 +105,9 @@ class SimController : public cSimpleModule
     void parseChainPoaToken (string const token, ChainId_t &chainId, DcId_t &poaId);
 		void calcDistBetweenAllDcs (); // Calculate the distance (in num of hops) between each pair of datacenters.
 		Lvl_t calcDistBetweenTwoDcs (DcId_t i, DcId_t); // Calculate the distance (in num of hops) between Dc i and Dc j
-		inline Lvl_t idxInPathToRoot (DcId_t i, Lvl_t lvl);
+		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
+		inline DcId_t leafId2DcId (DcId_t leafId);
+		inline DcId_t dcId2leafId (DcId_t dcId);
     void openFiles ();
     
     // Functions used for debugging

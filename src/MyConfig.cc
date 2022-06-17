@@ -54,7 +54,8 @@ void MyConfig::setNetTypeFromString (string str)
 //**************************************************************************************************************************************************/
 void MyConfig::printToLog (vector <vector <int32_t>> mat) {
 	for (auto vec: mat) {
-		MyConfig::printToLog (vec);
+		MyConfig::printToLog ("\n");
+		MyConfig::printToLog (vec);		
 	}
 }
 

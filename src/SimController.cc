@@ -59,8 +59,8 @@ void SimController::initialize (int stage)
 	}
 	discoverPathsToRoot  ();
 	calcDistBetweenAllDcs				 ();
-	endSimulation (); ///$$$
-//	MyConfig::printToLog (dist);
+	MyConfig::printToLog (distTable);
+	endSimulation ();
 	ChainsMaster::clear  ();
 	runTrace ();
 }
@@ -107,20 +107,37 @@ void SimController::checkParams ()
 }
 
 /*************************************************************************************************************************************************
-Fill this->pathToRoot. pathToRoot[i] will hold the path from leaf i to the root.
+- Fill this->pathFromLeafToRoot. pathFromLeafToRoot[i] will hold the path from leaf i to the root.
+- Fill this->pathFromDcToRoot. pathFromDcToRoot[i] will hold the path from Dc i to the root.
 **************************************************************************************************************************************************/
 void SimController::discoverPathsToRoot () {
-	pathToRoot.resize (numLeaves);
+	pathFromLeafToRoot.resize (numLeaves);
 	DcId_t dcId;
 	for (int leafId(0) ; leafId < numLeaves; leafId++)  {
-		pathToRoot[leafId].resize (height);
+		pathFromLeafToRoot[leafId].resize (height);
 		dcId = leaves[leafId]->dcId;
 	  int height = 0;
 		while (dcId != root_id) {
-		 	pathToRoot[leafId][height++] = dcId;
+		 	pathFromLeafToRoot[leafId][height++] = dcId;
 		 	dcId = datacenters[dcId]->idOfParent;
 		}
 	}
+	MyConfig::printToLog (pathFromLeafToRoot);
+	pathFromDcToRoot.resize (numDatacenters);
+	for (int leafId(0) ; leafId < numLeaves; leafId++)  {
+		for (Lvl_t lvl (0); lvl<height; lvl++) {
+			for (Lvl_t i(0); lvl+i<height; i++) {
+				dcId = pathFromLeafToRoot[leafId][lvl];
+				if (pathFromDcToRoot[dcId].size() < height - datacenters[dcId]->lvl) { // this path is not full yet -- need to add DCs to it.
+					pathFromDcToRoot[pathFromLeafToRoot[leafId][lvl]].push_back(pathFromLeafToRoot[leafId][lvl+i]);
+				}
+//				snprintf (buf, bufSize, "\nleafId=%d, lvl=%d, i=%d", leafId, lvl, i);
+//				printBufToLog();
+			}
+		}
+	}
+	MyConfig::printToLog (pathFromDcToRoot);
+	endSimulation ();
 }
 
 /*************************************************************************************************************************************************
@@ -136,26 +153,46 @@ Lvl_t SimController::dist (DcId_t i, DcId_t j) {
 /*************************************************************************************************************************************************
 returns the index of the Dc of level lvl in the path from Dc i to the root
 **************************************************************************************************************************************************/
-Lvl_t SimController::idxInPathToRoot (DcId_t i, Lvl_t lvl) {return lvl - datacenters[i]->lvl;}
+inline Lvl_t SimController::idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl) {return lvl - datacenters[i]->lvl;}
+
+inline DcId_t SimController::leafId2DcId (DcId_t leafId) {return leaves		 [leafId]->dcId;}
+inline DcId_t SimController::dcId2leafId (DcId_t dcId)   {return datacenters[dcId]  ->leafId;}
+
 
 /*************************************************************************************************************************************************
 Calculate the distance (in num of hops) beween node i and node j
 **************************************************************************************************************************************************/
 Lvl_t SimController::calcDistBetweenTwoDcs (DcId_t i, DcId_t j)
 {
-	return 7;
+	if (datacenters[i]->lvl < datacenters[j]->lvl) {
+		error ("calcDistBetweenTwoDcs cannot calculate the dist between i and j when j is in higher level than i");
+	}
+	for (Lvl_t lvl=datacenters[i]->lvl; lvl<height; lvl++) {
+			//$$$
+			snprintf (buf, bufSize, "pathFromDcToRoot[%d][%d]=%d,  pathFromDcToRoot[%d][%d]=%d", i, idxInpathFromDcToRoot(i, lvl), pathFromDcToRoot[i][idxInpathFromDcToRoot(i, lvl)],
+																																							 j, idxInpathFromDcToRoot(j, lvl), pathFromDcToRoot[j][idxInpathFromDcToRoot(j, lvl)]	);
+			printBufToLog ();
+			endSimulation ();
+		if (pathFromDcToRoot[i][idxInpathFromDcToRoot(i, lvl)]==pathFromDcToRoot[j][idxInpathFromDcToRoot(j, lvl)]) {
+			return idxInpathFromDcToRoot(i, lvl) + idxInpathFromDcToRoot(j, lvl);
+		}
+	}
+	return -1;
 } 
 
 /*************************************************************************************************************************************************
 Calculate the distance (in num of hops) between each pair of datacenters.
 **************************************************************************************************************************************************/
-inline
 
 void SimController::calcDistBetweenAllDcs () {
 	distTable.resize (numDatacenters);
 	for (DcId_t i(0) ; i < numDatacenters; i++)  {
 		for (DcId_t j=1; i+j < numDatacenters; j++) {
-			distTable[i].push_back (calcDistBetweenTwoDcs (i, i+j));
+			Lvl_t dist = calcDistBetweenTwoDcs (i, i+j);
+			if (dist < 0) {
+				error ("couldn't calc the dist between Dc %d and Dc %d", i, i+j);
+			}
+			distTable[i].push_back (dist);
 		}
 	}
 }
@@ -426,12 +463,12 @@ void SimController::rdNewUsrsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
 		
 		if (genRtChain(chainId)) {
-			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+RT_Chain::mu_u_len};
+			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RT_Chain::mu_u_len};
 			chain = RT_Chain (chainId, S_u);
 
 		}
 		else {
-			vector<DcId_t> S_u = {pathToRoot[poaId].begin(), pathToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
+			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
 			chain = Non_RT_Chain (chainId, S_u); 
 		}
 		
@@ -466,7 +503,7 @@ void SimController::rdOldUsrsLine (string line)
 		parseChainPoaToken (token, chainId, poaId);
   	chainId = stoi (token);
   	
-  	if (!ChainsMaster::modifyS_u (chainId, pathToRoot[poaId], chain))
+  	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
 			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
   	}

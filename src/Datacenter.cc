@@ -23,6 +23,7 @@ inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintS
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
+
 Datacenter::Datacenter()
 {
 }
