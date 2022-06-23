@@ -45,7 +45,10 @@ const bool randomlySetChainType = false;
 const bool evenChainsAreRt			= false;
 
 // Mode: SYNC, or ASYNC
+const bool SYNC  = true;
+const bool ASYNC = false;
 const bool mode=SYNC;
+const string mode_str = (mode==SYNC)? "Sync" : "Async";
 
 // Defines whether to print to the log and to the .res file the results of the BU stage of BUPU
 const bool printBuRes = true; 
