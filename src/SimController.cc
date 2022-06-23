@@ -328,16 +328,8 @@ void SimController::concludeTimePeriod ()
 	if (DEBUG_LVL > 0) {
 		checkChainsMasterData ();
 	}
-	int nonMigCost = ChainsMaster::calcNonMigCost ();
-	if (nonMigCost < 0) {
-		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
-	}
-
-	int periodCost = numMigs * uniformChainMigCost + nonMigCost;
-	
-		if (RES_LVL > 0) {
-		snprintf (buf, bufSize, "\nt=%d, tot cost = %d", t, periodCost);
-		printBufToRes();
+	if (RES_LVL > 0) {
+		printResLine ();
 	}
 
 	if (LOG_LVL>=BASIC_LOG) {
@@ -694,7 +686,7 @@ void SimController::handleMessage (cMessage *msg)
 *************************************************************************************************************************************************/
 inline void SimController::genSettingsBuf ()
 {																																																					 
-  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RT_chain_pr, seed, stts); 
+  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RT_chain_pr, seed, stts); 
 }
 
 /*************************************************************************************************************************************************
@@ -709,14 +701,19 @@ printf (output_file, '{} | {}\n' .format(
 void SimController::printResLine ()
 {
 	genSettingsBuf ();
-	MyConfig::printToLog (settingsBuf);
-	endSimulation ();
-//	char errorMsg[errorMsgStr.length() + 1];
-//	strcpy(errorMsg, errorMsgStr.c_str());
-//  snprintf (buf, bufSize, "
+	MyConfig::printToRes (settingsBuf);
+	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
+	if (periodNonMigCost < 0) {
+		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
+	}
+
+	int periodMigCost = numMigs * uniformChainMigCost;
+  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = 0 | mig_cost=%d | tot_cost=%d\n", periodNonMigCost, periodMigCost, periodNonMigCost + periodMigCost);
+  printBufToRes ();
 }
 
-
+//t27000_ourAlg_cpu103_p0.3_sd20_stts1 | cpu_cost=603260 | link_cost=26700 | mig_cost=0 | tot_cost=629960 | ratio=[0.96,0.04,0.00] | num_usrs=2678 | num_crit_usrs=2678 | resh=F
+// 
 
 
 
