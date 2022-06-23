@@ -692,13 +692,16 @@ void SimController::handleMessage (cMessage *msg)
 /*************************************************************************************************************************************************
  * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
 *************************************************************************************************************************************************/
-inline void SimController::gen_settings_str (string &str)
-{
-    snprintf (buf, bufSize, "t%d_%s_cpu%d_p%f_sd%d_stts%d",	
-    					t, MyConfig::mode_str, datacenters[0]->cpuCapacity, RT_chain_pr, seed, stts); 
+inline void SimController::gen_settings_str ()
+{																																																					 
+  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RT_chain_pr, seed, stts); 
 }
 
-
+//MyConfig::cpuAtlLeaf
+//void printResLine ()
+//{
+//	
+//}
 
 
 

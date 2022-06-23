@@ -109,7 +109,7 @@ class SimController : public cSimpleModule
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
 		inline DcId_t leafId2DcId (DcId_t leafId);
 		inline DcId_t dcId2leafId (DcId_t dcId);
-		inline void gen_settings_str (string &str);
+		inline void gen_settings_str ();
     void openFiles ();
     
     // Functions used for debugging
@@ -124,6 +124,8 @@ class SimController : public cSimpleModule
  		string LogFileName   = "example.txt";
 		static const int bufSize = 128;
 		char buf[bufSize];
+		static const int settingsBufSize = 32;
+		char settingsBuf [settingsBufSize];
 		ofstream logFile;
     SimController ();
     ~SimController ();

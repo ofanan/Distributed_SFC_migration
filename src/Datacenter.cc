@@ -47,8 +47,6 @@ void Datacenter::initialize(int stage)
 		numParents  	= (Lvl_t)  (par("numParents"));
 		lvl				  	= (Lvl_t)  (par("lvl"));
 		dcId					= (DcId_t) (par("dcId"));
-//		cpuCapacity   = nonAugmentedCpuAtLeaf[MyConfig::netType]*(lvl+1); 
-//		availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 		numBuPktsRcvd = 0;
 
 		numPorts    = numParents + numChildren;
