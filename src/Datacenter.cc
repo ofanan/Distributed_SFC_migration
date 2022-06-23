@@ -37,7 +37,7 @@ Datacenter::~Datacenter()
   }
 }
 
-void Datacenter::initialize()
+void Datacenter::initialize(int stage)
 {
 	network     	= (cModule*) (getParentModule ()); 
 	simController = (SimController*) network->getSubmodule("sim_controller");

@@ -80,7 +80,8 @@ class Datacenter : public cSimpleModule
 		static const int bufSize = 128;
 		char 	 buf[bufSize];
 
-    virtual void initialize();
+    void initialize(int stage);
+    virtual int numInitStages() const {return 2;}; 
     virtual void handleMessage (cMessage *msg);
 
 		// Functions related to the alg' running    
