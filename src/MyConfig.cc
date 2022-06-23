@@ -7,19 +7,20 @@ using namespace std;
 
 class MyConfig;
 
-string 					MyConfig::logFileName, MyConfig::resFileName;
-string 					MyConfig::traceFileName; 
-int							MyConfig::netType;
-ofstream 				MyConfig::logFile, MyConfig::resFile;
-char 						MyConfig::buf[MyConfig::bufSize];
-char 						MyConfig::mode_str[12]; 
-
+string 	 MyConfig::logFileName, MyConfig::resFileName;
+string 	 MyConfig::traceFileName; 
+int			 MyConfig::netType;
+ofstream MyConfig::logFile, MyConfig::resFile;
+char 		 MyConfig::buf[MyConfig::bufSize];
+char 		 MyConfig::mode_str[12]; 
+Cpu_t    MyConfig::cpuAtLeaf;
 /*************************************************************************************************************************************************
 * Init parameters and variables
 **************************************************************************************************************************************************/
 void MyConfig::init()
 {
 	snprintf (mode_str, 12, (mode==SYNC)? "Sync" : "Async"); 
+	cpuAtLeaf = nonAugmentedCpuAtLeaf[netType];
 }
 
 

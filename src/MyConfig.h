@@ -68,8 +68,8 @@ class MyConfig {
 		static string traceFileName;
 		static int netType;
 		static char mode_str[12]; 
+		static Cpu_t  cpuAtLeaf;
 
-/*    static string 				traceFileName, */
     static string logFileName, resFileName;
 
 		//Init
