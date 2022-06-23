@@ -689,8 +689,7 @@ void SimController::handleMessage (cMessage *msg)
 }
 
 /*************************************************************************************************************************************************
- * Generates a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
- * The string is written to self.buf
+ * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
 *************************************************************************************************************************************************/
 inline void SimController::gen_settings_str (string &str)
 {
