@@ -79,6 +79,9 @@ void Datacenter::initialize(int stage)
 		return;
 	}
 	cpuCapacity   = MyConfig::cpuAtLeaf*(lvl+1); 
+  //$$$
+//	snprintf (buf, bufSize, "\ncpuCapacity=%d", cpuCapacity);
+//	printBufToLog ();
 	availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 }
 

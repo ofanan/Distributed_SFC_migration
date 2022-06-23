@@ -710,9 +710,9 @@ void SimController::printResLine ()
 	int periodMigCost 	= numMigs * uniformChainMigCost;
 	int periodLinkCost  = 0;  //$$$
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%d %d %d]\n", 
+  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%d %d %d] | num_usrs=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
-  					periodNonMigCost/periodTotalCost, periodLinkCost/periodTotalCost, periodMigCost/periodTotalCost);
+  					periodNonMigCost/periodTotalCost, periodLinkCost/periodTotalCost, periodMigCost/periodTotalCost, (int)ChainsMaster::allChains.size());
   printBufToRes ();
 }
 
