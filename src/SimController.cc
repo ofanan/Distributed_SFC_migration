@@ -707,8 +707,12 @@ void SimController::printResLine ()
 		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
 	}
 
-	int periodMigCost = numMigs * uniformChainMigCost;
-  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = 0 | mig_cost=%d | tot_cost=%d\n", periodNonMigCost, periodMigCost, periodNonMigCost + periodMigCost);
+	int periodMigCost 	= numMigs * uniformChainMigCost;
+	int periodLinkCost  = 0;  //$$$
+	int periodTotalCost = periodNonMigCost + periodMigCost;
+  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%d %d %d]\n", 
+  					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
+  					periodNonMigCost/periodTotalCost, periodLinkCost/periodTotalCost, periodMigCost/periodTotalCost);
   printBufToRes ();
 }
 
