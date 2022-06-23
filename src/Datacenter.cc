@@ -39,45 +39,46 @@ Datacenter::~Datacenter()
 
 void Datacenter::initialize(int stage)
 {
-	network     	= (cModule*) (getParentModule ()); 
-	simController = (SimController*) network->getSubmodule("sim_controller");
-	networkName 	= (network -> par ("name")).stdstringValue();
-  numChildren 	= (Lvl_t)  (par("numChildren"));
-  numParents  	= (Lvl_t)  (par("numParents"));
-  lvl				  	= (Lvl_t)  (par("lvl"));
-  dcId					= (DcId_t) (par("dcId"));
-  cpuCapacity   = nonAugmentedCpuAtLeaf[MyConfig::netType]*(lvl+1); 
-  availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
-  numBuPktsRcvd = 0;
+	if (stage==0) {
+		network     	= (cModule*) (getParentModule ()); 
+		simController = (SimController*) network->getSubmodule("sim_controller");
+		networkName 	= (network -> par ("name")).stdstringValue();
+		numChildren 	= (Lvl_t)  (par("numChildren"));
+		numParents  	= (Lvl_t)  (par("numParents"));
+		lvl				  	= (Lvl_t)  (par("lvl"));
+		dcId					= (DcId_t) (par("dcId"));
+		cpuCapacity   = nonAugmentedCpuAtLeaf[MyConfig::netType]*(lvl+1); 
+		availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
+		numBuPktsRcvd = 0;
 
-  numPorts    = numParents + numChildren;
-  isRoot      = (numParents==0);
-  isLeaf      = (numChildren==0);
-  outputQ.        resize (numPorts);
-  xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
-  endXmtEvents.   resize (numPorts);
-  idOfChildren.   resize (numChildren);
-  
-  // Discover the xmt channels to the neighbors, and the neighbors' id's.
-	for (int portNum (0); portNum < numPorts; portNum++) {
-	  cGate *outGate    = gate("port$o", portNum);
-	  xmtChnl[portNum]  = outGate->getTransmissionChannel();
-	  cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
-	  if (isRoot) {
-	    idOfChildren[portNum] = DcId_t (nghbr -> par ("dcId"));
-	  }
-	  else {
-	    if (portNum==0) { // port 0 is towards the parents
-	      idOfParent = DcId_t (nghbr -> par ("dcId"));
-	    }
-	    else { // ports 1...numChildren are towards the children
-	      idOfChildren[portNum-1] = DcId_t (nghbr -> par ("dcId"));
-	    }
-  	}       
-  }
+		numPorts    = numParents + numChildren;
+		isRoot      = (numParents==0);
+		isLeaf      = (numChildren==0);
+		outputQ.        resize (numPorts);
+		xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
+		endXmtEvents.   resize (numPorts);
+		idOfChildren.   resize (numChildren);
+		
+		// Discover the xmt channels to the neighbors, and the neighbors' id's.
+		for (int portNum (0); portNum < numPorts; portNum++) {
+			cGate *outGate    = gate("port$o", portNum);
+			xmtChnl[portNum]  = outGate->getTransmissionChannel();
+			cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
+			if (isRoot) {
+			  idOfChildren[portNum] = DcId_t (nghbr -> par ("dcId"));
+			}
+			else {
+			  if (portNum==0) { // port 0 is towards the parents
+			    idOfParent = DcId_t (nghbr -> par ("dcId"));
+			  }
+			  else { // ports 1...numChildren are towards the children
+			    idOfChildren[portNum-1] = DcId_t (nghbr -> par ("dcId"));
+			  }
+			}       
+		}
 
-  fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
-
+		fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
+	}
 }
 
 /*************************************************************************************************************************************************
