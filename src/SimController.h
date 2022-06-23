@@ -109,7 +109,7 @@ class SimController : public cSimpleModule
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
 		inline DcId_t leafId2DcId (DcId_t leafId);
 		inline DcId_t dcId2leafId (DcId_t dcId);
-		inline void gen_settings_str ();
+		inline void genSettingsBuf ();
     void openFiles ();
     
     // Functions used for debugging
@@ -134,6 +134,7 @@ class SimController : public cSimpleModule
 		void prepareReshSync (DcId_t dcId, DcId_t leafId);
 		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printInCntrFormat=true);
 		void printBuCost ();
+		void printResLine ();
 };
 
 #endif

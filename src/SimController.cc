@@ -692,16 +692,29 @@ void SimController::handleMessage (cMessage *msg)
 /*************************************************************************************************************************************************
  * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
 *************************************************************************************************************************************************/
-inline void SimController::gen_settings_str ()
+inline void SimController::genSettingsBuf ()
 {																																																					 
   snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RT_chain_pr, seed, stts); 
 }
 
-//MyConfig::cpuAtlLeaf
-//void printResLine ()
-//{
-//	
-//}
+/*************************************************************************************************************************************************
+ * Print a solution for the problem to the output res file.
+printf (output_file, '{} | {}\n' .format(
+            self.settings_str(), 
+            self.sol_cost_str (cpu_cost  = self.calc_cpu_cost_in_slot_alg(),
+                               link_cost = self.calc_link_cost_in_slot_alg()
+                               ,mig_cost  = self.calc_mig_cost_in_slot_alg())))
+
+*************************************************************************************************************************************************/
+void SimController::printResLine ()
+{
+	genSettingsBuf ();
+	MyConfig::printToLog (settingsBuf);
+	endSimulation ();
+//	char errorMsg[errorMsgStr.length() + 1];
+//	strcpy(errorMsg, errorMsgStr.c_str());
+//  snprintf (buf, bufSize, "
+}
 
 
 
