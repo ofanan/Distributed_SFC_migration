@@ -78,7 +78,10 @@ void Datacenter::initialize(int stage)
 		}
 
 		fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
+		return;
 	}
+	cpuCapacity   = MyConfig::cpuAtLeaf*(lvl+1); 
+	availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 }
 
 /*************************************************************************************************************************************************
