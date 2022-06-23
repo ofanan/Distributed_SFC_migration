@@ -66,8 +66,6 @@ void SimController::initialize (int stage)
 
 void SimController::openFiles ()
 {
-	MyConfig::logFileName = "example.txt";
-	MyConfig::resFileName = "res.res";
 	if (MyConfig::netType==MonacoIdx) {
 		MyConfig::traceFileName = "Monaco_0829_0830_20secs_Telecom.poa";
 	}
@@ -78,6 +76,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "UniformTree.poa";
 	}
 
+	setResFileName ();
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
 	if (traceNetType!=MyConfig::MyConfig::netType) {
 		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
@@ -691,12 +690,6 @@ inline void SimController::genSettingsBuf ()
 
 /*************************************************************************************************************************************************
  * Print a solution for the problem to the output res file.
-printf (output_file, '{} | {}\n' .format(
-            self.settings_str(), 
-            self.sol_cost_str (cpu_cost  = self.calc_cpu_cost_in_slot_alg(),
-                               link_cost = self.calc_link_cost_in_slot_alg()
-                               ,mig_cost  = self.calc_mig_cost_in_slot_alg())))
-
 *************************************************************************************************************************************************/
 void SimController::printResLine ()
 {
@@ -716,9 +709,15 @@ void SimController::printResLine ()
   printBufToRes ();
 }
 
-//t27000_ourAlg_cpu103_p0.3_sd20_stts1 | cpu_cost=603260 | link_cost=26700 | mig_cost=0 | tot_cost=629960 | ratio=[0.96,0.04,0.00] | num_usrs=2678 | num_crit_usrs=2678 | resh=F
-// 
 
+/*************************************************************************************************************************************************
+ * 
+*************************************************************************************************************************************************/
+void SimController::setResFileName ()
+{
+	MyConfig::resFileName = MyConfig::traceFileName + ".res";
+	MyConfig::logFileName = MyConfig::traceFileName + ".log";
+}
 
 
 
