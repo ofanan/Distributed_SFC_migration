@@ -12,6 +12,16 @@ string 					MyConfig::traceFileName;
 int							MyConfig::netType;
 ofstream 				MyConfig::logFile, MyConfig::resFile;
 char 						MyConfig::buf[MyConfig::bufSize];
+char 						MyConfig::mode_str[12]; 
+
+/*************************************************************************************************************************************************
+* Init parameters and variables
+**************************************************************************************************************************************************/
+void MyConfig::init()
+{
+	snprintf (mode_str, 12, (mode==SYNC)? "Sync" : "Async"); 
+}
+
 
 /*************************************************************************************************************************************************
 * Open the log and result files.

@@ -52,6 +52,7 @@ class SimController : public cSimpleModule
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
     int seed = 42;
+    int stts = 1; // stts of the last run of the alg'
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
@@ -108,6 +109,7 @@ class SimController : public cSimpleModule
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
 		inline DcId_t leafId2DcId (DcId_t leafId);
 		inline DcId_t dcId2leafId (DcId_t dcId);
+		inline void gen_settings_str (string &str);
     void openFiles ();
     
     // Functions used for debugging

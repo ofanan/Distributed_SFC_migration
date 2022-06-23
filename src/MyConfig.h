@@ -48,7 +48,6 @@ const bool evenChainsAreRt			= false;
 const bool SYNC  = true;
 const bool ASYNC = false;
 const bool mode=SYNC;
-const string mode_str = (mode==SYNC)? "Sync" : "Async";
 
 // Defines whether to print to the log and to the .res file the results of the BU stage of BUPU
 const bool printBuRes = true; 
@@ -68,11 +67,13 @@ class MyConfig {
 
 		static string traceFileName;
 		static int netType;
+		static char mode_str[12]; 
 
 /*    static string 				traceFileName, */
     static string logFileName, resFileName;
 
 		//Init
+		static void init ();
 		static bool openFiles ();
 		
 		//print

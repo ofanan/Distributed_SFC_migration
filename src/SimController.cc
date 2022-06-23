@@ -688,12 +688,34 @@ void SimController::handleMessage (cMessage *msg)
   delete (msg);
 }
 
-///*************************************************************************************************************************************************
-// * Generates a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
-// * The string is written to self.buf
-//*************************************************************************************************************************************************/
-//inline void Datacenter::gen_settings_str (string &str)
-//{
-//    snprintf (buf, bufSize, "t%d_%s_cpu%d_p%f_sd%d_stts%d", t, mode, self.G.nodes[len (self.G.nodes)-1]['RCs'], self.prob_of_target_delay[0], self.seed, self.stts)) 
-//}
+/*************************************************************************************************************************************************
+ * Generates a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
+ * The string is written to self.buf
+*************************************************************************************************************************************************/
+inline void SimController::gen_settings_str (string &str)
+{
+    snprintf (buf, bufSize, "t%d_%s_cpu%d_p%f_sd%d_stts%d",	
+    					t, MyConfig::mode_str, datacenters[0]->cpuCapacity, RT_chain_pr, seed, stts); 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
