@@ -5,5 +5,5 @@ chmod 777 out out/clang-release
 chmod 777 Makefile
 make -i
 clear
-./Distributed_SFC_migration -f Common.ini Monaco.ini -u Cmdenv
+out/clang-release/Distributed_SFC_migration -f Common.ini Monaco.ini -u Cmdenv
 
