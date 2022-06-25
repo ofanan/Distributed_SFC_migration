@@ -27,7 +27,7 @@ using namespace std;
 class Chain;
 class ChainHash;
 
-const string tracePath = "results/poa_files/";
+const string tracePath = "res/poa_files/";
 const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // levels of log to be written to the log file.
 
 //costs and cpu demands of chains for different types of networks

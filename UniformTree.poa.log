@@ -1,0 +1,19 @@
+
+BU results:
+t=0, nonMigCost=10, numMigs=0, tot cost = 10
+s2 : Rcs=2, a=1, used cpu=1, num_of_chains=1
+BU results:
+t=1, nonMigCost=110, numMigs=0, tot cost = 110
+s2 : Rcs=2, a=1, used cpu=1, num_of_chains=1
+s3 : Rcs=1, a=0, used cpu=1, num_of_chains=1
+BU results:
+t=2, nonMigCost=131, numMigs=0, tot cost = 131
+s0 : Rcs=3, a=2, used cpu=1, num_of_chains=1
+s1 : Rcs=2, a=0, used cpu=2, num_of_chains=2
+s2 : Rcs=2, a=1, used cpu=1, num_of_chains=1
+s4 : Rcs=1, a=0, used cpu=1, num_of_chains=1
+BU results:
+t=3, nonMigCost=32, numMigs=0, tot cost = 32
+s0 : Rcs=3, a=1, used cpu=2, num_of_chains=2
+s1 : Rcs=2, a=0, used cpu=2, num_of_chains=2
+s2 : Rcs=2, a=1, used cpu=1, num_of_chains=1

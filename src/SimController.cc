@@ -262,7 +262,7 @@ void SimController::runTrace () {
 	isFirstPeriod = true;
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
-  	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + "was not found");
+  	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
 	runTimePeriod ();
 }
