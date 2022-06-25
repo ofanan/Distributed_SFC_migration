@@ -20,4 +20,5 @@ example.txt
 src/*_m.h
 src/*_m.cc
 results/*
+res/*
 
