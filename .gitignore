@@ -21,4 +21,6 @@ src/*_m.h
 src/*_m.cc
 results/*
 res/*
+*.log
+*.res
 
