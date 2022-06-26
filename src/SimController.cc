@@ -35,33 +35,39 @@ void SimController::initialize (int stage)
 		return;
 	}
 	
-	openFiles ();
-	RT_Chain		::costAtLvl = MyConfig::RT_ChainCostAtLvl		 	[MyConfig::netType];
-	Non_RT_Chain::costAtLvl = MyConfig::Non_RT_ChainCostAtLvl	[MyConfig::netType];
-	RT_Chain::mu_u 		 			= MyConfig::RT_ChainMu_u 					[MyConfig::netType];
-	Non_RT_Chain::mu_u 			= MyConfig::Non_RT_ChainMu_u 			[MyConfig::netType];
-	RT_Chain	  ::mu_u_len 	= RT_Chain		::mu_u.size();
-	Non_RT_Chain::mu_u_len 	= Non_RT_Chain::mu_u.size();
+  if (stage==1) {
+		openFiles ();
+		RT_Chain		::costAtLvl = MyConfig::RT_ChainCostAtLvl		 	[MyConfig::netType];
+		Non_RT_Chain::costAtLvl = MyConfig::Non_RT_ChainCostAtLvl	[MyConfig::netType];
+		RT_Chain::mu_u 		 			= MyConfig::RT_ChainMu_u 					[MyConfig::netType];
+		Non_RT_Chain::mu_u 			= MyConfig::Non_RT_ChainMu_u 			[MyConfig::netType];
+		RT_Chain	  ::mu_u_len 	= RT_Chain		::mu_u.size();
+		Non_RT_Chain::mu_u_len 	= Non_RT_Chain::mu_u.size();
 
-	checkParams (); 
-	// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
-	rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
-	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	leaves.resize (numLeaves);
-	datacenters.resize (numDatacenters);
-	DcId_t leafId = 0;
-	for (int dc(0); dc<numDatacenters; dc++) {
-	  datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
-	  if (bool(datacenters[dc]->par("isLeaf"))==1) {
-	    leaves[leafId] = datacenters[dc];
-	    leaves[leafId]->setLeafId (leafId);
-	    leafId++;
-	  }
+		checkParams (); 
+		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
+		rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
+		fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+		leaves.resize (numLeaves);
+		datacenters.resize (numDatacenters);
+		DcId_t leafId = 0;
+		for (int dc(0); dc<numDatacenters; dc++) {
+			datacenters[dc] = (Datacenter*) network->getSubmodule("datacenters", dc);
+			if (bool(datacenters[dc]->par("isLeaf"))==1) {
+			  leaves[leafId] = datacenters[dc];
+			  leaves[leafId]->setLeafId (leafId);
+			  leafId++;
+			}
+		}
+		discoverPathsToRoot  ();
+		calcDistBetweenAllDcs				 ();
+		ChainsMaster::clear  ();
+		return;
 	}
-	discoverPathsToRoot  ();
-	calcDistBetweenAllDcs				 ();
-	ChainsMaster::clear  ();
-	runTrace ();
+	
+	if (stage==2) {
+		runTrace ();
+	}
 }
 
 void SimController::openFiles ()
@@ -656,7 +662,7 @@ void SimController::PrintStateAndEndSim ()
 		MyConfig::printToLog ("Printing the PoAs of each chain\n");
   	ChainsMaster::printAllChainsPoas  (); 
   }
-	MyConfig::printToLog ("simulation abnormally terminated by SimController.PrintStateAndEndSim");
+	MyConfig::printToLog ("\nsimulation terminated by SimController.PrintStateAndEndSim");
 	error ("simulation abnormally terminated by SimController.PrintStateAndEndSim. Check the log file for details.");
 }
 

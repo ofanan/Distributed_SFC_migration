@@ -79,10 +79,12 @@ void Datacenter::initialize(int stage)
 		return;
 	}
 	cpuCapacity   = MyConfig::cpuAtLeaf*(lvl+1); 
-  //$$$
-//	snprintf (buf, bufSize, "\ncpuCapacity=%d", cpuCapacity);
-//	printBufToLog ();
-	availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
+  availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
+	if (dcId==1830) { //$$$
+		snprintf (buf, bufSize, "\ncpuCapacity=%d, availCpu=%d", cpuCapacity, availCpu);
+		printBufToLog ();
+	}
+
 }
 
 /*************************************************************************************************************************************************
@@ -405,6 +407,11 @@ void Datacenter::bottomUpSync ()
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 				availCpu -= requiredCpuToLocallyPlaceThisChain;
+				
+				if (dcId==1830) { //$$$
+					snprintf (buf, bufSize, "\nchain's cpu=%d, availCpu=%d", requiredCpuToLocallyPlaceThisChain, availCpu);
+					printBufToLog ();
+				}
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.				 insert  (chainPtr->id);
 					newlyPlacedChains.insert  (chainPtr->id);
