@@ -73,10 +73,10 @@ void SimController::initialize (int stage)
 void SimController::openFiles ()
 {
 	if (MyConfig::netType==MonacoIdx) {
-		MyConfig::traceFileName = "Monaco_0829_0830_20secs_Telecom.poa";
+		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0829_0830_60secs_post.poa";
+		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree.poa";
