@@ -112,3 +112,14 @@ For binding a directory (may be helpful if calling sinularity as root), use
 
 Can't find a source file at "/build/glibc-SzIz7B/glibc-2.31/stdio-common/snprintf.c" 
 Locate the file or edit the source lookup path to include its location.
+
+
+scp Distributed_SFC_migration . icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration/Distributed_SFC_migration
+
+Problem of ln: hard link
+////////////////////////
+Need to run the container from /Distributed_SFC_migration, while the omnet.img file is found 1 dir up, e.g.:
+[Distributed_SFC_migration]icohen@legionlogin$ singularity exec ../omnetpp-5.6.2.img  bash -c './Tree_runner.sh'
+
+
+
