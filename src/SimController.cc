@@ -36,7 +36,7 @@ void SimController::initialize (int stage)
 	}
 	
 	openFiles ();
-	RT_Chain		::costAtLvl = RT_ChainCostAtLvl		 	[MyConfig::netType];
+	RT_Chain		::costAtLvl = MyConfig::RT_ChainCostAtLvl		 	[MyConfig::netType];
 	Non_RT_Chain::costAtLvl = Non_RT_ChainCostAtLvl	[MyConfig::netType];
 	RT_Chain::mu_u 		 			= RT_ChainMu_u 					[MyConfig::netType];
 	Non_RT_Chain::mu_u 			= Non_RT_ChainMu_u 			[MyConfig::netType];

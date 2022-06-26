@@ -15,6 +15,7 @@ char 		 MyConfig::buf[MyConfig::bufSize];
 char 		 MyConfig::mode_str[12]; 
 Cpu_t    MyConfig::cpuAtLeaf;
 const vector <Cpu_t>  MyConfig::nonAugmentedCpuAtLeaf    = {842, 94, 1,	30,};  //{842, 94, 1,	30,}; 
+const vector <vector <Cost_t>> MyConfig::RT_ChainCostAtLvl = {{544, 278, 164}, 							{544, 278, 164},						 {100, 10   }, {68, 40, 31}};
 /*************************************************************************************************************************************************
 * Init parameters and variables
 **************************************************************************************************************************************************/

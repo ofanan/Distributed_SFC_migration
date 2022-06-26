@@ -32,7 +32,6 @@ const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // leve
 
 //costs and cpu demands of chains for different types of networks
 const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possible NetType values
-const vector <Cost_t> RT_ChainCostAtLvl     [] = {{544, 278, 164}, 							{544, 278, 164},						 {100, 10   }, {68, 40, 31}};
 const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
@@ -68,6 +67,7 @@ class MyConfig {
 		static int netType;
 		static char mode_str[12]; 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
+		static const vector <vector <Cost_t>> RT_ChainCostAtLvl;
 		static Cpu_t  cpuAtLeaf;
 
     static string logFileName, resFileName;
