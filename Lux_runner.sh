@@ -5,5 +5,5 @@ LANG=C
 #chmod 777 Makefile
 #make -i
 #clear
-out/clang-release/Distributed_SFC_migration -f Common.ini Lux.ini -u Cmdenv
+Distributed_SFC_migration -f Common.ini Lux.ini -u Cmdenv
 
