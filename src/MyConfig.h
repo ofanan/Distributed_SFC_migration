@@ -68,6 +68,9 @@ class MyConfig {
 		static char mode_str[12]; 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
 		static const vector <vector <Cost_t>> RT_ChainCostAtLvl;
+		static const vector <vector <Cost_t>> Non_RT_ChainCostAtLvl;
+		static const vector <vector <Cpu_t>>  RT_ChainMu_u;
+		static const vector <vector <Cpu_t>>  Non_RT_ChainMu_u;
 		static Cpu_t  cpuAtLeaf;
 
     static string logFileName, resFileName;
