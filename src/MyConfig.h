@@ -47,9 +47,6 @@ const bool SYNC  = true;
 const bool ASYNC = false;
 const bool mode=SYNC;
 
-// Defines whether to print to the log and to the .res file the results of the BU stage of BUPU
-const bool printBuRes = true; 
-
 // Determining the level of debug and log.
 const int  DEBUG_LVL=1, LOG_LVL=NO_LOG, RES_LVL=1;
 
@@ -72,6 +69,9 @@ class MyConfig {
 		static const vector <vector <Cpu_t>>  RT_ChainMu_u;
 		static const vector <vector <Cpu_t>>  Non_RT_ChainMu_u;
 		static Cpu_t  cpuAtLeaf;
+
+		static const bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+
 
     static string logFileName, resFileName;
 
