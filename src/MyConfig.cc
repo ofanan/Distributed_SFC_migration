@@ -14,6 +14,7 @@ ofstream MyConfig::logFile, MyConfig::resFile;
 char 		 MyConfig::buf[MyConfig::bufSize];
 char 		 MyConfig::mode_str[12]; 
 Cpu_t    MyConfig::cpuAtLeaf;
+const vector <Cpu_t>  MyConfig::nonAugmentedCpuAtLeaf    = {842, 94, 1,	30,};  //{842, 94, 1,	30,}; 
 /*************************************************************************************************************************************************
 * Init parameters and variables
 **************************************************************************************************************************************************/
