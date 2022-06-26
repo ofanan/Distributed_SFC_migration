@@ -707,7 +707,7 @@ void SimController::printResLine ()
 	}
 
 	int periodMigCost 	= numMigs * uniformChainMigCost;
-	int periodLinkCost  = 0;  //$$$
+	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
   snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%d %d %d] | num_usrs=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
