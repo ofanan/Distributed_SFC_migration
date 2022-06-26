@@ -116,10 +116,15 @@ Locate the file or edit the source lookup path to include its location.
 
 scp Distributed_SFC_migration . icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration/Distributed_SFC_migration
 
-Problem of ln: hard link
-////////////////////////
+ln: failed to create hard link 'Distributed_SFC_migration' => 'out/clang-release//Distributed_SFC_migration': Operation not permitted
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+A mitigation: scp the exe file to HPC. However, this requires scp-ing the exe upon each change in the code.
 Need to run the container from /Distributed_SFC_migration, while the omnet.img file is found 1 dir up, e.g.:
 [Distributed_SFC_migration]icohen@legionlogin$ singularity exec ../omnetpp-5.6.2.img  bash -c './Tree_runner.sh'
+However, this still doesn't solve the prob'.
+-- Found out the can "make" the file locally, and then git it to the dest. The size of the exe file is only 320K.
 
-
+Prob' of not updated cpu cap at leaf:
+The header is not compiled again each time an exe is created (unless deleting the old exe).
+A possible sol: declare nonAugmentedCpuAtLeaf in MyConfig.h, but set it in MyConfig.cc:
 
