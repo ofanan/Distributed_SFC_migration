@@ -76,7 +76,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_shorter.poa"; //"Lux_0730_0830_1secs_post.poa";  //
+		MyConfig::traceFileName = "Lux_short.poa"; //"Lux_0730_0830_1secs_post.poa";  //
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree.poa";
@@ -210,6 +210,7 @@ void SimController::runTimePeriod ()
   // discard empty and comment lines
   while (getline (traceFile, line)) { 
   	if (line.compare("")==0 || (line.substr(0,2)).compare("//")==0 ){ 
+  		continue;
   	}
 
 		if ( (line.substr(0,4)).compare("t = ")==0) {
@@ -224,23 +225,20 @@ void SimController::runTimePeriod ()
 				error ("error in trace file: t is not incremented. t=%d, new_t=%d", t, new_t);
 			}
 			t = new_t;
-			MyConfig::printToLog ("\nfinished reading t line"); //$$$$
 
 			if (LOG_LVL>0) {
 				snprintf (buf, bufSize, "\n\nt = %d\n********************", t);
 				MyConfig::printToLog (buf); 
 			}
 		}
-		else if ( (line.substr(0,15)).compare("usrs_that_left:")==0) {
-			MyConfig::printToLog ("\nreading usrs that left"); //$$$$
+		else if ( (line.substr(0,15)).compare("usrs_that_left:")==0) {			
 			rdUsrsThatLeftLine (line.substr(16));
 		} 	
-		else if ( (line.substr(0,8)).compare("new_usrs")==0) {
-			MyConfig::printToLog ("\nreading new usrs"); //$$$$
-			rdNewUsrsLine (line.substr(9)); 
+		else if ( (line.substr(0,9)).compare("new_usrs:")==0) {
+			rdNewUsrsLine (line.substr(10)); 
 		}
-		else if ( (line.substr(0,8)).compare("old_usrs")==0) {
-			rdOldUsrsLine (line.substr(9));
+		else if ( (line.substr(0,9)).compare("old_usrs:")==0) {
+			rdOldUsrsLine (line.substr(10));
 			
 			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
@@ -267,13 +265,14 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 * Run the trace
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
+  MyConfig::printToLog ("\nin runTrace\n"); //$$$
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
 	isFirstPeriod = true;
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
-  MyConfig::printToLog ("\nSimCtrlr starting reading trace"); //$$$
+  MyConfig::printToLog ("\nSimCtrlr starting reading trace\n"); //$$$
 	runTimePeriod ();
 }
 
@@ -367,21 +366,10 @@ void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpLi
 // parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
 void SimController::parseChainPoaToken (string token, ChainId_t &chainId, DcId_t &poaId)
 {
-
-	MyConfig::printToLog ("\nin parseChainPoaToken"); //$$$
 	replace_if(begin(token), end(token), [] (char x) { return ispunct(x); }, ' ');
 	stringstream ss (token); 
 	ss >> chainId;
 	ss >> poaId;
-//	istringstream newChainToken(token); 
-//  string numStr; 
-//	getline (newChainToken, numStr, ',');
-//	chainId = stoi (numStr);
-//	getline (newChainToken, numStr, ',');
-//	poaId = stoi (numStr);
-//	if (poaId > numLeaves) {
-//		error ("t=%d. : .poa file includes poa ID %d while the number of leaves in the network is only %d", t, poaId, numLeaves);
-//	}
 }
 
 
@@ -398,67 +386,24 @@ void SimController::rdUsrsThatLeftLine (string line)
   ChainId_t chainId;
   DcId_t chainCurDc;
 	vector <ChainId_t> usrsThatLeft; // the users that left at the current period
-//  char_separator<char> sep(" ");
-//  tokenizer<char_separator<char>> tokens(line, sep);
-  
-  MyConfig::printToLog ("\nwithin rdUsrsThatLeftLine"); //$$$
-  
   stringstream streamOfChainIds (line);
   
- 	MyConfig::printToLog ("\n");
-  while (streamOfChainIds >> chainId) {
-  	snprintf (buf, bufSize, "chainId=%d ", chainId);
-  	printBufToLog ();
-  }
-
   // parse each old chain in the trace (.poa file), and find its current datacenter
-//	for (const string& token : tokens) {
-//	  if (token.substr(0,1).compare(" ")==0) {
-//	  	MyConfig::printToLog ("\nspace");
-//	  	endSimulation ();
-//	  }
-////		if (!dynamic_cast<string*>(&token)) {
-////			MyConfig::printToLog ("\ntoken, aleck==0");
-////			endSimulation ();
-////		}
-//	  MyConfig::printToLog (token); //prints nothing $$$ 
-//	  
-//		istringstream newChainToken(token); 
-//		string numStr; 
-//		getline (newChainToken, numStr, ' ');
-//		MyConfig::printToLog (numStr); //prints endl
-////		endSimulation ();
-//		if (numStr.size()==0) { //$$$
-//			MyConfig::printToLog ("\n0"); //$$$
-//			endSimulation ();//$$$
-//		}
-//		
-//	  if (numStr.substr(0,1).compare("\n")==0) {
-//	  	MyConfig::printToLog ("\nspace");
-//	  	endSimulation ();
-//	  }
-
-//		chainId = stoi (numStr);
-//	  MyConfig::printToLog ("\nafter stoi"); //$$$
-//	  endSimulation ();//$$$
-
-//		if (!ChainsMaster::findChain (chainId, chain)) { 
-//			error ("t=%d: didn't find chain id %d that left", t, chainId);
-//	  }
-//    
-//  	chainCurDc = chain.curDc;
-//  	if (DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
-//			error ("Note: this chain was not placed before leaving\n"); 
-//  	}
-//		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);  //insert the id of the moved chain to the vector of chains that left the current datacenter, where the chain is placed.
-//		usrsThatLeft.push_back (chainId);
-//  }
-//	if (!ChainsMaster::eraseChains (usrsThatLeft)){
-//		error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
-//	}
-//	MyConfig::printToLog ("\nalmost finished rdUsrsThatLeft");
-//	usrsThatLeft.clear ();
-	MyConfig::printToLog ("\nfinished rdUsrsThatLeft");
+  while (streamOfChainIds >> chainId) {
+		if (!ChainsMaster::findChain (chainId, chain)) { 
+			error ("t=%d: didn't find chain id %d that left", t, chainId);
+	  }    
+  	chainCurDc = chain.curDc;
+  	if (DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
+			error ("Note: this chain was not placed before leaving\n"); 
+  	}
+		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);//insert the id of the moved chain to the vec of chains that left its curreht Dc
+		usrsThatLeft.push_back (chainId);
+		if (!ChainsMaster::eraseChains (usrsThatLeft)){
+			error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
+		}
+		usrsThatLeft.clear ();
+  }
 }
 
 /*************************************************************************************************************************************************
@@ -495,7 +440,7 @@ void SimController::rdNewUsrsLine (string line)
 	Chain chain; // will hold the new chain to be generated each time
 	MyConfig::printToLog ("\nstarting reading newUsrsLine"); //$$$$
 
-	for (const auto& token : tokens) {
+	for (auto &token : tokens) {
 		parseChainPoaToken (token, chainId, poaId);
 		
 		if (genRtChain(chainId)) {
@@ -530,16 +475,18 @@ Inputs:
 **************************************************************************************************************************************************/
 void SimController::rdOldUsrsLine (string line)
 {
-  char_separator<char> sep("() ");
-  tokenizer<char_separator<char>> tokens(line, sep);
+//  char_separator<char> sep("() ");
+//  tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
   DcId_t poaId;
 	Chain chain; 
-
+	
+	replace_if(begin(line), end(line), [] (char x) { return ispunct(x); }, ' ');
+	stringstream ss (line); 
+	
 	MyConfig::printToLog ("\nin rdOldU"); //$$$
-	for (const auto& token : tokens) {
-		parseChainPoaToken (token, chainId, poaId);
-  	
+	while (ss >> chainId) {
+		ss >> poaId;	
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
 			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
@@ -552,8 +499,6 @@ void SimController::rdOldUsrsLine (string line)
 			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
 	}
-
-	
 }
 
 
