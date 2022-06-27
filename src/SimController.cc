@@ -361,16 +361,6 @@ void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpLi
 	}
 }
 
-// parse a token of the type "u,poa" where u is the chainId number and poas is the user's current poa
-void SimController::parseChainPoaToken (string token, ChainId_t &chainId, DcId_t &poaId)
-{
-	replace_if(begin(token), end(token), [] (char x) { return ispunct(x); }, ' ');
-	stringstream ss (token); 
-	ss >> chainId;
-	ss >> poaId;
-}
-
-
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
 - insert all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
