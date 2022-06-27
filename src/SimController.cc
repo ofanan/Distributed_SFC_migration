@@ -265,14 +265,12 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 * Run the trace
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
-  MyConfig::printToLog ("\nin runTrace\n"); //$$$
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
 	isFirstPeriod = true;
   numMigs         = 0; // will cnt the # of migrations in the current run
   if (!traceFile.is_open ()) {
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
-  MyConfig::printToLog ("\nSimCtrlr starting reading trace\n"); //$$$
 	runTimePeriod ();
 }
 
@@ -433,16 +431,15 @@ Inputs:
 **************************************************************************************************************************************************/
 void SimController::rdNewUsrsLine (string line)
 {
-  char_separator<char> sep("() ");
-  tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
   DcId_t 		poaId; 
 	Chain chain; // will hold the new chain to be generated each time
-	MyConfig::printToLog ("\nstarting reading newUsrsLine"); //$$$$
 
-	for (auto &token : tokens) {
-		parseChainPoaToken (token, chainId, poaId);
-		
+	replace_if(begin(line), end(line), [] (char x) { return ispunct(x); }, ' ');
+	stringstream ss (line); 
+	
+	while (ss >> chainId) {
+		ss >> poaId;
 		if (genRtChain(chainId)) {
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RT_Chain::mu_u_len};
 			chain = RT_Chain (chainId, S_u);
@@ -462,7 +459,6 @@ void SimController::rdNewUsrsLine (string line)
 			error ("t=%d new chain %d was already found in ChainsMaster", t, chainId);
 		}
 	}	
-	MyConfig::printToLog ("\nfinished reading newUsrsLine"); //$$$$
 	
 }
 
@@ -484,7 +480,6 @@ void SimController::rdOldUsrsLine (string line)
 	replace_if(begin(line), end(line), [] (char x) { return ispunct(x); }, ' ');
 	stringstream ss (line); 
 	
-	MyConfig::printToLog ("\nin rdOldU"); //$$$
 	while (ss >> chainId) {
 		ss >> poaId;	
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
