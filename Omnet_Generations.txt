@@ -114,7 +114,6 @@ Can't find a source file at "/build/glibc-SzIz7B/glibc-2.31/stdio-common/snprint
 Locate the file or edit the source lookup path to include its location.
 
 
-scp Distributed_SFC_migration . icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration/Distributed_SFC_migration
 
 ln: failed to create hard link 'Distributed_SFC_migration' => 'out/clang-release//Distributed_SFC_migration': Operation not permitted
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,4 +126,9 @@ However, this still doesn't solve the prob'.
 Prob' of not updated cpu cap at leaf:
 The header is not compiled again each time an exe is created (unless deleting the old exe).
 A possible sol: declare nonAugmentedCpuAtLeaf in MyConfig.h, but set it in MyConfig.cc:
+
+scp Distributed_SFC_migration . icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration/Distributed_SFC_migration
+
+scp icohen@legionlogin.polito.it:/home/icohen/dist_SFC_migration/Distributed_SFC_migration/res/poa_files/Monaco_0730_0830_1secs_Telecom.poa res/poa_files
+
 
