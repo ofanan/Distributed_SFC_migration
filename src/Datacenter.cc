@@ -278,7 +278,7 @@ void Datacenter::pushUpSync ()
 	}
 	reshuffled = false;
 	
-	// First, check if this is a chain that was pushed-up for me, and therefore I can regain resources for it.
+	// Check for all chains that were pushed-up for me, and regain resources for them.
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
 		auto search = potPlacedChains.find (chainPtr->id);
 		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do

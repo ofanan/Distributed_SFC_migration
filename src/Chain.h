@@ -21,10 +21,11 @@ class Chain
   public:
     ChainId_t id;
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
-    bool isRT_Chain;
+    bool isRtChain;
 		const static vector<Cost_t> costOfCpuUnitAtLvl; 
-		Lvl_t curLvl;        // Level of the datacenter currently assigned to host me. This may change a few times until the real placement as curDatacenter
-		DcId_t curDc; // 
+		Lvl_t  curLvl;        // Level of the datacenter currently assigned to host me. This may change a few times until the real placement as curDatacenter
+		DcId_t curDc; 
+		Cpu_t  potCpu; // the cpu that this chain needs, if placed on its currently pot-placed placed
 
 		// C'tors
     Chain ();
@@ -47,7 +48,7 @@ class Chain
 		bool dcIsDelayFeasible (DcId_t dcId, Lvl_t dcLvl) {return this->S_u[dcLvl]==dcId;}
 
 		// Setters
-/*		void setNetType (const unsigned int netType);*/
+		void setPotCpu (Lvl_t lvl); // set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain
 };
 
 class RT_Chain : public Chain

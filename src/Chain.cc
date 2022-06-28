@@ -17,8 +17,9 @@ Chain::Chain ()
 	this->id 					= DUMMY_CHAIN_ID; 
 	this->curLvl			= UNPLACED_LVL;
 	this->curDc 			= UNPLACED_DC;
+	this->potCpu			= UNPLACED_CPU;
 	this->S_u 				= {};
-	this->isRT_Chain 	= false;
+	this->isRtChain 	= false;
 };
 
 Chain::Chain (ChainId_t id) 
@@ -26,8 +27,9 @@ Chain::Chain (ChainId_t id)
 	this->id 					= id; 
 	this->curLvl 			= UNPLACED_LVL;
 	this->curDc 			= UNPLACED_DC;
+	this->potCpu			= UNPLACED_CPU;
 	this->S_u 			 	= {};
-	this->isRT_Chain 	= false;
+	this->isRtChain 	= false;
 };
 
 Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl) 
@@ -36,7 +38,8 @@ Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl)
 	this->S_u 				= S_u;
 	this->curLvl 			= curLvl;
 	this->curDc 			= UNPLACED_DC;
-	this->isRT_Chain 	= false;
+	this->potCpu			= UNPLACED_CPU;
+	this->isRtChain 	= false;
 };
 
 Chain::Chain (const Chain &c) {
@@ -44,7 +47,8 @@ Chain::Chain (const Chain &c) {
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
   this->curDc 			= c.curDc;
-  this->isRT_Chain 	= c.isRT_Chain;
+	this->potCpu			= c.potCpu;
+  this->isRtChain 	= c.isRtChain;
 }
 
 RT_Chain::RT_Chain (const RT_Chain &c) {
@@ -52,7 +56,8 @@ RT_Chain::RT_Chain (const RT_Chain &c) {
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
   this->curDc 			= c.curDc;
-  this->isRT_Chain 	= true;
+	this->potCpu			= c.potCpu;
+  this->isRtChain 	= true;
 }
 
 Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
@@ -60,7 +65,8 @@ Non_RT_Chain::Non_RT_Chain (const Non_RT_Chain &c) {
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
   this->curDc 			= c.curDc;
-  this->isRT_Chain 	= false;
+	this->potCpu			= c.potCpu;
+  this->isRtChain 	= false;
 }
 
 RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
@@ -68,7 +74,8 @@ RT_Chain::RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
   this->S_u       	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
   this->curDc 			= UNPLACED_DC;
-  this->isRT_Chain 	= true;
+	this->potCpu			= UNPLACED_CPU;
+  this->isRtChain 	= true;
 };
 
 Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
@@ -76,8 +83,18 @@ Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
   this->S_u      	 	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
   this->curDc 			= UNPLACED_DC;
-  this->isRT_Chain 	= false;
+	this->potCpu			= UNPLACED_CPU;
+  this->isRtChain 	= false;
 };
+
+
+/*************************************************************************************************************************************************
+* set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain
+**************************************************************************************************************************************************/
+void Chain::setPotCpu (Lvl_t lvl) 
+{
+	this->potCpu = (this->isRtChain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
+}
 
 void Chain::print (bool printS_u)
 {
@@ -97,27 +114,15 @@ void Chain::print (bool printS_u)
 // returns the number of datacenters which are delay-feasible for this chain
 Lvl_t Chain::mu_u_len () const
 {
-	return (this->isRT_Chain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
+	return (this->isRtChain)? RT_Chain::mu_u_len : Non_RT_Chain::mu_u_len;
 }
 
 
 // returns the mu_u (amount of cpu required by the chain) at a given level in the tree
 Cpu_t Chain::mu_u_at_lvl (Lvl_t lvl) const
 {
-	return (this->isRT_Chain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
+	return (this->isRtChain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
 }
-
-//// returns true iff the given datacenter id is delay-feasible for this chain (namely, appears in its S_u)
-//bool Chain::isDelayFeasible (DcId_t dcId) const 
-//{
-//	for (auto const dc : S_u) {
-//		if (dc==dcId) { // the suggested datacenter appears in my vector of delay-feasible datacenters
-//			return true;
-//		}
-//	}
-//	return false;
-//}
-
 
 /*************************************************************************************************************************************************
 * Given a set of chains and a poa, return all the chains in the set associated with this poa.
@@ -185,7 +190,7 @@ bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId
 **************************************************************************************************************************************************/
 Cost_t Chain::getCost () const
 {
-	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRT_Chain)? RT_Chain::costAtLvl[curLvl] : Non_RT_Chain::costAtLvl[curLvl]);
+	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRtChain)? RT_Chain::costAtLvl[curLvl] : Non_RT_Chain::costAtLvl[curLvl]);
 }
 
 /*************************************************************************************************************************************************
@@ -193,7 +198,7 @@ Cost_t Chain::getCost () const
 **************************************************************************************************************************************************/
 Cost_t Chain::getCostAtLvl (const Lvl_t lvl) const
 {
-	return (isRT_Chain)? RT_Chain::costAtLvl[lvl] : Non_RT_Chain::costAtLvl[lvl];
+	return (isRtChain)? RT_Chain::costAtLvl[lvl] : Non_RT_Chain::costAtLvl[lvl];
 }
 
 /*************************************************************************************************************************************************
@@ -205,7 +210,7 @@ Cpu_t Chain::getCpu () const
 		return UNPLACED_CPU;
 	}
 	else {
-	  return (isRT_Chain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
+	  return (isRtChain)? RT_Chain::mu_u[curLvl] : Non_RT_Chain::mu_u[curLvl];
 	}
 }
 
@@ -216,7 +221,7 @@ Hence, the chain should be inserted either to the head if it's a RT chain, of to
 **************************************************************************************************************************************************/
 void insertSorted (vector <Chain> &vec, const Chain &c)
 {
-	if (c.isRT_Chain) {
+	if (c.isRtChain) {
 		vec.insert (vec.begin(), c);
 	}
 	else {
@@ -229,12 +234,13 @@ The compare function used by pushUpList: sort two chains in a decreasing order o
 Namely, return true iff lhs is currently using more cpu than rhs
 **************************************************************************************************************************************************/
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
-	Cpu_t lhsCpu = lhs.getCpu ();
-	Cpu_t rhsCpu = rhs.getCpu ();
-	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties arbitrarily
-		return true;
-	}
-	return lhsCpu > rhsCpu;
+	return lhs.potCpu > rhs.potCpu;
+//	Cpu_t lhsCpu = lhs.potCpu;
+//	Cpu_t rhsCpu = rhs.potCpu;
+//	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties arbitrarily
+//		return true;
+//	}
+//	return lhsCpu > rhsCpu;
 }
 
 /*************************************************************************************************************************************************
@@ -271,7 +277,7 @@ Currently unused.
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
 {
 	for (auto const &chain : vec) {
-		if (chain.isRT_Chain) {
+		if (chain.isRtChain) {
 			vec.insert (vec.begin(), chain);
 		}
 		else {

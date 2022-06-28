@@ -158,6 +158,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 			numMigs++;
 		}
 		it->second.curDc = it->second.S_u[it->second.curLvl];
+		it->second.potCpu = UNPLACED_CPU; // reset; will be set again only when this chain is pot-placed
 	}	
 	return true;
 }
