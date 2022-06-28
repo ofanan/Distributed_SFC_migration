@@ -90,7 +90,7 @@ void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 // Insert a chain in its correct place to a sorted datastructure
 void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
-void insertSorted (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+bool insertSorted (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 
 /*************************************************************************************************************************************************
 // Given chainId, assigns to chain the respective chain from the set. returns true iff the requested chain Id was found in the set.

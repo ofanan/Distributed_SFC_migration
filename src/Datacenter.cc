@@ -253,7 +253,10 @@ void Datacenter::handlePushUpPkt ()
 	}
 	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		insertSorted (pushUpList, pkt->getPushUpVec (i)); 
+		if (!insertSorted (pushUpList, pkt->getPushUpVec (i))) {
+			error ("Error in insertSorted. See log file for details");
+		}
+
 	} 
 
 	if (mode==SYNC){ 
@@ -314,7 +317,9 @@ void Datacenter::pushUpSync ()
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the push-upped chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
 			newlyPlacedChains.insert (pushedUpChain.id);
-			insertSorted 								(pushUpList, pushedUpChain);
+			if (!insertSorted (pushUpList, pushedUpChain)) {
+				error ("Error in insertSorted. See log file for details");
+			}			
 		}
 	}
 	
@@ -413,7 +418,10 @@ void Datacenter::bottomUpSync ()
 					Chain modifiedChain = *chainPtr;
 					modifiedChain.curLvl = lvl;
 					chainPtr = notAssigned.erase (chainPtr); 
-					insertSorted (pushUpList, modifiedChain); 
+					modifiedChain.potCpu = requiredCpuToLocallyPlaceThisChain; // set the chain's "potCpu" field to the cpu required, if I'll host it
+					if (!insertSorted (pushUpList, modifiedChain)) {
+						error ("Error in insertSorted. See log file for details");
+					}
 				}
 		}
 		else { 
@@ -514,7 +522,9 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-        insertSorted (pushUpList, pkt->getPushUpVec(i));
+    if (!insertSorted (pushUpList, pkt->getPushUpVec(i))) {
+			error ("Error in insertSorted. See log file for details");
+		}        
 	}
 	if (LOG_LVL == VERY_DETAILED_LOG) {
     snprintf (buf, bufSize, "\ns%d : pushUpList=", dcId);

@@ -26,7 +26,6 @@ class ChainsMaster {
 		static const int 	bufSize = 128; // buffer for print-outs
 		static char 			buf[bufSize];
 		static int 				numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
-		static int 				numMigs; // num of final placements
 		static unordered_map <ChainId_t, Chain> allChains; // All the currently active chains. 
 
 	public:

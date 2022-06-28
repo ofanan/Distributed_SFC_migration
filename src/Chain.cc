@@ -89,12 +89,13 @@ Non_RT_Chain::Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u) {
 
 
 /*************************************************************************************************************************************************
-* set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain
+* set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain. 
+* Currently unused, as the Dc set it themselves.
 **************************************************************************************************************************************************/
-void Chain::setPotCpu (Lvl_t lvl) 
-{
-	this->potCpu = (this->isRtChain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
-}
+//void Chain::setPotCpu (Lvl_t lvl) 
+//{
+//	this->potCpu = (this->isRtChain)? RT_Chain::mu_u[lvl] : Non_RT_Chain::mu_u[lvl];
+//}
 
 void Chain::print (bool printS_u)
 {
@@ -247,9 +248,18 @@ inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 insert a chain to its correct location in a sorted list.
 If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
 **************************************************************************************************************************************************/
-void insertSorted (list <Chain> &sortedList, const Chain &chain)
+bool insertSorted (list <Chain> &sortedList, const Chain &chain)
 {
 
+	if (chain.potCpu==UNPLACED_CPU) {
+		int bufSize = 128;
+		char buf[bufSize];	
+		snprintf (buf, bufSize, "\error: insertSorted was called with chain %d for which postCpu==UNPLACED_CPU", chain.id);
+		MyConfig::printToLog (buf);
+		return false;
+	}
+	
+	
 	// delete the old occurance of that chain in the list, if exists
 	for (auto chainPtr = sortedList.begin(); chainPtr!=sortedList.end(); ) {
 		if (chainPtr->id == chain.id) {
@@ -266,6 +276,7 @@ void insertSorted (list <Chain> &sortedList, const Chain &chain)
   	begin++;
   }
   sortedList.insert(begin, chain);
+  return true;
 }
 
 

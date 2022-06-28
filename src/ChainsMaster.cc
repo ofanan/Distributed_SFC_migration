@@ -2,7 +2,6 @@
 
 unordered_map <ChainId_t, Chain> ChainsMaster::allChains; // All the currently active chains. 
 int ChainsMaster::numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
-int ChainsMaster::numMigs;
 const int ChainsMaster::bufSize;
 char ChainsMaster::buf[bufSize];
 
@@ -68,6 +67,7 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
 		return false;
   }
   it->second.curLvl = newLvl;
+  it->second.potCpu = UNPLACED_CPU; // as the chain is now really placed, reset its "potential Cpu" value.
 	ChainsMaster::numInstantMigs++; // assume that every change in the lvl implies an "instantaneous migration" (several inst' mig' may happen per period).
   return true;
 }

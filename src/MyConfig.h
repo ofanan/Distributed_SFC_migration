@@ -48,7 +48,7 @@ const bool ASYNC = false;
 const bool mode=SYNC;
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=BASIC_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, LOG_LVL=VERY_DETAILED_LOG, RES_LVL=1;
 
 										 
 class MyConfig { 
