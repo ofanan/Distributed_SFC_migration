@@ -69,6 +69,7 @@ class MyConfig {
 		static const vector <vector <Cpu_t>>  RT_ChainMu_u;
 		static const vector <vector <Cpu_t>>  Non_RT_ChainMu_u;
 		static Cpu_t  cpuAtLeaf;
+		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
 
 		static const bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
@@ -82,8 +83,6 @@ class MyConfig {
 		//print
 		static void printToRes (char* buf); 
 		static void printToRes (string str);
-/*		static void printToLog (const int *ar);*/
-/*		static void printToLog (const int **ar);*/
     static void printToLog (vector <vector <int32_t>> mat);
 		static void printToLog (char* buf); 
 		static void printToLog (string str);

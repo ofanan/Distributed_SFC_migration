@@ -586,6 +586,8 @@ void Datacenter::prepareReshSync ()
 		return genNsndBottomUpPkt ();	
 	}
 	reshuffled = true;
+	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is highest then the highest lvl reshuffled at this period - update. 
+
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
 		PrepareReshSyncPkt *pkt = new PrepareReshSyncPkt;

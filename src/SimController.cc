@@ -7,7 +7,8 @@ Controller of the simulation:
 #include "SimController.h"
 
 class Datacenter;
-bool MyConfig::notifiedReshInThisPeriod;
+bool  MyConfig::notifiedReshInThisPeriod;
+Lvl_t MyConfig::lvlOfHighestReshDc;
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 
@@ -77,7 +78,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa";
+		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa";
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree.poa";
@@ -280,8 +281,11 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
-	isFirstPeriod = true;
-  numMigs         = 0; // will cnt the # of migrations in the current run
+	
+	isFirstPeriod 								= true;
+  numMigsAtThisPeriod 					= 0; // will cnt the # of migrations in the current run
+  MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
+  
   if (!traceFile.is_open ()) {
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
@@ -305,7 +309,6 @@ void SimController::printBuCost ()
 {
 	Enter_Method ("SimController::printBuCost ()");
 	int 	nonMigCost = 0;
-	int   numMigs = 0;
 	Chain chain;
 
 	for (DcId_t dcId=0; dcId < numDatacenters; dcId++) {
@@ -316,7 +319,7 @@ void SimController::printBuCost ()
 			}
 			nonMigCost += chain.getCostAtLvl (datacenters[dcId]->lvl);
 			if (chain.curDc!=UNPLACED_DC && chain.curDc!=dcId) {
-				numMigs++;
+				numMigsAtThisPeriod++;
 			}
 		}
 		for (const auto &chainId : datacenters[dcId]->potPlacedChains) {
@@ -325,23 +328,23 @@ void SimController::printBuCost ()
 			}
 			nonMigCost += chain.getCostAtLvl (datacenters[dcId]->lvl);
 			if (chain.curDc!=UNPLACED_DC && chain.curDc!=dcId) {
-				numMigs++;
+				numMigsAtThisPeriod++;
 			}
 		}
 
 	}
-	snprintf (buf, bufSize, "\nt=%d, nonMigCost=%d, numMigs=%d, tot cost = %d", t, nonMigCost, numMigs, nonMigCost + numMigs * uniformChainMigCost);
+	snprintf (buf, bufSize, "\nt=%d, nonMigCost=%d, numMigs=%d, tot cost = %d", t, nonMigCost, numMigsAtThisPeriod, nonMigCost + numMigsAtThisPeriod * uniformChainMigCost);
 	printBufToLog();
 }
 
 /*************************************************************************************************************************************************
-- Inc. numMigs for every chain where curDC!=nxtDc.
+- Call ChainsMaster to handle its own operation to conclude the time period.
+- Calc the # of migrations at this period.
 - If running in sync mode: calculate and print the total cost
 **************************************************************************************************************************************************/
 void SimController::concludeTimePeriod ()
 {
-	int numMigs;
-	if (!ChainsMaster::concludeTimePeriod (numMigs)) {
+	if (!ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod)) {
 		error ("error occured during run of ChainsMaster::concludeTimePeriod. Check log file for details.");
 	}
 	
@@ -349,7 +352,7 @@ void SimController::concludeTimePeriod ()
 		checkChainsMasterData ();
 	}
 	if (RES_LVL > 0) {
-		printResLine ();
+		 printResLine ();
 	}
 
 	if (LOG_LVL>=DETAILED_LOG) {
@@ -361,8 +364,12 @@ void SimController::concludeTimePeriod ()
 		}
 	}
 	
+	// reset state variables, in preparation for the next period
 	chainsThatJoinedLeaf.    clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+	numMigsAtThisPeriod = 0; 
+	numCritUsrs					= 0;
+	MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
 }
 
 
@@ -489,7 +496,8 @@ void SimController::rdOldUsrsLine (string line)
 		if (DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
 		}
-		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore
+		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
+			numCritUsrs++;
 			insertSorted (chainsThatJoinedLeaf[poaId], chain); // need to inform the chain's new poa that it has to place it
 			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
@@ -704,12 +712,13 @@ void SimController::printResLine ()
 		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
 	}
 
-	int periodMigCost 	= numMigs * uniformChainMigCost;
+	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%d %d %d] | num_usrs=%d\n", 
+  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
-  					periodNonMigCost/periodTotalCost, periodLinkCost/periodTotalCost, periodMigCost/periodTotalCost, (int)ChainsMaster::allChains.size());
+  					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
+  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc);
   printBufToRes ();
 }
 

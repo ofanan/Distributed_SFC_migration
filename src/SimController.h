@@ -56,7 +56,8 @@ class SimController : public cSimpleModule
     int      RT_chain_rand_int = (int) (RT_chain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
-		int numMigs=0; // number of migration performed		
+		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
+		int numCritUsrs=0; // number of critical usrs at the beginning of this period
 		float     period=1.0;
 		
 		string line; //current line being read from the tracefile
@@ -123,7 +124,7 @@ class SimController : public cSimpleModule
 		int netType;
     ifstream traceFile;
  		string LogFileName   = "example.txt";
-		static const int bufSize = 128;
+		static const int bufSize = 200;
 		char buf[bufSize];
 		static const int settingsBufSize = 64;
 		char settingsBuf [settingsBufSize];
