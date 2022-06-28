@@ -224,11 +224,14 @@ void insertSorted (vector <Chain> &vec, const Chain &c)
 	}
 }
 
-// the compare function used by pushUpList: sort two chains in a decreasing order of the cpu they current use.
+/*************************************************************************************************************************************************
+The compare function used by pushUpList: sort two chains in a decreasing order of the cpu they current use.
+Namely, return true iff lhs is currently using more cpu than rhs
+**************************************************************************************************************************************************/
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 	Cpu_t lhsCpu = lhs.getCpu ();
 	Cpu_t rhsCpu = rhs.getCpu ();
-	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties
+	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties arbitrarily
 		return true;
 	}
 	return lhsCpu > rhsCpu;
@@ -241,6 +244,7 @@ If the chain (recognized equivocally by its id) is already found in the list, th
 void insertSorted (list <Chain> &sortedList, const Chain &chain)
 {
 
+	// delete the old occurance of that chain in the list, if exists
 	for (auto chainPtr = sortedList.begin(); chainPtr!=sortedList.end(); ) {
 		if (chainPtr->id == chain.id) {
 			sortedList.erase (chainPtr);
@@ -249,6 +253,7 @@ void insertSorted (list <Chain> &sortedList, const Chain &chain)
 		chainPtr++;
 	}
 
+	// insert the chain to its correct location in the (sorted) list
 	auto begin 	= sortedList.begin();
   auto end 		= sortedList.end();
   while ((begin != end) && CompareChainsByDecCpuUsage (*begin, chain)) { // skip all chains in the list which use more cpu than me

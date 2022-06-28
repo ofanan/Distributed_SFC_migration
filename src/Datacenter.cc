@@ -429,6 +429,9 @@ void Datacenter::bottomUpSync ()
 					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle", dcId);
 					printBufToLog();
 				}
+				snprintf (buf, bufSize, "\ninitiating resh at lvl %d", lvl); //$$$
+				printBufToLog ();
+
 				return prepareReshSync ();
 			}
 			chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  
@@ -456,7 +459,7 @@ void Datacenter::bottomUpSync ()
 }
 
 /*************************************************************************************************************************************************
-Send to the sim ctrlr a direct message, indicating (the IDs of) all the newly placed chains, as indicated in newlyPlacedChains.
+Update ChainMaster about (the IDs of) all the newly placed chains, as indicated in newlyPlacedChains.
 Later, clear newlyPlacedChains.
 *************************************************************************************************************************************************/
 void Datacenter::updatePlacementInfo ()
@@ -468,7 +471,7 @@ void Datacenter::updatePlacementInfo ()
 	
 	for (auto chainId : newlyPlacedChains) {
 		if (LOG_LVL == VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\nsimCtrlr updating: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
+			snprintf (buf, bufSize, "\nupdating the ChainMaster: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
 			printBufToLog ();
 		}
 		if (!(ChainsMaster::modifyLvl (chainId, lvl))) { // Change the lvl of this chain written in our DB
