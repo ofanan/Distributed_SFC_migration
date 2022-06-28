@@ -7,6 +7,7 @@ Controller of the simulation:
 #include "SimController.h"
 
 class Datacenter;
+bool MyConfig::notifiedReshInThisPeriod;
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 
@@ -76,7 +77,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_short.poa"; //"Lux_0730_0830_1secs_post.poa";  //
+		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa";
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree.poa";
@@ -205,6 +206,8 @@ void SimController::runTimePeriod ()
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 	}
 	
+	MyConfig::notifiedReshInThisPeriod = false;
+
   string line;
   
   // discard empty and comment lines
@@ -233,6 +236,16 @@ void SimController::runTimePeriod ()
 		}
 		else if ( (line.substr(0,15)).compare("usrs_that_left:")==0) {			
 			rdUsrsThatLeftLine (line.substr(16));
+
+			// rlz the rsrcs of chains that left from their current datacenters 
+			rlzRsrcOfChains (chainsThatLeftDatacenter);
+			chainsThatLeftDatacenter.clear ();
+
+			//Remove the left chains from ChainsMaster
+			if (!ChainsMaster::eraseChains (usrsThatLeft)){
+				error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
+			}
+			usrsThatLeft.clear ();
 		} 	
 		else if ( (line.substr(0,9)).compare("new_usrs:")==0) {
 			rdNewUsrsLine (line.substr(10)); 
@@ -240,10 +253,11 @@ void SimController::runTimePeriod ()
 		else if ( (line.substr(0,9)).compare("old_usrs:")==0) {
 			rdOldUsrsLine (line.substr(10));
 			
-			//Finished parsing the data about new and critical chains --> rlz rsrcs of chains that left their current location, and then call a placement algorithm 
+			// rlz rsrcs of chains that left their current location 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
-
-			initAlg ();
+			chainsThatLeftDatacenter.clear ();
+		
+			initAlg (); // call a placement algorithm 
 			// Schedule a self-event for reading the handling the next time-step
 			scheduleAt (simTime() + period, new cMessage); 
 			break;
@@ -338,7 +352,7 @@ void SimController::concludeTimePeriod ()
 		printResLine ();
 	}
 
-	if (LOG_LVL>=BASIC_LOG) {
+	if (LOG_LVL>=DETAILED_LOG) {
 		MyConfig::printToLog ("\nBUPU results:");
 		printAllDatacenters ();
 		if (DEBUG_LVL>1) {
@@ -348,7 +362,6 @@ void SimController::concludeTimePeriod ()
 	}
 	
 	chainsThatJoinedLeaf.    clear ();
-	chainsThatLeftDatacenter.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 }
 
@@ -364,16 +377,17 @@ void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpLi
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
 - insert all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
-- remove all the chains whose users left from ChainsMaster::allChains.
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
+Note: this func' still does NOT remove the left chains from ChainsMaster::allChains, because the data about the left chains (in particular, 
+the currently used rsrc) is needed for letting the currently-hosting DCs to regain the rsrc.
+each chain that left will be removed from ChainsMaster::allChains only after it's removed its curDc.
 **************************************************************************************************************************************************/
 void SimController::rdUsrsThatLeftLine (string line)
 {
-  Chain chain; // will hold the new chain to be inserted each time
+  Chain chain; // will hold the left chain
   ChainId_t chainId;
   DcId_t chainCurDc;
-	vector <ChainId_t> usrsThatLeft; // the users that left at the current period
   stringstream streamOfChainIds (line);
   
   // parse each old chain in the trace (.poa file), and find its current datacenter
@@ -387,10 +401,6 @@ void SimController::rdUsrsThatLeftLine (string line)
   	}
 		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);//insert the id of the moved chain to the vec of chains that left its curreht Dc
 		usrsThatLeft.push_back (chainId);
-		if (!ChainsMaster::eraseChains (usrsThatLeft)){
-			error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
-		}
-		usrsThatLeft.clear ();
   }
 }
 
@@ -494,11 +504,13 @@ void SimController::rdOldUsrsLine (string line)
 void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > &ChainsToRlzFromDc) 
 {
 
-	for (auto &item : ChainsToRlzFromDc) // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
-	{
+	for (auto &item : ChainsToRlzFromDc) { // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
+		if (t == 27006 and item.first==189) { //$$$
+			MyConfig::printToLog ("\nt=27006, dcId=189, list of chainIds to rlz=");
+			MyConfig::printToLog (ChainsToRlzFromDc[189]);
+		}
 		datacenters[item.first]->rlzRsrc (item.second); 
 	}
-
 }
 
 // Initiate the run of placement alg'
@@ -536,11 +548,16 @@ The function does the following:
 void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 {
 
+	if (!	MyConfig::notifiedReshInThisPeriod && LOG_LVL>=BASIC_LOG) {
+		MyConfig::printToLog ("\nresh");
+		MyConfig::notifiedReshInThisPeriod = true;
+	}
+
   unordered_map <DcId_t, vector<ChainId_t> > chainsToReplace;
   vector<Chain> vecOfUsrsOfThisPoA; 
 
 	for (const auto &it : ChainsMaster::allChains) {
-		if (it.second.S_u[0] == dcId) { // if the dcId of the chain's poa is the src of the msg that requested to prepare a sync resh...
+		if (it.second.S_u[0] == dcId) { // if the chain's poa is the src of the msg that requested to prepare a sync resh...
 			DcId_t chainCurDatacenter = (it.second).curDc;
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
 				chainsToReplace[chainCurDatacenter].push_back (it.first); // If this chain's PoA is the leaf that requested resh, the chain should be released

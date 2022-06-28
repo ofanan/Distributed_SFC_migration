@@ -48,7 +48,7 @@ const bool ASYNC = false;
 const bool mode=SYNC;
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=NO_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, LOG_LVL=BASIC_LOG, RES_LVL=1;
 
 										 
 class MyConfig { 
@@ -71,7 +71,7 @@ class MyConfig {
 		static Cpu_t  cpuAtLeaf;
 
 		static const bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
-
+		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
 
     static string logFileName, resFileName;
 

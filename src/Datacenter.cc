@@ -606,11 +606,11 @@ Clear all the resources currently allocated at this datastore:
 *************************************************************************************************************************************************/
 void Datacenter::clrRsrc () 
 {
-	notAssigned. 					clear ();
-	pushUpList.   				clear ();
-	placedChains.			 	  clear ();
-	potPlacedChains.			clear ();
-	newlyPlacedChains.	clear ();
+	notAssigned. 			clear ();
+	pushUpList.   		clear ();
+	placedChains.			clear ();
+	potPlacedChains.	clear ();
+	newlyPlacedChains.clear ();
 	availCpu 				 = cpuCapacity;
 }
 
