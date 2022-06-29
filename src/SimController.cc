@@ -39,12 +39,12 @@ void SimController::initialize (int stage)
 	
   if (stage==1) {
 		openFiles ();
-		RT_Chain		::costAtLvl = MyConfig::RT_ChainCostAtLvl		 	[MyConfig::netType];
-		Non_RT_Chain::costAtLvl = MyConfig::Non_RT_ChainCostAtLvl	[MyConfig::netType];
-		RT_Chain::mu_u 		 			= MyConfig::RT_ChainMu_u 					[MyConfig::netType];
-		Non_RT_Chain::mu_u 			= MyConfig::Non_RT_ChainMu_u 			[MyConfig::netType];
-		RT_Chain	  ::mu_u_len 	= RT_Chain		::mu_u.size();
-		Non_RT_Chain::mu_u_len 	= Non_RT_Chain::mu_u.size();
+		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		 	[MyConfig::netType];
+		Non_RtChain::costAtLvl = MyConfig::Non_RtChainCostAtLvl	[MyConfig::netType];
+		RtChain::mu_u 		 			= MyConfig::RtChainMu_u 					[MyConfig::netType];
+		Non_RtChain::mu_u 			= MyConfig::Non_RtChainMu_u 			[MyConfig::netType];
+		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
+		Non_RtChain::mu_u_len 	= Non_RtChain::mu_u.size();
 
 		checkParams (); 
 		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
@@ -98,16 +98,16 @@ void SimController::openFiles ()
 void SimController::checkParams ()
 {
 
-	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
-		if ((int)(RT_Chain::costAtLvl[lvl]) <= (int)(RT_Chain::costAtLvl[lvl+1])) {
-			error ("RT_Chain::costAtLvl[] should be decreasing. However, RT_Chain::costAtLvl[%d]=%d, RT_Chain::costAtLvl[%d]=%d\n", 
-							lvl, RT_Chain::costAtLvl[lvl], lvl+1, RT_Chain::costAtLvl[lvl+1]);
+	for (int lvl(0); lvl < RtChain::costAtLvl.size()-1; lvl++) {
+		if ((int)(RtChain::costAtLvl[lvl]) <= (int)(RtChain::costAtLvl[lvl+1])) {
+			error ("RtChain::costAtLvl[] should be decreasing. However, RtChain::costAtLvl[%d]=%d, RtChain::costAtLvl[%d]=%d\n", 
+							lvl, RtChain::costAtLvl[lvl], lvl+1, RtChain::costAtLvl[lvl+1]);
 		}
 	}
-	for (int lvl(0); lvl < RT_Chain::costAtLvl.size()-1; lvl++) {
-		if ((int)(Non_RT_Chain::costAtLvl[lvl]) <= (int)(Non_RT_Chain::costAtLvl[lvl+1])) {
-			error ("Non_RT_Chain::costAtLvl[] should be decreasing. However, Non_RT_Chain::costAtLvl[%d]=%d, Non_RT_Chain::costAtLvl[%d]=%d\n", 
-							lvl, Non_RT_Chain::costAtLvl[lvl], lvl+1, Non_RT_Chain::costAtLvl[lvl+1]);
+	for (int lvl(0); lvl < RtChain::costAtLvl.size()-1; lvl++) {
+		if ((int)(Non_RtChain::costAtLvl[lvl]) <= (int)(Non_RtChain::costAtLvl[lvl+1])) {
+			error ("Non_RtChain::costAtLvl[] should be decreasing. However, Non_RtChain::costAtLvl[%d]=%d, Non_RtChain::costAtLvl[%d]=%d\n", 
+							lvl, Non_RtChain::costAtLvl[lvl], lvl+1, Non_RtChain::costAtLvl[lvl+1]);
 		}
 	}
 }
@@ -418,13 +418,13 @@ void SimController::rdUsrsThatLeftLine (string line)
 bool SimController::genRtChain (ChainId_t chainId)
 {
 	if (randomlySetChainType) {
-		return (rand () < RT_chain_rand_int);
+		return (rand () < RtChain_rand_int);
 	}
 	else if (evenChainsAreRt) {
 		return (chainId%2==0);
 	}
 	else {
-		return (float(chainId % 10)/10) < RT_chain_pr;
+		return (float(chainId % 10)/10) < RtChain_pr;
 	}
 }			
 			
@@ -448,13 +448,13 @@ void SimController::rdNewUsrsLine (string line)
 	while (ss >> chainId) {
 		ss >> poaId;
 		if (genRtChain(chainId)) {
-			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RT_Chain::mu_u_len};
-			chain = RT_Chain (chainId, S_u);
+			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RtChain::mu_u_len};
+			chain = RtChain (chainId, S_u);
 
 		}
 		else {
-			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+Non_RT_Chain::mu_u_len};
-			chain = Non_RT_Chain (chainId, S_u); 
+			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+Non_RtChain::mu_u_len};
+			chain = Non_RtChain (chainId, S_u); 
 		}
 		
 		if (DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
@@ -697,7 +697,7 @@ void SimController::handleMessage (cMessage *msg)
 *************************************************************************************************************************************************/
 inline void SimController::genSettingsBuf ()
 {																																																					 
-  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RT_chain_pr, seed, stts); 
+  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RtChain_pr, seed, stts); 
 }
 
 /*************************************************************************************************************************************************

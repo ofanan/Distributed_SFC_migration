@@ -51,24 +51,24 @@ class Chain
 		void setPotCpu (Lvl_t lvl); // set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain
 };
 
-class RT_Chain : public Chain
+class RtChain : public Chain
 {
 public:
   static vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
   static Lvl_t mu_u_len;
 	static vector<Cost_t> costAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
-	RT_Chain (const RT_Chain &c);
-  RT_Chain (ChainId_t id, vector <DcId_t> &S_u);
+	RtChain (const RtChain &c);
+  RtChain (ChainId_t id, vector <DcId_t> &S_u);
 };
 
-class Non_RT_Chain: public Chain
+class Non_RtChain: public Chain
 {
   public:
 	  static vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static Lvl_t  mu_u_len;
 		static vector<Cost_t> costAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
-    Non_RT_Chain (ChainId_t id, vector <DcId_t> &S_u);
-	  Non_RT_Chain (const Non_RT_Chain &c);
+    Non_RtChain (ChainId_t id, vector <DcId_t> &S_u);
+	  Non_RtChain (const Non_RtChain &c);
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.

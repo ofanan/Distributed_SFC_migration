@@ -32,13 +32,13 @@ const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // leve
 
 //costs and cpu demands of chains for different types of networks
 const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possible NetType values
-const vector <Cost_t> Non_RT_ChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
-const vector <Cpu_t>  RT_ChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
-const vector <Cpu_t>  Non_RT_ChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
+const vector <Cost_t> Non_RtChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
+const vector <Cpu_t>  RtChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
+const vector <Cpu_t>  Non_RtChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 const int uniformChainMigCost = 600;
 
 // Parameters determining how to define whether a new generated chain is RT or not
-const float RT_chain_pr = 0.3; // prob' that a new chain is an RT chain
+const float RtChain_pr = 0.3; // prob' that a new chain is an RT chain
 const bool randomlySetChainType = false;
 const bool evenChainsAreRt			= false;
 
@@ -64,10 +64,10 @@ class MyConfig {
 		static int netType;
 		static char mode_str[12]; 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
-		static const vector <vector <Cost_t>> RT_ChainCostAtLvl;
-		static const vector <vector <Cost_t>> Non_RT_ChainCostAtLvl;
-		static const vector <vector <Cpu_t>>  RT_ChainMu_u;
-		static const vector <vector <Cpu_t>>  Non_RT_ChainMu_u;
+		static const vector <vector <Cost_t>> RtChainCostAtLvl;
+		static const vector <vector <Cost_t>> Non_RtChainCostAtLvl;
+		static const vector <vector <Cpu_t>>  RtChainMu_u;
+		static const vector <vector <Cpu_t>>  Non_RtChainMu_u;
 		static Cpu_t  cpuAtLeaf;
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
 
