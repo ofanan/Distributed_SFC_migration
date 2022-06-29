@@ -5,12 +5,12 @@ const vector<Cost_t> Chain::costOfCpuUnitAtLvl	 = {16, 8, 4, 2, 1};
 // mu_u[i] is the amount of CPU required for placing a chain in a datacenter at level i
 
 vector <Cost_t> RtChain		::costAtLvl; 
-vector <Cost_t> Non_RtChain::costAtLvl;
+vector <Cost_t> NonRtChain::costAtLvl;
 
 vector<Cpu_t> RtChain::		mu_u; 
-vector<Cpu_t> Non_RtChain::mu_u; 
+vector<Cpu_t> NonRtChain::mu_u; 
 Lvl_t RtChain	  ::mu_u_len; // = RtChain		 ::mu_u.size();
-Lvl_t Non_RtChain::mu_u_len; // = Non_RtChain::mu_u.size();
+Lvl_t NonRtChain::mu_u_len; // = NonRtChain::mu_u.size();
 
 Chain::Chain () 
 {
@@ -60,7 +60,7 @@ RtChain::RtChain (const RtChain &c) {
   this->isRtChain 	= true;
 }
 
-Non_RtChain::Non_RtChain (const Non_RtChain &c) {
+NonRtChain::NonRtChain (const NonRtChain &c) {
 	this->id 					= c.id;
   this->S_u 				= c.S_u;
   this->curLvl			= c.curLvl;
@@ -78,7 +78,7 @@ RtChain::RtChain (ChainId_t id, vector <DcId_t> &S_u) {
   this->isRtChain 	= true;
 };
 
-Non_RtChain::Non_RtChain (ChainId_t id, vector <DcId_t> &S_u) {
+NonRtChain::NonRtChain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id       		= id;
   this->S_u      	 	= S_u;
 	this->curLvl 			= UNPLACED_LVL;
@@ -94,7 +94,7 @@ Non_RtChain::Non_RtChain (ChainId_t id, vector <DcId_t> &S_u) {
 **************************************************************************************************************************************************/
 //void Chain::setPotCpu (Lvl_t lvl) 
 //{
-//	this->potCpu = (this->isRtChain)? RtChain::mu_u[lvl] : Non_RtChain::mu_u[lvl];
+//	this->potCpu = (this->isRtChain)? RtChain::mu_u[lvl] : NonRtChain::mu_u[lvl];
 //}
 
 void Chain::print (bool printS_u)
@@ -115,14 +115,14 @@ void Chain::print (bool printS_u)
 // returns the number of datacenters which are delay-feasible for this chain
 Lvl_t Chain::mu_u_len () const
 {
-	return (this->isRtChain)? RtChain::mu_u_len : Non_RtChain::mu_u_len;
+	return (this->isRtChain)? RtChain::mu_u_len : NonRtChain::mu_u_len;
 }
 
 
 // returns the mu_u (amount of cpu required by the chain) at a given level in the tree
 Cpu_t Chain::mu_u_at_lvl (Lvl_t lvl) const
 {
-	return (this->isRtChain)? RtChain::mu_u[lvl] : Non_RtChain::mu_u[lvl];
+	return (this->isRtChain)? RtChain::mu_u[lvl] : NonRtChain::mu_u[lvl];
 }
 
 /*************************************************************************************************************************************************
@@ -191,7 +191,7 @@ bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId
 **************************************************************************************************************************************************/
 Cost_t Chain::getCost () const
 {
-	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRtChain)? RtChain::costAtLvl[curLvl] : Non_RtChain::costAtLvl[curLvl]);
+	return (curLvl==UNPLACED_LVL)? UNPLACED_COST : ((isRtChain)? RtChain::costAtLvl[curLvl] : NonRtChain::costAtLvl[curLvl]);
 }
 
 /*************************************************************************************************************************************************
@@ -199,7 +199,7 @@ Cost_t Chain::getCost () const
 **************************************************************************************************************************************************/
 Cost_t Chain::getCostAtLvl (const Lvl_t lvl) const
 {
-	return (isRtChain)? RtChain::costAtLvl[lvl] : Non_RtChain::costAtLvl[lvl];
+	return (isRtChain)? RtChain::costAtLvl[lvl] : NonRtChain::costAtLvl[lvl];
 }
 
 /*************************************************************************************************************************************************
@@ -211,7 +211,7 @@ Cpu_t Chain::getCpu () const
 		return UNPLACED_CPU;
 	}
 	else {
-	  return (isRtChain)? RtChain::mu_u[curLvl] : Non_RtChain::mu_u[curLvl];
+	  return (isRtChain)? RtChain::mu_u[curLvl] : NonRtChain::mu_u[curLvl];
 	}
 }
 

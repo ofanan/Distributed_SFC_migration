@@ -40,11 +40,11 @@ void SimController::initialize (int stage)
   if (stage==1) {
 		openFiles ();
 		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		 	[MyConfig::netType];
-		Non_RtChain::costAtLvl = MyConfig::Non_RtChainCostAtLvl	[MyConfig::netType];
+		NonRtChain::costAtLvl = MyConfig::NonRtChainCostAtLvl	[MyConfig::netType];
 		RtChain::mu_u 		 			= MyConfig::RtChainMu_u 					[MyConfig::netType];
-		Non_RtChain::mu_u 			= MyConfig::Non_RtChainMu_u 			[MyConfig::netType];
+		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
-		Non_RtChain::mu_u_len 	= Non_RtChain::mu_u.size();
+		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
 
 		checkParams (); 
 		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
@@ -105,9 +105,9 @@ void SimController::checkParams ()
 		}
 	}
 	for (int lvl(0); lvl < RtChain::costAtLvl.size()-1; lvl++) {
-		if ((int)(Non_RtChain::costAtLvl[lvl]) <= (int)(Non_RtChain::costAtLvl[lvl+1])) {
-			error ("Non_RtChain::costAtLvl[] should be decreasing. However, Non_RtChain::costAtLvl[%d]=%d, Non_RtChain::costAtLvl[%d]=%d\n", 
-							lvl, Non_RtChain::costAtLvl[lvl], lvl+1, Non_RtChain::costAtLvl[lvl+1]);
+		if ((int)(NonRtChain::costAtLvl[lvl]) <= (int)(NonRtChain::costAtLvl[lvl+1])) {
+			error ("NonRtChain::costAtLvl[] should be decreasing. However, NonRtChain::costAtLvl[%d]=%d, NonRtChain::costAtLvl[%d]=%d\n", 
+							lvl, NonRtChain::costAtLvl[lvl], lvl+1, NonRtChain::costAtLvl[lvl+1]);
 		}
 	}
 }
@@ -412,7 +412,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 }
 
 /*************************************************************************************************************************************************
-* Determine whether the generated chain would be RT, or Non_RT.
+* Determine whether the generated chain would be RT, or NonRT.
 * This is done based on either random selection, or pseudo-random, based on the chainId.
 **************************************************************************************************************************************************/
 bool SimController::genRtChain (ChainId_t chainId)
@@ -453,8 +453,8 @@ void SimController::rdNewUsrsLine (string line)
 
 		}
 		else {
-			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+Non_RtChain::mu_u_len};
-			chain = Non_RtChain (chainId, S_u); 
+			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+NonRtChain::mu_u_len};
+			chain = NonRtChain (chainId, S_u); 
 		}
 		
 		if (DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){

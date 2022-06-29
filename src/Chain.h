@@ -61,14 +61,14 @@ public:
   RtChain (ChainId_t id, vector <DcId_t> &S_u);
 };
 
-class Non_RtChain: public Chain
+class NonRtChain: public Chain
 {
   public:
 	  static vector<Cpu_t> mu_u; // mu_u[i] will hold the # of cpu units required for placing an RT chain on a DC in level i
 	  static Lvl_t  mu_u_len;
 		static vector<Cost_t> costAtLvl; // cpuCostAtLvl[i] will hold the cost of placing an RT chain on a DC in level i
-    Non_RtChain (ChainId_t id, vector <DcId_t> &S_u);
-	  Non_RtChain (const Non_RtChain &c);
+    NonRtChain (ChainId_t id, vector <DcId_t> &S_u);
+	  NonRtChain (const NonRtChain &c);
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.

@@ -19,9 +19,9 @@ const bool MyConfig::printBuRes = false; // when true, print to the log and to t
 
 const vector <Cpu_t>  				 MyConfig::nonAugmentedCpuAtLeaf = {842, 94, 1,	30,};  //{842, 94, 1,	30,}; 
 const vector <vector <Cost_t>> MyConfig::RtChainCostAtLvl     = {{544, 278, 164}, 							{544, 278, 164},						 {100, 10   }, {68, 40, 31}};
-const vector <vector <Cost_t>> MyConfig::Non_RtChainCostAtLvl = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
+const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				 = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
-const vector <vector <Cpu_t>>  MyConfig::Non_RtChainMu_u 		 = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
+const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		 = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 /*************************************************************************************************************************************************
 * Init parameters and variables
 **************************************************************************************************************************************************/
