@@ -39,15 +39,15 @@ void SimController::initialize (int stage)
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
-		snprintf (MyConfig::modeStr, 12, (mode==SYNC)? "Sync" : "Async"); 
-		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[netType];
-		for (Lvl_t lvl(0); lvl < height; lvl++) {
-			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
-		}
 		return;
 	}
 	
   if (stage==1) {
+		snprintf (MyConfig::modeStr, 12, (mode==SYNC)? "Sync" : "Async"); 
+		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
+		for (Lvl_t lvl(0); lvl < height; lvl++) {
+			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
+		}
 		openFiles ();
 		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		 	[MyConfig::netType];
 		NonRtChain::costAtLvl = MyConfig::NonRtChainCostAtLvl	[MyConfig::netType];
