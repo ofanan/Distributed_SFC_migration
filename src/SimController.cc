@@ -8,6 +8,9 @@ Controller of the simulation:
 
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
+float MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
+bool MyConfig::randomlySetChainType = false;
+bool MyConfig::evenChainsAreRt			 = false;
 Lvl_t MyConfig::lvlOfHighestReshDc;
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -45,6 +48,11 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
+    RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
+
+		MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
+		MyConfig::randomlySetChainType = false;
+		MyConfig::evenChainsAreRt			 = false;
 
 		checkParams (); 
 		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
@@ -417,14 +425,14 @@ void SimController::rdUsrsThatLeftLine (string line)
 **************************************************************************************************************************************************/
 bool SimController::genRtChain (ChainId_t chainId)
 {
-	if (randomlySetChainType) {
-		return (rand () < RtChain_rand_int);
+	if (MyConfig::randomlySetChainType) {
+		return (rand () < RtChainRandInt);
 	}
-	else if (evenChainsAreRt) {
+	else if (MyConfig::evenChainsAreRt) {
 		return (chainId%2==0);
 	}
 	else {
-		return (float(chainId % 10)/10) < RtChain_pr;
+		return (float(chainId % 10)/10) < MyConfig::RtChainPr;
 	}
 }			
 			
@@ -697,7 +705,7 @@ void SimController::handleMessage (cMessage *msg)
 *************************************************************************************************************************************************/
 inline void SimController::genSettingsBuf ()
 {																																																					 
-  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, RtChain_pr, seed, stts); 
+  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts); 
 }
 
 /*************************************************************************************************************************************************

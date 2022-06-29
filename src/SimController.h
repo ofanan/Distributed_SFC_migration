@@ -53,7 +53,7 @@ class SimController : public cSimpleModule
     bool isLastPeriod = false;
     int seed = 42;
     int stts = 1; // stts of the last run of the alg'
-    int      RtChain_rand_int = (int) (RtChain_pr * (float) (RAND_MAX)); // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
+    int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	

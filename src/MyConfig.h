@@ -37,11 +37,6 @@ const vector <Cpu_t>  RtChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19}
 const vector <Cpu_t>  NonRtChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 const int uniformChainMigCost = 600;
 
-// Parameters determining how to define whether a new generated chain is RT or not
-const float RtChain_pr = 0.3; // prob' that a new chain is an RT chain
-const bool randomlySetChainType = false;
-const bool evenChainsAreRt			= false;
-
 // Mode: SYNC, or ASYNC
 const bool SYNC  = true;
 const bool ASYNC = false;
@@ -70,6 +65,11 @@ class MyConfig {
 		static const vector <vector <Cpu_t>>  NonRtChainMu_u;
 		static Cpu_t  cpuAtLeaf;
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
+
+		// Parameters determining how to define whether a new generated chain is RT or not
+		static float RtChainPr; // prob' that a new chain is an RT chain
+		static bool randomlySetChainType;
+		static bool evenChainsAreRt;
 
 		static const bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
