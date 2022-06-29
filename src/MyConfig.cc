@@ -13,8 +13,6 @@ string 	 MyConfig::traceFileName;
 int			 MyConfig::netType;
 ofstream MyConfig::logFile, MyConfig::resFile;
 char 		 MyConfig::buf[MyConfig::bufSize];
-char 		 MyConfig::mode_str[12]; 
-Cpu_t    MyConfig::cpuAtLeaf;
 const bool MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 
 const vector <Cpu_t>  				 MyConfig::nonAugmentedCpuAtLeaf = {842, 94, 1,	30,};  //{842, 94, 1,	30,}; 
@@ -27,8 +25,6 @@ const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		 = {{17, 17, 17, 17, 1
 **************************************************************************************************************************************************/
 void MyConfig::init()
 {
-	snprintf (mode_str, 12, (mode==SYNC)? "Sync" : "Async"); 
-	cpuAtLeaf = nonAugmentedCpuAtLeaf[netType];
 }
 
 

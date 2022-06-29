@@ -57,13 +57,14 @@ class MyConfig {
 
 		static string traceFileName;
 		static int netType;
-		static char mode_str[12]; 
+		static char modeStr[12]; 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
 		static const vector <vector <Cost_t>> RtChainCostAtLvl;
 		static const vector <vector <Cost_t>> NonRtChainCostAtLvl;
 		static const vector <vector <Cpu_t>>  RtChainMu_u;
 		static const vector <vector <Cpu_t>>  NonRtChainMu_u;
 		static Cpu_t  cpuAtLeaf;
+		static vector <Cpu_t> cpuAtLvl; 
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
 
 		// Parameters determining how to define whether a new generated chain is RT or not

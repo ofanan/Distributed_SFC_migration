@@ -9,9 +9,12 @@ Controller of the simulation:
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
 float MyConfig::RtChainPr; // prob' that a new chain is an RT chain
-bool MyConfig::randomlySetChainType = false;
-bool MyConfig::evenChainsAreRt;
+bool  MyConfig::randomlySetChainType = false;
+bool  MyConfig::evenChainsAreRt;
+char 	MyConfig::modeStr[12]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
+Cpu_t MyConfig::cpuAtLeaf;
+vector <Cpu_t> MyConfig::cpuAtLvl; 
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 
@@ -36,7 +39,11 @@ void SimController::initialize (int stage)
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t) (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
-		MyConfig::init ();
+		snprintf (MyConfig::modeStr, 12, (mode==SYNC)? "Sync" : "Async"); 
+		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[netType];
+		for (Lvl_t lvl(0); lvl < height; lvl++) {
+			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
+		}
 		return;
 	}
 	
@@ -710,7 +717,7 @@ void SimController::handleMessage (cMessage *msg)
 *************************************************************************************************************************************************/
 inline void SimController::genSettingsBuf ()
 {																																																					 
-  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::mode_str, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts); 
+  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts); 
 }
 
 /*************************************************************************************************************************************************
