@@ -8,9 +8,9 @@ Controller of the simulation:
 
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
-float MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
+float MyConfig::RtChainPr; // prob' that a new chain is an RT chain
 bool MyConfig::randomlySetChainType = false;
-bool MyConfig::evenChainsAreRt			 = false;
+bool MyConfig::evenChainsAreRt;
 Lvl_t MyConfig::lvlOfHighestReshDc;
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -50,9 +50,14 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
 
-		MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
-		MyConfig::randomlySetChainType = false;
-		MyConfig::evenChainsAreRt			 = false;
+		// Set the prob' of a generated chain to be an RtChain
+		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
+			MyConfig::evenChainsAreRt			 = false;
+			MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
+		}
+		else {
+			MyConfig::evenChainsAreRt			 = true;
+		}
 
 		checkParams (); 
 		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
