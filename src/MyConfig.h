@@ -32,9 +32,6 @@ const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // leve
 
 //costs and cpu demands of chains for different types of networks
 const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possible NetType values
-const vector <Cost_t> NonRtChainCostAtLvl [] = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
-const vector <Cpu_t>  RtChainMu_u 				  [] = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
-const vector <Cpu_t>  NonRtChainMu_u 		  [] = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 const int uniformChainMigCost = 600;
 
 // Mode: SYNC, or ASYNC
@@ -66,6 +63,7 @@ class MyConfig {
 		static Cpu_t  cpuAtLeaf;
 		static vector <Cpu_t> cpuAtLvl; 
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
+		static bool useFullResh;
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static float RtChainPr; // prob' that a new chain is an RT chain

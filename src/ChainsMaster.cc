@@ -156,6 +156,10 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
     }
 		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
+			if (LOG_LVL >= DETAILED_LOG) {
+				snprintf (buf, bufSize, "\nchain %d migrated from %d to %d", it->second.id, it->second.curDc, it->second.S_u[it->second.curLvl]);
+				MyConfig::printToLog (buf);
+			}
 		}
 		it->second.curDc = it->second.S_u[it->second.curLvl];
 		it->second.potCpu = UNPLACED_CPU; // reset; will be set again only when this chain is pot-placed

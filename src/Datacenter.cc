@@ -5,6 +5,7 @@ using namespace std;
 
 Define_Module(Datacenter);
 
+bool MyConfig::useFullResh;
 
 /*************************************************************************************************************************************************
  * Infline functions
@@ -440,7 +441,7 @@ void Datacenter::bottomUpSync ()
 				snprintf (buf, bufSize, "\ninitiating resh at lvl %d", lvl); //$$$
 				printBufToLog ();
 
-				return prepareReshSync ();
+				return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 			}
 			chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  
 		}

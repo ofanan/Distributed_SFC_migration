@@ -20,6 +20,7 @@ const vector <vector <Cost_t>> MyConfig::RtChainCostAtLvl     = {{544, 278, 164}
 const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				 = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		 = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
+bool useFullResh = true;
 /*************************************************************************************************************************************************
 * Init parameters and variables
 **************************************************************************************************************************************************/
@@ -38,6 +39,11 @@ bool MyConfig::openFiles()
 {
 	logFile.open (logFileName);
 	resFile.open (resFileName);
+
+	resFile << "	// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where\n";
+	resFile << "T is the slot cnt (read from the input file)\nMode is the algorithm / solver used.\n";
+	resFile << "C is the num of CPU units used in the leaf\n[c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp.";
+	resFile << "lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else.\n\n";
 	return true;
 }
 

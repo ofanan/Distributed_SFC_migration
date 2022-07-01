@@ -377,7 +377,7 @@ void SimController::concludeTimePeriod ()
 
 	if (LOG_LVL>=DETAILED_LOG) {
 		MyConfig::printToLog ("\nBUPU results:");
-		printAllDatacenters ();
+		printAllDatacenters (false, false, false); //$$$
 		if (DEBUG_LVL>1) {
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
@@ -385,7 +385,7 @@ void SimController::concludeTimePeriod ()
 	}
 	
 	// reset state variables, in preparation for the next period
-	chainsThatJoinedLeaf.    clear ();
+	chainsThatJoinedLeaf.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	numMigsAtThisPeriod = 0; 
 	numCritUsrs					= 0;
@@ -566,9 +566,19 @@ void SimController::checkChainsMasterData ()
 	}
 }
 
+/*************************************************************************************************************************************************
+Prepare a full reshuffle. 
+The function does the following:
+- rlz the rsrscs of all the chains in the system.
+- Initiate a placement alg' from all the leaves.
+**************************************************************************************************************************************************/
+void SimController::prepareFullReshSync ()
+{
+}
+
 
 /*************************************************************************************************************************************************
-Prepare a reshuffle. This function is invoked separately (using a direct msg) be each leaf (poa) that takes part in a reshuffle.
+Prepare a reshuffle. This function is invoked separately (using a direct msg) by each leaf (poa) that takes part in a reshuffle.
 The function does the following:
 - rlz the rsrscs of all the chains associated with this poa.
 - Initiate a placement alg' from this poa, where notAssigned=all users currently associated with this PoA.

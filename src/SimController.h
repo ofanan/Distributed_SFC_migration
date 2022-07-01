@@ -134,6 +134,7 @@ class SimController : public cSimpleModule
     void checkParams (); // Sanity checks for various parameters    
 		void finishedAlg 		 (DcId_t dcId, DcId_t leafId);
 		void prepareReshSync (DcId_t dcId, DcId_t leafId);
+		void prepareFullReshSync ();
 		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printInCntrFormat=true);
 		void printBuCost ();
 		void 
