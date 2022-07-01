@@ -569,11 +569,24 @@ void SimController::checkChainsMasterData ()
 /*************************************************************************************************************************************************
 Prepare a full reshuffle. 
 The function does the following:
-- rlz the rsrscs of all the chains in the system.
+- rlx the rsrscs of all the chains in the system.
 - Initiate a placement alg' from all the leaves.
 **************************************************************************************************************************************************/
 void SimController::prepareFullReshSync ()
 {
+	Enter_Method ("prepareFullReshSync ()");
+	
+	// rlz all chains throughout
+	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
+		datacenters[dcId]->clrRsrc();
+	}
+	
+	chainsThatJoinedLeaf.clear ();
+	for (auto &it : ChainsMaster::allChains) {
+		DcId_t poa = it.second.S_u[0];
+		chainsThatJoinedLeaf[it.second.S_u[0]].push_back (it.first); // push the chain id into the vec' of chains that "joined" this usr's poa.
+	}
+	initAlgSync ();
 }
 
 
