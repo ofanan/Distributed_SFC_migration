@@ -587,7 +587,7 @@ void SimController::initFullReshSync ()
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
 		MyConfig::printToLog ("\nbeginning full resh\n");
 	}
-	MyConfig::lvlOfHighestReshDc = height;
+	MyConfig::lvlOfHighestReshDc = height-1;
 	
 	// rlz all chains throughout
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
