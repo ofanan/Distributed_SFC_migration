@@ -5,8 +5,6 @@ using namespace std;
 
 Define_Module(Datacenter);
 
-bool MyConfig::useFullResh;
-
 /*************************************************************************************************************************************************
  * Infline functions
 *************************************************************************************************************************************************/
@@ -143,6 +141,12 @@ void Datacenter::handleEndXmtMsg ()
 
 void Datacenter::handleMessage (cMessage *msg)
 {
+
+	if (MyConfig::discardAllMsgs) {
+		MyConfig::printToLog ("\ndiscarding"); //$$$$
+		delete msg;
+		return;
+	}
   curHandledMsg = msg;
   if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
   	handleEndXmtMsg ();
@@ -435,11 +439,9 @@ void Datacenter::bottomUpSync ()
 					printStateAndEndSim  ();
 				}
 				if (LOG_LVL>=DETAILED_LOG) {
-					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle", dcId);
+					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
 					printBufToLog();
 				}
-				snprintf (buf, bufSize, "\ninitiating resh at lvl %d", lvl); //$$$
-				printBufToLog ();
 
 				return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 			}
@@ -572,9 +574,12 @@ void Datacenter::genNsndBottomUpPkt ()
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
 		pkt2send->setPushUpVec (idixInPushUpVec++, *chainPtr);
 	}
-	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjest the array's size to the real number of chains inserted into it. 
+	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+	if (dcId==44) { //$$$
+		MyConfig::printToLog ("\n s44 sending BU pkt to prnt");
+	}
 	if (!reshuffled) { 
 		notAssigned.clear ();
 	}

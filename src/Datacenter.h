@@ -43,7 +43,7 @@ class Datacenter : public cSimpleModule
     bool isRoot;
     bool isLeaf;
     int16_t dcId;
-    int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1
+    int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
 		Cpu_t cpuCapacity;
     
 		//getter

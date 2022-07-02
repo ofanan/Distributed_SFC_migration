@@ -14,6 +14,7 @@ bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[12]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
+bool  MyConfig::discardAllMsgs;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -80,6 +81,9 @@ void SimController::initialize (int stage)
 			  leaves[leafId]->setLeafId (leafId);
 			  leafId++;
 			}
+			else {
+				datacenters[dc] -> setLeafId (-1);
+			}
 		}
 		discoverPathsToRoot  ();
 		calcDistBetweenAllDcs				 ();
@@ -88,6 +92,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
+		MyConfig::discardAllMsgs = false;
 		runTrace ();
 	}
 }
@@ -279,8 +284,7 @@ void SimController::runTimePeriod ()
 			chainsThatLeftDatacenter.clear ();
 		
 			initAlg (); // call a placement algorithm 
-			// Schedule a self-event for reading the handling the next time-step
-			scheduleAt (simTime() + period, new cMessage); 
+			scheduleAt (simTime() + period, new RunTimePeriodMsg); // Schedule a self-event for reading the handling the next time-step
 			break;
 		}
   }
@@ -364,8 +368,13 @@ void SimController::printBuCost ()
 **************************************************************************************************************************************************/
 void SimController::concludeTimePeriod ()
 {
-	if (!ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod)) {
-		error ("error occured during run of ChainsMaster::concludeTimePeriod. Check log file for details.");
+
+	ChainId_t errChainId;
+	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, errChainId);
+	
+	if (stts!=0) {
+		error ("sim time=%lf, t=%d: error occured during run of ChainsMaster::concludeTimePeriod. err of type %d. errChainId=%d. For further details, plz Check the log file.",
+					  simTime().dbl(), t, stts, errChainId);
 	}
 	
 	if (DEBUG_LVL > 0) {
@@ -403,7 +412,8 @@ void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpLi
 
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
-- insert all the IDs of chains that left some datacenter dc to chainsThatLeftDatacenter[dc].
+- insert all the IDs of chains that left some datacenter dc to this->chainsThatLeftDatacenter[dc].
+- insert all the IDs of chains that left ANY dc to this->usrsThatLeft.
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
 Note: this func' still does NOT remove the left chains from ChainsMaster::allChains, because the data about the left chains (in particular, 
@@ -533,10 +543,6 @@ void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > 
 {
 
 	for (auto &item : ChainsToRlzFromDc) { // each item in the list includes dcId, and a list of chains that left the datacenter with this dcId.
-		if (t == 27006 and item.first==189) { //$$$
-			MyConfig::printToLog ("\nt=27006, dcId=189, list of chainIds to rlz=");
-			MyConfig::printToLog (ChainsToRlzFromDc[189]);
-		}
 		datacenters[item.first]->rlzRsrc (item.second); 
 	}
 }
@@ -566,6 +572,41 @@ void SimController::checkChainsMasterData ()
 	}
 }
 
+
+/*************************************************************************************************************************************************
+Prepare a full reshuffle. 
+The function does the following:
+- rlx the rsrscs of all the chains in the system.
+- Initiate a placement alg' from all the leaves.
+**************************************************************************************************************************************************/
+void SimController::initFullReshSync ()
+{
+
+	if (LOG_LVL >= DETAILED_LOG) {
+		MyConfig::printToLog ("\nbeginning full resh\n");
+	}
+	
+	// rlz all chains throughout
+	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
+		datacenters[dcId]->clrRsrc();
+	}
+	
+	chainsThatJoinedLeaf.clear ();
+	for (auto &it : ChainsMaster::allChains) {
+		DcId_t leafId = datacenters[it.second.S_u[0]]->leafId;
+		if (leafId >= numLeaves || leafId<0) {
+			snprintf (buf, bufSize, "\t=%d. error in initFullReshSync: chain %d has leafId=%d", t, it.second.id, leafId);
+			printBufToLog();
+			error ("Error in initFullReshSync. Please check the log file.");
+		}
+		insertSorted (chainsThatJoinedLeaf[leafId], it.second); // push the chain id into the vec' of chains that "joined" this usr's poa.
+	}
+	MyConfig::discardAllMsgs = false;
+	ChainsMaster::displaceAllChains ();
+	initAlgSync ();
+}
+
+
 /*************************************************************************************************************************************************
 Prepare a full reshuffle. 
 The function does the following:
@@ -575,18 +616,8 @@ The function does the following:
 void SimController::prepareFullReshSync ()
 {
 	Enter_Method ("prepareFullReshSync ()");
-	
-	// rlz all chains throughout
-	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
-		datacenters[dcId]->clrRsrc();
-	}
-	
-	chainsThatJoinedLeaf.clear ();
-	for (auto &it : ChainsMaster::allChains) {
-		DcId_t poa = it.second.S_u[0];
-		chainsThatJoinedLeaf[it.second.S_u[0]].push_back (it.first); // push the chain id into the vec' of chains that "joined" this usr's poa.
-	}
-	initAlgSync ();
+	MyConfig::discardAllMsgs = true;
+	scheduleAt (simTime() + CLEARNACE_DELAY, new InitFullReshMsg); 
 }
 
 
@@ -672,6 +703,9 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
+	if (MyConfig::discardAllMsgs) {
+		return;
+	}
 	if (DEBUG_LVL>0 && mode==ASYNC) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
@@ -717,17 +751,20 @@ void SimController::PrintStateAndEndSim ()
 
 void SimController::handleMessage (cMessage *msg)
 {
-  if (msg -> isSelfMessage()) {
+  if (dynamic_cast<RunTimePeriodMsg*> (msg)) {
 		isFirstPeriod = false;
 		if (!isLastPeriod) {
 			runTimePeriod ();
-		}
-  }
+		}  
+  }  
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
   	printAllDatacenters ();
   }
   else if (dynamic_cast<PrintStateAndEndSimMsg*> (msg)) { 
   	PrintStateAndEndSim ();
+  }
+  else if (dynamic_cast<InitFullReshMsg*> (msg)) { 
+  	initFullReshSync ();
   }
   else {
   	error ("Rcvd unknown msg type");
@@ -779,6 +816,9 @@ void SimController::setResFileName ()
 
 
 
+//		error ("b4 wait");
+//		wait (CLEARNACE_DELAY);
+//		error ("after wait");
 
 
 

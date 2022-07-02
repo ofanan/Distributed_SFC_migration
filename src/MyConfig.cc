@@ -20,7 +20,7 @@ const vector <vector <Cost_t>> MyConfig::RtChainCostAtLvl     = {{544, 278, 164}
 const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				 = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		 = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
-bool useFullResh = true;
+bool 	MyConfig::useFullResh = false;
 /*************************************************************************************************************************************************
 * Init parameters and variables
 **************************************************************************************************************************************************/

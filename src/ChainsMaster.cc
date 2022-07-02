@@ -56,6 +56,16 @@ bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
 
 
 /*************************************************************************************************************************************************
+* Displace all chains, by setting their curLvl to UNPLACED_LVL.
+**************************************************************************************************************************************************/
+void ChainsMaster::displaceAllChains ()
+{
+	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
+		it->second.curLvl = UNPLACED_LVL;
+	}
+}
+
+/*************************************************************************************************************************************************
 * Given a chain id, update the curLvl field of the respective chain to the given newLvl.
 * Output: true iff the requested chain was found, and its level was updated to newLvl.
 * The function also increments the number of inst' migrations (numInstantMigs).
@@ -136,23 +146,27 @@ void ChainsMaster::printAllChainsPoas () //(bool printSu=true, bool printleaf=fa
 
 
 /*************************************************************************************************************************************************
-* Writes into numMigs the overall num of migrations in the last time period.
-* Update for each chain c: c.curDc to be its currently hosting datacenter.
-* If any chain is unplaced, return false. Else, return true.
+Writes into numMigs the overall num of migrations in the last time period.
+Update for each chain c: c.curDc to be its currently hosting datacenter.
+- If any chain is unplaced, return 1, and set errChainId to the id of this erroneous chain.
+- Else, if any chain is placed incorrectly, return 2, and set errChainId to the id of this erroneous chain.
+- Else, return 0.
 **************************************************************************************************************************************************/
-bool ChainsMaster::concludeTimePeriod (int &numMigs)
+int ChainsMaster::concludeTimePeriod (int &numMigs, ChainId_t &errChainId)
 {
 	numMigs = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		if (DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
-			snprintf (buf, bufSize, "\nERROR: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", it->second.id);
+			errChainId = it->second.id;
+			snprintf (buf, bufSize, "\nerror: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", it->second.id);
 			MyConfig::printToLog (buf); 
-			return false;
+			return 1;
 		}
     if ((int)(it->second.S_u).size()<(it->second.curLvl-1)) {
-        MyConfig::printToLog ("\nERROR: ChainsMaster::concludeTimePeriod encountered the following problematic chain:\n");
+				errChainId = it->second.id;
+        MyConfig::printToLog ("\nerror: ChainsMaster::concludeTimePeriod encountered the following problematic chain:\n");
         MyConfig::printToLog (it->second);
-        return false;
+        return 2;
     }
 		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Was the chain migrated?
 			numMigs++;
@@ -164,7 +178,7 @@ bool ChainsMaster::concludeTimePeriod (int &numMigs)
 		it->second.curDc = it->second.S_u[it->second.curLvl];
 		it->second.potCpu = UNPLACED_CPU; // reset; will be set again only when this chain is pot-placed
 	}	
-	return true;
+	return 0;
 }
 
 /*************************************************************************************************************************************************

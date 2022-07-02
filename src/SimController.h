@@ -31,6 +31,8 @@ Controller of the simulation:
 #include "ChainsMaster.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
+#include "InitFullReshMsg_m.h"
+#include "RunTimePeriodMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -58,13 +60,13 @@ class SimController : public cSimpleModule
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
 		int numCritUsrs=0; // number of critical usrs at the beginning of this period
-		float     period=1.0;
+		float     period=10.0;
 		
 		string line; //current line being read from the tracefile
 		
 		//chainsThatLeftDatacenter[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
     unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDatacenter;
-    unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined leaf i
+    unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined the leaf with leafId i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
 		vector <ChainId_t> usrsThatLeft; // list of chains that left the relevant chain in the cur time priod.
     
@@ -135,6 +137,7 @@ class SimController : public cSimpleModule
 		void finishedAlg 		 (DcId_t dcId, DcId_t leafId);
 		void prepareReshSync (DcId_t dcId, DcId_t leafId);
 		void prepareFullReshSync ();
+		void initFullReshSync ();
 		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printInCntrFormat=true);
 		void printBuCost ();
 		void 

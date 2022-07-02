@@ -40,8 +40,9 @@ const bool ASYNC = false;
 const bool mode=SYNC;
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=DETAILED_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, LOG_LVL=VERY_DETAILED_LOG, RES_LVL=1;
 
+const double CLEARNACE_DELAY = 0.1; 
 										 
 class MyConfig { 
 
@@ -63,7 +64,8 @@ class MyConfig {
 		static Cpu_t  cpuAtLeaf;
 		static vector <Cpu_t> cpuAtLvl; 
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
-		static bool useFullResh;
+		static bool useFullResh; // when true, a failure cause a global reshuffle, of all chains and datacenters
+		static bool discardAllMsgs; // when true, all DCs ignore all incoming msgs.
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static float RtChainPr; // prob' that a new chain is an RT chain
