@@ -15,6 +15,7 @@ char 	MyConfig::modeStr[12];
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
+int   MyConfig::LOG_LVL;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -92,6 +93,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
+		MyConfig::LOG_LVL=VERY_DETAILED_LOG;
 		MyConfig::discardAllMsgs = false;
 		runTrace ();
 	}
@@ -255,7 +257,7 @@ void SimController::runTimePeriod ()
 			}
 			t = new_t;
 
-			if (LOG_LVL>0) {
+			if (MyConfig::LOG_LVL>0) {
 				snprintf (buf, bufSize, "\n\nt = %d\n********************", t);
 				MyConfig::printToLog (buf); 
 			}
@@ -319,7 +321,7 @@ void SimController::runTrace () {
 void SimController::finish () 
 {
   traceFile.close ();
-	if (LOG_LVL>0) {
+	if (MyConfig::LOG_LVL>0) {
   	MyConfig::printToLog ("\nfinished sim\n");
   }
 }
@@ -384,7 +386,7 @@ void SimController::concludeTimePeriod ()
 		 printResLine ();
 	}
 
-	if (LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		MyConfig::printToLog ("\nBUPU results:");
 		printAllDatacenters (false, false, false); //$$$
 		if (DEBUG_LVL>1) {
@@ -582,13 +584,15 @@ The function does the following:
 void SimController::initFullReshSync ()
 {
 
-	if (LOG_LVL >= DETAILED_LOG) {
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
 		MyConfig::printToLog ("\nbeginning full resh\n");
 	}
+	MyConfig::lvlOfHighestReshDc = height;
 	
 	// rlz all chains throughout
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
 		datacenters[dcId]->clrRsrc();
+		datacenters[dcId]->numBuPktsRcvd = 0;
 	}
 	
 	chainsThatJoinedLeaf.clear ();
@@ -630,7 +634,7 @@ The function does the following:
 void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 {
 
-	if (!	MyConfig::notifiedReshInThisPeriod && LOG_LVL>=BASIC_LOG) {
+	if (!	MyConfig::notifiedReshInThisPeriod && MyConfig::LOG_LVL>=BASIC_LOG) {
 		MyConfig::printToLog ("\nresh");
 		MyConfig::notifiedReshInThisPeriod = true;
 	}
@@ -648,7 +652,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 		}
 	}
 	rlzRsrcOfChains (chainsToReplace);
-	if (LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nSimCtrlr calling DC %d.initBottomUp with vecOfChainsThatJoined=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (vecOfUsrsOfThisPoA);
@@ -660,7 +664,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 void SimController::initAlgSync () 
 {  	
 
-	if (LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
 		printBufToLog();
 	} 
@@ -670,7 +674,7 @@ void SimController::initAlgSync ()
 	// First, initiate the alg' in all the leaves to which new chains have joined.
 	for (auto item : chainsThatJoinedLeaf)
 	{
-		if (LOG_LVL==2) {
+		if (MyConfig::LOG_LVL==2) {
 			logFile << "Chains that joined dc " << item.first << ": ";
 		}
 		leaves[item.first]->initBottomUp (item.second);
@@ -703,14 +707,11 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
-	if (MyConfig::discardAllMsgs) {
-		return;
-	}
 	if (DEBUG_LVL>0 && mode==ASYNC) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
-	if (LOG_LVL>=VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", dcId, leafId);
 		MyConfig::printToLog (buf);
 	}
@@ -723,7 +724,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 	}
 	if (rcvdFinishedAlgMsgFromAllLeaves) {
 
-		if (LOG_LVL>=DETAILED_LOG) {
+		if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 			MyConfig::printToLog ("\nrcvd fin alg msg from all leaves");
 		}
 		
@@ -741,7 +742,7 @@ void SimController::PrintStateAndEndSim ()
 	Enter_Method ("PrintStateAndEndSim ()");
 	MyConfig::printToLog ("\nPrinting state and finishing simulation\n");
 	printAllDatacenters (true, false);
-	if (LOG_LVL >= DETAILED_LOG) {
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
 		MyConfig::printToLog ("Printing the PoAs of each chain\n");
   	ChainsMaster::printAllChainsPoas  (); 
   }

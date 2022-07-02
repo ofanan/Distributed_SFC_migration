@@ -142,15 +142,14 @@ void Datacenter::handleEndXmtMsg ()
 void Datacenter::handleMessage (cMessage *msg)
 {
 
-	if (MyConfig::discardAllMsgs) {
-		MyConfig::printToLog ("\ndiscarding"); //$$$$
-		delete msg;
-		return;
-	}
   curHandledMsg = msg;
   if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
   	handleEndXmtMsg ();
   }
+	else if (MyConfig::discardAllMsgs) {
+		delete curHandledMsg;
+		return;
+	}
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
@@ -227,7 +226,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	potPlacedChains.clear ();
  	notAssigned = vecOfChainsThatJoined;
 
- 	if (LOG_LVL==VERY_DETAILED_LOG) {
+ 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : rcvd vecOfChainsThatJoined=", dcId);
 		printBufToLog (); 
 		MyConfig::printToLog(vecOfChainsThatJoined);
@@ -246,7 +245,7 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-	if (LOG_LVL>=VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		if (pkt->getPushUpVecArraySize()==0) {
 			snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpVec rcvd is empty", dcId);
 			printBufToLog ();
@@ -279,7 +278,7 @@ Assume that this->pushUpList already contains the relevant chains.
 void Datacenter::pushUpSync ()
 {
 
-	if (LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : begins PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
@@ -333,7 +332,7 @@ void Datacenter::pushUpSync ()
 		updatePlacementInfo ();
 	}
 
-	if (LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finihsed PU.", dcId);
 		printBufToLog ();
 		print ();
@@ -403,7 +402,7 @@ Assume that this->notAssigned and this->pushUpList already contain the relevant 
 void Datacenter::bottomUpSync ()
 {
 
-	if (LOG_LVL>=VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning BU sync. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
@@ -438,7 +437,7 @@ void Datacenter::bottomUpSync ()
 					printBufToLog ();
 					printStateAndEndSim  ();
 				}
-				if (LOG_LVL>=DETAILED_LOG) {
+				if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
 					printBufToLog();
 				}
@@ -449,7 +448,7 @@ void Datacenter::bottomUpSync ()
 		}
 	}
 
-	if (LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU sync.", dcId);
 		printBufToLog ();
 		print ();
@@ -481,7 +480,7 @@ void Datacenter::updatePlacementInfo ()
 	}
 	
 	for (auto chainId : newlyPlacedChains) {
-		if (LOG_LVL == VERY_DETAILED_LOG) {
+		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "\nupdating the ChainMaster: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
 			printBufToLog ();
 		}
@@ -505,7 +504,7 @@ Handle a bottomUP pkt, when running in sync' mode.
 void Datacenter::handleBottomUpPktSync ()
 {
 
-	if (LOG_LVL==VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 	}
@@ -529,7 +528,7 @@ void Datacenter::handleBottomUpPktSync ()
 			error ("Error in insertSorted. See log file for details");
 		}        
 	}
-	if (LOG_LVL == VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
     snprintf (buf, bufSize, "\ns%d : pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
@@ -647,6 +646,9 @@ void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
   }
   else {
     xmt (portNum, pkt2send);
+		if (dcId==44) { //$$$
+			MyConfig::printToLog ("\n s44 xmtd pkt");
+		}
   }
 }
 

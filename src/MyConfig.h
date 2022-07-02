@@ -40,7 +40,7 @@ const bool ASYNC = false;
 const bool mode=SYNC;
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, LOG_LVL=VERY_DETAILED_LOG, RES_LVL=1;
+const int  DEBUG_LVL=1, RES_LVL=1;
 
 const double CLEARNACE_DELAY = 0.1; 
 										 
@@ -76,6 +76,7 @@ class MyConfig {
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
 
     static string logFileName, resFileName;
+		static int LOG_LVL;
 
 		//Init
 		static void init ();

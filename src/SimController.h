@@ -60,7 +60,7 @@ class SimController : public cSimpleModule
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
 		int numCritUsrs=0; // number of critical usrs at the beginning of this period
-		float     period=10.0;
+		float     period=1.0;
 		
 		string line; //current line being read from the tracefile
 		

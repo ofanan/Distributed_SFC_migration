@@ -45,6 +45,7 @@ class Datacenter : public cSimpleModule
     int16_t dcId;
     int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
 		Cpu_t cpuCapacity;
+		int numBuPktsRcvd; 
     
 		//getter
 		void setLeafId (DcId_t leafId);
@@ -75,7 +76,6 @@ class Datacenter : public cSimpleModule
     Cpu_t  								 availCpu;
     vector<Chain> notAssigned; 
     unordered_set <ChainId_t>  newlyPlacedChains;    // IDs of the chains that I have placed after the last update I had sent to SimCtrlr.
-		int numBuPktsRcvd; 
 		
 		// A small buffer, used for printing results / log
 		static const int bufSize = 128;
