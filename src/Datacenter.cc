@@ -577,9 +577,6 @@ void Datacenter::genNsndBottomUpPkt ()
 	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
 	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
-	if (dcId==44) { //$$$
-		MyConfig::printToLog ("\n s44 sending BU pkt to prnt");
-	}
 	if (!reshuffled) { 
 		notAssigned.clear ();
 	}
@@ -647,9 +644,6 @@ void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
   }
   else {
     xmt (portNum, pkt2send);
-		if (dcId==44) { //$$$
-			MyConfig::printToLog ("\n s44 xmtd pkt");
-		}
   }
 }
 
