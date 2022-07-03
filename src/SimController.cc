@@ -22,6 +22,13 @@ vector <Cpu_t> MyConfig::cpuAtLvl;
 
 Define_Module(SimController);
 
+//returns the index of the Dc of level lvl in the path from Dc i to the root
+inline Lvl_t  SimController::idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl) {return lvl - datacenters[i]->lvl;}
+
+// convert leafId <--> dcId
+inline DcId_t SimController::leafId2DcId (DcId_t leafId) {return leaves		 [leafId]->dcId;}
+inline DcId_t SimController::dcId2leafId (DcId_t dcId)   {return datacenters[dcId]  ->leafId;}
+
 SimController::SimController() {
 }
 
@@ -65,6 +72,7 @@ void SimController::initialize (int stage)
 			MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
 		}
 		else {
+			MyConfig::RtChainPr = 0.5; // prob' that a new chain is an RT chain
 			MyConfig::evenChainsAreRt			 = true;
 		}
 
@@ -179,15 +187,6 @@ Lvl_t SimController::dist (DcId_t i, DcId_t j) {
 }
 
 /*************************************************************************************************************************************************
-returns the index of the Dc of level lvl in the path from Dc i to the root
-**************************************************************************************************************************************************/
-inline Lvl_t SimController::idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl) {return lvl - datacenters[i]->lvl;}
-
-inline DcId_t SimController::leafId2DcId (DcId_t leafId) {return leaves		 [leafId]->dcId;}
-inline DcId_t SimController::dcId2leafId (DcId_t dcId)   {return datacenters[dcId]  ->leafId;}
-
-
-/*************************************************************************************************************************************************
 Calculate the distance (in num of hops) beween node i and node j
 **************************************************************************************************************************************************/
 Lvl_t SimController::calcDistBetweenTwoDcs (DcId_t i, DcId_t j)
@@ -204,7 +203,8 @@ Lvl_t SimController::calcDistBetweenTwoDcs (DcId_t i, DcId_t j)
 } 
 
 /*************************************************************************************************************************************************
-Calculate the distance (in num of hops) between each pair of datacenters.
+Calculate the distance (in num of hops) between each pair of datacenters i, j, where i<j.
+Write the distances to this->distTable.
 **************************************************************************************************************************************************/
 
 void SimController::calcDistBetweenAllDcs () {
@@ -303,7 +303,7 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 }
 
 /*************************************************************************************************************************************************
-* Run the trace
+* Run the whole trace
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
@@ -375,7 +375,7 @@ void SimController::concludeTimePeriod ()
 	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, errChainId);
 	
 	if (stts!=0) {
-		error ("sim time=%lf, t=%d: error occured during run of ChainsMaster::concludeTimePeriod. err of type %d. errChainId=%d. For further details, plz Check the log file.",
+		error ("sim t=%lf, t=%d: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log file.",
 					  simTime().dbl(), t, stts, errChainId);
 	}
 	
@@ -445,7 +445,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 
 /*************************************************************************************************************************************************
 * Determine whether the generated chain would be RT, or NonRT.
-* This is done based on either random selection, or pseudo-random, based on the chainId.
+* This is done based on either random selection; or pseudo-random, based on the chainId.
 **************************************************************************************************************************************************/
 bool SimController::genRtChain (ChainId_t chainId)
 {
@@ -549,7 +549,10 @@ void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > 
 	}
 }
 
-// Initiate the run of placement alg'
+
+/*************************************************************************************************************************************************
+Initiate the run of placement alg'
+**************************************************************************************************************************************************/
 void SimController::initAlg () {  	
 
 	return (mode==SYNC)? initAlgSync() : initAlgAsync();
@@ -576,7 +579,7 @@ void SimController::checkChainsMasterData ()
 
 
 /*************************************************************************************************************************************************
-Prepare a full reshuffle. 
+Initiates a full reshuffle. 
 The function does the following:
 - rlx the rsrscs of all the chains in the system.
 - Initiate a placement alg' from all the leaves.
@@ -663,6 +666,10 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 // Initiate the run of an Sync placement alg'
 void SimController::initAlgSync () 
 {  	
+
+	for (DcId_t dcId(0); dcId < numDatacenters; dcId++) {
+		datacenters[dcId]->numBuPktsRcvd = 0;
+	}
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);

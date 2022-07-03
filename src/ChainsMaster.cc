@@ -56,6 +56,22 @@ bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
 
 
 /*************************************************************************************************************************************************
+* Get the cur Dc, in which a chain is currently placed. If the chain isn't placed, the curDc is UNPLACED_DC.
+* Assigns the value into dcId, given by ref'.
+* Returns true iff the ChainId_t is found in allChains.
+**************************************************************************************************************************************************/
+bool ChainsMaster::getChainCurDc (ChainId_t chainId, DcId_t &dcId)
+{
+	auto it = ChainsMaster::allChains.find(chainId);
+	if (it == ChainsMaster::allChains.end()) { 
+		return false;
+  }
+  dcId = it->second.curDc;
+  return true;
+}
+
+
+/*************************************************************************************************************************************************
 * Displace all chains, by setting their curLvl to UNPLACED_LVL.
 **************************************************************************************************************************************************/
 void ChainsMaster::displaceAllChains ()
@@ -168,7 +184,7 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, ChainId_t &errChainId)
         MyConfig::printToLog (it->second);
         return 2;
     }
-		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Was the chain migrated?
+		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Did that chain migrate?
 			numMigs++;
 			if (MyConfig::LOG_LVL >= DETAILED_LOG) {
 				snprintf (buf, bufSize, "\nchain %d migrated from %d to %d", it->second.id, it->second.curDc, it->second.S_u[it->second.curLvl]);

@@ -308,11 +308,12 @@ void Datacenter::pushUpSync ()
 	Cpu_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, ... 
-				requiredCpuToLocallyPlaceThisChain > availCpu || // or because not enough avail' cpu for pushing-up, ...
-				!chainPtr->dcIsDelayFeasible (dcId, lvl)) { // or because I'm not delay-feasible for this chain  
-			chainPtr++;
-			continue;
+		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, or ... 
+				requiredCpuToLocallyPlaceThisChain > availCpu || // because not enough avail' cpu for pushing-up, or ...
+				!chainPtr->dcIsDelayFeasible (dcId, lvl) || // because I'm not delay-feasible for this chain, or ...
+				chainPtr->curDc == chainPtr->S_u[chainPtr->curLvl]) {// the chain's suggested new place is identical to its current place, thus saving mig'
+					chainPtr++;
+					continue;
 		}
 		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
 			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
