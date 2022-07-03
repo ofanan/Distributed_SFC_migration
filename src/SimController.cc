@@ -111,7 +111,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "UniformTree.poa";
 	}
 
-	setResFileName ();
+	setOutputFileNames ();
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
 	if (traceNetType!=MyConfig::MyConfig::netType) {
 		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
@@ -805,21 +805,20 @@ void SimController::printResLine ()
 
 
 /*************************************************************************************************************************************************
- * 
+ * Set the output file names based on the settings of this sim run
 *************************************************************************************************************************************************/
-void SimController::setResFileName ()
+void SimController::setOutputFileNames ()
 {
-	MyConfig::resFileName = MyConfig::traceFileName + ".res";
-	MyConfig::logFileName = MyConfig::traceFileName + ".log";
+	
+	string traceRawName = MyConfig::traceFileName.substr(0, MyConfig::traceFileName.find_last_of("."));
+	MyConfig::resFileName = traceRawName + ".res";
+	MyConfig::logFileName = traceRawName + ".log";
 }
 
 
 
 
 
-//		error ("b4 wait");
-//		wait (CLEARNACE_DELAY);
-//		error ("after wait");
 
 
 

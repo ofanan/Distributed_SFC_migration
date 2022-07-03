@@ -2,7 +2,6 @@
 
 #include "MyConfig.h"
 
-
 using namespace omnetpp;
 using namespace std;
 
@@ -26,7 +25,6 @@ bool 	MyConfig::useFullResh = true;
 **************************************************************************************************************************************************/
 void MyConfig::init()
 {
-	MyConfig::discardAllMsgs = false;
 }
 
 

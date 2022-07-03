@@ -82,7 +82,7 @@ class SimController : public cSimpleModule
 		// Init Functions
     void initialize(int stage);
     virtual int numInitStages() const {return 3;}; //2nd  stage: after all DCs are already initialized, discover shortest paths; 3rd stage: runTrace
-		void setResFileName ();
+		void setOutputFileNames ();
 		void discoverPathsToRoot ();
 		Lvl_t dist (DcId_t i, DcId_t j);
 
