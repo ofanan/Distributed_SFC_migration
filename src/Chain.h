@@ -72,6 +72,14 @@ class NonRtChain: public Chain
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
+class ChainHash1 {
+	public:
+	size_t operator()(const Chain& lhs) const {
+  	return hash<ChainId_t>()(lhs.id);
+  }
+};
+
+// Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
 class ChainHash {
 	public:
 	size_t operator()(const Chain& c) const {
