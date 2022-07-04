@@ -304,6 +304,7 @@ void Datacenter::pushUpSync ()
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
 	}
 
+	pushUpList.sort (SortChainsForPushUpList());
 	// Next, try to push-up chains of my descendants
 	Cpu_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
