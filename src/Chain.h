@@ -72,7 +72,7 @@ class NonRtChain: public Chain
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
-struct ChainHash1 {
+struct SortChainsForPushUpList {
 	size_t operator()(const Chain& lhs, const Chain&rhs) const {
 	if (lhs.potCpu > rhs.potCpu) {
 		return true;
