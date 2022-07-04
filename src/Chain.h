@@ -74,8 +74,16 @@ class NonRtChain: public Chain
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
 class ChainHash1 {
 	public:
-	size_t operator()(const Chain& lhs) const {
-  	return hash<ChainId_t>()(lhs.id);
+	size_t operator()(const Chain& lhs, const Chain&rhs) const {
+/*  	return hash<ChainId_t>()(lhs.id);*/
+	if (lhs.potCpu > rhs.potCpu) {
+		return true;
+	}
+/*	if (!lhs.isRtChain && rhs.isRtChain) {*/
+/*		return true;*/
+/*	}*/
+/*	return (lhs.id < rhs.id);*/
+	return false;
   }
 };
 
