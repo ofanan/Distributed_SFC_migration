@@ -183,14 +183,14 @@ void MyConfig::printToLog (const int d)
 void MyConfig::printToLog (vector <Chain> vec) 
 {
 	for (const auto &chain : vec) {
-		logFile << chain.id << ",";
+		logFile << chain.id << ", ";
 	}
 }
 
 void MyConfig::printToLog (vector <ChainId_t> vec) 
 {
 	for (const auto i : vec) {
-		logFile << i << ",";
+		logFile << i << ", ";
 	}
 }
 

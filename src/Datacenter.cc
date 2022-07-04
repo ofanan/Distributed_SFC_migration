@@ -95,12 +95,17 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
 		return;
 	}
-	snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_chains=%d.", 
+	snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_chains=%d", 
 														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()+potPlacedChains.size()) );
 	printBufToLog ();
 	if (printChainIds) {
-		MyConfig::printToLog ("chains [");
-		MyConfig::printToLog (placedChains);	
+		MyConfig::printToLog (" chains [");
+		vector <ChainId_t> placedChainsVec;
+		for (auto const &chainId : placedChains) {
+			placedChainsVec.push_back (chainId);
+		}
+		sort(placedChainsVec.begin(), placedChainsVec.end()); 
+		MyConfig::printToLog (placedChainsVec);	
 		MyConfig::printToLog ("]");
 		return;
 	}
@@ -304,8 +309,9 @@ void Datacenter::pushUpSync ()
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
 	}
 
-	pushUpList.sort (SortChainsForPushUpList());
 	// Next, try to push-up chains of my descendants
+	list <Chain> pushedUpChains;
+	pushUpList.sort (SortChainsForPushUpList());
 	Cpu_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
@@ -323,10 +329,15 @@ void Datacenter::pushUpSync ()
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
 			newlyPlacedChains.insert (pushedUpChain.id);
-			if (!insertSorted (pushUpList, pushedUpChain)) {
-				error ("Error in insertSorted. See log file for details");
-			}			
+			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
+//			if (!insertSorted (pushUpList, pushedUpChain)) {
+//				error ("Error in insertSorted. See log file for details");
+//			}			
 		}
+	}
+	
+	for (auto chainPtr=pushedUpChains.begin(); chainPtr!=pushedUpChains.end(); chainPtr++) {
+		insertSorted (pushUpList, *chainPtr);
 	}
 	
 	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
@@ -410,6 +421,7 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
+	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedpList());
 	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it

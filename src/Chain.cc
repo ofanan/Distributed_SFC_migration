@@ -282,21 +282,21 @@ bool insertSorted (list <Chain> &sortedList, const Chain &chain)
 }
 
 
-/*************************************************************************************************************************************************
-Rcvs 2 sorted vectors of chains. 
-Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
-Currently unused.
-**************************************************************************************************************************************************/
-void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
-{
-	for (auto const &chain : vec) {
-		if (chain.isRtChain) {
-			vec.insert (vec.begin(), chain);
-		}
-		else {
-			vec.push_back (chain);
-		}
-	}
-}
+///*************************************************************************************************************************************************
+//Rcvs 2 sorted vectors of chains. 
+//Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
+//Currently unused.
+//**************************************************************************************************************************************************/
+//void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
+//{
+//	for (auto const &chain : vec) {
+//		if (chain.isRtChain) {
+//			vec.insert (vec.begin(), chain);
+//		}
+//		else {
+//			vec.push_back (chain);
+//		}
+//	}
+//}
 
 

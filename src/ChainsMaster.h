@@ -15,7 +15,7 @@
 #include "MyConfig.h"
 
 class Chain;
-class ChainHash;
+struct ChainHash;
 
 using namespace omnetpp;
 using namespace std;

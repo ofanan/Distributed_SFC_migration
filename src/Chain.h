@@ -71,7 +71,29 @@ class NonRtChain: public Chain
 	  NonRtChain (const NonRtChain &c);
 };
 
-// Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
+/*************************************************************************************************************************************************
+Sort the chains for notAssignedList, as follow:
+- give higher priority to RT chains.
+- break ties by an inc. order of id.
+**************************************************************************************************************************************************/
+struct SortChainsForNotAssignedpList {
+	size_t operator()(const Chain& lhs, const Chain&rhs) const {
+		if (lhs.isRtChain && !rhs.isRtChain) { // give higher priority to RT chains
+			return true;
+		}
+		return (lhs.id < rhs.id);
+	}
+};
+
+
+/*************************************************************************************************************************************************
+Sort the chains for pushUpList, as follow:
+- sort by decreasing order of the # of CPU units each chain is currently using.
+- Break ties by how much CPU each of them will be using if pushed-up to a certain level; usrs that would consume lower cpu when pushed-up, should appear first.
+  This is approximated merely by letting non-RT chains appear first, because for a given level, 
+  non-RT chains are likely to consume less cpu than the RT equivalents.
+- Break further ties by an increasing id order.
+**************************************************************************************************************************************************/
 struct SortChainsForPushUpList {
 	size_t operator()(const Chain& lhs, const Chain&rhs) const {
 	if (lhs.potCpu > rhs.potCpu) {
@@ -85,8 +107,7 @@ struct SortChainsForPushUpList {
 };
 
 // Instruct the compiler to identify (and, in particular, hash) Chains based on theirs id only.
-class ChainHash {
-	public:
+struct ChainHash {
 	size_t operator()(const Chain& c) const {
   	return hash<ChainId_t>()(c.id);
   }
