@@ -33,9 +33,9 @@ class Chain
     Chain (ChainId_t id);
     Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl=UNPLACED_LVL);
             
-/*    bool operator== (const Chain &right) const {*/ //$$$$
-/*      return (this->id == right.id);*/
-/*    }*/
+    bool operator== (const Chain &right) const { //$$$$
+      return (int(this->id) == int(right.id));
+    }
 	
 		void print (bool printS_u = true);	
 	

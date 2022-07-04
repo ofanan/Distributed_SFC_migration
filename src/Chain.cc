@@ -246,6 +246,11 @@ inline bool SortChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 	return (lhs.id < rhs.id);
 }
 
+//bool operator< (const Chain &rhs) const { 
+//  return (this->id == right.id);
+//}
+
+
 /*************************************************************************************************************************************************
 insert a chain to its correct location in a sorted list.
 If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
