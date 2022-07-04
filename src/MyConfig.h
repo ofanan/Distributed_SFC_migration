@@ -72,7 +72,7 @@ class MyConfig {
 		static bool randomlySetChainType;
 		static bool evenChainsAreRt;
 
-		static const bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		static bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
 
     static string logFileName, resFileName;

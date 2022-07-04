@@ -85,25 +85,25 @@ void Datacenter::initialize(int stage)
 /*************************************************************************************************************************************************
  * Print to the log file data about chains on this DC. 
  * Inputs: 
- * - printInCntrFormat: when true, print in a format similar to that used in the centralized alg'.
+ * - printChainIds: when true, print in a format similar to that used in the centralized alg'.
  * - printPotPlaced: when true and there're potPlacedChains to print - print them.
  * - printPushUpList: when true and pushUpList isn't impty - print them.
 *************************************************************************************************************************************************/
 
-void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printInCntrFormat)
+void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds)
 {
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
 		return;
 	}
-	if (printInCntrFormat) {
-		snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_chains=%d", 
-															dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()+potPlacedChains.size()) );
-		printBufToLog ();
+	snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_chains=%d.", 
+														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()+potPlacedChains.size()) );
+	printBufToLog ();
+	if (printChainIds) {
+		MyConfig::printToLog ("chains [");
+		MyConfig::printToLog (placedChains);	
+		MyConfig::printToLog ("]");
 		return;
 	}
-	snprintf (buf, bufSize, "\ns%d : lvl=%d. placed chains: ", dcId, lvl);
-	printBufToLog ();
-	MyConfig::printToLog (placedChains);	
 	if (printPotPlaced) {
 		MyConfig::printToLog ("pot. placed chains: ");
 		MyConfig::printToLog (potPlacedChains);
@@ -311,7 +311,7 @@ void Datacenter::pushUpSync ()
 		if (chainPtr->curLvl >= lvl || // shouldn't push-up this chain either because it's already pushed-up by me/by an ancestor, or ... 
 				requiredCpuToLocallyPlaceThisChain > availCpu || // because not enough avail' cpu for pushing-up, or ...
 				!chainPtr->dcIsDelayFeasible (dcId, lvl) || // because I'm not delay-feasible for this chain, or ...
-				chainPtr->curDc == chainPtr->S_u[chainPtr->curLvl]) {// the chain's suggested new place is identical to its current place, thus saving mig'
+				chainPtr->curDc == chainPtr->S_u[chainPtr->curLvl]) {// the chain's suggested new place is identical to its current place, thus saving mig' cost
 					chainPtr++;
 					continue;
 		}
@@ -319,7 +319,7 @@ void Datacenter::pushUpSync ()
 			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
 			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpList
 			pushedUpChain.curLvl = lvl;
-			chainPtr 						 = pushUpList.erase (chainPtr); // remove the push-upped chain from the list of potentially pushed-up chains; to be replaced by a modified chain
+			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
 			newlyPlacedChains.insert (pushedUpChain.id);
 			if (!insertSorted (pushUpList, pushedUpChain)) {
@@ -457,7 +457,7 @@ void Datacenter::bottomUpSync ()
 
   if (isRoot) { 
   	if (MyConfig::printBuRes) {
-  		MyConfig::printToLog ("\nBU results:");
+  		MyConfig::printToLog ("\nAfter BU:");
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
   	}

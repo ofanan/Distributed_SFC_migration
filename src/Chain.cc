@@ -232,16 +232,18 @@ void insertSorted (vector <Chain> &vec, const Chain &c)
 
 /*************************************************************************************************************************************************
 The compare function used by pushUpList: sort two chains in a decreasing order of the cpu they current use.
-Namely, return true iff lhs is currently using more cpu than rhs
+Namely, if lhs is currently using more cpu than rhs, return true.
+Break ties by having NonRtChains first, because such chains are likely to consume less cpu at the destination.
+For having deterministic reproducible results, break further ties by an inc. id #.
 **************************************************************************************************************************************************/
-inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
-	return lhs.potCpu > rhs.potCpu;
-//	Cpu_t lhsCpu = lhs.potCpu;
-//	Cpu_t rhsCpu = rhs.potCpu;
-//	if (lhsCpu==UNPLACED_CPU ||  rhsCpu==UNPLACED_CPU) {  // break ties arbitrarily
-//		return true;
-//	}
-//	return lhsCpu > rhsCpu;
+inline bool SortChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
+	if (lhs.potCpu > rhs.potCpu) {
+		return true;
+	}
+	if (!lhs.isRtChain && rhs.isRtChain) {
+		return true;
+	}
+	return (lhs.id < rhs.id);
 }
 
 /*************************************************************************************************************************************************
@@ -272,7 +274,7 @@ bool insertSorted (list <Chain> &sortedList, const Chain &chain)
 	// insert the chain to its correct location in the (sorted) list
 	auto begin 	= sortedList.begin();
   auto end 		= sortedList.end();
-  while ((begin != end) && CompareChainsByDecCpuUsage (*begin, chain)) { // skip all chains in the list which use more cpu than me
+  while ((begin != end) && SortChainsByDecCpuUsage (*begin, chain)) { // skip all chains in the list which use more cpu than me
   	begin++;
   }
   sortedList.insert(begin, chain);

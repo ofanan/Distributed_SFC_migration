@@ -16,6 +16,7 @@ Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
 int   MyConfig::LOG_LVL;
+bool MyConfig::printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -101,7 +102,8 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL=VERY_DETAILED_LOG;
+		MyConfig::LOG_LVL=NO_LOG;
+		MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
 		runTrace ();
 	}
@@ -113,7 +115,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa";
+		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree.poa";
@@ -386,6 +388,10 @@ void SimController::concludeTimePeriod ()
 		 printResLine ();
 	}
 
+	MyConfig::printToLog ("\nBUPU results:"); // $$$
+	printAllDatacenters (false, false, true); //$$$
+
+
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		MyConfig::printToLog ("\nBUPU results:");
 		printAllDatacenters (false, false, false); //$$$
@@ -405,10 +411,10 @@ void SimController::concludeTimePeriod ()
 
 
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
-void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpList, bool printInCntrFormat)
+void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpList, bool printChainIds)
 {
 	for (const auto datacenter : datacenters) {
-		datacenter -> print (printPotPlaced, printPushUpList, printInCntrFormat);
+		datacenter -> print (printPotPlaced, printPushUpList, printChainIds);
 	}
 }
 

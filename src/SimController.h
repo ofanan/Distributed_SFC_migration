@@ -138,7 +138,7 @@ class SimController : public cSimpleModule
 		void prepareReshSync (DcId_t dcId, DcId_t leafId);
 		void prepareFullReshSync ();
 		void initFullReshSync ();
-		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printInCntrFormat=true);
+		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printChainIds=true);
 		void printBuCost ();
 		void 
 		printResLine ();
