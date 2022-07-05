@@ -131,7 +131,8 @@ Put in the first vector (given by ref') a sorted vector, containing the union of
 void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 // Insert a chain in its correct place to a sorted datastructure
-void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness. Currently unused, bacuase it's easier to insert chains wo sorting, and sort only when needed.
+
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
 bool insertChainToList (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 

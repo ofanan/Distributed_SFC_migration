@@ -500,7 +500,7 @@ void SimController::rdNewUsrsLine (string line)
 			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 		}
 		
-		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
+		chainsThatJoinedLeaf[poaId].push_back ( chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
 		if (!ChainsMaster::insert (chainId, chain)) {
 			error ("t=%d new chain %d was already found in ChainsMaster", t, chainId);
 		}
@@ -537,7 +537,7 @@ void SimController::rdOldUsrsLine (string line)
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
 			numCritUsrs++;
-			insertSorted (chainsThatJoinedLeaf[poaId], chain); 
+			chainsThatJoinedLeaf[poaId].push_back(chain); 
 			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
 	}
@@ -613,7 +613,7 @@ void SimController::initFullReshSync ()
 			printBufToLog();
 			error ("Error in initFullReshSync. Please check the log file.");
 		}
-		insertSorted (chainsThatJoinedLeaf[leafId], it.second); // push the chain id into the vec' of chains that "joined" this usr's poa.
+		chainsThatJoinedLeaf[leafId].push_back(it.second); // push the chain id into the vec' of chains that "joined" this usr's poa.
 	}
 	MyConfig::discardAllMsgs = false;
 	ChainsMaster::displaceAllChains ();
