@@ -523,7 +523,7 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
 	for (int i(0); i < (pkt->getNotAssignedArraySize ());i++) {
-		insertSorted (notAssigned, pkt->getNotAssigned(i));
+		notAssigned.push_back (pkt->getNotAssigned(i));
 	}
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
