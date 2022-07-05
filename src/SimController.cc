@@ -103,7 +103,7 @@ void SimController::initialize (int stage)
 	
 	if (stage==2) {
 		MyConfig::LOG_LVL=NO_LOG;
-		MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
 		runTrace ();
@@ -389,13 +389,17 @@ void SimController::concludeTimePeriod ()
 		 printResLine ();
 	}
 
-	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
-		MyConfig::printToLog ("\nBUPU results:");
+	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG || t==27001) { //$$$$
+		snprintf (buf, bufSize, "\nt=%d, BUPU results:", t);
+		printBufToLog ();
 		printAllDatacenters (false, false, true); 
 		if (DEBUG_LVL>1) {
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
 		}
+	}
+	if (t==27001) { //$$$
+		endSimulation ();
 	}
 	
 	// reset state variables, in preparation for the next period
