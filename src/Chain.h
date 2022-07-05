@@ -78,11 +78,14 @@ Sort the chains for notAssignedList, as follow:
 **************************************************************************************************************************************************/
 struct SortChainsForNotAssignedpList {
 	size_t operator()(const Chain& lhs, const Chain&rhs) const {
-		if (lhs.isRtChain && !rhs.isRtChain) { // give higher priority to RT chains
+		if (lhs.isRtChain && (!rhs.isRtChain)) { // give higher priority to RT chains
 			return true;
 		}
-		return (lhs.id < rhs.id);
-	}
+		if (!lhs.isRtChain && (rhs.isRtChain)) { // give higher priority to RT chains
+			return false;
+		}		
+			return (lhs.id < rhs.id);
+	} 
 };
 
 

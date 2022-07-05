@@ -196,9 +196,12 @@ void MyConfig::printToLog (vector <ChainId_t> vec)
 
 void MyConfig::printToLog (unordered_set <ChainId_t> set2print) 
 {
-	for (const auto i : set2print) {
-		logFile << i << ",";
+	vector <ChainId_t> setAsVec;
+	for (auto const &chainId : set2print) {
+		setAsVec.push_back (chainId);
 	}
+	sort(setAsVec.begin(), setAsVec.end()); 
+	MyConfig::printToLog (setAsVec);	
 }
 
 vector<Cost_t> MyConfig::scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2) 

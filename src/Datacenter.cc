@@ -100,18 +100,11 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	printBufToLog ();
 	if (printChainIds) {
 		MyConfig::printToLog (" chains [");
-		vector <ChainId_t> placedChainsVec;
-		for (auto const &chainId : placedChains) {
-			placedChainsVec.push_back (chainId);
+		MyConfig::printToLog (placedChains);	
+		if (printPotPlaced) {
+			MyConfig::printToLog (potPlacedChains);
 		}
-		sort(placedChainsVec.begin(), placedChainsVec.end()); 
-		MyConfig::printToLog (placedChainsVec);	
 		MyConfig::printToLog ("]");
-		return;
-	}
-	if (printPotPlaced) {
-		MyConfig::printToLog ("pot. placed chains: ");
-		MyConfig::printToLog (potPlacedChains);
 	}
 	if (printPushUpList) {
 		MyConfig::printToLog ("pushUpList: ");
@@ -422,6 +415,11 @@ void Datacenter::bottomUpSync ()
 	}
 
 	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedpList());
+	if (dcId==1836) { //$$$
+		MyConfig::printToLog ("\ns1836 notAssigned=");
+		MyConfig::printToLog (notAssigned);
+		endSimulation ();
+	}
 	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
@@ -473,6 +471,7 @@ void Datacenter::bottomUpSync ()
   		MyConfig::printToLog ("\nAfter BU:");
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
+  		endSimulation (); //$$$$$$
   	}
   	
   	pushUpSync ();

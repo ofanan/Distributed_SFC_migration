@@ -103,7 +103,7 @@ void SimController::initialize (int stage)
 	
 	if (stage==2) {
 		MyConfig::LOG_LVL=NO_LOG;
-		MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
 		runTrace ();
 	}
@@ -287,6 +287,7 @@ void SimController::runTimePeriod ()
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			chainsThatLeftDatacenter.clear ();
 		
+			//$$$
 			initAlg (); // call a placement algorithm 
 			scheduleAt (simTime() + period, new RunTimePeriodMsg); // Schedule a self-event for reading the handling the next time-step
 			break;
@@ -413,6 +414,9 @@ void SimController::concludeTimePeriod ()
 // print all the placed (and possibly, the pot-placed) chains on each DC by the datacenter's data.
 void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpList, bool printChainIds)
 {
+	if (printPotPlaced) {
+		MyConfig::printToLog ("\n************* Note: this print includes also potPlaced chains *************");
+	}
 	for (const auto datacenter : datacenters) {
 		datacenter -> print (printPotPlaced, printPushUpList, printChainIds);
 	}
