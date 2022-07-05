@@ -255,8 +255,8 @@ void Datacenter::handlePushUpPkt ()
 	}
 	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		if (!insertSorted (pushUpList, pkt->getPushUpVec (i))) {
-			error ("Error in insertSorted. See log file for details");
+		if (!insertChainToList (pushUpList, pkt->getPushUpVec (i))) {
+			error ("Error in insertChainToList. See log file for details");
 		}
 
 	} 
@@ -327,7 +327,7 @@ void Datacenter::pushUpSync ()
 	}
 	
 	for (auto chainPtr=pushedUpChains.begin(); chainPtr!=pushedUpChains.end(); chainPtr++) {
-		insertSorted (pushUpList, *chainPtr);
+		insertChainToList (pushUpList, *chainPtr);
 	}
 	
 	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
@@ -427,8 +427,8 @@ void Datacenter::bottomUpSync ()
 					modifiedChain.curLvl = lvl;
 					chainPtr = notAssigned.erase (chainPtr); 
 					modifiedChain.potCpu = requiredCpuToLocallyPlaceThisChain; // set the chain's "potCpu" field to the cpu required, if I'll host it
-					if (!insertSorted (pushUpList, modifiedChain)) {
-						error ("Error in insertSorted. See log file for details");
+					if (!insertChainToList (pushUpList, modifiedChain)) {
+						error ("Error in insertChainToList. See log file for details");
 					}
 				}
 		}
@@ -528,8 +528,8 @@ void Datacenter::handleBottomUpPktSync ()
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-    if (!insertSorted (pushUpList, pkt->getPushUpVec(i))) {
-			error ("Error in insertSorted. See log file for details");
+    if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
+			error ("Error in insertChainToList. See log file for details");
 		}        
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {

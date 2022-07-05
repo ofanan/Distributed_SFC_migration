@@ -250,13 +250,13 @@ inline bool SortChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
 insert a chain to its correct location in a sorted list.
 If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
 **************************************************************************************************************************************************/
-bool insertSorted (list <Chain> &sortedList, const Chain &chain)
+bool insertChainToList (list <Chain> &sortedList, const Chain &chain)
 {
 
 	if (chain.potCpu==UNPLACED_CPU) {
 		int bufSize = 128;
 		char buf[bufSize];	
-		snprintf (buf, bufSize, "\error: insertSorted was called with chain %d for which postCpu==UNPLACED_CPU", chain.id);
+		snprintf (buf, bufSize, "\error: insertChainToList was called with chain %d for which postCpu==UNPLACED_CPU", chain.id);
 		MyConfig::printToLog (buf);
 		return false;
 	}

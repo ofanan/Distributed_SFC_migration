@@ -500,7 +500,7 @@ void SimController::rdNewUsrsLine (string line)
 			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
 		}
 		
-		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to its correct order in the (ordered) vector of chainsThatJoinedLeaf[poaId].		
+		insertSorted (chainsThatJoinedLeaf[poaId], chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
 		if (!ChainsMaster::insert (chainId, chain)) {
 			error ("t=%d new chain %d was already found in ChainsMaster", t, chainId);
 		}
@@ -537,7 +537,7 @@ void SimController::rdOldUsrsLine (string line)
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
 			numCritUsrs++;
-			insertSorted (chainsThatJoinedLeaf[poaId], chain); // need to inform the chain's new poa that it has to place it
+			insertSorted (chainsThatJoinedLeaf[poaId], chain); 
 			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
 	}
