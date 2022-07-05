@@ -16,7 +16,7 @@ Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
 int   MyConfig::LOG_LVL;
-bool MyConfig::printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+bool MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -103,7 +103,8 @@ void SimController::initialize (int stage)
 	
 	if (stage==2) {
 		MyConfig::LOG_LVL=NO_LOG;
-		MyConfig::printBuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBupuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
 		runTrace ();
 	}
@@ -287,7 +288,6 @@ void SimController::runTimePeriod ()
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			chainsThatLeftDatacenter.clear ();
 		
-			//$$$
 			initAlg (); // call a placement algorithm 
 			scheduleAt (simTime() + period, new RunTimePeriodMsg); // Schedule a self-event for reading the handling the next time-step
 			break;
@@ -389,13 +389,9 @@ void SimController::concludeTimePeriod ()
 		 printResLine ();
 	}
 
-	MyConfig::printToLog ("\nBUPU results:"); // $$$
-	printAllDatacenters (false, false, true); //$$$
-
-
-	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
 		MyConfig::printToLog ("\nBUPU results:");
-		printAllDatacenters (false, false, false); //$$$
+		printAllDatacenters (false, false, true); 
 		if (DEBUG_LVL>1) {
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);

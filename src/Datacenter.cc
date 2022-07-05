@@ -415,11 +415,6 @@ void Datacenter::bottomUpSync ()
 	}
 
 	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedpList());
-	if (dcId==1836) { //$$$
-		MyConfig::printToLog ("\ns1836 notAssigned=");
-		MyConfig::printToLog (notAssigned);
-		endSimulation ();
-	}
 	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
@@ -471,7 +466,6 @@ void Datacenter::bottomUpSync ()
   		MyConfig::printToLog ("\nAfter BU:");
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
-  		endSimulation (); //$$$$$$
   	}
   	
   	pushUpSync ();
