@@ -34,10 +34,10 @@ const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // leve
 const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possible NetType values
 const int uniformChainMigCost = 600;
 
-// Mode: SYNC, or ASYNC
-const bool SYNC  = true;
-const bool ASYNC = false;
-const bool mode=SYNC;
+// Mode: Sync, or Async
+const bool Sync  = true;
+const bool Async = false;
+const bool mode=Sync;
 
 // Determining the level of debug and log.
 const int  DEBUG_LVL=1, RES_LVL=1;

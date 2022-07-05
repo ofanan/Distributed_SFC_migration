@@ -53,7 +53,7 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
-		snprintf (MyConfig::modeStr, 12, (mode==SYNC)? "Sync" : "Async"); 
+		snprintf (MyConfig::modeStr, 12, (mode==Sync)? "Sync" : "Async"); 
 		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
 		for (Lvl_t lvl(0); lvl < height; lvl++) {
 			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
@@ -131,6 +131,7 @@ void SimController::openFiles ()
 	if (!MyConfig::openFiles ()) {
 		error ("MyConfig::openFiles failed");
 	}
+	MyConfig::printToLog (MyConfig::traceFileName); //$$$
 }
 
 void SimController::checkParams ()
@@ -562,7 +563,7 @@ Initiate the run of placement alg'
 **************************************************************************************************************************************************/
 void SimController::initAlg () {  	
 
-	return (mode==SYNC)? initAlgSync() : initAlgAsync();
+	return (mode==Sync)? initAlgSync() : initAlgAsync();
 }
 
 /*************************************************************************************************************************************************
@@ -721,7 +722,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
-	if (DEBUG_LVL>0 && mode==ASYNC) {
+	if (DEBUG_LVL>0 && mode==Async) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
@@ -825,8 +826,8 @@ void SimController::setOutputFileNames ()
 {
 	
 	string traceRawName = MyConfig::traceFileName.substr(0, MyConfig::traceFileName.find_last_of("."));
-	MyConfig::resFileName = traceRawName + ".res";
-	MyConfig::logFileName = traceRawName + ".log";
+	MyConfig::resFileName = traceRawName + "_" + MyConfig::modeStr + ".res";
+	MyConfig::logFileName = traceRawName + "_" + MyConfig::modeStr + ".log";
 }
 
 

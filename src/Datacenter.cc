@@ -149,14 +149,14 @@ void Datacenter::handleMessage (cMessage *msg)
 		return;
 	}
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
-  	if (mode==SYNC) { handleBottomUpPktSync();} else {bottomUpAsync ();}
+  	if (mode==Sync) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
   {
-    if (mode==SYNC) { prepareReshSync ();} {reshuffleAsync();}
+    if (mode==Sync) { prepareReshSync ();} {reshuffleAsync();}
   }
   else
   {
@@ -230,7 +230,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 		MyConfig::printToLog(vecOfChainsThatJoined);
 		print (); 
 	}
-  if (mode==SYNC) { bottomUpSync();} else {bottomUpAsync ();}		
+  if (mode==Sync) { bottomUpSync();} else {bottomUpAsync ();}		
 }
 
 /*************************************************************************************************************************************************
@@ -261,7 +261,7 @@ void Datacenter::handlePushUpPkt ()
 
 	} 
 
-	if (mode==SYNC){ 
+	if (mode==Sync){ 
 		pushUpSync ();
 	}
 	else {
@@ -381,7 +381,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		// shrink pushUpVec to its real size
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
-		if (mode==SYNC || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+		if (mode==Sync || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
