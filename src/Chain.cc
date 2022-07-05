@@ -271,13 +271,8 @@ bool insertSorted (list <Chain> &sortedList, const Chain &chain)
 		chainPtr++;
 	}
 
-	// insert the chain to its correct location in the (sorted) list
-	auto begin 	= sortedList.begin();
-  auto end 		= sortedList.end();
-  while ((begin != end) && SortChainsByDecCpuUsage (*begin, chain)) { // skip all chains in the list which use more cpu than me
-  	begin++;
-  }
-  sortedList.insert(begin, chain);
+	// insert the chain
+  sortedList.insert(sortedList.begin(), chain);
   return true;
 }
 

@@ -323,9 +323,6 @@ void Datacenter::pushUpSync ()
 			placedChains.				 insert (pushedUpChain.id);
 			newlyPlacedChains.insert (pushedUpChain.id);
 			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
-//			if (!insertSorted (pushUpList, pushedUpChain)) {
-//				error ("Error in insertSorted. See log file for details");
-//			}			
 		}
 	}
 	

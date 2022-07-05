@@ -389,7 +389,7 @@ void SimController::concludeTimePeriod ()
 		 printResLine ();
 	}
 
-	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG || t==27001) { //$$$$
+	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%d, BUPU results:", t);
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
@@ -397,9 +397,6 @@ void SimController::concludeTimePeriod ()
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
 		}
-	}
-	if (t==27001) { //$$$
-		endSimulation ();
 	}
 	
 	// reset state variables, in preparation for the next period
