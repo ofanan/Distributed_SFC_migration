@@ -414,7 +414,7 @@ void Datacenter::bottomUpSync ()
 		MyConfig::printToLog (notAssigned);
 	}
 
-	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedpList());
+	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedList());
 	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it

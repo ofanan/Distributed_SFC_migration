@@ -76,7 +76,7 @@ Sort the chains for notAssignedList, as follow:
 - give higher priority to RT chains.
 - break ties by an inc. order of id.
 **************************************************************************************************************************************************/
-struct SortChainsForNotAssignedpList {
+struct SortChainsForNotAssignedList {
 	size_t operator()(const Chain& lhs, const Chain&rhs) const {
 		if (lhs.isRtChain && (!rhs.isRtChain)) { // give higher priority to RT chains
 			return true;
@@ -102,8 +102,14 @@ struct SortChainsForPushUpList {
 	if (lhs.potCpu > rhs.potCpu) {
 		return true;
 	}
+	if (lhs.potCpu < rhs.potCpu) {
+		return false;
+	}
 	if (!lhs.isRtChain && rhs.isRtChain) {
 		return true;
+	}
+	if (lhs.isRtChain && !rhs.isRtChain) {
+		return false;
 	}
 	return (lhs.id < rhs.id);
   }
