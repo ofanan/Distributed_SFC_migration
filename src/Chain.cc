@@ -175,17 +175,6 @@ bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId
 	}
 }
 
-//void Chain::setNetType (const unsigned int netType)
-//{
-//	Chain::netType = netType;
-//}
-
-//// returns the id of the datacenter currently hosting "this"; or UNPLACED_DC, if this chain isn't placed
-//DcId_t Chain::getCurDatacenter () const 
-//{
-//	return (curLvl==UNPLACED_LVL)? UNPLACED_DC : S_u[curLvl];
-//} 
-
 /*************************************************************************************************************************************************
 * Returns the non-mig' cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
 **************************************************************************************************************************************************/
