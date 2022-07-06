@@ -232,22 +232,6 @@ void insertSorted (vector <Chain> &vec, const Chain &c)
 }
 
 /*************************************************************************************************************************************************
-The compare function used by pushUpList: sort two chains in a decreasing order of the cpu they current use.
-Namely, if lhs is currently using more cpu than rhs, return true.
-Break ties by having NonRtChains first, because such chains are likely to consume less cpu at the destination.
-For having deterministic reproducible results, break further ties by an inc. id #.
-**************************************************************************************************************************************************/
-inline bool SortChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs) {
-	if (lhs.potCpu > rhs.potCpu) {
-		return true;
-	}
-	if (!lhs.isRtChain && rhs.isRtChain) {
-		return true;
-	}
-	return (lhs.id < rhs.id);
-}
-
-/*************************************************************************************************************************************************
 insert a chain to its correct location in a sorted list.
 If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
 **************************************************************************************************************************************************/
@@ -276,23 +260,5 @@ bool insertChainToList (list <Chain> &sortedList, const Chain &chain)
   sortedList.insert(sortedList.begin(), chain);
   return true;
 }
-
-
-///*************************************************************************************************************************************************
-//Rcvs 2 sorted vectors of chains. 
-//Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
-//Currently unused.
-//**************************************************************************************************************************************************/
-//void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union)
-//{
-//	for (auto const &chain : vec) {
-//		if (chain.isRtChain) {
-//			vec.insert (vec.begin(), chain);
-//		}
-//		else {
-//			vec.push_back (chain);
-//		}
-//	}
-//}
 
 
