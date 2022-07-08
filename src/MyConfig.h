@@ -35,9 +35,8 @@ const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possi
 const int uniformChainMigCost = 600;
 
 // Mode: Sync, or Async
-const bool Sync  = true;
-const bool Async = false;
-const bool mode=Sync;
+const bool Sync  = 0;
+const bool Async = 1;
 
 // Determining the level of debug and log.
 const int  DEBUG_LVL=1, RES_LVL=1;
@@ -53,6 +52,7 @@ class MyConfig {
 
 	public:
 
+		static int mode;
 		static string traceFileName;
 		static int netType;
 		static char modeStr[12]; 

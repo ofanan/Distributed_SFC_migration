@@ -4,7 +4,6 @@ using namespace omnetpp;
 using namespace std;
 
 Define_Module(Datacenter);
-
 /*************************************************************************************************************************************************
  * Infline functions
 *************************************************************************************************************************************************/
@@ -55,11 +54,6 @@ void Datacenter::initialize(int stage)
 		xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
 		endXmtEvents.   resize (numPorts);
 		idOfChildren.   resize (numChildren);
-
-		if (mode==Async) {
-			shouldSndAsyncReshPktToChild.resize (numChildren); 
-			pushDownListOfChild.				 resize (numChildren); ; // pushDownListOfChild[c] will hold the pushDownList of child c
-		}
 		
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
 		for (int portNum (0); portNum < numPorts; portNum++) {
@@ -81,6 +75,12 @@ void Datacenter::initialize(int stage)
 
 		fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 		return;
+	}
+	
+	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
+	if (MyConfig::mode==Async) {
+		shouldSndAsyncReshPktToChild.resize (numChildren); 
+		pushDownListOfChild.				 resize (numChildren); ; // pushDownListOfChild[c] will hold the pushDownList of child c
 	}
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
@@ -154,14 +154,14 @@ void Datacenter::handleMessage (cMessage *msg)
 		return;
 	}
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
-  	if (mode==Sync) { handleBottomUpPktSync();} else {bottomUpAsync ();}
+  	if (MyConfig::mode==Sync) { handleBottomUpPktSync();} else {bottomUpAsync ();}
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
   else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
   {
-    if (mode==Sync) { prepareReshSync ();} {reshAsync();}
+    if (MyConfig::mode==Sync) { prepareReshSync ();} {reshAsync();}
   }
   else
   {
@@ -235,7 +235,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 		MyConfig::printToLog(vecOfChainsThatJoined);
 		print (); 
 	}
-  if (mode==Sync) { bottomUpSync();} else {bottomUpAsync ();}		
+  if (MyConfig::mode==Sync) { bottomUpSync();} else {bottomUpAsync ();}		
 }
 
 /*************************************************************************************************************************************************
@@ -266,7 +266,7 @@ void Datacenter::handlePushUpPkt ()
 
 	} 
 
-	if (mode==Sync){ 
+	if (MyConfig::mode==Sync){ 
 		pushUpSync ();
 	}
 	else {
@@ -386,7 +386,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		// shrink pushUpVec to its real size
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
-		if (mode==Sync || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+		if (MyConfig::mode==Sync || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}

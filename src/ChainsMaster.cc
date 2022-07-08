@@ -134,7 +134,7 @@ int ChainsMaster::calcNonMigCost ()
 	int totNonMigCost = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		int16_t chainNonMigCost = it->second.getCost ();
-		if (mode==Sync && chainNonMigCost == UNPLACED_COST) {
+		if (MyConfig::mode==Sync && chainNonMigCost == UNPLACED_COST) {
 			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: chain %d isn't placed yet", it->second.id);
 			MyConfig::printToLog (buf);
 			return -1;

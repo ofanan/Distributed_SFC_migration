@@ -15,7 +15,7 @@ char 	MyConfig::modeStr[12];
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
-int   MyConfig::LOG_LVL;
+int   MyConfig::mode, MyConfig::LOG_LVL;
 bool MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
@@ -41,6 +41,7 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
+		MyConfig::mode 	= Sync;
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
@@ -53,7 +54,7 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
-		snprintf (MyConfig::modeStr, 12, (mode==Sync)? "Sync" : "Async"); 
+		snprintf (MyConfig::modeStr, 12, (MyConfig::mode==Sync)? "Sync" : "Async"); 
 		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
 		for (Lvl_t lvl(0); lvl < height; lvl++) {
 			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
@@ -559,7 +560,7 @@ Initiate the run of placement alg'
 **************************************************************************************************************************************************/
 void SimController::initAlg () {  	
 
-	return (mode==Sync)? initAlgSync() : initAlgAsync();
+	return (MyConfig::mode==Sync)? initAlgSync() : initAlgAsync();
 }
 
 /*************************************************************************************************************************************************
@@ -718,7 +719,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
-	if (DEBUG_LVL>0 && mode==Async) {
+	if (DEBUG_LVL>0 && MyConfig::mode==Async) {
 		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
