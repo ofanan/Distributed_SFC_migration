@@ -163,6 +163,9 @@ void Datacenter::handleMessage (cMessage *msg)
   {
     if (MyConfig::mode==Sync) { prepareReshSync ();} {reshAsync();}
   }
+  else if (dynamic_cast<ReshAsyncPkt*>(curHandledMsg) != nullptr)
+  {
+  }
   else
   {
     error ("rcvd a pkt of an unknown type");

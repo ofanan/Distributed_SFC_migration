@@ -19,6 +19,7 @@
 #include "PrepareReshSyncPkt_m.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
+#include "ReshAsyncPkt_m.h"
 
 using namespace omnetpp;
 using namespace std;
