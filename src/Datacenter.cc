@@ -55,6 +55,11 @@ void Datacenter::initialize(int stage)
 		xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
 		endXmtEvents.   resize (numPorts);
 		idOfChildren.   resize (numChildren);
+
+		if (mode==Async) {
+			shouldSndAsyncReshPktToChild.resize (numChildren); 
+			pushDownListOfChild.				 resize (numChildren); ; // pushDownListOfChild[c] will hold the pushDownList of child c
+		}
 		
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
 		for (int portNum (0); portNum < numPorts; portNum++) {
