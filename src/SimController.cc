@@ -497,10 +497,6 @@ void SimController::rdNewUsrsLine (string line)
 			chain = NonRtChain (chainId, S_u); 
 		}
 		
-		if (DEBUG_LVL>1 && ChainsMaster::findChain (chainId, chain)){
-			error ("t=%d: in rdNewUsrsLine, new chain %d already found in allChains\n", t, chainId);
-		}
-		
 		chainsThatJoinedLeaf[poaId].push_back ( chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
 		if (!ChainsMaster::insert (chainId, chain)) {
 			error ("t=%d new chain %d was already found in ChainsMaster", t, chainId);

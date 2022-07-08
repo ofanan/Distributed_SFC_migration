@@ -141,6 +141,14 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcI
 }
 
 /*************************************************************************************************************************************************
+* Returns True iff this chain is new, namely, joined the sim at this period
+**************************************************************************************************************************************************/
+inline bool Chain::isNew () const
+{
+	return (curDc==UNPLACED_DC);
+}
+
+/*************************************************************************************************************************************************
 * Given a chain id, if that chain is found in the given set - erase it from the set.
 * Returns true iff the requested chain was found (and erased) from the set.
 Currently unused

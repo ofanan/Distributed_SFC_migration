@@ -46,6 +46,7 @@ class Chain
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;
 		bool dcIsDelayFeasible (DcId_t dcId, Lvl_t dcLvl) {return this->S_u[dcLvl]==dcId;}
+		inline bool isNew () const; // returns True iff this chain is new, namely, joined the sim at this period
 
 		// Setters
 		void setPotCpu (Lvl_t lvl); // set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain
@@ -74,7 +75,8 @@ class NonRtChain: public Chain
 /*************************************************************************************************************************************************
 Sort the chains for notAssignedList, as follow:
 - give higher priority to RT chains.
-- break ties by an inc. order of id.
+- break ties by giving higher priority to "old" (existing) chains.
+- break further ties by an inc. order of id.
 **************************************************************************************************************************************************/
 struct SortChainsForNotAssignedList {
 	size_t operator()(const Chain& lhs, const Chain&rhs) const {
@@ -84,7 +86,14 @@ struct SortChainsForNotAssignedList {
 		if (!lhs.isRtChain && (rhs.isRtChain)) { // give higher priority to RT chains
 			return false;
 		}		
-			return (lhs.id < rhs.id);
+		if (!lhs.isNew() && rhs.isNew()) {
+			return true;
+		}
+		if (lhs.isNew() && !rhs.isNew()) {
+			return false;
+		}
+		
+		return (lhs.id < rhs.id);
 	} 
 };
 
