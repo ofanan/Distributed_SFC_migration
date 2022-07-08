@@ -165,6 +165,8 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<ReshAsyncPkt*>(curHandledMsg) != nullptr)
   {
+  	handleReshAsyncPktFromPrnt ();
+  	handleReshAsyncPktFromChild ();
   }
   else
   {
@@ -682,13 +684,13 @@ bool Datacenter::checkIfChainIsPlaced (ChainId_t chainId)
 
 /*************************************************************************************************************************************************
 *************************************************************************************************************************************************/
-void Datacenter::handleAsyncReshPktFromPrnt  ()
+void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
 }
 /*************************************************************************************************************************************************
 *************************************************************************************************************************************************/
 
-void Datacenter::handleAsyncReshPktFromChild ()
+void Datacenter::handleReshAsyncPktFromChild ()
 {
 }
 /*************************************************************************************************************************************************
