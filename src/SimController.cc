@@ -659,7 +659,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
 				chainsToReplace[chainCurDatacenter].push_back (it.first); // If this chain's PoA is the leaf that requested resh, the chain should be released
 			}
-			insertSorted (vecOfUsrsOfThisPoA, it.second);
+			vecOfUsrsOfThisPoA.push_back (it.second);
 		}
 	}
 	rlzRsrcOfChains (chainsToReplace);
