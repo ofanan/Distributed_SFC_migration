@@ -156,7 +156,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
   {
-    if (mode==Sync) { prepareReshSync ();} {reshuffleAsync();}
+    if (mode==Sync) { prepareReshSync ();} {reshAsync();}
   }
   else
   {
@@ -585,7 +585,7 @@ void Datacenter::genNsndBottomUpPkt ()
 	}
 }
 
-void Datacenter::reshuffleAsync ()
+void Datacenter::reshAsync ()
 {
 }
 

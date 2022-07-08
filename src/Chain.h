@@ -46,7 +46,7 @@ class Chain
     Cpu_t mu_u_at_lvl (Lvl_t lvl) const; // returns the amount of cpu required for placing this chain at level lvl
     Lvl_t mu_u_len () const;
 		bool dcIsDelayFeasible (DcId_t dcId, Lvl_t dcLvl) {return this->S_u[dcLvl]==dcId;}
-		inline bool isNew () const; // returns True iff this chain is new, namely, joined the sim at this period
+		inline bool isNew () const {return (curDc==UNPLACED_DC);} // returns True iff this chain is new, namely, joined the sim at this period
 
 		// Setters
 		void setPotCpu (Lvl_t lvl); // set this->potCpu according to the lvl of the pot-placing host, and the characteristic of the chain

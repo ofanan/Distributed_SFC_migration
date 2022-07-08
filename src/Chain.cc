@@ -141,14 +141,6 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcI
 }
 
 /*************************************************************************************************************************************************
-* Returns True iff this chain is new, namely, joined the sim at this period
-**************************************************************************************************************************************************/
-inline bool Chain::isNew () const
-{
-	return (curDc==UNPLACED_DC);
-}
-
-/*************************************************************************************************************************************************
 * Given a chain id, if that chain is found in the given set - erase it from the set.
 * Returns true iff the requested chain was found (and erased) from the set.
 Currently unused
@@ -231,10 +223,10 @@ Currently unused, bacuase it's easier to insert chains wo sorting, and sort only
 //}
 
 /*************************************************************************************************************************************************
-insert a chain to its correct location in a sorted list.
+insert a chain to a list.
 If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
 **************************************************************************************************************************************************/
-bool insertChainToList (list <Chain> &sortedList, const Chain &chain)
+bool insertChainToList (list <Chain> &listOfChains, const Chain &chain)
 {
 
 	if (chain.potCpu==UNPLACED_CPU) {
@@ -247,16 +239,16 @@ bool insertChainToList (list <Chain> &sortedList, const Chain &chain)
 	
 	
 	// delete the old occurance of that chain in the list, if exists
-	for (auto chainPtr = sortedList.begin(); chainPtr!=sortedList.end(); ) {
+	for (auto chainPtr = listOfChains.begin(); chainPtr!=listOfChains.end(); ) {
 		if (chainPtr->id == chain.id) {
-			sortedList.erase (chainPtr);
+			listOfChains.erase (chainPtr);
 			break;
 		}
 		chainPtr++;
 	}
 
 	// insert the chain
-  sortedList.insert(sortedList.begin(), chain);
+  listOfChains.insert(listOfChains.begin(), chain);
   return true;
 }
 

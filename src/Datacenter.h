@@ -96,16 +96,20 @@ class Datacenter : public cSimpleModule
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();
+    void handleAsyncReshPktFromPrnt  ();
+    void handleAsyncReshPktFromChild ();
+    void sndReshPktToNextChild  ();
     void bottomUpSync     			();
     void bottomUpAsync  			  ();
     void pushUpSync        			();
     void pushUpAsync       			();
     void prepareReshSync		 		();
-		void reshuffleAsync					();
+		void reshAsync					();
     void genNsndBottomUpPkt			();
     void sndPushUpPkt						();
     void updatePlacementInfo 		();
     void genNsndPushUpPktsToChildren ();
+    void pushDown ();
     
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
