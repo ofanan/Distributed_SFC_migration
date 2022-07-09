@@ -204,13 +204,13 @@ Update for each chain c: c.curDc to be its currently hosting datacenter.
 - Else, if any chain is placed incorrectly, return 2, and set errChainId to the id of this erroneous chain.
 - Else, return 0.
 **************************************************************************************************************************************************/
-int ChainsMaster::concludeTimePeriod (int &numMigs, int &numBlockedUsrs, ChainId_t &errChainId)
+int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, ChainId_t &errChainId)
 {
 	numMigs = 0;
-	numBlockedUsrs = 0;
+	curNumBlockedUsrs = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
 		if (it->second.isBlocked) {
-			numBlockedUsrs++;
+			curNumBlockedUsrs++;
 			continue;
 		}
 		if (DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
