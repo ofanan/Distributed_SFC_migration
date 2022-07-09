@@ -444,7 +444,10 @@ void SimController::rdUsrsThatLeftLine (string line)
   while (streamOfChainIds >> chainId) {
 		if (!ChainsMaster::findChain (chainId, chain)) { 
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
-	  }    
+	  }
+	  if (chain.isBlocked) { //$$$
+	  	continue;
+	  }
   	chainCurDc = chain.curDc;
   	if (DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
 			error ("Note: this chain was not placed before leaving\n"); 
@@ -821,10 +824,11 @@ void SimController::printResLine ()
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-  snprintf (buf, bufSize, " | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d\n", 
+  snprintf (buf, bufSize, 
+  					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
   					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
-  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc);
+  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, numBlockedUsrs);
   printBufToRes ();
 }
 
