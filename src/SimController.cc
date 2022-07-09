@@ -11,10 +11,11 @@ bool  MyConfig::notifiedReshInThisPeriod;
 float MyConfig::RtChainPr; // prob' that a new chain is an RT chain
 bool  MyConfig::randomlySetChainType = false;
 bool  MyConfig::evenChainsAreRt;
-char 	MyConfig::modeStr[12]; 
+char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
+bool 	MyConfig::useFullResh;
 int   MyConfig::mode, MyConfig::LOG_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
@@ -43,6 +44,13 @@ void SimController::initialize (int stage)
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Sync;
+		MyConfig::useFullResh = false;
+		if (MyConfig::mode==Sync) {
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync"); 		
+		}
+		else {
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
+		}
 		MyConfig::overallNumBlockedUsrs = 0; 
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
@@ -56,7 +64,6 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
-		snprintf (MyConfig::modeStr, 12, (MyConfig::mode==Sync)? "Sync" : "Async"); 
 		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
 		for (Lvl_t lvl(0); lvl < height; lvl++) {
 			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
@@ -806,7 +813,7 @@ void SimController::handleMessage (cMessage *msg)
  * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
 *************************************************************************************************************************************************/
 inline void SimController::genSettingsBuf ()
-{																																																					 
+{
   snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts); 
 }
 
@@ -816,7 +823,8 @@ inline void SimController::genSettingsBuf ()
 void SimController::printResLine ()
 {
 	genSettingsBuf ();
-	MyConfig::printToRes (settingsBuf);
+	MyConfig::printToRes (settingsBuf); 
+//	error (settingsBuf);//$$$$
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
 	if (periodNonMigCost < 0) {
 		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");

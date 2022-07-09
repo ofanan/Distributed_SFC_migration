@@ -129,7 +129,7 @@ class SimController : public cSimpleModule
  		string LogFileName   = "example.txt";
 		static const int bufSize = 200;
 		char buf[bufSize];
-		static const int settingsBufSize = 64;
+		static const int settingsBufSize = 128;
 		char settingsBuf [settingsBufSize];
 		ofstream logFile;
     SimController ();
