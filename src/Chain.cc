@@ -20,6 +20,7 @@ Chain::Chain ()
 	this->potCpu			= UNPLACED_CPU;
 	this->S_u 				= {};
 	this->isRtChain 	= false;
+	this->isBlocked 	= false;
 };
 
 Chain::Chain (ChainId_t id) 
@@ -30,6 +31,7 @@ Chain::Chain (ChainId_t id)
 	this->potCpu			= UNPLACED_CPU;
 	this->S_u 			 	= {};
 	this->isRtChain 	= false;
+	this->isBlocked 	= false;
 };
 
 Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl) 
@@ -40,6 +42,7 @@ Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl)
 	this->curDc 			= UNPLACED_DC;
 	this->potCpu			= UNPLACED_CPU;
 	this->isRtChain 	= false;
+	this->isBlocked 	= false;
 };
 
 Chain::Chain (const Chain &c) {
@@ -49,6 +52,7 @@ Chain::Chain (const Chain &c) {
   this->curDc 			= c.curDc;
 	this->potCpu			= c.potCpu;
   this->isRtChain 	= c.isRtChain;
+	this->isBlocked 	= false; //$$$
 }
 
 RtChain::RtChain (const RtChain &c) {
@@ -58,6 +62,7 @@ RtChain::RtChain (const RtChain &c) {
   this->curDc 			= c.curDc;
 	this->potCpu			= c.potCpu;
   this->isRtChain 	= true;
+	this->isBlocked 	= false; //$$$
 }
 
 NonRtChain::NonRtChain (const NonRtChain &c) {
@@ -67,6 +72,7 @@ NonRtChain::NonRtChain (const NonRtChain &c) {
   this->curDc 			= c.curDc;
 	this->potCpu			= c.potCpu;
   this->isRtChain 	= false;
+	this->isBlocked 	= false; //$$$
 }
 
 RtChain::RtChain (ChainId_t id, vector <DcId_t> &S_u) {
@@ -76,6 +82,7 @@ RtChain::RtChain (ChainId_t id, vector <DcId_t> &S_u) {
   this->curDc 			= UNPLACED_DC;
 	this->potCpu			= UNPLACED_CPU;
   this->isRtChain 	= true;
+	this->isBlocked 	= false;
 };
 
 NonRtChain::NonRtChain (ChainId_t id, vector <DcId_t> &S_u) {
@@ -85,6 +92,7 @@ NonRtChain::NonRtChain (ChainId_t id, vector <DcId_t> &S_u) {
   this->curDc 			= UNPLACED_DC;
 	this->potCpu			= UNPLACED_CPU;
   this->isRtChain 	= false;
+	this->isBlocked 	= false;
 };
 
 

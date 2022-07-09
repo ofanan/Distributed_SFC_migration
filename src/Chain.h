@@ -22,10 +22,11 @@ class Chain
     ChainId_t id;
     vector <DcId_t> S_u;         // List of delay-feasible datacenters for this chain
     bool isRtChain;
-		const static vector<Cost_t> costOfCpuUnitAtLvl; 
+		bool   isBlocked;
 		Lvl_t  curLvl;        // Level of the datacenter currently assigned to host me. This may change a few times until the real placement as curDatacenter
 		DcId_t curDc; 
 		Cpu_t  potCpu; // the cpu that this chain needs, if placed on its currently pot-placed placed
+		const static vector<Cost_t> costOfCpuUnitAtLvl; 
 
 		// C'tors
     Chain ();
