@@ -56,7 +56,7 @@ class MyConfig {
 		static string traceFileName;
 		static int netType;
 		static char modeStr[12]; 
-		static int  numBlockedUsrs; 
+		static int  overallNumBlockedUsrs; 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
 		static const vector <vector <Cost_t>> RtChainCostAtLvl;
 		static const vector <vector <Cost_t>> NonRtChainCostAtLvl;

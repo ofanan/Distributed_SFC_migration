@@ -16,7 +16,7 @@ Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
 int   MyConfig::mode, MyConfig::LOG_LVL;
-int		MyConfig::numBlockedUsrs; 
+int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
@@ -43,7 +43,7 @@ void SimController::initialize (int stage)
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Sync;
-		MyConfig::numBlockedUsrs = 0; 
+		MyConfig::overallNumBlockedUsrs = 0; 
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
@@ -379,7 +379,8 @@ void SimController::concludeTimePeriod ()
 {
 
 	ChainId_t errChainId;
-	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, numBlockedUsrs, errChainId);
+	int curNumBlockedUsrs;
+	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
 	
 	if (stts!=0) {
 		error ("sim t=%lf, t=%d: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log file.",
@@ -828,7 +829,7 @@ void SimController::printResLine ()
   					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
   					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
-  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, numBlockedUsrs);
+  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
   printBufToRes ();
 }
 
