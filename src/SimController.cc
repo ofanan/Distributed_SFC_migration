@@ -105,7 +105,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL=NO_LOG;
+		MyConfig::LOG_LVL=VERY_DETAILED_LOG;
 		MyConfig::printBuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
@@ -522,12 +522,19 @@ void SimController::rdOldUsrsLine (string line)
   ChainId_t chainId;
   DcId_t poaId;
 	Chain chain; 
+	bool isBlocked;
 	
 	replace_if(begin(line), end(line), [] (char x) { return ispunct(x); }, ' ');
 	stringstream ss (line); 
 	
 	while (ss >> chainId) {
-		ss >> poaId;	
+		if (!ChainsMaster::checkIfBlocked (chainId, isBlocked)) {
+			error ("error in t=%d: ChainsMaster::checkIfBlocked didn't find chain %d", t, chainId); 
+		}
+		if (isBlocked) { // skip blocked usrs
+			continue;
+		}
+		ss >> poaId;
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
 			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
@@ -608,6 +615,9 @@ void SimController::initFullReshSync ()
 	
 	chainsThatJoinedLeaf.clear ();
 	for (auto &it : ChainsMaster::allChains) {
+		if (it.second.isBlocked) {
+			continue;
+		}
 		DcId_t leafId = datacenters[it.second.S_u[0]]->leafId;
 		if (leafId >= numLeaves || leafId<0) {
 			snprintf (buf, bufSize, "\t=%d. error in initFullReshSync: chain %d has leafId=%d", t, it.second.id, leafId);

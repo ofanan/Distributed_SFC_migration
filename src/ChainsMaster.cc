@@ -36,9 +36,10 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 		return false;
 	}
 	it->second.isBlocked = true;
-	snprintf (buf, bufSize, "\nblocked chain %d", chainId); //$$$
-	MyConfig::printToLog(buf); //$$$
-	
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nblocked chain %d", chainId); 
+		MyConfig::printToLog(buf); 
+	}	
 	return true;
 }
 
@@ -117,6 +118,19 @@ bool ChainsMaster::modifyLvl (ChainId_t chainId, Lvl_t newLvl)
   return true;
 }
 
+/*************************************************************************************************************************************************
+* Given a chain id, fill into the isBlocked input (given by ref') true iff this chain is blocked.
+* Output: true iff the requested chain was found.
+**************************************************************************************************************************************************/
+bool ChainsMaster::checkIfBlocked (ChainId_t chainId, bool &isBlocked)
+{
+	auto it = ChainsMaster::allChains.find(chainId);
+	if (it == ChainsMaster::allChains.end()) { 
+		return false;
+  }
+  isBlocked = it->second.isBlocked;
+  return true;
+}
 
 /*************************************************************************************************************************************************
 * Given a chain id:
@@ -152,6 +166,9 @@ int ChainsMaster::calcNonMigCost ()
 {
 	int totNonMigCost = 0;
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
+		if (it->second.isBlocked) {
+			continue;
+		}
 		int16_t chainNonMigCost = it->second.getCost ();
 		if (MyConfig::mode==Sync && chainNonMigCost == UNPLACED_COST) {
 			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: chain %d isn't placed yet", it->second.id);

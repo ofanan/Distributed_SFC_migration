@@ -457,7 +457,7 @@ void Datacenter::bottomUpSync ()
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
-					return;
+					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
 					snprintf (buf, bufSize, "\ns%d : : couldn't find a feasible sol' even after reshuffling", dcId);
