@@ -446,7 +446,7 @@ void Datacenter::bottomUpSync ()
 		}
 		else { 
 			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  
+				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
 				continue;
 			}
 			
@@ -454,8 +454,8 @@ void Datacenter::bottomUpSync ()
 			if (reshuffled) {
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					MyConfig::numBlockedUsrs++;
-					if (!ChainsMaster::eraseChain (chainPtr->id)) {
-						error ("DC %d tried to erase chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+					if (!ChainsMaster::blockChain (chainPtr->id)) {
+						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
 					return;
 				}
@@ -467,7 +467,7 @@ void Datacenter::bottomUpSync ()
 					printStateAndEndSim  ();
 				}
 			}
-			else { // haven't reshuffled yet --> reshuffle!
+			else { // haven't reshuffled yet --> reshuffle
 				if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
 					printBufToLog();
