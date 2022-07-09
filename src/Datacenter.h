@@ -47,6 +47,7 @@ class Datacenter : public cSimpleModule
     int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
 		Cpu_t cpuCapacity;
 		int numBuPktsRcvd; 
+  	bool 									reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     
 		//getter
 		void setLeafId (DcId_t leafId);
@@ -66,7 +67,6 @@ class Datacenter : public cSimpleModule
     
   private:
   	static const Lvl_t 	portToPrnt=0;
-  	bool 									reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
     vector <EndXmtMsg*> 	endXmtEvents; // Indicates when the currently xmtd packet will finish

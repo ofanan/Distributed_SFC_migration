@@ -379,7 +379,7 @@ void SimController::concludeTimePeriod ()
 {
 
 	ChainId_t errChainId;
-	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, errChainId);
+	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, numBlockedUsrs, errChainId);
 	
 	if (stts!=0) {
 		error ("sim t=%lf, t=%d: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log file.",
@@ -603,6 +603,7 @@ void SimController::initFullReshSync ()
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
 		datacenters[dcId]->clrRsrc();
 		datacenters[dcId]->numBuPktsRcvd = 0;
+		datacenters[dcId]->reshuffled = true;
 	}
 	
 	chainsThatJoinedLeaf.clear ();

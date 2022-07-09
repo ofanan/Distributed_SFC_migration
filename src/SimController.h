@@ -59,6 +59,7 @@ class SimController : public cSimpleModule
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
+		int numBlockedUsrs;
 		int numCritUsrs=0; // number of critical usrs at the beginning of this period
 		float     period=1.0;
 		
