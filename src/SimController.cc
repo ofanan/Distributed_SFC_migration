@@ -16,7 +16,8 @@ Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
 int   MyConfig::mode, MyConfig::LOG_LVL;
-bool MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
+int		MyConfig::numBlockedUsrs; 
+bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -42,6 +43,7 @@ void SimController::initialize (int stage)
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Sync;
+		MyConfig::numBlockedUsrs = 0; 
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");

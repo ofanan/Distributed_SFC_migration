@@ -118,6 +118,7 @@ class Datacenter : public cSimpleModule
     
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
+    inline bool canPlaceThisChainHigher 	 (const Chain chain) const;
     inline bool cannotPlaceThisChainHigher (const Chain chain) const;
 		inline void	printStateAndEndSim 			 ();
 		void 				PrintAllDatacenters 		(); // initiate a print of the content of all the datacenters

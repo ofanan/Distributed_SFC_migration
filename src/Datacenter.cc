@@ -9,7 +9,9 @@ Define_Module(Datacenter);
 *************************************************************************************************************************************************/
 inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= rhs.getCpu();}
 
-inline bool Datacenter::cannotPlaceThisChainHigher 	(const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
+inline bool Datacenter::cannotPlaceThisChainHigher (const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
+inline bool Datacenter::canPlaceThisChainHigher 	 (const Chain chain) const {return !cannotPlaceThisChainHigher(chain);}
+
 inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
@@ -443,22 +445,38 @@ void Datacenter::bottomUpSync ()
 				}
 		}
 		else { 
-			if (cannotPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				if (reshuffled) {
+			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+				chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  
+				continue;
+			}
+			
+			// Not enough availCpu for this chain, and it cannot be placed higher
+			if (reshuffled) {
+				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
+					MyConfig::numBlockedUsrs++;
+					ChainsMaster::eraseChain (chainPtr->id);
+					return;
+				}
+				else { // Failed to place an old chain even after resh
 					snprintf (buf, bufSize, "\ns%d : : couldn't find a feasible sol' even after reshuffling", dcId);
 					printBufToLog ();
 					snprintf (buf, bufSize, "\ncpuCapacity=%d chain required cpu=%d", cpuCapacity, chainPtr->mu_u_at_lvl(lvl));
 					printBufToLog ();
 					printStateAndEndSim  ();
 				}
+			}
+			else { // haven't reshuffled yet --> reshuffle!
 				if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
 					printBufToLog();
 				}
-
-				return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
+				if (MyConfig::mode==Sync) {
+					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
+				}
+				else {
+					return reshAsync ();
+				}
 			}
-			chainPtr++; //No enough availCpu for this chain, and I'm not the highest delay-feasible DC of this chain --> go on to the next notAssigned chain  
 		}
 	}
 
