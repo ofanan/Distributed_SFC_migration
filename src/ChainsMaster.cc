@@ -24,8 +24,8 @@ bool ChainsMaster::eraseChains (vector <ChainId_t> vec)
 }
 
 /*************************************************************************************************************************************************
-* Erases a chain, given its id
-* Returns false if the chains to erase wasn't found in allChains, else true.
+* Block a chain, given its id
+* Returns false if the chains to block wasn't found in allChains, else true.
 **************************************************************************************************************************************************/
 bool ChainsMaster::eraseChain  (ChainId_t chainId) 
 {
@@ -35,6 +35,7 @@ bool ChainsMaster::eraseChain  (ChainId_t chainId)
 		MyConfig::printToLog (buf);
 		return false;
 	}
+	it->second.isBlocked = true;
 	return true;
 }
 
