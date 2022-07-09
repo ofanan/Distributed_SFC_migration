@@ -454,7 +454,9 @@ void Datacenter::bottomUpSync ()
 			if (reshuffled) {
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					MyConfig::numBlockedUsrs++;
-					ChainsMaster::eraseChain (chainPtr->id);
+					if (!ChainsMaster::eraseChain (chainPtr->id)) {
+						error ("DC %d tried to erase chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+					}
 					return;
 				}
 				else { // Failed to place an old chain even after resh
@@ -486,13 +488,12 @@ void Datacenter::bottomUpSync ()
 		print ();
 	}
 
-  if (isRoot) { 
+  if (isRoot || (MyConfig::mode==Async && notAssigned.empty())) { 
   	if (MyConfig::printBuRes) {
   		MyConfig::printToLog ("\nAfter BU:");
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
   	}
-  	
   	pushUpSync ();
   }
   else {
@@ -528,6 +529,14 @@ void Datacenter::updatePlacementInfo ()
 
 
 /*************************************************************************************************************************************************
+Handle a bottomUP pkt, when running in Async mode.
+*************************************************************************************************************************************************/
+void Datacenter::handleBottomUpPktAsync ()
+{
+ //$$$ When do we reset notAssigned, and pushUpList?
+}
+
+/*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in sync' mode.
 - add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") databases.
 - delete the pkt.
@@ -543,7 +552,7 @@ void Datacenter::handleBottomUpPktSync ()
 
 	if (numBuPktsRcvd==0) { // this is the first BU pkt rcvd from a child at this period
 		notAssigned.clear ();
-		pushUpList.  clear ();
+		pushUpList. clear ();
 	}
 	numBuPktsRcvd++;
 	

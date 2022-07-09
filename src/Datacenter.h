@@ -100,6 +100,7 @@ class Datacenter : public cSimpleModule
     void xmt              											(int16_t portNum, cPacket *pkt2send);
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
+    void handleBottomUpPktAsync ();
     void handlePushUpPkt			 	();
     void handleReshAsyncPktFromPrnt  ();
     void handleReshAsyncPktFromChild ();
