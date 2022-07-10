@@ -48,7 +48,7 @@ void SimController::initialize (int stage)
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Sync;
-		MyConfig::useFullResh = false;
+		MyConfig::useFullResh = true;
 		if (MyConfig::mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
 		}

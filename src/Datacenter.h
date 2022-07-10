@@ -114,7 +114,7 @@ class Datacenter : public cSimpleModule
     void genNsndBottomUpPkt			();
     void sndPushUpPkt						();
     void updatePlacementInfo 		();
-    void genNsndPushUpPktsToChildren ();
+    void genNsndPushUpPktsToAllChildren ();
     void pushDown ();
     
     // Print functions

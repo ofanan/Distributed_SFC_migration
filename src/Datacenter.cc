@@ -237,9 +237,10 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	if (!isLeaf) { 
 		error ("Non-leaf s%d : was called by initBottomUp");
 	}
-	pushUpList.clear ();	
-	potPlacedChains.clear ();
- 	notAssigned = vecOfChainsThatJoined;
+	pushUpList.				clear ();	
+	potPlacedChains.  clear ();
+	newlyPlacedChains.clear ();
+	notAssigned = vecOfChainsThatJoined;
 
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : rcvd vecOfChainsThatJoined=", dcId);
@@ -370,14 +371,16 @@ void Datacenter::pushUpSync ()
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
 	}
 
-	genNsndPushUpPktsToChildren ();
-	pushUpList.clear();
+	if (MyConfig::mode==Sync) {
+		genNsndPushUpPktsToAllChildren ();
+		pushUpList.clear();
+	}
 }
 
 /*************************************************************************************************************************************************
 Generate pushUpPkts, based on the data currently found in pushUpList, and xmt these pkts to all the children
 *************************************************************************************************************************************************/
-void Datacenter::genNsndPushUpPktsToChildren ()
+void Datacenter::genNsndPushUpPktsToAllChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
 	
@@ -543,6 +546,9 @@ Handle a bottomUP pkt, when running in Async mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsync ()
 {
+	rdBottomUpPkt ();
+	bottomUp 			();
+
  //$$$ When do we reset notAssigned, and pushUpList?
 }
 
