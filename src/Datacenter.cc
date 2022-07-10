@@ -254,7 +254,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 /*************************************************************************************************************************************************
 Handle a rcvd PushUpPkt:
 - Read the data from the pkt to this->pushUpList.
-- Call pushUpSync() | pushUpAsync(), for running the PU alg'.
+- Call pushUp() for running the PU alg'.
 *************************************************************************************************************************************************/
 void Datacenter::handlePushUpPkt () 
 {
@@ -278,20 +278,15 @@ void Datacenter::handlePushUpPkt ()
 		}
 
 	} 
-
-	if (MyConfig::mode==Sync){ 
-		pushUpSync ();
-	}
-	else {
-		pushUpAsync ();
-	}
+	
+	pushUp ();
 }
 
 /*************************************************************************************************************************************************
 Run the PU Sync alg'. 
 Assume that this->pushUpList already contains the relevant chains.
 *************************************************************************************************************************************************/
-void Datacenter::pushUpSync ()
+void Datacenter::pushUp ()
 {
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
@@ -371,8 +366,9 @@ void Datacenter::pushUpSync ()
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
 	}
 
-	if (MyConfig::mode==Sync) {
-		genNsndPushUpPktsToAllChildren ();
+	genNsndPushUpPktsToChildren ();
+	
+	if (MyConfig::mode==Sync) { // in sync mode we're sure that we won't accept additional PUpkts at this cycle, and therefore can clear the PU list 
 		pushUpList.clear();
 	}
 }
@@ -380,7 +376,7 @@ void Datacenter::pushUpSync ()
 /*************************************************************************************************************************************************
 Generate pushUpPkts, based on the data currently found in pushUpList, and xmt these pkts to all the children
 *************************************************************************************************************************************************/
-void Datacenter::genNsndPushUpPktsToAllChildren ()
+void Datacenter::genNsndPushUpPktsToChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
 	
@@ -401,21 +397,13 @@ void Datacenter::genNsndPushUpPktsToAllChildren ()
 		// shrink pushUpVec to its real size
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
-		if (MyConfig::mode==Sync || idxInPushUpVec==0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if the child's push-up vec isn't empty
+		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
 			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
 		}
 	}
 	if (DEBUG_LVL>0 && !pushUpList.empty()) {
 		error ("pushUpList not empty after sending PU pkts to all children");
 	}
-}
-
-/*************************************************************************************************************************************************
-Run the PU Async' alg'. 
-Assume that this->pushUpList already contains the relevant chains.
-*************************************************************************************************************************************************/
-void Datacenter::pushUpAsync ()
-{
 }
 
 /************************************************************************************************************************************************
@@ -502,12 +490,7 @@ void Datacenter::bottomUp ()
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
   	}
-  	if (MyConfig::mode==Sync) {
-	  	pushUpSync ();
-  	}
-  	else {
-	  	pushUpAsync ();
-	  }
+	  pushUp ();
   }
   else {
   	genNsndBottomUpPkt ();
