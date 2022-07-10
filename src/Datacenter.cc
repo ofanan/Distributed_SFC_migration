@@ -356,7 +356,9 @@ void Datacenter::pushUp ()
 
 	if (isLeaf) {
 
-		simController->finishedAlg (dcId, leafId);
+		if (MyConfig::mode == Sync) {
+			simController->finishedAlg (dcId, leafId);
+		}
 		
 		if (DEBUG_LVL > 0) {
 			if (!pushUpList.empty()) {
