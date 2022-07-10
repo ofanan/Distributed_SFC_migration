@@ -42,11 +42,15 @@ void SimController::initialize (int stage)
 
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
+		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
+		height       		= (Lvl_t)  (network -> par ("height"));
+		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Sync;
 		MyConfig::useFullResh = false;
 		if (MyConfig::mode==Sync) {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync"); 		
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
 		}
 		else {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
@@ -56,10 +60,6 @@ void SimController::initialize (int stage)
 		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
 		}
-		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
-		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
-		height       		= (Lvl_t) (network -> par ("height"));
-		srand(seed); // set the seed of random num generation
 		return;
 	}
 	
@@ -69,9 +69,9 @@ void SimController::initialize (int stage)
 			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
 		}
 		openFiles ();
-		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		 	[MyConfig::netType];
+		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		[MyConfig::netType];
 		NonRtChain::costAtLvl = MyConfig::NonRtChainCostAtLvl	[MyConfig::netType];
-		RtChain::mu_u 		 			= MyConfig::RtChainMu_u 					[MyConfig::netType];
+		RtChain::mu_u 		 		= MyConfig::RtChainMu_u 				[MyConfig::netType];
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
@@ -692,7 +692,11 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 	datacenters[dcId]->initBottomUp (vecOfUsrsOfThisPoA);
 }
 
-// Initiate the run of an Sync placement alg'
+/*************************************************************************************************************************************************
+Initiate the run of a Sync placement alg':
+- initiate a run of the alg' in all the leaves, be calling initBottomUp. If there're no usrs that joined the respective PoA, the leaf is called 
+with an empty notAssigned list.
+**************************************************************************************************************************************************/
 void SimController::initAlgSync () 
 {  	
 
@@ -727,9 +731,26 @@ void SimController::initAlgSync ()
 	delete[] initAlgAtLeaf;
 }
 
-// Initiate the run of a Async placement alg'
+/*************************************************************************************************************************************************
+Initiate the run of an Async placement alg'
+- initiate a run of the alg' in all the leaves associated with usrs that arrived at them.
+**************************************************************************************************************************************************/
 void SimController::initAlgAsync () 
-{
+{  	
+
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
+		printBufToLog();
+	} 
+
+	// First, initiate the alg' in all the leaves to which new chains have joined.
+	for (auto item : chainsThatJoinedLeaf)
+	{
+		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+			logFile << "Chains that joined dc " << item.first << ": ";
+		}
+		leaves[item.first]->initBottomUp (item.second);
+	}
 
 }
 
