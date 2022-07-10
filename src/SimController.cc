@@ -667,7 +667,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
 {
 
 	if (!	MyConfig::notifiedReshInThisPeriod && MyConfig::LOG_LVL>=BASIC_LOG) {
-		MyConfig::printToLog ("\nresh");
+		MyConfig::printToLog ("\nSimCtrlr is preparing reshuffle.");
 		MyConfig::notifiedReshInThisPeriod = true;
 	}
 

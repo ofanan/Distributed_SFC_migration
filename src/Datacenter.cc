@@ -547,25 +547,11 @@ void Datacenter::handleBottomUpPktAsync ()
 }
 
 /*************************************************************************************************************************************************
-Handle a bottomUP pkt, when running in sync' mode.
-- add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") databases.
-- delete the pkt.
-- If already rcvd a bottomUp pkt from all the children, call the sync' mode of the bottom-up (BU) alg'.
+Read a BU pkt, and add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") data bases.
 *************************************************************************************************************************************************/
-void Datacenter::handleBottomUpPktSync ()
+void Datacenter::rdBottomUpPkt ()
 {
 
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
-		printBufToLog ();
-	}
-
-	if (numBuPktsRcvd==0) { // this is the first BU pkt rcvd from a child at this period
-		notAssigned.clear ();
-		pushUpList. clear ();
-	}
-	numBuPktsRcvd++;
-	
 	BottomUpPkt *pkt = (BottomUpPkt*)(curHandledMsg);
 	
 	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
@@ -580,10 +566,28 @@ void Datacenter::handleBottomUpPktSync ()
 		}        
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-    snprintf (buf, bufSize, "\ns%d : pushUpList=", dcId);
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
 	}
+}
+
+/*************************************************************************************************************************************************
+Handle a bottomUP pkt, when running in sync' mode.
+- add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") databases.
+- delete the pkt.
+- If already rcvd a bottomUp pkt from all the children, call the sync' mode of the bottom-up (BU) alg'.
+*************************************************************************************************************************************************/
+void Datacenter::handleBottomUpPktSync ()
+{
+
+	if (numBuPktsRcvd==0) { // this is the first BU pkt rcvd from a child at this period
+		notAssigned.clear ();
+		pushUpList. clear ();
+	}
+	numBuPktsRcvd++;
+	rdBottomUpPkt ();
+	
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
 		bottomUp ();
 		numBuPktsRcvd = 0;
