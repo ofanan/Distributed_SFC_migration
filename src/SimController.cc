@@ -48,7 +48,7 @@ void SimController::initialize (int stage)
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Sync;
-		MyConfig::useFullResh = true;
+		MyConfig::useFullResh = false;
 		if (MyConfig::mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
 		}
@@ -112,8 +112,8 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL=VERY_DETAILED_LOG;
-		MyConfig::printBuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::LOG_LVL=DETAILED_LOG;
+		MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
 		runTrace ();

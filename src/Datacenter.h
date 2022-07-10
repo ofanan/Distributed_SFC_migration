@@ -110,7 +110,8 @@ class Datacenter : public cSimpleModule
     void pushUp		        			();
     void prepareReshSync		 		();
 		void reshAsync							();
-    void genNsndBottomUpPkt			();
+    void genNsndBottomUpPktSync ();
+    void genNsndBottomUpPktAsync();
     void sndPushUpPkt						();
     void updatePlacementInfo 		();
     void genNsndPushUpPktsToChildren ();

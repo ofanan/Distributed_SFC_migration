@@ -160,7 +160,7 @@ void Datacenter::handleMessage (cMessage *msg)
   		handleBottomUpPktSync();
   	} 
 		else {
-			error ("sorry, handle BU PKT Aynsc is not supported yet");
+			handleBottomUpPktAsync();		
 		} 
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
@@ -168,7 +168,12 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
   {
-    if (MyConfig::mode==Sync) { prepareReshSync ();} {reshAsync();}
+    if (MyConfig::mode==Sync) { 
+    	prepareReshSync ();
+    }
+    else {
+    	reshAsync();
+    }
   }
   else if (dynamic_cast<ReshAsyncPkt*>(curHandledMsg) != nullptr)
   {
@@ -481,12 +486,12 @@ void Datacenter::bottomUp ()
 	}
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : finished BU sync.", dcId);
+		snprintf (buf, bufSize, "\ns%d : finished BU.", dcId);
 		printBufToLog ();
 		print ();
 	}
 
-  if (isRoot || (MyConfig::mode==Async && notAssigned.empty())) { 
+  if (isRoot) { 
   	if (MyConfig::printBuRes) {
   		MyConfig::printToLog ("\nAfter BU:");
   		simController->printBuCost ();
@@ -495,7 +500,7 @@ void Datacenter::bottomUp ()
 	  pushUp ();
   }
   else {
-  	genNsndBottomUpPkt ();
+  	return (MyConfig::mode==Sync)? genNsndBottomUpPktSync () : genNsndBottomUpPktAsync ();
   }
 }
 
@@ -592,7 +597,7 @@ Generate a BottomUpPkt, based on the data currently found in notAssigned and pus
 For each chain in this->notAssigned:
 	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
 *************************************************************************************************************************************************/
-void Datacenter::genNsndBottomUpPkt ()
+void Datacenter::genNsndBottomUpPktSync ()
 {
 	BottomUpPkt* pkt2send = new BottomUpPkt;
 
@@ -619,8 +624,47 @@ void Datacenter::genNsndBottomUpPkt ()
 	}
 }
 
+/*************************************************************************************************************************************************
+Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpList, and xmt it to my parent:
+- For each chain in this->pushUpList:
+	- if the chain can be placed higher, include it in pushUpList to be xmtd to prnt, and remove it from the this->pushUpList.
+For each chain in this->notAssigned:
+	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
+*************************************************************************************************************************************************/
+void Datacenter::genNsndBottomUpPktAsync ()
+{
+	BottomUpPkt* pkt2send = new BottomUpPkt;
+
+	pkt2send -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	int idixInPushUpVec = 0;
+	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
+		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
+			continue;
+		}
+		
+		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
+		pkt2send->setPushUpVec (idixInPushUpVec++, *chainPtr);
+	}
+	
+	if (idixInPushUpVec==0 && notAssigned.empty()) { // there's neither pushUp nor notAssigned data to send to prnt
+		return pushUp ();	
+	}
+	
+	// now we know that there's either notAssigned, or pushUp, data to send to prnt
+	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
+
+	pkt2send -> setNotAssignedArraySize (notAssigned.size());
+	for (int i=0; i<notAssigned.size(); i++) {
+		pkt2send->setNotAssigned (i, notAssigned[i]);
+	}
+
+	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+	notAssigned.clear ();
+}
+
 void Datacenter::reshAsync ()
 {
+	error ("Sorry, async resh is not supported yet");
 }
 
 //// initiate a print of the content of all the datacenters
@@ -636,7 +680,7 @@ Prepare a reshuffle in Sync mode.
 void Datacenter::prepareReshSync () 
 {
 	if (reshuffled) {
-		return genNsndBottomUpPkt ();	
+		return genNsndBottomUpPktSync ();	
 	}
 	reshuffled = true;
 	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is highest then the highest lvl reshuffled at this period - update. 
