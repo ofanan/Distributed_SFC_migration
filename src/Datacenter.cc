@@ -156,7 +156,12 @@ void Datacenter::handleMessage (cMessage *msg)
 		return;
 	}
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
-  	if (MyConfig::mode==Sync) { handleBottomUpPktSync();} else {bottomUpAsync ();}
+  	if (MyConfig::mode==Sync) { 
+  		handleBottomUpPktSync();
+  	} 
+		else {
+			error ("sorry, handle BU PKT Aynsc is not supported yet");
+		} 
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
@@ -218,7 +223,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 }
 
 /*************************************************************************************************************************************************
-Initiate the bottomUpSyncAlg:
+Initiate the bottomUpAlg:
 - Clear this->pushUpList and this->notAssigned.
 - Insert the chains  into this->notAssigned. The input vector is assumed to be already sorted by the delay tightness.
 - Schedule a self-msg to call0 bottomUp, for running the BU alg'.
@@ -242,7 +247,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 		MyConfig::printToLog(vecOfChainsThatJoined);
 		print (); 
 	}
-  if (MyConfig::mode==Sync) { bottomUpSync();} else {bottomUpAsync ();}		
+	bottomUp ();
 }
 
 /*************************************************************************************************************************************************
@@ -414,11 +419,11 @@ void Datacenter::pushUpAsync ()
 Running the BU alg'. 
 Assume that this->notAssigned and this->pushUpList already contain the relevant chains, and are sorted.
 *************************************************************************************************************************************************/
-void Datacenter::bottomUpSync ()
+void Datacenter::bottomUp ()
 {
 
 	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : beginning BU sync. notAssigned=", dcId);
+		snprintf (buf, bufSize, "\ns%d : beginning BU. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
 	}
@@ -494,7 +499,12 @@ void Datacenter::bottomUpSync ()
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
   	}
-  	pushUpSync ();
+  	if (MyConfig::mode==Sync) {
+	  	pushUpSync ();
+  	}
+  	else {
+	  	pushUpAsync ();
+	  }
   }
   else {
   	genNsndBottomUpPkt ();
@@ -575,17 +585,9 @@ void Datacenter::handleBottomUpPktSync ()
 		MyConfig::printToLog (pushUpList);
 	}
 	if (numBuPktsRcvd == numChildren) { // have I already rcvd a bottomUpMsg from each child?
-		bottomUpSync ();
+		bottomUp ();
 		numBuPktsRcvd = 0;
 	}
-}
-
-/*************************************************************************************************************************************************
-Running the BU alg'. 
-Assume that this->notAssigned and this->pushUpList already contain the relevant chains, in the correct order.
-*************************************************************************************************************************************************/
-void Datacenter::bottomUpAsync ()
-{
 }
 
 /*************************************************************************************************************************************************
