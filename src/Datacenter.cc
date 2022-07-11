@@ -102,20 +102,23 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
 		return;
 	}
-	snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_chains=%d", 
-														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()+potPlacedChains.size()) );
+	snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
+														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
 	printBufToLog ();
 	if (printChainIds) {
 		MyConfig::printToLog (" chains [");
 		MyConfig::printToLog (placedChains);	
-		if (printPotPlaced) {
-			MyConfig::printToLog (potPlacedChains);
-		}
-		MyConfig::printToLog ("]");
+		MyConfig::printToLog ("] ");
+	}
+
+	if (printPotPlaced) {
+		MyConfig::printToLog ("potPlaced=[");
+		MyConfig::printToLog (potPlacedChains);
+		MyConfig::printToLog ("] ");
 	}
 	if (printPushUpList) {
 		MyConfig::printToLog ("pushUpList: ");
-		MyConfig::printToLog (pushUpList);
+		MyConfig::printToLog (pushUpList, false);
 	}
 }
 
@@ -139,8 +142,8 @@ void Datacenter::handleEndXmtMsg ()
   }
 
   // Now we know that the output Q isn't empty --> Pop and xmt the HoL pkt
-  cPacket* pkt2send = (cPacket*) outputQ[portNum].pop();
-  xmt (portNum, pkt2send);
+  cPacket* pkt2snd = (cPacket*) outputQ[portNum].pop();
+  xmt (portNum, pkt2snd);
 }
 
 
@@ -281,8 +284,7 @@ void Datacenter::handlePushUpPkt ()
 		if (!insertChainToList (pushUpList, pkt->getPushUpVec (i))) {
 			error ("Error in insertChainToList. See log file for details");
 		}
-
-	} 
+	}
 	
 	pushUp ();
 }
@@ -365,7 +367,7 @@ void Datacenter::pushUp ()
 			simController->finishedAlg (dcId, leafId);
 		}
 		
-		if (DEBUG_LVL > 0) {
+		if (DEBUG_LVL > 0 && MyConfig::mode==Sync) {
 			if (!pushUpList.empty()) {
 				error ("pushUpList isn't empty after running pushUp() on a leaf");
 			}
@@ -405,7 +407,10 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
-			sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
+			sndViaQ (portOfChild(child), pkt); //send the pkt to the child
+		}
+		else {
+			delete (pkt);
 		}
 	}
 	if (DEBUG_LVL>0 && !pushUpList.empty()) {
@@ -420,10 +425,12 @@ Assume that this->notAssigned and this->pushUpList already contain the relevant 
 void Datacenter::bottomUp ()
 {
 
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning BU. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
+		MyConfig::printToLog (" pushUpList=");
+		MyConfig::printToLog (pushUpList, false);	// "false" means that we print only the chainIds; true would print also each chain's current level
 	}
 
 	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedList());
@@ -599,14 +606,14 @@ For each chain in this->notAssigned:
 *************************************************************************************************************************************************/
 void Datacenter::genNsndBottomUpPktSync ()
 {
-	BottomUpPkt* pkt2send = new BottomUpPkt;
+	BottomUpPkt* pkt2snd = new BottomUpPkt;
 
-	pkt2send -> setNotAssignedArraySize (notAssigned.size());
+	pkt2snd -> setNotAssignedArraySize (notAssigned.size());
 	for (int i=0; i<notAssigned.size(); i++) {
-		pkt2send->setNotAssigned (i, notAssigned[i]);
+		pkt2snd->setNotAssigned (i, notAssigned[i]);
 	}
 
-	pkt2send -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
 	int idixInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
@@ -614,11 +621,11 @@ void Datacenter::genNsndBottomUpPktSync ()
 		}
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
-		pkt2send->setPushUpVec (idixInPushUpVec++, *chainPtr);
+		pkt2snd->setPushUpVec (idixInPushUpVec++, *chainPtr);
 	}
-	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
+	pkt2snd -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
-	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
+	sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 	if (!reshuffled) { 
 		notAssigned.clear ();
 	}
@@ -633,9 +640,9 @@ For each chain in this->notAssigned:
 *************************************************************************************************************************************************/
 void Datacenter::genNsndBottomUpPktAsync ()
 {
-	BottomUpPkt* pkt2send = new BottomUpPkt;
+	BottomUpPkt* pkt2snd = new BottomUpPkt;
 
-	pkt2send -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
 	int idixInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
@@ -643,23 +650,27 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		}
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
-		pkt2send->setPushUpVec (idixInPushUpVec++, *chainPtr);
+		pkt2snd->setPushUpVec (idixInPushUpVec++, *chainPtr);
 	}
 	
-	if (idixInPushUpVec==0 && notAssigned.empty()) { // there's neither pushUp nor notAssigned data to send to prnt
-		return pushUp ();	
-	}
-	
-	// now we know that there's either notAssigned, or pushUp, data to send to prnt
-	pkt2send -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
+	if (idixInPushUpVec>0 || notAssigned.empty()) { // there's either pushUp nor notAssigned data to send to prnt
+		pkt2snd -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
-	pkt2send -> setNotAssignedArraySize (notAssigned.size());
-	for (int i=0; i<notAssigned.size(); i++) {
-		pkt2send->setNotAssigned (i, notAssigned[i]);
+		pkt2snd -> setNotAssignedArraySize (notAssigned.size());
+		for (int i=0; i<notAssigned.size(); i++) {
+			pkt2snd->setNotAssigned (i, notAssigned[i]);
+		}
+
+		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
+	}
+	else { // no really data to send; in async mode there's no use to send an empty pkt, so just destroy it
+		delete (pkt2snd);
 	}
 
-	sndViaQ (0, pkt2send); //send the bottomUPpkt to my prnt	
 	notAssigned.clear ();
+	if (idixInPushUpVec==0) { // I didn't request prnt to push-up any chain. Hence, no need to wait for his reply --> begin pushUp.
+		pushUp ();
+	}
 }
 
 void Datacenter::reshAsync ()
@@ -718,24 +729,24 @@ void Datacenter::clrRsrc ()
  * If the output port is free, xmt the pkt immediately.
  * Else, queue the pkt until the output port is free, and then xmt it.
 *************************************************************************************************************************************************/
-void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2send)
+void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 {
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
-    outputQ[portNum].insert (pkt2send);
+    outputQ[portNum].insert (pkt2snd);
   }
   else {
-    xmt (portNum, pkt2send);
+    xmt (portNum, pkt2snd);
   }
 }
 
 /*************************************************************************************************************************************************
  * Xmt the given pkt to the given output port; schedule a self msg for the end of transmission.
 *************************************************************************************************************************************************/
-void Datacenter::xmt(int16_t portNum, cPacket* pkt2send)
+void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 {
-  EV << "Starting transmission of " << pkt2send << endl;
+  EV << "Starting transmission of " << pkt2snd << endl;
 
-	send(pkt2send, "port$o", portNum);
+	send(pkt2snd, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
   endXmtEvents[portNum] = new EndXmtMsg ("");

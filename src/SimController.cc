@@ -47,7 +47,7 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		MyConfig::mode 	= Sync;
+		MyConfig::mode 	= Async;
 		MyConfig::useFullResh = false;
 		if (MyConfig::mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
@@ -129,7 +129,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
-		MyConfig::traceFileName = "UniformTree_infeasible_in_T3.poa"; //"UniformTree.poa";
+		MyConfig::traceFileName = "UniformTree_no_resh.poa"; // "UniformTree_infeasible_in_T3.poa"; //"UniformTree.poa";
 	}
 
 	setOutputFileNames ();
@@ -390,8 +390,8 @@ void SimController::concludeTimePeriod ()
 	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
 	
 	if (stts!=0) {
-		error ("sim t=%lf, t=%d: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log file.",
-					  simTime().dbl(), t, stts, errChainId);
+		snprintf (buf, bufSize, "sim t=%lf, t=%d: error during run of mode ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log `file.", simTime().dbl(), t, stts, errChainId);
+		error (buf);
 	}
 	
 	if (DEBUG_LVL > 0) {
