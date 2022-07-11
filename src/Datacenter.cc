@@ -82,7 +82,7 @@ void Datacenter::initialize(int stage)
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	if (MyConfig::mode==Async) {
 		shouldSndReshAsyncPktToChild.resize (numChildren); 
-		pushDownListOfChild.				 resize (numChildren); ; // pushDownListOfChild[c] will hold the pushDownList of child c
+		pushDwnListOfChild.				 resize (numChildren); ; // pushDwnListOfChild[c] will hold the pushDwnList of child c
 	}
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
@@ -389,7 +389,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 {
 	PushUpPkt* pkt;	 // the packet to be sent 
 	
-	for (int child(0); child<numChildren; child++) { // for each child...
+	for (Lvl_t child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
 		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
 		int idxInPushUpVec = 0;
@@ -673,18 +673,31 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	}
 }
 
+/*************************************************************************************************************************************************
+run the async reshuffle algorithm
+*************************************************************************************************************************************************/
 void Datacenter::reshAsync ()
 {
 	if (isLeaf) {
-		pushDown ();
+		pushDwn ();
 	}
-	else {
-		fill(shouldSndReshAsyncPktToChild.begin(), shouldSndReshAsyncPktToChild.end(), true); // default: send reshAsyncPkt to each child
-//		shouldSndReshAsyncPktToChild; // will be true iff still need to send an Async resh pkt to the respective child
-//		vector <list<Chain>> pushDownListOfChild; // pushDownListOfChild[c] will hold the pushDownList of child c	
+	else {	
+//			// copy each chain in pushDwnList into pushDwnListOfChild[c], where c is the child belonging to this chain's S_u
+//			for (Lvl_t child(0); child<numChildren; child++) { // for each child...
+//				int idxInPushDwnVec = 0;
+//				for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++;) {	// consider all the chains in pushUpVec
+//					if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
+//						if (!insertChainToList (pushDwnListOfChild[child], *chainPtr)) {
+//							error ("Error in insertChainToList. See log file for details");
+//						}
+//					}
+//				}
+//			}
+//		nxtChildToSndReshAsync = 0;	
+//		sndReshAsyncPktToNxtChild ();			
 	}
-	
 }
+
 
 //// initiate a print of the content of all the datacenters
 void Datacenter::PrintAllDatacenters ()
@@ -789,7 +802,7 @@ void Datacenter::sndReshPktToNextChild  ()
 
 /*************************************************************************************************************************************************
 *************************************************************************************************************************************************/
-void Datacenter::pushDown ()
+void Datacenter::pushDwn ()
 {
 }
 
