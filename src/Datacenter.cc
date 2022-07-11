@@ -81,7 +81,7 @@ void Datacenter::initialize(int stage)
 	
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	if (MyConfig::mode==Async) {
-		shouldSndAsyncReshPktToChild.resize (numChildren); 
+		shouldSndReshAsyncPktToChild.resize (numChildren); 
 		pushDownListOfChild.				 resize (numChildren); ; // pushDownListOfChild[c] will hold the pushDownList of child c
 	}
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
@@ -675,7 +675,15 @@ void Datacenter::genNsndBottomUpPktAsync ()
 
 void Datacenter::reshAsync ()
 {
-	error ("Sorry, async resh is not supported yet");
+	if (isLeaf) {
+		pushDown ();
+	}
+	else {
+		fill(shouldSndReshAsyncPktToChild.begin(), shouldSndReshAsyncPktToChild.end(), true); // default: send reshAsyncPkt to each child
+//		shouldSndReshAsyncPktToChild; // will be true iff still need to send an Async resh pkt to the respective child
+//		vector <list<Chain>> pushDownListOfChild; // pushDownListOfChild[c] will hold the pushDownList of child c	
+	}
+	
 }
 
 //// initiate a print of the content of all the datacenters
