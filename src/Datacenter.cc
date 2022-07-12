@@ -299,11 +299,11 @@ void Datacenter::pushUp ()
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : begins PU. pushUpList=", dcId);
 		printBufToLog ();
-		MyConfig::printToLog (pushUpList);
+		MyConfig::printToLog (pushUpList, false);
 	}
 	reshuffled = false;
 	
-	// Check for all chains that were pushed-up for me, and regain resources for them.
+	// Find all chains that were pushed-up for me, and regain resources for them.
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
 		auto search = potPlacedChains.find (chainPtr->id);
 		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do
@@ -335,7 +335,7 @@ void Datacenter::pushUp ()
 					chainPtr++;
 					continue;
 		}
-		else { // the chain is currently placed on a descendant, and I have enough place for this chain --> push up this chain to me
+		else { // the chain is currently placed on a descendant, and I have enough place for this chain-->push up this chain to me
 			availCpu 						-= requiredCpuToLocallyPlaceThisChain;
 			Chain pushedUpChain  = *chainPtr; // construct a new chain to insert to placedChains, because it's forbidden to modify the chain in pushUpList
 			pushedUpChain.curLvl = lvl;
@@ -350,10 +350,8 @@ void Datacenter::pushUp ()
 		insertChainToList (pushUpList, *chainPtr);
 	}
 	
-	// Now, after finishing my local push-up handling, this is the final place of each chain for the next period.
-	if (newlyPlacedChains.size()>0) { // inform sim_ctrlr about all the newly placed chains since the last update.
-		updatePlacementInfo ();
-	}
+	// inform sim_ctrlr about all the newly placed chains
+	updatePlacementInfo ();
 
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finihsed PU.", dcId);
@@ -365,11 +363,8 @@ void Datacenter::pushUp ()
 
 		if (MyConfig::mode == Sync) {
 			simController->finishedAlg (dcId, leafId);
-		}
-		
-		if (DEBUG_LVL > 0 && MyConfig::mode==Sync) {
-			if (!pushUpList.empty()) {
-				error ("pushUpList isn't empty after running pushUp() on a leaf");
+			if (DEBUG_LVL > 0 && !pushUpList.empty()) {
+					error ("pushUpList isn't empty after running pushUp() on a leaf");
 			}
 		}
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
@@ -377,9 +372,6 @@ void Datacenter::pushUp ()
 
 	genNsndPushUpPktsToChildren ();
 	
-	if (MyConfig::mode==Sync) { // in sync mode we're sure that we won't accept additional PUpkts at this cycle, and therefore can clear the PU list 
-		pushUpList.clear();
-	}
 }
 
 /*************************************************************************************************************************************************
@@ -440,6 +432,9 @@ void Datacenter::bottomUp ()
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.				 insert  (chainPtr->id);
+					if (MyConfig::mode==Async) {
+						newlyPlacedChains.insert (chainPtr->id);
+					}
 					newlyPlacedChains.insert  (chainPtr->id);
 					chainPtr = notAssigned.erase (chainPtr);
 				}
@@ -482,10 +477,12 @@ void Datacenter::bottomUp ()
 					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
 					printBufToLog();
 				}
+				
 				if (MyConfig::mode==Sync) {
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
+					updatePlacementInfo ();
 					this->reshInitiator = dcId; // assign my id as the reshInitiator of this resh
 					this->deficitCpu = 7; //$$$
 					return reshAsync ();
@@ -500,11 +497,17 @@ void Datacenter::bottomUp ()
 		print ();
 	}
 
+	if (MyConfig::mode==Async) {
+		updatePlacementInfo ();
+	}
   if (isRoot) { 
   	if (MyConfig::printBuRes) {
   		MyConfig::printToLog ("\nAfter BU:");
   		simController->printBuCost ();
   		simController->printAllDatacenters (true, false);
+  	}
+  	if (!(notAssigned.empty())) {
+  		error ("notAssigned isn't empty after running BU on the root");
   	}
 	  pushUp ();
   }
@@ -573,7 +576,7 @@ void Datacenter::rdBottomUpPkt ()
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
-		MyConfig::printToLog (pushUpList);
+		MyConfig::printToLog (pushUpList, false);
 	}
 }
 
@@ -646,16 +649,18 @@ void Datacenter::genNsndBottomUpPktAsync ()
 
 	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
 	int idixInPushUpVec = 0;
-	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
+	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
+			chainPtr++;
 			continue;
 		}
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
 		pkt2snd->setPushUpVec (idixInPushUpVec++, *chainPtr);
+		chainPtr = pushUpList.erase (chainPtr); //delete the local entry for this chain in pushUpList; once the push-up repy arrives from the prnt, we'll re-insert it
 	}
 	
-	if (idixInPushUpVec>0 || notAssigned.empty()) { // there's either pushUp nor notAssigned data to send to prnt
+	if (idixInPushUpVec>0 || notAssigned.empty()) { // there's either pushUp, or notAssigned data to send to prnt
 		pkt2snd -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
 		pkt2snd -> setNotAssignedArraySize (notAssigned.size());
