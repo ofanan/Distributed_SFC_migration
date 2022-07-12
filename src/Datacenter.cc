@@ -689,7 +689,10 @@ void Datacenter::genNsndBottomUpPktAsync ()
 *************************************************************************************************************************************************/
 void Datacenter::initReshAsync ()
 {
-	this->reshInitiator = dcId; // assign my id as the reshInitiator of this resh
+	reshInitiator = dcId; // assign my id as the initiator of this reshuffle
+	pushDwnList.clear (); // verify that the push down list doesn't contain left-overs from previous runs
+	for (auto chain : notAssigned ) {
+	} 
 	this->deficitCpu = 7; //$$$
 
 	error ("sorry, Async resh isn't supported yet");
