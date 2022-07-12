@@ -111,7 +111,8 @@ class Datacenter : public cSimpleModule
     void rdBottomUpPkt					();
     void pushUp		        			();
     void prepareReshSync		 		();
-		void reshAsync							();
+		void initReshAsync					(); // init an async reshuffle. called upon a failure to place a chain
+		void reshAsync							(); // run async resh. called either by initReshAsync upon a failure to place a chain, or by an arrival of reshAsyncPkt
     void genNsndBottomUpPktSync ();
     void genNsndBottomUpPktAsync();
     void sndPushUpPkt						();

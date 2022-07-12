@@ -488,9 +488,7 @@ void Datacenter::bottomUp ()
 				}
 				else {
 					updatePlacementInfo ();
-					this->reshInitiator = dcId; // assign my id as the reshInitiator of this resh
-					this->deficitCpu = 7; //$$$
-					return reshAsync ();
+					return initReshAsync ();
 				}
 			}
 		}
@@ -685,12 +683,23 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	}
 }
 
+		
 /*************************************************************************************************************************************************
-run the async reshuffle algorithm
+ Init an async reshuffle. called upon a failure to place a chain
+*************************************************************************************************************************************************/
+void Datacenter::initReshAsync ()
+{
+	this->reshInitiator = dcId; // assign my id as the reshInitiator of this resh
+	this->deficitCpu = 7; //$$$
+
+	error ("sorry, Async resh isn't supported yet");
+}
+
+/*************************************************************************************************************************************************
+run the async reshuffle algorithm. Called either by initReshAsync upon a failure to place a chain, or by an arrival of reshAsyncPkt
 *************************************************************************************************************************************************/
 void Datacenter::reshAsync ()
 {
-	error ("sorry, Async resh isn't supported yet");
 	if (isLeaf) {
 		pushDwn ();
 	}
