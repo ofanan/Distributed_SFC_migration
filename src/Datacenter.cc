@@ -95,14 +95,19 @@ void Datacenter::initialize(int stage)
  * - printChainIds: when true, print in a format similar to that used in the centralized alg'.
  * - printPotPlaced: when true and there're potPlacedChains to print - print them.
  * - printPushUpList: when true and pushUpList isn't impty - print them.
+ * - beginWithNewLine: when true, the print begins in a new line
 *************************************************************************************************************************************************/
 
-void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds)
+void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
 {
+
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
 		return;
 	}
-	snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
+	if (beginWithNewLine) {
+		MyConfig::printToLog ("\n");
+	}
+	snprintf (buf, bufSize, "s%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
 														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
 	printBufToLog ();
 	if (printChainIds) {
@@ -494,7 +499,7 @@ void Datacenter::bottomUp ()
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU.", dcId);
 		printBufToLog ();
-		print ();
+		print (true, true, true, false);
 	}
 
 	if (MyConfig::mode==Async) {
