@@ -105,6 +105,7 @@ class Datacenter : public cSimpleModule
     void handlePushUpPkt			 	();
     void handleReshAsyncPktFromPrnt  ();
     void handleReshAsyncPktFromChild ();
+    void sndReshAsyncPktToNxtChild ();
     void sndReshPktToNextChild  ();
     void bottomUp         			();
     void rdBottomUpPkt					();

@@ -413,7 +413,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			delete (pkt);
 		}
 	}
-	if (DEBUG_LVL>0 && !pushUpList.empty()) {
+	if (DEBUG_LVL>0 && MyConfig::mode==Sync && !pushUpList.empty()) {
 		error ("pushUpList not empty after sending PU pkts to all children");
 	}
 }
@@ -486,6 +486,8 @@ void Datacenter::bottomUp ()
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
+					this->reshInitiator = dcId; // assign my id as the reshInitiator of this resh
+					this->deficitCpu = 7; //$$$
 					return reshAsync ();
 				}
 			}
@@ -678,24 +680,53 @@ run the async reshuffle algorithm
 *************************************************************************************************************************************************/
 void Datacenter::reshAsync ()
 {
+	error ("sorry, Async resh isn't supported yet");
 	if (isLeaf) {
 		pushDwn ();
 	}
 	else {	
-//			// copy each chain in pushDwnList into pushDwnListOfChild[c], where c is the child belonging to this chain's S_u
-//			for (Lvl_t child(0); child<numChildren; child++) { // for each child...
-//				int idxInPushDwnVec = 0;
-//				for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++;) {	// consider all the chains in pushUpVec
-//					if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
-//						if (!insertChainToList (pushDwnListOfChild[child], *chainPtr)) {
-//							error ("Error in insertChainToList. See log file for details");
-//						}
-//					}
-//				}
-//			}
-//		nxtChildToSndReshAsync = 0;	
-//		sndReshAsyncPktToNxtChild ();			
+			// copy each chain in pushDwnList into pushDwnListOfChild[c], where c is the child belonging to this chain's S_u
+			for (Lvl_t child(0); child<numChildren; child++) { // for each child...
+				int idxInPushDwnVec = 0;
+				for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
+					if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
+						if (!insertChainToList (pushDwnListOfChild[child], *chainPtr)) {
+							error ("Error in insertChainToList. See log file for details");
+						}
+					}
+				}
+			}
+		nxtChildToSndReshAsync = 0;	
+		sndReshAsyncPktToNxtChild ();			
 	}
+}
+
+/*************************************************************************************************************************************************
+Check whether there exists (at least one) additional child to which we should send a reshuffle (in async mode) - and if so, send to him.
+*************************************************************************************************************************************************/
+void Datacenter::sndReshAsyncPktToNxtChild ()
+{
+	//skip all children to which there's nothing to snd in the pushDwnList
+	while (pushDwnListOfChild[nxtChildToSndReshAsync].empty() && nxtChildToSndReshAsync<numChildren) { 
+		nxtChildToSndReshAsync++;
+	}
+	if (nxtChildToSndReshAsync==numChildren) { // finished sending pushDwn to all children
+		return pushDwn ();	
+	}
+	// Now we know we should snd a reshAsync pkt to child nxtChildToSndReshAsync
+	ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
+
+	pkt2snd -> setReshInitiator (reshInitiator); 
+	pkt2snd -> setDeficitCpu (deficitCpu);
+	pkt2snd -> setPushDwnVecArraySize (pushDwnListOfChild[nxtChildToSndReshAsync].size());
+	
+	int idxInPushDwnVec = 0;
+	for (auto chainPtr=pushDwnListOfChild[nxtChildToSndReshAsync].begin(); chainPtr!=pushDwnListOfChild[nxtChildToSndReshAsync].end(); ) {	
+		pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
+		chainPtr = pushDwnListOfChild[nxtChildToSndReshAsync].erase (chainPtr);
+	}
+	sndViaQ (portOfChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
+	nxtChildToSndReshAsync++;
 }
 
 
