@@ -97,6 +97,7 @@ class Datacenter : public cSimpleModule
 		inline Lvl_t 	portOfChild 								(const Lvl_t child) const; 
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);
+		inline bool withinAnotherResh (const DcId_t reshInitiator) const;
     void sndViaQ         												(int16_t portNum, cPacket* pkt2send);
     void xmt              											(int16_t portNum, cPacket *pkt2send);
     void handleEndXmtMsg   		  ();

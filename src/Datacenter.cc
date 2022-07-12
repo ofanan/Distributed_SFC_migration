@@ -23,6 +23,7 @@ inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintS
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
+inline bool Datacenter::withinAnotherResh (const DcId_t reshInitiator) const {return (this->reshInitiator!=UNPLACED_DC && this->reshInitiator!=reshInitiator);}
 
 Datacenter::Datacenter()
 {
@@ -48,6 +49,7 @@ void Datacenter::initialize(int stage)
 		lvl				  	= (Lvl_t)  (par("lvl"));
 		dcId					= (DcId_t) (par("dcId"));
 		numBuPktsRcvd = 0;
+		reshInitiator = UNPLACED_DC;
 
 		numPorts    = numParents + numChildren;
 		isRoot      = (numParents==0);
