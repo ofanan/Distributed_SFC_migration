@@ -692,6 +692,9 @@ void Datacenter::initReshAsync ()
 	reshInitiator = dcId; // assign my id as the initiator of this reshuffle
 	pushDwnList.clear (); // verify that the push down list doesn't contain left-overs from previous runs
 	for (auto chain : notAssigned ) {
+		if (cannotPlaceThisChainHigher(chain)) {
+			insertChainToList (pushDwnList, chain);
+		}
 	} 
 	this->deficitCpu = 7; //$$$
 
