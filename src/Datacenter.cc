@@ -709,14 +709,24 @@ void Datacenter::initReshAsync ()
 {
 	reshInitiator = dcId; // assign my id as the initiator of this reshuffle
 	pushDwnList.clear (); // verify that the push down list doesn't contain left-overs from previous runs
+	deficitCpu = 0;
 	for (auto chain : notAssigned ) {
 		if (cannotPlaceThisChainHigher(chain)) {
+			deficitCpu += requiredCpuToLocallyPlaceChain(chain);
 			insertChainToList (pushDwnList, chain);
 		}
+	}
+	Chain chain;
+	for (auto chainId : potPlacedChains) {
+		if (!ChainsMaster::findChain (chainId, chain)) {
+			error ("in initReshAsync. ChainsMaster didn't find chain %d", (int)chainId);
+		}
+		potPlacedChains.erase (chainId);
+		availCpu += requiredCpuToLocallyPlaceChain(chain);
 	} 
-	this->deficitCpu = 7; //$$$
+	
+	deficitCpu -= availCpu;
 
-	error ("sorry, Async resh isn't supported yet");
 }
 
 /*************************************************************************************************************************************************
