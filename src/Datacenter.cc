@@ -572,7 +572,6 @@ void Datacenter::handleBottomUpPktAsync ()
 	rdBottomUpPkt ();
 	bottomUp 			();
 
- //$$$ When do we reset notAssigned, and pushUpList?
 }
 
 /*************************************************************************************************************************************************
@@ -904,12 +903,22 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 
 void Datacenter::handleReshAsyncPktFromChild ()
 {
-}
-/*************************************************************************************************************************************************
-*************************************************************************************************************************************************/
-
-void Datacenter::sndReshPktToNextChild  ()
-{
+	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
+	DcId_t reshInitiator = pkt->getReshInitiator ();
+	if (withinAnotherResh(reshInitiator)) {
+		error ("rcvd from child a reshAsync pkt with reshInitiator=%d while running another resh with reshInitiator=%d", reshInitiator, this->reshInitiator);
+	}
+	this->deficitCpu = pkt->getDeficitCpu ();
+	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
+    if (!insertChainToList (pushDwnList, pkt->getPushDwnVec(i))) {
+			error ("Error in insertChainToList. See log file for details");
+		}        
+	}
+	
+	// $$$ rlz the rsrcs by this child
+	reshAsync ();
+	
+	
 }
 
 /*************************************************************************************************************************************************
