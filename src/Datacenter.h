@@ -72,7 +72,6 @@ class Datacenter : public cSimpleModule
     vector <EndXmtMsg*> 	endXmtEvents; // Indicates when the currently xmtd packet will finish
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList, pushDwnList;     // Used by the BUPU alg'
-		vector <list<Chain>>  pushDwnListOfChild; // pushDwnListOfChild[c] will hold the push-down list associated with child c
 		Lvl_t  nxtChildToSndReshAsync; // will hold the serial num (0, 1, ..., numChildren-1) of the next child to which the Dc may try to snd a reshAsyncPkt.
 		vector <bool> shouldSndReshAsyncPktToChild; // will be true iff still need to send an Async resh pkt to the respective child
 		int deficitCpu;
@@ -106,7 +105,7 @@ class Datacenter : public cSimpleModule
     void handlePushUpPkt			 	();
     void handleReshAsyncPktFromPrnt  ();
     void handleReshAsyncPktFromChild ();
-    void sndReshAsyncPktToNxtChild ();
+    bool sndReshAsyncPktToNxtChild ();
     void sndReshPktToNextChild  ();
     void bottomUp         			();
     void rdBottomUpPkt					();
