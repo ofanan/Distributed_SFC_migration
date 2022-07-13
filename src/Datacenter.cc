@@ -726,7 +726,7 @@ void Datacenter::initReshAsync ()
 	} 
 	
 	deficitCpu -= availCpu;
-
+	reshAsync ();
 }
 
 /*************************************************************************************************************************************************
@@ -882,6 +882,22 @@ bool Datacenter::checkIfChainIsPlaced (ChainId_t chainId)
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
+	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
+	DcId_t reshInitiator = pkt->getReshInitiator ();
+	if (withinAnotherResh(reshInitiator)) {
+		// send the same pkt back to the prnt
+		return sndViaQ (portToPrnt, pkt);
+	}
+
+	// now we know that we're not within another reshuffle 	
+	this->reshInitiator = reshInitiator;
+	this->deficitCpu = pkt->getDeficitCpu ();
+	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
+    if (!insertChainToList (pushDwnList, pkt->getPushDwnVec(i))) {
+			error ("Error in insertChainToList. See log file for details");
+		}        
+	}
+	reshAsync ();
 }
 /*************************************************************************************************************************************************
 *************************************************************************************************************************************************/
