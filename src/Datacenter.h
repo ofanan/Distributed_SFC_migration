@@ -108,6 +108,8 @@ class Datacenter : public cSimpleModule
     bool sndReshAsyncPktToNxtChild ();
     void sndReshPktToNextChild  ();
     void bottomUp         			();
+    void bottomUpFMode     			(); // bottom-up at "feasibility" mode
+    void pushUpFMode     		  	(); // bottom-up at "feasibility" mode
     void rdBottomUpPkt					();
     void pushUp		        			();
     void prepareReshSync		 		();
