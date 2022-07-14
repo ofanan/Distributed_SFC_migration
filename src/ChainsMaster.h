@@ -35,6 +35,7 @@ class ChainsMaster {
 	static bool eraseChains (vector <ChainId_t> vec); // a vector of chains ids to erase 
 	static bool modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain);
 	static bool modifyLvl   (ChainId_t chainId, Lvl_t newLvl); // Change t	he level of the given chain
+	static bool modifyLvl (list <ChainId_t> listOfChainIds, Lvl_t newLvl);
 	static bool blockChain  (ChainId_t chainId); // block a chain, given its id
 	static bool checkIfBlocked (ChainId_t chainId, bool &isBlocked);
 	static void printAllDatacenters (int numDatacenters);

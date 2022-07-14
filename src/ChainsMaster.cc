@@ -102,6 +102,27 @@ void ChainsMaster::displaceAllChains ()
 }
 
 /*************************************************************************************************************************************************
+* Given a list of chain ids, update the curLvl field of the all the chains in the list to the given newLvl.
+* Output: true iff all the chains in the list were found, and their levels were updated to newLvl.
+* The function also increments the number of inst' migrations (numInstantMigs).
+**************************************************************************************************************************************************/
+bool ChainsMaster::modifyLvl (list <ChainId_t> listOfChainIds, Lvl_t newLvl)
+{
+	for (ChainId_t chainId : listOfChainIds) {
+		auto it = ChainsMaster::allChains.find(chainId);
+		if (it == ChainsMaster::allChains.end()) { 
+			snprintf (buf, bufSize, "error: ChainsMaster::modifyLvl didn't find chain %d", chainId);
+			MyConfig::printToLog (buf);
+			return false;
+		}
+		it->second.curLvl = newLvl;
+		it->second.potCpu = UNPLACED_CPU; // as the chain is now really placed, reset its "potential Cpu" value.
+		ChainsMaster::numInstantMigs++; // assume that every change in the lvl implies an "instantaneous migration" (several inst' mig' may happen per period).	
+	}
+  return true;
+}
+
+/*************************************************************************************************************************************************
 * Given a chain id, update the curLvl field of the respective chain to the given newLvl.
 * Output: true iff the requested chain was found, and its level was updated to newLvl.
 * The function also increments the number of inst' migrations (numInstantMigs).

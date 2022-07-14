@@ -456,18 +456,18 @@ void Datacenter::bottomUp ()
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.		  insert  (chainPtr->id);
 					newlyPlacedChains.insert  (chainPtr->id);
-					chainPtr = notAssigned.erase (chainPtr);
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
 					potPlacedChains.insert (chainPtr->id);
 					Chain modifiedChain = *chainPtr;
 					modifiedChain.curLvl = lvl;
-					chainPtr = notAssigned.erase (chainPtr); 
 					modifiedChain.potCpu = requiredCpuToLocallyPlaceThisChain; // set the chain's "potCpu" field to the cpu required, if I'll host it
 					if (!insertChainToList (pushUpList, modifiedChain)) {
 						error ("Error in insertChainToList. See log file for details");
 					}
 				}
+				chainPtr = notAssigned.erase (chainPtr);
+
 		}
 		else { 
 			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
