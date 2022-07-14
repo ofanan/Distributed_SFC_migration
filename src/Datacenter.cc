@@ -541,23 +541,14 @@ Later, clear newlyPlacedChains.
 void Datacenter::updatePlacementInfo ()
 {
 
-	if (newlyPlacedChains.empty ()) {
-		return;
-	}
-	
-	for (auto chainId : newlyPlacedChains) {
-		if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\nupdating the ChainMaster: chain %d: curLvl=%d, curDC=%d\n", chainId, lvl, dcId);
-			printBufToLog ();
-		}
-		if (!(ChainsMaster::modifyLvl (chainId, lvl))) { // Change the lvl of this chain written in our DB
-			snprintf (buf, bufSize, "\nError: s%d : chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster\n", dcId, chainId);
-			printBufToLog ();
-			ChainsMaster::printAllChains ();
-			error ("chain %d that appeared in a call to updatePlacementInfo was not found in ChainsMaster", chainId);
-		}
-	}
-	newlyPlacedChains.		clear ();
+//	if (newlyPlacedChains.empty ()) {
+//		return;
+//	}
+
+//	if (ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
+//		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
+//	}
+//	newlyPlacedChains.clear ();
 }
 
 

@@ -106,7 +106,7 @@ void ChainsMaster::displaceAllChains ()
 * Output: true iff all the chains in the list were found, and their levels were updated to newLvl.
 * The function also increments the number of inst' migrations (numInstantMigs).
 **************************************************************************************************************************************************/
-bool ChainsMaster::modifyLvl (list <ChainId_t> listOfChainIds, Lvl_t newLvl)
+bool ChainsMaster::modifyLvl (unordered_set <ChainId_t> listOfChainIds, Lvl_t newLvl)
 {
 	for (ChainId_t chainId : listOfChainIds) {
 		auto it = ChainsMaster::allChains.find(chainId);
