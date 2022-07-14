@@ -540,11 +540,7 @@ Later, clear newlyPlacedChains.
 *************************************************************************************************************************************************/
 void Datacenter::updatePlacementInfo ()
 {
-	if (newlyPlacedChains.empty ()) {
-		return;
-	}
-
-	if (ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
+	if (!ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
 		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
 	}
 	newlyPlacedChains.clear ();
