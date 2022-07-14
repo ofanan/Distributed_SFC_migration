@@ -899,6 +899,9 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 	reshAsync ();
 }
 /*************************************************************************************************************************************************
+Handle a reshuffle async pkt, received from a child.
+- Read the pkt's fields.
+- dis-place every chain that was pushed-down from me, and release the cpu resources (namely, increase this->availCpu) accordingly.
 *************************************************************************************************************************************************/
 
 void Datacenter::handleReshAsyncPktFromChild ()
@@ -909,15 +912,30 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		error ("rcvd from child a reshAsync pkt with reshInitiator=%d while running another resh with reshInitiator=%d", reshInitiator, this->reshInitiator);
 	}
 	this->deficitCpu = pkt->getDeficitCpu ();
+	
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
-    if (!insertChainToList (pushDwnList, pkt->getPushDwnVec(i))) {
-			error ("Error in insertChainToList. See log file for details");
-		}        
+		Chain chain = pkt->getPushDwnVec(i);
+		if (chain.curLvl >= lvl) { // the chain wasn't pushed down from me -> insert it into pushDwnList
+			if (!insertChainToList (pushDwnList, chain)) {
+				error ("Error in insertChainToList. See log file for details");
+			}
+			continue;
+		}
+		// now we know that the chain was placed below me
+		auto search = placedChains.find (chain.id);
+		if (search==placedChains.end()) { // this chain wasn't pushed-down from me
+			if (!insertChainToList (pushDwnList, chain)) {
+				error ("Error in insertChainToList. See log file for details");
+			}
+			continue;
+		}
+		
+		// now we know that the chain was pushed-down from me
+		regainRsrcOfChain (chain); 
 	}
 	
 	// $$$ rlz the rsrcs by this child
 	reshAsync ();
-	
 	
 }
 
