@@ -20,7 +20,7 @@ int   MyConfig::mode, MyConfig::LOG_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 vector <Cpu_t> MyConfig::cpuAtLvl; 
-
+vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
 
 Define_Module(SimController);
@@ -77,6 +77,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
 
+		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
 			MyConfig::evenChainsAreRt			 = false;
@@ -112,10 +113,18 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL=DETAILED_LOG;
-		MyConfig::printBuRes = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
-		MyConfig::printBupuRes = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::LOG_LVL				 = DETAILED_LOG;
+		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBupuRes   = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
+		Lvl_t h;
+		for (h=0; h<RtChain::mu_u_len; h++) {
+			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (1); // (min (1,1)); //(RtChain::mu_u[h], NonRtChain::mu_u[h]));
+		}
+		for (h=RtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
+			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
+		}
+		MyConfig::printToLog (MyConfig::minCpuToPlaceAnyChainAtLvl);
 		runTrace ();
 	}
 }
@@ -141,7 +150,6 @@ void SimController::openFiles ()
 	if (!MyConfig::openFiles ()) {
 		error ("MyConfig::openFiles failed");
 	}
-	MyConfig::printToLog (MyConfig::traceFileName); //$$$
 }
 
 void SimController::checkParams ()
@@ -300,10 +308,6 @@ void SimController::runTimePeriod ()
 			chainsThatLeftDatacenter.clear ();
 		
 			initAlg (); // call a placement algorithm 
-			if (MyConfig::LOG_LVL > NO_LOG) {
-				genSettingsBuf ();
-				MyConfig::printToLog (settingsBuf); 
-			}
 			scheduleAt (simTime() + period, new RunTimePeriodMsg); // Schedule a self-event for reading the handling the next time-step
 			break;
 		}

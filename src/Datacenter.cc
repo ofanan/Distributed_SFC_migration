@@ -725,7 +725,7 @@ void Datacenter::reshAsync ()
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 
 		// there're no additional relevant children to send a reshAsyncPkt to --> pushDwn chains from Dcs above me into myself
-		
+//		while (
 //		for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
 //			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
 //				if (!insertChainToList (pushDwnListOfChild, *chainPtr)) {
@@ -733,8 +733,8 @@ void Datacenter::reshAsync ()
 //				}
 //			}
 //		}
-		
-		pushDwn();	
+//		
+//		pushDwn();	
 		return finReshAsync ();
 	}
 }
