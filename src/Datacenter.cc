@@ -322,7 +322,7 @@ void Datacenter::pushUp ()
 			regainRsrcOfChain (*chainPtr); // Yes --> regain its resources
 		}
 		else { //the chain wasn't pushed-up --> need to locally place it
-			placedChains.				 insert (chainPtr->id);
+			placedChains.			insert (chainPtr->id);
 			newlyPlacedChains.insert (chainPtr->id);
 		}
 		potPlacedChains.erase (chainPtr->id);
@@ -455,9 +455,6 @@ void Datacenter::bottomUp ()
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.				 insert  (chainPtr->id);
-					if (MyConfig::mode==Async) {
-						newlyPlacedChains.insert (chainPtr->id);
-					}
 					newlyPlacedChains.insert  (chainPtr->id);
 					chainPtr = notAssigned.erase (chainPtr);
 				}
