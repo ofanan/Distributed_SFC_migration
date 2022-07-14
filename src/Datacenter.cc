@@ -454,7 +454,7 @@ void Datacenter::bottomUp ()
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-					placedChains.				 insert  (chainPtr->id);
+					placedChains.		  insert  (chainPtr->id);
 					newlyPlacedChains.insert  (chainPtr->id);
 					chainPtr = notAssigned.erase (chainPtr);
 				}
