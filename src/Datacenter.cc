@@ -705,7 +705,6 @@ void Datacenter::initReshAsync ()
 		if (!ChainsMaster::findChain (chainId, chain)) {
 			error ("in initReshAsync. ChainsMaster didn't find chain %d", (int)chainId);
 		}
-		potPlacedChains.erase (chainId);
 		availCpu += requiredCpuToLocallyPlaceChain(chain);
 	} 
 	
@@ -720,27 +719,24 @@ void Datacenter::reshAsync ()
 {
 
 	if (deficitCpu <= 0) {
-		finReshAsync ();
+		return finReshAsync ();
 	}
 	
-//	if (isLeaf) {
-//		pushDwn ();
-//	}
-//	else {	
-//			// copy each chain in pushDwnList into pushDwnListOfChild[c], where c is the child belonging to this chain's S_u
-//			for (Lvl_t child(0); child<numChildren; child++) { // for each child...
-//				int idxInPushDwnVec = 0;
-//				for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
-//					if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
-//						if (!insertChainToList (pushDwnListOfChild[child], *chainPtr)) {
-//							error ("Error in insertChainToList. See log file for details");
-//						}
-//					}
+	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
+
+		// there're no additional relevant children to send a reshAsyncPkt to --> pushDwn chains from Dcs above me into myself
+		
+//		for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
+//			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
+//				if (!insertChainToList (pushDwnListOfChild, *chainPtr)) {
+//					error ("Error in insertChainToList. See log file for details");
 //				}
 //			}
-//		nxtChildToSndReshAsync = 0;	
-//		sndReshAsyncPktToNxtChild ();			
-//	}
+//		}
+		
+		pushDwn();	
+		return finReshAsync ();
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -754,11 +750,11 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 	//skip all children to which there's nothing to snd in the pushDwnList
 	while (nxtChildToSndReshAsync < numChildren) {
 		for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
-				if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
-					if (!insertChainToList (pushDwnListOfChild, *chainPtr)) {
-						error ("Error in insertChainToList. See log file for details");
-					}
+			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
+				if (!insertChainToList (pushDwnListOfChild, *chainPtr)) {
+					error ("Error in insertChainToList. See log file for details");
 				}
+			}
 		}
 		if (pushDwnListOfChild.empty()) { // no push-down data to send to this child
 			nxtChildToSndReshAsync++;
@@ -892,6 +888,8 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 Handle a reshuffle async pkt, received from a child.
 - Read the pkt's fields.
 - dis-place every chain that was pushed-down from me, and release the cpu resources (namely, increase this->availCpu) accordingly.
+- if the chain was pushed-down from another Dc (above me), insert it into pushDwnList, that I will later send to my prnt.
+- call reshAsync to either call the next child / run the push-down locally / return to bottomUp.
 *************************************************************************************************************************************************/
 
 void Datacenter::handleReshAsyncPktFromChild ()
@@ -905,28 +903,29 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);
-		if (chain.curLvl >= lvl) { // the chain wasn't pushed down from me -> insert it into pushDwnList
+		if (chain.curLvl >= lvl) { // the chain wasn't pushed down 
 			error ("Hey child! you should bother me only with chains that you succeeded to push-down");
-//			if (!insertChainToList (pushDwnList, chain)) {
-//				error ("Error in insertChainToList. See log file for details");
-//			}
-//			continue;
+			//			if (!insertChainToList (pushDwnList, chain)) {
+			//				error ("Error in insertChainToList. See log file for details");
+			//			}
+			//			continue;
 		}
-		// now we know that the chain was placed below me
-		auto search = placedChains.find (chain.id);
-		if (search==placedChains.end()) { // this chain wasn't pushed-down from me
-			if (!insertChainToList (pushDwnList, chain)) {
-				error ("Error in insertChainToList. See log file for details");
-			}
-			continue;
-		}
-		
-		// now we know that the chain was pushed-down from me
-		regainRsrcOfChain (chain);
-		chain.potCpu = requiredCpuToLocallyPlaceChain (chain); // set the chain's "potCpu" field to the cpu required, if I'll host it
+		// now we know that the chain was pushed-down to a Dc below me
+		auto search = potPlacedChains.find (chain.id);
+		if (search!=potPlacedChains.end()) { // Does this chain appear in my potPlacedChains?
+			potPlacedChains.erase (chain.id); // Yes --> displace this chain
+			regainRsrcOfChain (chain); // regain the chain's resources
+			continue; // finished handling this chain --> no need to enter it into pushDwnList
+		}	
+		search = placedChains.find (chain.id);
+		if (search!=placedChains.end()) { // Does this chain appear in my placedChains?
+			placedChains.erase (chain.id); // Yes --> displace this chain
+			regainRsrcOfChain (chain); // regain the chain's resources
+			continue; // finished handling this chain --> no need to enter it into pushDwnList
+		}			
+		// now we know that the chain was pushed-down from someone else, above me
 		insertChainToList (pushDwnList, chain);
-	}
-	
+	 }
 	reshAsync ();
 	
 }
