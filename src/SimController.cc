@@ -47,7 +47,7 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		MyConfig::mode 	= Sync;
+		MyConfig::mode 	= Async;
 		MyConfig::useFullResh = false;
 		if (MyConfig::mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
@@ -300,6 +300,10 @@ void SimController::runTimePeriod ()
 			chainsThatLeftDatacenter.clear ();
 		
 			initAlg (); // call a placement algorithm 
+			if (MyConfig::LOG_LVL > NO_LOG) {
+				genSettingsBuf ();
+				MyConfig::printToLog (settingsBuf); 
+			}
 			scheduleAt (simTime() + period, new RunTimePeriodMsg); // Schedule a self-event for reading the handling the next time-step
 			break;
 		}
@@ -845,7 +849,6 @@ void SimController::printResLine ()
 {
 	genSettingsBuf ();
 	MyConfig::printToRes (settingsBuf); 
-//	error (settingsBuf);//$$$$
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
 	if (periodNonMigCost < 0) {
 		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");

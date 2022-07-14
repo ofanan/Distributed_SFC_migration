@@ -32,7 +32,7 @@ alias lex='c; l $PROJ_PATH/example.txt'
 alias lexer='ge $PROJ_PATH/example.txt &'
 alias rex='c; l $PROJ_PATH/res.res'
 alias ltp='ltr $PROJ_PATH/results/poa_files'
-alias gee='ge MyConfig.* SimController.cc SimController.h Datacenter.cc Datacenter.h ChainsMaster.* &'
+alias gee='ge MyConfig.* SimController.cc SimController.h Datacenter.cc Datacenter.h ChainsMaster.* Chain.cc &'
 alias cdd='cd $PROJ_PATH'
 alias t='tail'
 

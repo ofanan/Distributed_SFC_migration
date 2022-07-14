@@ -695,11 +695,13 @@ void Datacenter::initReshAsync ()
 	for (auto chain : notAssigned ) {
 		if (cannotPlaceThisChainHigher(chain)) {
 			deficitCpu += requiredCpuToLocallyPlaceChain(chain);
+			chain.curLvl = lvl;
 			insertChainToList (pushDwnList, chain);
 		}
 	}
 	Chain chain;
 	for (auto chainId : potPlacedChains) {
+		error ("note: initReshAsync was called when potPlacedChains isn't empty");
 		if (!ChainsMaster::findChain (chainId, chain)) {
 			error ("in initReshAsync. ChainsMaster didn't find chain %d", (int)chainId);
 		}
@@ -899,10 +901,11 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);
 		if (chain.curLvl >= lvl) { // the chain wasn't pushed down from me -> insert it into pushDwnList
-			if (!insertChainToList (pushDwnList, chain)) {
-				error ("Error in insertChainToList. See log file for details");
-			}
-			continue;
+			error ("Hey child! you should bother me only with chains that you succeeded to push-down");
+//			if (!insertChainToList (pushDwnList, chain)) {
+//				error ("Error in insertChainToList. See log file for details");
+//			}
+//			continue;
 		}
 		// now we know that the chain was placed below me
 		auto search = placedChains.find (chain.id);
@@ -914,10 +917,11 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		}
 		
 		// now we know that the chain was pushed-down from me
-		regainRsrcOfChain (chain); 
+		regainRsrcOfChain (chain);
+		chain.potCpu = requiredCpuToLocallyPlaceChain (chain); // set the chain's "potCpu" field to the cpu required, if I'll host it
+		insertChainToList (pushDwnList, chain);
 	}
 	
-	// $$$ rlz the rsrcs by this child
 	reshAsync ();
 	
 }
