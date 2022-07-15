@@ -94,10 +94,6 @@ void Datacenter::initialize(int stage)
 	}
 	
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
-	if (MyConfig::mode==Async) {
-//		shouldSndReshAsyncPktToChild.resize (numChildren); 
-//		pushDwnReqFromChild.				 resize (numChildren); ; // pushDwnReqFromChild[c] will hold the pushDwnList of child c
-	}
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 
@@ -1003,8 +999,24 @@ void Datacenter::pushDwn ()
 }
 
 
-bool Datacenter::sndReshAsyncPktToPrnt ()
+/*************************************************************************************************************************************************
+send a reshAsync pkt to prnt.
+In particular, the pushDwnVec field in this pkt will contain pushDwnAck, which should contain details about all the pkts that were pushed-down 
+into my sub-tree.
+After sending the pkt, pushDwnAck is clear.
+*************************************************************************************************************************************************/
+void Datacenter::sndReshAsyncPktToPrnt ()
 {
-	return true;
+	ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
+	pkt2snd -> setReshInitiatorLvl (reshInitiatorLvl);
+	pkt2snd -> setDeficitCpu 		(deficitCpu);
+	pkt2snd -> setPushDwnVecArraySize (pushDwnAck.size());
+	
+	int idxInPushDwnVec = 0;
+	for (auto chainPtr=pushDwnAck.begin(); chainPtr!=pushDwnAck.end(); ) {	
+		pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
+	}
+	sndViaQ (portToPrnt, pkt2snd);
+	pushDwnAck.clear ();
 }
 
