@@ -59,8 +59,8 @@ class Datacenter : public cSimpleModule
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void initBottomUp (vector<Chain> &vecOfChainThatJoined);
-    bool checkIfChainIsPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
-    bool checkIfChainIsPotentiallyPlaced (ChainId_t chainId); // return true iff the queried chain id is locally potentially-placed
+    bool isPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
+    bool isPotentiallyPlaced (ChainId_t chainId); // return true iff the queried chain id is locally potentially-placed
 
     // Log / debug funcs
     void print (bool printPotPlaced=true, bool printPushUpList=true, bool printChainIds=true, bool beginWithNewLine=true); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
@@ -125,6 +125,7 @@ class Datacenter : public cSimpleModule
     void genNsndBottomUpPktAsync();
     void sndPushUpPkt						();
     void updatePlacementInfo 		();
+    void updatePlacementInfo 		(unordered_set <ChainId_t> newlyPlacedChains);
     void genNsndPushUpPktsToChildren ();
     void pushDwn 								();
     

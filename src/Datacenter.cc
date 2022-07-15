@@ -560,6 +560,17 @@ void Datacenter::updatePlacementInfo ()
 
 
 /*************************************************************************************************************************************************
+Update ChainMaster about (the IDs of) all the newly placed chains, as indicated in newlyPlacedChains.
+Later, clear newlyPlacedChains.
+*************************************************************************************************************************************************/
+void Datacenter::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChains)
+{
+	if (!ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
+		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
+	}
+}
+
+/*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in Async mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsync ()
@@ -860,14 +871,14 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 }
 
 // return true iff the queried chain id is locally placed
-bool Datacenter::checkIfChainIsPlaced (ChainId_t chainId) 
+bool Datacenter::isPlaced (ChainId_t chainId) 
 {
 	auto search = placedChains.find (chainId);
 	return (search!=placedChains.end()); 	
 }
 
 // return true iff the queried chain id is locally placed
-bool Datacenter::checkIfChainIsPotentiallyPlaced (ChainId_t chainId) 
+bool Datacenter::isPotentiallyPlaced (ChainId_t chainId) 
 {
 	auto search = potPlacedChains.find (chainId);
 	return (search!=potPlacedChains.end()); 	
@@ -878,9 +889,7 @@ bool Datacenter::checkIfChainIsPotentiallyPlaced (ChainId_t chainId)
 void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
-//	DcId_t reshInitiator = pkt->getReshInitiator ();
 	DcId_t reshInitiatorLvl = pkt->getReshInitiatorLvl ();
-//	if (withinAnotherResh(reshInitiator)) {
 	if (withinAnotherResh(reshInitiatorLvl)) {
 		// send the same pkt back to the prnt
 		return sndViaQ (portToPrnt, pkt);
@@ -916,23 +925,17 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);
 		if (chain.curLvl >= lvl) { // the chain wasn't pushed down 
-			error ("Hey child! you should bother me only with chains that you succeeded to push-down");
-			//			if (!insertChainToList (pushDwnList, chain)) {
-			//				error ("Error in insertChainToList. See log file for details");
-			//			}
-			//			continue;
+			error ("rcvd a reshAsync pkt from child with lvl above child's lvl");
 		}
 		// now we know that the chain was pushed-down to a Dc below me
-		auto search = potPlacedChains.find (chain.id);
-		if (search!=potPlacedChains.end()) { // Does this chain appear in my potPlacedChains?
-			potPlacedChains.erase (chain.id); // Yes --> displace this chain
-			regainRsrcOfChain (chain); // regain the chain's resources
+		if (isPotentiallyPlaced (chain.id)) {
+			potPlacedChains.erase (chain.id); 
+			regainRsrcOfChain (chain); 
 			continue; // finished handling this chain --> no need to enter it into pushDwnList
 		}	
-		search = placedChains.find (chain.id);
-		if (search!=placedChains.end()) { // Does this chain appear in my placedChains?
-			placedChains.erase (chain.id); // Yes --> displace this chain
-			regainRsrcOfChain (chain); // regain the chain's resources
+		if (isPlaced(chain.id)) { 
+			placedChains.erase (chain.id); 
+			regainRsrcOfChain (chain); 
 			continue; // finished handling this chain --> no need to enter it into pushDwnList
 		}			
 		// now we know that the chain was pushed-down from someone else, above me
@@ -950,6 +953,7 @@ void Datacenter::finReshAsync ()
 	for (ChainId_t chainId_t : potPlacedChains) {
 		placedChains.insert (chainId_t);
 	}
+	updatePlacementInfo (potPlacedChains);
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		bottomUpFMode ();
@@ -976,7 +980,7 @@ void Datacenter::pushDwn ()
 		}
 		
 		// If this chain is placed / potPlaced on me, then availCpu was already decreased when it was placed / pot-placed. No need to decrease it again
-		if (checkIfChainIsPlaced (chainPtr->id) || checkIfChainIsPotentiallyPlaced (chainPtr->id)) { 
+		if (isPlaced (chainPtr->id) || isPotentiallyPlaced (chainPtr->id)) { 
 			continue; 
 		}
 
@@ -985,8 +989,14 @@ void Datacenter::pushDwn ()
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) {
 			availCpu -= requiredCpuToLocallyPlaceThisChain;
 			placedChains.insert (chainPtr->id); 				
+			ChainsMaster::modifyLvl (chainPtr->id, lvl);
 			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
 				deficitCpu -= requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl);
+			}
+			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from the an ancestor of me?
+				Chain pushedDwnChain = *chainPtr;
+				pushedDwnChain.curLvl = lvl;
+				insertChainToList (pushDwnAck, pushedDwnChain);
 			}
 		}
 	}
@@ -995,5 +1005,6 @@ void Datacenter::pushDwn ()
 
 bool Datacenter::sndReshAsyncPktToPrnt ()
 {
+	return true;
 }
 
