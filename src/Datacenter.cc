@@ -724,17 +724,20 @@ void Datacenter::reshAsync ()
 	
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 
-		// there're no additional relevant children to send a reshAsyncPkt to --> pushDwn chains from Dcs above me into myself
-//		while (
-//		for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
-//			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
-//				if (!insertChainToList (pushDwnListOfChild, *chainPtr)) {
-//					error ("Error in insertChainToList. See log file for details");
-//				}
-//			}
-//		}
-//		
-//		pushDwn();	
+		// there isn't any additional child to whom I can send a reshAsyncPkt --> pushDwn chains from Dcs above me into myself
+		while (availCpu >=MyConfig::minCpuToPlaceAnyChainAtLvl [lvl]) { // do I still have available cpu to place a chain at all?
+			for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushDwnVec
+				if (chainPtr->curLvl <= lvl) { // this chain is already placed on me / on a descendant dc
+					chainPtr++;
+					continue;
+				}
+				Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
+				if (availCpu > requiredCpuToLocallyPlaceThisChain) {
+				}
+			}
+		}
+		
+		pushDwn();	
 		return finReshAsync ();
 	}
 }
