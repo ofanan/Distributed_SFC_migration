@@ -8,7 +8,7 @@ class noncobject Chain;
 packet ReshAsyncPkt
 {
 	int deficitCpu;
-	int reshInitiator;
+	int reshInitiatorLvl;
   Chain pushDwnVec [];
 }
 

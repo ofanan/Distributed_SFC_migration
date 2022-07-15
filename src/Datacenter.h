@@ -60,6 +60,7 @@ class Datacenter : public cSimpleModule
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void initBottomUp (vector<Chain> &vecOfChainThatJoined);
     bool checkIfChainIsPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
+    bool checkIfChainIsPotentiallyPlaced (ChainId_t chainId); // return true iff the queried chain id is locally potentially-placed
 
     // Log / debug funcs
     void print (bool printPotPlaced=true, bool printPushUpList=true, bool printChainIds=true, bool beginWithNewLine=true); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
@@ -71,11 +72,12 @@ class Datacenter : public cSimpleModule
     vector <cChannel*>  	xmtChnl;
     vector <EndXmtMsg*> 	endXmtEvents; // Indicates when the currently xmtd packet will finish
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
-		list <Chain> 					pushUpList, pushDwnList;     // Used by the BUPU alg'
+		list <Chain> 					pushUpList, pushDwnReq, pushDwnAck;     // Used by the BUPU alg'
 		Lvl_t  nxtChildToSndReshAsync; // will hold the serial num (0, 1, ..., numChildren-1) of the next child to which the Dc may try to snd a reshAsyncPkt.
 		vector <bool> shouldSndReshAsyncPktToChild; // will be true iff still need to send an Async resh pkt to the respective child
 		int deficitCpu;
-		DcId_t reshInitiator; // will hold the dcId of the initiator of the currently running async reshuffle
+/*		DcId_t reshInitiator; // will hold the dcId of the initiator of the currently running async reshuffle*/
+		Lvl_t reshInitiatorLvl; // will hold the level of the initiator of the currently running async reshuffle
 		
     // Dynamic
     Cpu_t  								 availCpu;
@@ -92,11 +94,14 @@ class Datacenter : public cSimpleModule
 
 		// Functions related to the alg' running    
     
-    Cpu_t requiredCpuToLocallyPlaceChain 			(const Chain chain) const;
-		inline Lvl_t 	portOfChild 								(const Lvl_t child) const; 
+    Cpu_t requiredCpuToLocallyPlaceChain 			  (const Chain chain) const;
+    Cpu_t requiredCpuToPlaceChainAtLvl 			    (const Chain chain, Lvl_t lvl) const;
+		inline Lvl_t 	portOfChild 								  (const Lvl_t child) const; 
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);
-		inline bool withinAnotherResh (const DcId_t reshInitiator) const;
+		inline bool IAmTheReshIniator 							() const;
+/*		inline bool withinAnotherResh (const DcId_t reshInitiator) const;*/
+		inline bool withinAnotherResh (const Lvl_t reshInitiatorLvl) const;
     void sndViaQ         												(int16_t portNum, cPacket* pkt2send);
     void xmt              											(int16_t portNum, cPacket *pkt2send);
     void handleEndXmtMsg   		  ();
@@ -106,6 +111,7 @@ class Datacenter : public cSimpleModule
     void handleReshAsyncPktFromPrnt  ();
     void handleReshAsyncPktFromChild ();
     bool sndReshAsyncPktToNxtChild ();
+    bool sndReshAsyncPktToPrnt  ();
     void bottomUp         			();
     void bottomUpFMode     			(); // bottom-up at "feasibility" mode
     void pushUpFMode     		  	(); // bottom-up at "feasibility" mode

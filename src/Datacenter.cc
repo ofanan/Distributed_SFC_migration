@@ -14,6 +14,8 @@ inline bool Datacenter::canPlaceThisChainHigher 	 (const Chain chain) const {ret
 
 inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
 
+inline Cpu_t Datacenter::requiredCpuToPlaceChainAtLvl (const Chain chain, const Lvl_t lvl) const {return chain.mu_u_at_lvl(lvl);}
+
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
 inline Lvl_t Datacenter::portOfChild (const Lvl_t child) const {if (isRoot) return child; else return child+1;} 
 
@@ -23,7 +25,16 @@ inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintS
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
-inline bool Datacenter::withinAnotherResh (const DcId_t reshInitiator) const {return (this->reshInitiator!=UNPLACED_DC && this->reshInitiator!=reshInitiator);}
+//inline bool Datacenter::withinAnotherResh (const DcId_t reshInitiator) const {return (this->reshInitiator!=UNPLACED_DC && this->reshInitiator!=reshInitiator);}
+inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const 
+{
+	return (this->reshInitiatorLvl!=UNPLACED_LVL && this->reshInitiatorLvl==reshInitiatorLvl);
+}
+
+inline bool Datacenter::IAmTheReshIniator () const
+{
+	return (this->reshInitiatorLvl == this->lvl);
+}
 
 Datacenter::Datacenter()
 {
@@ -49,7 +60,8 @@ void Datacenter::initialize(int stage)
 		lvl				  	= (Lvl_t)  (par("lvl"));
 		dcId					= (DcId_t) (par("dcId"));
 		numBuPktsRcvd = 0;
-		reshInitiator = UNPLACED_DC;
+//		reshInitiator = UNPLACED_DC;
+		reshInitiatorLvl = UNPLACED_LVL;
 
 		numPorts    = numParents + numChildren;
 		isRoot      = (numParents==0);
@@ -84,7 +96,7 @@ void Datacenter::initialize(int stage)
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	if (MyConfig::mode==Async) {
 //		shouldSndReshAsyncPktToChild.resize (numChildren); 
-//		pushDwnListOfChild.				 resize (numChildren); ; // pushDwnListOfChild[c] will hold the pushDwnList of child c
+//		pushDwnReqFromChild.				 resize (numChildren); ; // pushDwnReqFromChild[c] will hold the pushDwnList of child c
 	}
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
@@ -689,23 +701,18 @@ void Datacenter::genNsndBottomUpPktAsync ()
 *************************************************************************************************************************************************/
 void Datacenter::initReshAsync ()
 {
-	reshInitiator = dcId; // assign my id as the initiator of this reshuffle
-	pushDwnList.clear (); // verify that the push down list doesn't contain left-overs from previous runs
+	reshInitiatorLvl = lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+	pushDwnReq.clear (); // verify that the list doesn't contain left-overs from previous runs
 	deficitCpu = 0;
 	for (auto chain : notAssigned ) {
 		if (cannotPlaceThisChainHigher(chain)) {
 			deficitCpu += requiredCpuToLocallyPlaceChain(chain);
 			chain.curLvl = lvl;
-			insertChainToList (pushDwnList, chain);
+			insertChainToList (pushDwnReq, chain);
 		}
 	}
-	Chain chain;
-	for (auto chainId : potPlacedChains) {
+	if (!potPlacedChains.empty()) {
 		error ("note: initReshAsync was called when potPlacedChains isn't empty");
-		if (!ChainsMaster::findChain (chainId, chain)) {
-			error ("in initReshAsync. ChainsMaster didn't find chain %d", (int)chainId);
-		}
-		availCpu += requiredCpuToLocallyPlaceChain(chain);
 	} 
 	
 	deficitCpu -= availCpu;
@@ -718,27 +725,17 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
-	if (deficitCpu <= 0) {
-		return finReshAsync ();
-	}
-	
-	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
-
-		// there isn't any additional child to whom I can send a reshAsyncPkt --> pushDwn chains from Dcs above me into myself
-		while (availCpu >=MyConfig::minCpuToPlaceAnyChainAtLvl [lvl]) { // do I still have available cpu to place a chain at all?
-			for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushDwnVec
-				if (chainPtr->curLvl <= lvl) { // this chain is already placed on me / on a descendant dc
-					chainPtr++;
-					continue;
-				}
-				Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
-				if (availCpu > requiredCpuToLocallyPlaceThisChain) {
-					availCpu -= requiredCpuToLocallyPlaceThisChain;
-					placedChains.insert (chainPtr->id);
-				}
-			}
+	if (availCpu >= deficitCpu) { // Can finish the resh locally, wo calling my children
+		pushDwn ();
+		if (deficitCpu > 0) {
+			error ("at this stage, we should have deficitCpu <= 0");
 		}
 		
+		return finReshAsync ();
+	}
+
+	// Cannot free enough space --> need to call children	
+	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 		pushDwn();	
 		return finReshAsync ();
 	}
@@ -751,33 +748,33 @@ Check whether there exists (at least one) additional child to which we should se
 bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
-	list<Chain>  pushDwnListOfChild; 
+	list<Chain>  pushDwnReqFromChild; 
 
 	//skip all children to which there's nothing to snd in the pushDwnList
 	while (nxtChildToSndReshAsync < numChildren) {
-		for (auto chainPtr=pushDwnList.begin(); chainPtr!=pushDwnList.end(); chainPtr++) {	// consider all the chains in pushUpVec
+		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
-				if (!insertChainToList (pushDwnListOfChild, *chainPtr)) {
+				if (!insertChainToList (pushDwnReqFromChild, *chainPtr)) {
 					error ("Error in insertChainToList. See log file for details");
 				}
 			}
 		}
-		if (pushDwnListOfChild.empty()) { // no push-down data to send to this child
+		if (pushDwnReqFromChild.empty()) { // no push-down data to send to this child
 			nxtChildToSndReshAsync++;
 			continue;
 		}
 
-		// now we know that the pushDwnListOfChild isn't empty
+		// now we know that pushDwnReqFromChild isn't empty
 		ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
 
-		pkt2snd -> setReshInitiator (reshInitiator); 
+		pkt2snd -> setReshInitiatorLvl (reshInitiatorLvl); 
 		pkt2snd -> setDeficitCpu 		(deficitCpu);
-		pkt2snd -> setPushDwnVecArraySize (pushDwnListOfChild.size());
+		pkt2snd -> setPushDwnVecArraySize (pushDwnReqFromChild.size());
 		
 		int idxInPushDwnVec = 0;
-		for (auto chainPtr=pushDwnListOfChild.begin(); chainPtr!=pushDwnListOfChild.end(); ) {	
+		for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {	
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
-			chainPtr = pushDwnListOfChild.erase (chainPtr);
+			chainPtr = pushDwnReqFromChild.erase (chainPtr);
 		}
 		sndViaQ (portOfChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
@@ -869,22 +866,31 @@ bool Datacenter::checkIfChainIsPlaced (ChainId_t chainId)
 	return (search!=placedChains.end()); 	
 }
 
+// return true iff the queried chain id is locally placed
+bool Datacenter::checkIfChainIsPotentiallyPlaced (ChainId_t chainId) 
+{
+	auto search = potPlacedChains.find (chainId);
+	return (search!=potPlacedChains.end()); 	
+}
+
 /*************************************************************************************************************************************************
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
-	DcId_t reshInitiator = pkt->getReshInitiator ();
-	if (withinAnotherResh(reshInitiator)) {
+//	DcId_t reshInitiator = pkt->getReshInitiator ();
+	DcId_t reshInitiatorLvl = pkt->getReshInitiatorLvl ();
+//	if (withinAnotherResh(reshInitiator)) {
+	if (withinAnotherResh(reshInitiatorLvl)) {
 		// send the same pkt back to the prnt
 		return sndViaQ (portToPrnt, pkt);
 	}
 
 	// now we know that we're not within another reshuffle 	
-	this->reshInitiator = reshInitiator;
+	this->reshInitiatorLvl = reshInitiatorLvl;
 	this->deficitCpu = pkt->getDeficitCpu ();
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
-    if (!insertChainToList (pushDwnList, pkt->getPushDwnVec(i))) {
+    if (!insertChainToList (pushDwnReq, pkt->getPushDwnVec(i))) {
 			error ("Error in insertChainToList. See log file for details");
 		}        
 	}
@@ -901,9 +907,9 @@ Handle a reshuffle async pkt, received from a child.
 void Datacenter::handleReshAsyncPktFromChild ()
 {
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
-	DcId_t reshInitiator = pkt->getReshInitiator ();
-	if (withinAnotherResh(reshInitiator)) {
-		error ("rcvd from child a reshAsync pkt with reshInitiator=%d while running another resh with reshInitiator=%d", reshInitiator, this->reshInitiator);
+	if (withinAnotherResh(pkt->getReshInitiatorLvl ())) {
+		error ("rcvd from child a reshAsync pkt with reshInitiator=%d while running another resh with reshInitiatorLvl=%d", 
+		pkt->getReshInitiatorLvl (), this->reshInitiatorLvl);
 	}
 	this->deficitCpu = pkt->getDeficitCpu ();
 	
@@ -930,7 +936,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 			continue; // finished handling this chain --> no need to enter it into pushDwnList
 		}			
 		// now we know that the chain was pushed-down from someone else, above me
-		insertChainToList (pushDwnList, chain);
+		insertChainToList (pushDwnAck, chain);
 	 }
 	reshAsync ();
 	
@@ -939,14 +945,55 @@ void Datacenter::handleReshAsyncPktFromChild ()
 /*************************************************************************************************************************************************
 *************************************************************************************************************************************************/
 void Datacenter::finReshAsync ()
-{
+{  
+	// make all the "pot-placed" chains "placed"
+	for (ChainId_t chainId_t : potPlacedChains) {
+		placedChains.insert (chainId_t);
+	}
+	potPlacedChains.clear ();
+	if (IAmTheReshIniator()) {
+		bottomUpFMode ();
+	}
+	else {
+		sndReshAsyncPktToPrnt ();
+	}
 }
 
+
 /*************************************************************************************************************************************************
+push-down chains from the list pushDwnReq into me. 
+Update state vars (availCpu, deficitCpu, placedChains) accordingly.
+Return when either availCpu doesn't suffice to place any additional chain, or when deficitCpu <= 0.
 *************************************************************************************************************************************************/
 void Datacenter::pushDwn ()
 {
+	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
+		if (deficitCpu <= 0 || availCpu < MyConfig::minCpuToPlaceAnyChainAtLvl [lvl]) { 
+			break;
+		}
+		if (chainPtr->curLvl < this->lvl) { 
+			error ("my pushDwnReq should include only chains with curLvl >= this.lvl");
+		}
+		
+		// If this chain is placed / potPlaced on me, then availCpu was already decreased when it was placed / pot-placed. No need to decrease it again
+		if (checkIfChainIsPlaced (chainPtr->id) || checkIfChainIsPotentiallyPlaced (chainPtr->id)) { 
+			continue; 
+		}
+
+		// now we know that this chain wasn't previously placed, or pot-placed, on me
+		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
+		if (availCpu >= requiredCpuToLocallyPlaceThisChain) {
+			availCpu -= requiredCpuToLocallyPlaceThisChain;
+			placedChains.insert (chainPtr->id); 				
+			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
+				deficitCpu -= requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl);
+			}
+		}
+	}
 }
 
 
+bool Datacenter::sndReshAsyncPktToPrnt ()
+{
+}
 
