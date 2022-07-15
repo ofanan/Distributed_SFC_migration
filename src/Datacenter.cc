@@ -710,6 +710,7 @@ void Datacenter::initReshAsync ()
 {
 	reshInitiatorLvl = lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 	pushDwnReq.clear (); // verify that the list doesn't contain left-overs from previous runs
+	pushDwnAck.clear (); // verify that the list doesn't contain left-overs from previous runs
 	deficitCpu = 0;
 	for (auto chain : notAssigned ) {
 		if (cannotPlaceThisChainHigher(chain)) {
@@ -721,8 +722,10 @@ void Datacenter::initReshAsync ()
 	if (!potPlacedChains.empty()) {
 		error ("note: initReshAsync was called when potPlacedChains isn't empty");
 	} 
-	
 	deficitCpu -= availCpu;
+	if (deficitCpu <= 0) {
+		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
+	}
 	reshAsync ();
 }
 
@@ -732,18 +735,18 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
-	if (availCpu >= deficitCpu) { // Can finish the resh locally, wo calling my children
+	if (availCpu >= deficitCpu) { // Can finish the resh locally, by placing additional chains on me, w/o calling my children
 		pushDwn ();
 		if (deficitCpu > 0) {
 			error ("at this stage, we should have deficitCpu <= 0");
 		}
-		
+		//now we know that deficitCpu <= 0, so we can finish the reshuflle
 		return finReshAsync ();
 	}
 
 	// Cannot free enough space --> need to call children	
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
-		pushDwn();	
+		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
 		return finReshAsync ();
 	}
 }
@@ -927,18 +930,17 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		if (isPotentiallyPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
 			regainRsrcOfChain (chain); 
-			continue; // finished handling this chain --> no need to enter it into pushDwnList
+			continue; // finished handling this chain --> no need to enter it into pushDwnAck
 		}	
 		if (isPlaced(chain.id)) { 
 			placedChains.erase (chain.id); 
 			regainRsrcOfChain (chain); 
-			continue; // finished handling this chain --> no need to enter it into pushDwnList
+			continue; // finished handling this chain --> no need to enter it into pushDwnAck
 		}			
 		// now we know that the chain was pushed-down from someone else, above me
 		insertChainToList (pushDwnAck, chain);
 	 }
 	reshAsync ();
-	
 }
 
 /*************************************************************************************************************************************************
@@ -952,7 +954,7 @@ void Datacenter::finReshAsync ()
 	updatePlacementInfo (potPlacedChains);
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
-		bottomUpFMode ();
+		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
 	}
 	else {
 		sndReshAsyncPktToPrnt ();
@@ -1008,12 +1010,11 @@ After sending the pkt, pushDwnAck is clear.
 void Datacenter::sndReshAsyncPktToPrnt ()
 {
 	ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
-	pkt2snd -> setReshInitiatorLvl (reshInitiatorLvl);
-	pkt2snd -> setDeficitCpu 		(deficitCpu);
+	pkt2snd -> setReshInitiatorLvl    (reshInitiatorLvl);
+	pkt2snd -> setDeficitCpu 		      (deficitCpu);
 	pkt2snd -> setPushDwnVecArraySize (pushDwnAck.size());
-	
 	int idxInPushDwnVec = 0;
-	for (auto chainPtr=pushDwnAck.begin(); chainPtr!=pushDwnAck.end(); ) {	
+	for (auto chainPtr=pushDwnAck.begin(); chainPtr!=pushDwnAck.end(); chainPtr++) {	
 		pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
 	}
 	sndViaQ (portToPrnt, pkt2snd);
