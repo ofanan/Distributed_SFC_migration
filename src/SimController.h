@@ -86,6 +86,7 @@ class SimController : public cSimpleModule
 		void setOutputFileNames ();
 		void discoverPathsToRoot ();
 		Lvl_t dist (DcId_t i, DcId_t j);
+		char* gamad ();
 
 		// Termination functions
 		void finish ();
@@ -114,7 +115,7 @@ class SimController : public cSimpleModule
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
 		inline DcId_t leafId2DcId (DcId_t leafId);
 		inline DcId_t dcId2leafId (DcId_t dcId);
-		inline void genSettingsBuf ();
+		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
     
     // Functions used for debugging

@@ -124,7 +124,6 @@ void SimController::initialize (int stage)
 		for (h=RtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-		MyConfig::printToLog (MyConfig::minCpuToPlaceAnyChainAtLvl);
 		runTrace ();
 	}
 }
@@ -329,6 +328,8 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
+	genSettingsBuf (false);
+	MyConfig::printToLog (settingsBuf); 
 	
 	isFirstPeriod 								= true;
   numMigsAtThisPeriod 					= 0; // will cnt the # of migrations in the current run
@@ -841,9 +842,14 @@ void SimController::handleMessage (cMessage *msg)
 /*************************************************************************************************************************************************
  * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
 *************************************************************************************************************************************************/
-inline void SimController::genSettingsBuf ()
+inline void SimController::genSettingsBuf (bool printTime)
 {
-  snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts); 
+  if (printTime) {
+  	snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts);
+  }
+  else {
+  	snprintf (settingsBuf, settingsBufSize, "running %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed);
+  }
 }
 
 /*************************************************************************************************************************************************
