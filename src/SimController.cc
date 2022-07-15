@@ -119,7 +119,7 @@ void SimController::initialize (int stage)
 		MyConfig::discardAllMsgs = false;
 		Lvl_t h;
 		for (h=0; h<RtChain::mu_u_len; h++) {
-			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (1); // (min (1,1)); //(RtChain::mu_u[h], NonRtChain::mu_u[h]));
+			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (min (RtChain::mu_u[h], NonRtChain::mu_u[h]));
 		}
 		for (h=RtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
