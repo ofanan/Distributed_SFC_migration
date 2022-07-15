@@ -733,6 +733,8 @@ void Datacenter::reshAsync ()
 				}
 				Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 				if (availCpu > requiredCpuToLocallyPlaceThisChain) {
+					availCpu -= requiredCpuToLocallyPlaceThisChain;
+					placedChains.insert (chainPtr->id);
 				}
 			}
 		}
@@ -741,6 +743,7 @@ void Datacenter::reshAsync ()
 		return finReshAsync ();
 	}
 }
+
 
 /*************************************************************************************************************************************************
 Check whether there exists (at least one) additional child to which we should send a reshuffle (in async mode) - and if so, send to him.
