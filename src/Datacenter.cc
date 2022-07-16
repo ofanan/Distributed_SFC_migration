@@ -763,6 +763,10 @@ Check whether there exists (at least one) additional child to which we should se
 bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d in sndToNxtchild", dcId);
+		printBufToLog ();
+	}
 	list<Chain>  pushDwnReqFromChild; 
 
 	//skip all children to which there's nothing to snd in the pushDwnList
@@ -780,6 +784,10 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		}
 
 		// now we know that pushDwnReqFromChild isn't empty
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			MyConfig::printToLog (". pushDwnReq=");
+			MyConfig::printToLog (pushDwnReqFromChild);
+		}
 		ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
 
 		pkt2snd -> setReshInitiatorLvl (reshInitiatorLvl); 
@@ -1033,6 +1041,7 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 		snprintf (buf, bufSize, "\ns%d sending to prnt", dcId);
 		printBufToLog ();
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			MyConfig::printToLog (" pushDwnAck=");
 			MyConfig::printToLog (pushDwnAck);
 		}
 	}
