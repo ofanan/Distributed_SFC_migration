@@ -118,8 +118,9 @@ void Datacenter::initialize(int stage)
  * - printPotPlaced: when true and there're potPlacedChains to print - print them.
  * - printPushUpList: when true and pushUpList isn't impty - print them.
  * - beginWithNewLine: when true, the print begins in a new line
+ * - printNotAssigned: when true, print also the notAssigned list
 *************************************************************************************************************************************************/
-void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
+void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine, bool printNotAssigned)
 {
 
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
@@ -145,6 +146,10 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	if (printPushUpList) {
 		MyConfig::printToLog ("pushUpList: ");
 		MyConfig::printToLog (pushUpList, false);
+	}
+	if (printNotAssigned) {
+		MyConfig::printToLog ("notAssigned: ");
+		MyConfig::printToLog (pushUpList, true);
 	}
 }
 
@@ -327,7 +332,7 @@ void Datacenter::pushUp ()
 {
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : begins PU. pushUpList=", dcId);
+		snprintf (buf, bufSize, "\ns%d : beginning PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList, false);
 	}
@@ -469,9 +474,6 @@ void Datacenter::bottomUpFMode ()
 			
 			// Not enough availCpu for this chain, and it cannot be placed higher
 			if (reshuffled) {
-				if (MyConfig::mode==Async) {
-					error ("note: resetting back 'reshuffled' isn't supported yet in Async mode");
-				}
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					MyConfig::overallNumBlockedUsrs++;
 					error ("sorry. blocking chains isn't supported yet");
@@ -609,7 +611,7 @@ void Datacenter::bottomUp ()
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU.", dcId);
 		printBufToLog ();
-		print (true, true, true, false);
+		print (true, true, true, false, true);
 	}
 
 	if (MyConfig::mode==Async) {
@@ -800,6 +802,10 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		}
 
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "s %d sent PU pkt to prnt", dcId);
+			printBufToLog ();
+		}
 	}
 	else { // no really data to send; in async mode there's no use to send an empty pkt, so just destroy it
 		delete (pkt2snd);
@@ -852,7 +858,7 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
-	reshuffled = true;
+//	$$ reshuffled = true;
 	if (availCpu >= deficitCpu) { // Can finish the resh locally, by placing additional chains on me, w/o calling my children
 		pushDwn ();
 		if (deficitCpu > 0) {
