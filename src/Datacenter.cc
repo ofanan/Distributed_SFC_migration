@@ -445,6 +445,7 @@ Running the BU alg' at "feasibility" Async mode
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpFMode ()
 {
+	pushUpList.clear();
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning BU-f. notAssigned=", dcId);
 		printBufToLog ();
@@ -462,14 +463,11 @@ void Datacenter::bottomUpFMode ()
 		}
 		else { 
 			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				snprintf (buf, bufSize, "\ns%d in BU-f. c%d", dcId, chainPtr->id);
-				printBufToLog ();
 				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
 				continue;
 			}
 			
 			// Not enough availCpu for this chain, and it cannot be placed higher
-			error ("erer");
 			if (reshuffled) {
 				if (MyConfig::mode==Async) {
 					error ("note: resetting back 'reshuffled' isn't supported yet in Async mode");
@@ -509,7 +507,7 @@ void Datacenter::bottomUpFMode ()
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
 		printBufToLog ();
-		print (true, true, true, false);
+		print (false, false, true, false);
 	}
 
 	if (MyConfig::mode==Async) {
