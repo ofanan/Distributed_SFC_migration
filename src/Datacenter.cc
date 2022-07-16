@@ -25,10 +25,9 @@ inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintS
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
-//inline bool Datacenter::withinAnotherResh (const DcId_t reshInitiator) const {return (this->reshInitiator!=UNPLACED_DC && this->reshInitiator!=reshInitiator);}
 inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const 
 {
-	return (this->reshInitiatorLvl!=UNPLACED_LVL && this->reshInitiatorLvl==reshInitiatorLvl);
+	return (this->reshInitiatorLvl!=UNPLACED_LVL && this->reshInitiatorLvl!=reshInitiatorLvl);
 }
 
 inline bool Datacenter::IAmTheReshIniator () const
