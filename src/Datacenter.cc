@@ -833,10 +833,14 @@ void Datacenter::initReshAsync ()
 		if (cannotPlaceThisChainHigher(chain)) {
 			Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(chain);
 			deficitCpu += requiredCpuToLocallyPlaceThisChain;
-			Chain chainToPushDwn = chain; //$$$$ do we really need this copy?
-			chainToPushDwn.curLvl = lvl;
-			chainToPushDwn.potCpu = requiredCpuToLocallyPlaceThisChain;
-			insertChainToList (pushDwnReq, chainToPushDwn);
+//			Chain chainToPushDwn = chain; //$$$$ do we really need this copy?
+//			chainToPushDwn.curLvl = lvl;
+//			chainToPushDwn.potCpu = requiredCpuToLocallyPlaceThisChain;
+//			insertChainToList (pushDwnReq, chainToPushDwn);
+//			Chain chainToPushDwn = chain; //$$$$ do we really need this copy?
+			chain.curLvl = lvl;
+			chain.potCpu = requiredCpuToLocallyPlaceThisChain;
+			insertChainToList (pushDwnReq, chain);
 		}
 	}
 	if (!potPlacedChains.empty()) {
