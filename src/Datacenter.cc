@@ -445,7 +445,6 @@ Running the BU alg' at "feasibility" Async mode
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpFMode ()
 {
-	error ("sorry, bottomUp in Feasibility mode isn't coded yet");
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning BU-f. notAssigned=", dcId);
 		printBufToLog ();
