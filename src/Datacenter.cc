@@ -1140,8 +1140,9 @@ Reset the run of an async resh, and prepare for the next run
 *************************************************************************************************************************************************/
 void Datacenter::rstReshAsync ()
 {
-	reshInitiatorLvl = UNPLACED_LVL; // reset the initiator of the currently run reshuffling
-	nxtChildToSndReshAsync = 0; 
+	reshInitiatorLvl 			 = UNPLACED_LVL; // reset the initiator of the currently run reshuffling
+	nxtChildToSndReshAsync = 0; 					 // begin the passing over children from child 0
+	deficitCpu						 = 0;
 }
 
 /*************************************************************************************************************************************************
