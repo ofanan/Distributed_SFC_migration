@@ -464,7 +464,6 @@ void Datacenter::bottomUpFMode ()
 			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				snprintf (buf, bufSize, "\ns%d in BU-f. c%d", dcId, chainPtr->id);
 				printBufToLog ();
-//				error ("\nafter this line, the sim crashes");
 				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
 				continue;
 			}
