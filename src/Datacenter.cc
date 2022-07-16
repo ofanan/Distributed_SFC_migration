@@ -798,6 +798,7 @@ void Datacenter::reshAsync ()
 
 /*************************************************************************************************************************************************
 Check whether there exists (at least one) additional child to which we should send a reshuffle (in async mode) - and if so, send to him.
+returns true iff found a relevant child, and sent him a reshAsyncPkt.
 *************************************************************************************************************************************************/
 bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
@@ -808,7 +809,6 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 	}
 	list<Chain>  pushDwnReqFromChild; 
 
-	//skip all children to which there's nothing to snd in the pushDwnList
 	while (nxtChildToSndReshAsync < numChildren) {
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
@@ -817,7 +817,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 				}
 			}
 		}
-		if (pushDwnReqFromChild.empty()) { // no push-down data to send to this child
+		if (pushDwnReqFromChild.empty()) { // no push-down data to send to this child --> skip it
 			nxtChildToSndReshAsync++;
 			continue;
 		}
@@ -845,7 +845,10 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 	return false; // no additional relevant child to send to
 }
 
-//// initiate a print of the content of all the datacenters
+
+/*************************************************************************************************************************************************
+Initiate a print of the content of all the datacenters
+*************************************************************************************************************************************************/
 void Datacenter::PrintAllDatacenters ()
 {
 	PrintAllDatacentersMsg* msg2snd = new PrintAllDatacentersMsg; 
@@ -873,7 +876,6 @@ void Datacenter::prepareReshSync ()
 		simController->prepareReshSync (dcId, leafId);
 	}
 }
-
 
 /*************************************************************************************************************************************************
 Clear all the resources currently allocated at this datastore:
@@ -936,6 +938,9 @@ bool Datacenter::isPotentiallyPlaced (ChainId_t chainId)
 }
 
 /*************************************************************************************************************************************************
+handle a reshAsyncPkt that arrived from a prnt:
+- Insert all the chains into pushDwnReq.
+- call reshAsync()
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
@@ -956,6 +961,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 	}
 	reshAsync ();
 }
+
 /*************************************************************************************************************************************************
 Handle a reshuffle async pkt, received from a child.
 - Read the pkt's fields.
@@ -963,7 +969,6 @@ Handle a reshuffle async pkt, received from a child.
 - if the chain was pushed-down from another Dc (above me), insert it into pushDwnList, that I will later send to my prnt.
 - call reshAsync to either call the next child / run the push-down locally / return to bottomUp.
 *************************************************************************************************************************************************/
-
 void Datacenter::handleReshAsyncPktFromChild ()
 {
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
@@ -996,6 +1001,9 @@ void Datacenter::handleReshAsyncPktFromChild ()
 }
 
 /*************************************************************************************************************************************************
+Finish the local run of a reshAsync alg':
+- if I'm the initiator, come back to run bottomUp, but in "F" (feasibility) mode.
+- Else, send a reshAsyncPkt to prnt.
 *************************************************************************************************************************************************/
 void Datacenter::finReshAsync ()
 {  
@@ -1012,7 +1020,6 @@ void Datacenter::finReshAsync ()
 		sndReshAsyncPktToPrnt ();
 	}
 }
-
 
 /*************************************************************************************************************************************************
 push-down chains from the list pushDwnReq into me. 
