@@ -441,11 +441,86 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 }
 
 /************************************************************************************************************************************************
-Running the BU alg' at "feasibility" mode
+Running the BU alg' at "feasibility" Async mode
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpFMode ()
 {
 	error ("sorry, bottomUp in Feasibility mode isn't coded yet");
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : beginning BU-f. notAssigned=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+	}
+
+	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedList());
+	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
+		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
+		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
+				availCpu -= requiredCpuToLocallyPlaceThisChain;				
+				placedChains.		  insert  (chainPtr->id);
+				newlyPlacedChains.insert  (chainPtr->id);
+				chainPtr = notAssigned.erase (chainPtr);
+		}
+		else { 
+			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
+				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
+				continue;
+			}
+			
+			// Not enough availCpu for this chain, and it cannot be placed higher
+			if (reshuffled) {
+				if (MyConfig::mode==Async) {
+					error ("note: resetting back 'reshuffled' isn't supported yet in Async mode");
+				}
+				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
+					MyConfig::overallNumBlockedUsrs++;
+					error ("sorry. blocking chains isn't supported yet");
+					if (!ChainsMaster::blockChain (chainPtr->id)) {
+						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+					}
+					chainPtr = notAssigned.erase (chainPtr); 
+				}
+				else { // Failed to place an old chain even after resh
+					snprintf (buf, bufSize, "\ns%d : : couldn't place an old chain even after reshuffling", dcId);
+					printBufToLog ();
+					snprintf (buf, bufSize, "\ncpuCapacity=%d chain required cpu=%d", cpuCapacity, chainPtr->mu_u_at_lvl(lvl));
+					printBufToLog ();
+					printStateAndEndSim  ();
+				}
+			}
+			else { // haven't reshuffled yet --> reshuffle				
+				if (MyConfig::mode==Sync) {
+					if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+						snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
+						printBufToLog();
+					}
+					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
+				}
+				else {
+					updatePlacementInfo ();
+					return initReshAsync ();
+				}
+			}
+		}
+	}
+
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
+		printBufToLog ();
+		print (true, true, true, false);
+	}
+
+	if (MyConfig::mode==Async) {
+		updatePlacementInfo ();
+	}
+  if (isRoot) { 
+  	if (!(notAssigned.empty())) {
+  		error ("notAssigned isn't empty after running BU on the root");
+  	}
+  }
+  else {
+  	return genNsndBottomUpFmodePktAsync ();
+  }
 }
 
 /************************************************************************************************************************************************
@@ -672,6 +747,26 @@ void Datacenter::genNsndBottomUpPktSync ()
 	}
 }
 
+
+
+/*************************************************************************************************************************************************
+Generate a BottomUpPkt in Async f-mode, based on the data currently found in notAssigned, and xmt it to my parent:
+For each chain in this->notAssigned:
+	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
+*************************************************************************************************************************************************/
+void Datacenter::genNsndBottomUpFmodePktAsync ()
+{
+	if (!notAssigned.empty()) {
+		BottomUpPkt* pkt2snd = new BottomUpPkt;
+		pkt2snd -> setNotAssignedArraySize (notAssigned.size());
+		for (int i=0; i<notAssigned.size(); i++) {
+			pkt2snd->setNotAssigned (i, notAssigned[i]);
+		}
+		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt
+	}	
+	notAssigned.clear ();
+}
+
 /*************************************************************************************************************************************************
 Generate a BottomUpPkt, based on the data currently found in notAssigned and pushUpList, and xmt it to my parent:
 - For each chain in this->pushUpList:
@@ -756,6 +851,7 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
+	reshuffled = true;
 	if (availCpu >= deficitCpu) { // Can finish the resh locally, by placing additional chains on me, w/o calling my children
 		pushDwn ();
 		if (deficitCpu > 0) {
