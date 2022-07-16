@@ -463,7 +463,8 @@ void Datacenter::bottomUpFMode ()
 		else { 
 			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 				snprintf (buf, bufSize, "\ns%d in BU-f. c%d", dcId, chainPtr->id);
-				MyConfig::printToLog (buf);
+				printBufToLog ();
+//				error ("\nafter this line, the sim crashes");
 				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
 				continue;
 			}
@@ -827,9 +828,10 @@ void Datacenter::initReshAsync ()
 		if (cannotPlaceThisChainHigher(chain)) {
 			Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(chain);
 			deficitCpu += requiredCpuToLocallyPlaceThisChain;
-			chain.curLvl = lvl;
-			chain.potCpu = requiredCpuToLocallyPlaceThisChain;
-			insertChainToList (pushDwnReq, chain);
+			Chain chainToPushDwn = chain; //$$$$ do we really need this copy?
+			chainToPushDwn.curLvl = lvl;
+			chainToPushDwn.potCpu = requiredCpuToLocallyPlaceThisChain;
+			insertChainToList (pushDwnReq, chainToPushDwn);
 		}
 	}
 	if (!potPlacedChains.empty()) {
@@ -1105,6 +1107,7 @@ Finish the local run of a reshAsync alg':
 *************************************************************************************************************************************************/
 void Datacenter::finReshAsync ()
 {  
+
 	// make all the "pot-placed" chains "placed"
 	for (ChainId_t chainId_t : potPlacedChains) {
 		placedChains.insert (chainId_t);
@@ -1112,10 +1115,12 @@ void Datacenter::finReshAsync ()
 	updatePlacementInfo (potPlacedChains);
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
+		reshInitiatorLvl = UNPLACED_LVL; // reset the initiator of the currently run reshuffling	
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
 	}
 	else {
 		sndReshAsyncPktToPrnt ();
+		reshInitiatorLvl = UNPLACED_LVL; // reset the initiator of the currently run reshuffling	
 	}
 }
 
