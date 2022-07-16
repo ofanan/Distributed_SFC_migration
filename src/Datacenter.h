@@ -11,8 +11,8 @@
 #include "SimController.h"
 #include "Chain.h"
 #include "ChainsMaster.h"
-
 #include "EndXmtMsg_m.h"
+#include "EndFModeMsg_m.h"
 #include "BottomUpSelfMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
@@ -71,7 +71,8 @@ class Datacenter : public cSimpleModule
   	int prntGateId; // gateId of msgs arriving prnt
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
-    vector <EndXmtMsg*> 	endXmtEvents; // Indicates when the currently xmtd packet will finish
+    vector <EndXmtMsg*> 	endXmtEvents; // endXmts[i] will hold the event of the end of the transmission of a pkt in output channel i
+		EndFModeMsg						endFMode; // will hold the event of finishing "F" mode     
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'
 		list <Chain> 					pushDwnReq, pushDwnAck; // List of chains requested to be pushed-down, acknowledged that were pushed-down
