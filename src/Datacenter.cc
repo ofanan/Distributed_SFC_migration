@@ -122,7 +122,7 @@ void Datacenter::initialize(int stage)
  * - beginWithNewLine: when true, the print begins in a new line
  * - printNotAssigned: when true, print also the notAssigned list
 *************************************************************************************************************************************************/
-void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine, bool printNotAssigned)
+void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
 {
 
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
@@ -148,10 +148,6 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	if (printPushUpList) {
 		MyConfig::printToLog ("pushUpList: ");
 		MyConfig::printToLog (pushUpList, false);
-	}
-	if (printNotAssigned) {
-		MyConfig::printToLog ("notAssigned: ");
-		MyConfig::printToLog (pushUpList, true);
 	}
 }
 
@@ -611,9 +607,10 @@ void Datacenter::bottomUp ()
 	}
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : finished BU.", dcId);
+		snprintf (buf, bufSize, "\ns%d : finished BU. notAssigned=", dcId);
 		printBufToLog ();
-		print (true, true, true, false, true);
+		MyConfig::printToLog (notAssigned);
+		print (true, true, true, true);
 	}
 
 	if (MyConfig::mode==Async) {
@@ -734,16 +731,16 @@ void Datacenter::genNsndBottomUpPktSync ()
 	}
 
 	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
-	int idixInPushUpVec = 0;
+	int idxInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); chainPtr++) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 			continue;
 		}
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
-		pkt2snd->setPushUpVec (idixInPushUpVec++, *chainPtr);
+		pkt2snd->setPushUpVec (idxInPushUpVec++, *chainPtr);
 	}
-	pkt2snd -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
+	pkt2snd -> setPushUpVecArraySize (idxInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
 	sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 	if (!reshuffled) { 
@@ -783,7 +780,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	BottomUpPkt* pkt2snd = new BottomUpPkt;
 
 	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
-	int idixInPushUpVec = 0;
+	int idxInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
 			chainPtr++;
@@ -791,12 +788,12 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		}
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
-		pkt2snd->setPushUpVec (idixInPushUpVec++, *chainPtr);
+		pkt2snd->setPushUpVec (idxInPushUpVec++, *chainPtr);
 		chainPtr = pushUpList.erase (chainPtr); //delete the local entry for this chain in pushUpList; once the push-up repy arrives from the prnt, we'll re-insert it
 	}
 	
-	if (idixInPushUpVec>0 || notAssigned.empty()) { // there's either pushUp, or notAssigned data to send to prnt
-		pkt2snd -> setPushUpVecArraySize (idixInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
+	if (idxInPushUpVec>0 || !notAssigned.empty()) { // there's either pushUp, or notAssigned data to send to prnt
+		pkt2snd -> setPushUpVecArraySize (idxInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
 		pkt2snd -> setNotAssignedArraySize (notAssigned.size());
 		for (int i=0; i<notAssigned.size(); i++) {
@@ -805,7 +802,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "s %d sent PU pkt to prnt", dcId);
+			snprintf (buf, bufSize, "s %d sent BU pkt to prnt", dcId);
 			printBufToLog ();
 		}
 	}
@@ -814,7 +811,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	}
 
 	notAssigned.clear ();
-	if (idixInPushUpVec==0) { // I didn't request prnt to push-up any chain. Hence, no need to wait for his reply --> begin pushUp.
+	if (idxInPushUpVec==0) { // I didn't request prnt to push-up any chain. Hence, no need to wait for his reply --> begin pushUp.
 		pushUp ();
 	}
 }
@@ -913,14 +910,12 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
 	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
-		snprintf (buf, bufSize, "\ns%d in sndToNxtchild. nxtChildToSndReshAsyn=%d", dcId, nxtChildToSndReshAsync);
+		snprintf (buf, bufSize, "\ns%d in sndToNxtchild. nxtChildToSndReshAsync=%d", dcId, nxtChildToSndReshAsync);
 		printBufToLog ();
 	}
 	list<Chain>  pushDwnReqFromChild; 
 
 	while (nxtChildToSndReshAsync < numChildren) {
-		snprintf (buf, bufSize, "\ns %d checking child %d", dcId, nxtChildToSndReshAsync);
-		printBufToLog ();
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
 				if (!insertChainToList (pushDwnReqFromChild, *chainPtr)) {
