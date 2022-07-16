@@ -1143,6 +1143,8 @@ void Datacenter::rstReshAsync ()
 	reshInitiatorLvl 			 = UNPLACED_LVL; // reset the initiator of the currently run reshuffling
 	nxtChildToSndReshAsync = 0; 					 // begin the passing over children from child 0
 	deficitCpu						 = 0;
+	pushDwnReq.clear        ();
+	pushDwnAck.clear        ();
 }
 
 /*************************************************************************************************************************************************
