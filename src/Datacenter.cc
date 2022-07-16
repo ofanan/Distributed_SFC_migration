@@ -17,7 +17,7 @@ inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) cons
 inline Cpu_t Datacenter::requiredCpuToPlaceChainAtLvl (const Chain chain, const Lvl_t lvl) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
-inline Lvl_t Datacenter::portOfChild (const Lvl_t child) const {if (isRoot) return child; else return child+1;} 
+inline Lvl_t Datacenter::portToChild (const Lvl_t child) const {if (isRoot) return child; else return child+1;} 
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
@@ -48,6 +48,18 @@ Datacenter::~Datacenter()
   }
 }
 
+/*************************************************************************************************************************************************
+returns true iff curHandledMsg arrived from my prnt
+*************************************************************************************************************************************************/
+bool Datacenter::arrivedFromPrnt ()
+{
+	if (isRoot) {
+		return false;
+	}
+	
+	return curHandledMsg->arrivedOn (prntGateId); //("port$0");
+}
+
 void Datacenter::initialize(int stage)
 {
 	if (stage==0) {
@@ -59,7 +71,6 @@ void Datacenter::initialize(int stage)
 		lvl				  	= (Lvl_t)  (par("lvl"));
 		dcId					= (DcId_t) (par("dcId"));
 		numBuPktsRcvd = 0;
-//		reshInitiator = UNPLACED_DC;
 		reshInitiatorLvl = UNPLACED_LVL;
 
 		numPorts    = numParents + numChildren;
@@ -87,7 +98,9 @@ void Datacenter::initialize(int stage)
 			  }
 			}       
 		}
-
+		if (!isRoot) {
+			prntGateId = gate("port$i", 0)->getId();
+		}
 		fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 		return;
 	}
@@ -106,7 +119,6 @@ void Datacenter::initialize(int stage)
  * - printPushUpList: when true and pushUpList isn't impty - print them.
  * - beginWithNewLine: when true, the print begins in a new line
 *************************************************************************************************************************************************/
-
 void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
 {
 
@@ -194,8 +206,12 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<ReshAsyncPkt*>(curHandledMsg) != nullptr)
   {
-  	handleReshAsyncPktFromPrnt ();
-  	handleReshAsyncPktFromChild ();
+  	if (arrivedFromPrnt ()) {
+	  	handleReshAsyncPktFromPrnt ();
+	  }
+	  else {
+	  	handleReshAsyncPktFromChild ();
+	  }
   }
   else
   {
@@ -413,7 +429,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
-			sndViaQ (portOfChild(child), pkt); //send the pkt to the child
+			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 		}
 		else {
 			delete (pkt);
@@ -800,7 +816,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
 			chainPtr = pushDwnReqFromChild.erase (chainPtr);
 		}
-		sndViaQ (portOfChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
+		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
 	}
@@ -828,7 +844,7 @@ void Datacenter::prepareReshSync ()
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
 		PrepareReshSyncPkt *pkt = new PrepareReshSyncPkt;
-		sndViaQ (portOfChild(child), pkt); //send the bottomUPpkt to the child
+		sndViaQ (portToChild(child), pkt); //send the bottomUPpkt to the child
 	}
 	
 	if (isLeaf) {
@@ -938,7 +954,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);
 		if (chain.curLvl >= lvl) { // the chain wasn't pushed down 
-			error ("rcvd a reshAsync pkt from child with lvl above child's lvl");
+			error ("s%d rcvd a reshAsync pkt from child with lvl above child's lvl", dcId);
 		}
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
@@ -1043,7 +1059,7 @@ After sending the pkt, pushDwnAck is clear.
 void Datacenter::sndReshAsyncPktToPrnt ()
 {
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d sending to prnt", dcId);
+		snprintf (buf, bufSize, "\ns%d snding to prnt", dcId);
 		printBufToLog ();
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog (" pushDwnAck=");

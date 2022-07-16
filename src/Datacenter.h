@@ -68,6 +68,7 @@ class Datacenter : public cSimpleModule
     
   private:
   	static const Lvl_t 	portToPrnt=0;
+  	int prntGateId; // gateId of msgs arriving prnt
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
     vector <EndXmtMsg*> 	endXmtEvents; // Indicates when the currently xmtd packet will finish
@@ -97,7 +98,7 @@ class Datacenter : public cSimpleModule
     
     Cpu_t requiredCpuToLocallyPlaceChain 			  (const Chain chain) const;
     Cpu_t requiredCpuToPlaceChainAtLvl 			    (const Chain chain, Lvl_t lvl) const;
-		inline Lvl_t 	portOfChild 								  (const Lvl_t child) const; 
+		inline Lvl_t 	portToChild 								  (const Lvl_t child) const; 
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);
 		inline bool IAmTheReshIniator 							() const;
@@ -129,6 +130,7 @@ class Datacenter : public cSimpleModule
     void updatePlacementInfo 		(unordered_set <ChainId_t> newlyPlacedChains);
     void genNsndPushUpPktsToChildren ();
     void pushDwn 								();
+    bool arrivedFromPrnt        (); 
     
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
