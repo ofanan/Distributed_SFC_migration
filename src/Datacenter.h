@@ -110,9 +110,6 @@ class Datacenter : public cSimpleModule
     void handleBottomUpPktSync 	();
     void handleBottomUpPktAsync ();
     void handlePushUpPkt			 	();
-    void handleReshAsyncPktFromPrnt  ();
-    void handleReshAsyncPktFromChild ();
-    bool sndReshAsyncPktToNxtChild ();
     void sndReshAsyncPktToPrnt  ();
     void bottomUp         			();
     void bottomUpFMode     			(); // bottom-up at "feasibility" mode
@@ -123,15 +120,19 @@ class Datacenter : public cSimpleModule
 		void initReshAsync					(); // init an async reshuffle. called upon a failure to place a chain
 		void finReshAsync 					(); // finalize a run of aysnc resh on a single host
 		void reshAsync							(); // run async resh. called either by initReshAsync upon a failure to place a chain, or by an arrival of reshAsyncPkt
+		void rstReshAsync 					();
     void genNsndBottomUpPktSync ();
-    void genNsndBottomUpFmodePktAsync ();
-    void genNsndBottomUpPktAsync();
     void sndPushUpPkt						();
     void updatePlacementInfo 		();
-    void updatePlacementInfo 		(unordered_set <ChainId_t> newlyPlacedChains);
     void genNsndPushUpPktsToChildren ();
     void pushDwn 								();
     bool arrivedFromPrnt        (); 
+    void updatePlacementInfo 		(unordered_set <ChainId_t> newlyPlacedChains);
+    void handleReshAsyncPktFromPrnt   ();
+    void handleReshAsyncPktFromChild  ();
+    void genNsndBottomUpFmodePktAsync ();
+    void genNsndBottomUpPktAsync      ();
+    bool sndReshAsyncPktToNxtChild    ();
     
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}

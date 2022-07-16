@@ -81,8 +81,6 @@ void Datacenter::initialize(int stage)
 		endXmtEvents.   resize (numPorts);
 		idOfChildren.   resize (numChildren);
 		
-		nxtChildToSndReshAsync = 0; 
-				
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
 		for (int portNum (0); portNum < numPorts; portNum++) {
 			cGate *outGate    = gate("port$o", portNum);
@@ -110,6 +108,9 @@ void Datacenter::initialize(int stage)
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
+  if (MyConfig::mode==Async) {
+		rstReshAsync ();				
+  }
 
 }
 
@@ -1125,13 +1126,22 @@ void Datacenter::finReshAsync ()
 	updatePlacementInfo (potPlacedChains);
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
-		reshInitiatorLvl = UNPLACED_LVL; // reset the initiator of the currently run reshuffling	
+		rstReshAsync ();
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
 	}
 	else {
 		sndReshAsyncPktToPrnt ();
-		reshInitiatorLvl = UNPLACED_LVL; // reset the initiator of the currently run reshuffling	
+		rstReshAsync ();
 	}
+}
+
+/*************************************************************************************************************************************************
+Reset the run of an async resh, and prepare for the next run
+*************************************************************************************************************************************************/
+void Datacenter::rstReshAsync ()
+{
+	reshInitiatorLvl = UNPLACED_LVL; // reset the initiator of the currently run reshuffling
+	nxtChildToSndReshAsync = 0; 
 }
 
 /*************************************************************************************************************************************************
