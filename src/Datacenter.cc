@@ -726,6 +726,11 @@ void Datacenter::initReshAsync ()
 	if (deficitCpu <= 0) {
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
 	}
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		snprintf (buf, bufSize, "s%d init resh", dcId);
+		printBufToLog ();
+	}
+
 	reshAsync ();
 }
 
@@ -969,6 +974,12 @@ Return when either availCpu doesn't suffice to place any additional chain, or wh
 *************************************************************************************************************************************************/
 void Datacenter::pushDwn ()
 {
+
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		snprintf (buf, bufSize, "s%d push dwn", dcId);
+		printBufToLog ();
+	}
+
 	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 		if (deficitCpu <= 0 || availCpu < MyConfig::minCpuToPlaceAnyChainAtLvl [lvl]) { 
 			break;
