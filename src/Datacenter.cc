@@ -110,7 +110,8 @@ void Datacenter::initialize(int stage)
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   if (MyConfig::mode==Async) {
 		rstReshAsync ();
-		endFMode = nullptr;
+		endFMode  = nullptr;
+		isInFMode = false;
   }
 
 }

@@ -72,7 +72,8 @@ class Datacenter : public cSimpleModule
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
     vector <EndXmtMsg*> 	endXmtEvents; // endXmts[i] will hold the event of the end of the transmission of a pkt in output channel i
-		EndFModeMsg						endFMode; // will hold the event of finishing "F" mode     
+		EndFModeMsg						endFMode; // will hold the event of finishing "F" mode
+		bool									isInFMode; 
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'
 		list <Chain> 					pushDwnReq, pushDwnAck; // List of chains requested to be pushed-down, acknowledged that were pushed-down
