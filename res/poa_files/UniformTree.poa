@@ -33,10 +33,10 @@ old_usrs: (0,1)(4,0)
 t = 4
 usrs_that_left: 
 new_usrs: (5,2)(6,3)
-old_usrs: (0,1)(4,0)
+old_usrs: 
 
 t = 5
 usrs_that_left: 
-new_usrs: (5,2)(6,3)
+new_usrs: 
 old_usrs: (0,0)(4,1)
 
