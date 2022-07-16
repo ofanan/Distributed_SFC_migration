@@ -137,7 +137,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
-		MyConfig::traceFileName = "UniformTree_no_resh.poa"; // "UniformTree_infeasible_in_T3.poa"; //"UniformTree.poa";
+		MyConfig::traceFileName = "UniformTree.poa"; // "UniformTree_infeasible_in_T3.poa"; //"UniformTree.poa"; //"UniformTree_no_resh.poa"
 	}
 
 	setOutputFileNames ();

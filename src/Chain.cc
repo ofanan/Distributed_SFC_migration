@@ -240,7 +240,7 @@ bool insertChainToList (list <Chain> &listOfChains, const Chain &chain)
 	if (chain.potCpu==UNPLACED_CPU) {
 		int bufSize = 128;
 		char buf[bufSize];	
-		snprintf (buf, bufSize, "\error: insertChainToList was called with chain %d for which postCpu==UNPLACED_CPU", chain.id);
+		snprintf (buf, bufSize, "\nerror: insertChainToList was called with chain %d for which potCpu==UNPLACED_CPU", chain.id);
 		MyConfig::printToLog (buf);
 		return false;
 	}

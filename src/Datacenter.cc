@@ -714,8 +714,10 @@ void Datacenter::initReshAsync ()
 	deficitCpu = 0;
 	for (auto chain : notAssigned ) {
 		if (cannotPlaceThisChainHigher(chain)) {
-			deficitCpu += requiredCpuToLocallyPlaceChain(chain);
+			Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(chain);
+			deficitCpu += requiredCpuToLocallyPlaceThisChain;
 			chain.curLvl = lvl;
+			chain.potCpu = requiredCpuToLocallyPlaceThisChain;
 			insertChainToList (pushDwnReq, chain);
 		}
 	}
@@ -1017,7 +1019,11 @@ void Datacenter::pushDwn ()
 			placedChains.insert (chainPtr->id); 				
 			ChainsMaster::modifyLvl (chainPtr->id, lvl);
 			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
-				deficitCpu -= requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl);
+				deficitCpu -= chainPtr->potCpu;
+				if (DEBUG_LVL>0 && requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl) != chainPtr->potCpu) {
+					error ("s%d c%d chain.potCpu=%d reshInitiatorLvl=%d, requiredCpuToPlaceChainAtLvl=%d", 
+									dcId, chainPtr->id, chainPtr->potCpu, reshInitiatorLvl, requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl));
+				}
 			}
 			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from the an ancestor of me?
 				Chain pushedDwnChain = *chainPtr;

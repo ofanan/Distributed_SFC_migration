@@ -3,17 +3,15 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <omnetpp.h>
-
 #include <vector>
 #include <type_traits>
 #include <set>
 #include <algorithm>
 #include <unordered_set>
-using namespace std;
 
 #include "MyTypes.h"
 #include "MyConfig.h"
-
+using namespace std;
 
 class Chain
 {

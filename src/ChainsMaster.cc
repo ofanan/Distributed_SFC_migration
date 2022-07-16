@@ -111,7 +111,7 @@ bool ChainsMaster::modifyLvl (unordered_set <ChainId_t> listOfChainIds, Lvl_t ne
 	for (ChainId_t chainId : listOfChainIds) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
-			snprintf (buf, bufSize, "error: ChainsMaster::modifyLvl didn't find chain %d", chainId);
+			snprintf (buf, bufSize, "\nerror: ChainsMaster::modifyLvl didn't find chain %d", chainId);
 			MyConfig::printToLog (buf);
 			return false;
 		}
