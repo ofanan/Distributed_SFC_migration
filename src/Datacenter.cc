@@ -81,6 +81,8 @@ void Datacenter::initialize(int stage)
 		endXmtEvents.   resize (numPorts);
 		idOfChildren.   resize (numChildren);
 		
+		nxtChildToSndReshAsync = 0; 
+				
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
 		for (int portNum (0); portNum < numPorts; portNum++) {
 			cGate *outGate    = gate("port$o", portNum);
@@ -858,7 +860,7 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
-//	$$ reshuffled = true;
+//	$$reshuffled = true;
 	if (availCpu >= deficitCpu) { // Can finish the resh locally, by placing additional chains on me, w/o calling my children
 		pushDwn ();
 		if (deficitCpu > 0) {
@@ -907,12 +909,14 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
 	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
-		snprintf (buf, bufSize, "\ns%d in sndToNxtchild", dcId);
+		snprintf (buf, bufSize, "\ns%d in sndToNxtchild. nxtChildToSndReshAsyn=%d", dcId, nxtChildToSndReshAsync);
 		printBufToLog ();
 	}
 	list<Chain>  pushDwnReqFromChild; 
 
 	while (nxtChildToSndReshAsync < numChildren) {
+		snprintf (buf, bufSize, "\ns %d checking child %d", dcId, nxtChildToSndReshAsync);
+		printBufToLog ();
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
 				if (!insertChainToList (pushDwnReqFromChild, *chainPtr)) {
@@ -944,6 +948,10 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
+	}
+	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
+		snprintf (buf, bufSize, "\ns%d finished sending to all children", dcId);
+		printBufToLog ();
 	}
 	return false; // no additional relevant child to send to
 }
