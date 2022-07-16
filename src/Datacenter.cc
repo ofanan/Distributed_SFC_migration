@@ -515,13 +515,12 @@ void Datacenter::bottomUp ()
 					printStateAndEndSim  ();
 				}
 			}
-			else { // haven't reshuffled yet --> reshuffle
-				if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-					snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
-					printBufToLog();
-				}
-				
+			else { // haven't reshuffled yet --> reshuffle				
 				if (MyConfig::mode==Sync) {
+					if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+						snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
+						printBufToLog();
+					}
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
@@ -743,11 +742,11 @@ void Datacenter::initReshAsync ()
 	if (deficitCpu <= 0) {
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
 	}
-	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "s%d init resh", dcId);
-		printBufToLog ();
+	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+		snprintf (buf, bufSize, "\n************** s%d : init resh at lvl %d. pushDwnReq=", dcId, lvl);
+		printBufToLog();
+		MyConfig::printToLog (pushDwnReq);
 	}
-
 	reshAsync ();
 }
 
@@ -765,8 +764,31 @@ void Datacenter::reshAsync ()
 		//now we know that deficitCpu <= 0, so we can finish the reshuflle
 		return finReshAsync ();
 	}
+	// add my potPlacedChains, and then placedChains, to the end of pushDwnReq
+	Chain chain;
+	for (ChainId_t chainId : potPlacedChains) {
+		if (!ChainsMaster::findChain (chainId, chain)) {
+			error ("pot-placed chain %d was not found in ChainMaster", chainId);
+		}
+		chain.curLvl = lvl;
+		chain.potCpu = requiredCpuToLocallyPlaceChain (chain);
+		insertChainToList (pushDwnReq, chain);
+	}
+	for (ChainId_t chainId : placedChains) {
+		if (!ChainsMaster::findChain (chainId, chain)) {
+			error ("pot-placed chain %d was not found in ChainMaster", chainId);
+		}
+		chain.curLvl = lvl;
+		chain.potCpu = requiredCpuToLocallyPlaceChain (chain);
+		insertChainToList (pushDwnReq, chain);
+	}
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d in reshAsync. pushDwnReq=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushDwnReq);
+	}
 
-	// Cannot free enough space --> need to call children	
+	// Cannot free enough space --> need to call children. Also, add my 
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
 		return finReshAsync ();
@@ -780,7 +802,7 @@ Check whether there exists (at least one) additional child to which we should se
 bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
-	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
 		snprintf (buf, bufSize, "\ns%d in sndToNxtchild", dcId);
 		printBufToLog ();
 	}

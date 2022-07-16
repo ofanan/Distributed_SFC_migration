@@ -245,7 +245,6 @@ bool insertChainToList (list <Chain> &listOfChains, const Chain &chain)
 		return false;
 	}
 	
-	
 	// delete the old occurance of that chain in the list, if exists
 	for (auto chainPtr = listOfChains.begin(); chainPtr!=listOfChains.end(); ) {
 		if (chainPtr->id == chain.id) {
@@ -256,7 +255,7 @@ bool insertChainToList (list <Chain> &listOfChains, const Chain &chain)
 	}
 
 	// insert the chain
-  listOfChains.insert(listOfChains.begin(), chain);
+  listOfChains.insert(listOfChains.end(), chain);
   return true;
 }
 
