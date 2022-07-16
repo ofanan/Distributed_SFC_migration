@@ -976,7 +976,7 @@ void Datacenter::pushDwn ()
 {
 
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "s%d push dwn", dcId);
+		snprintf (buf, bufSize, "\ns%d push dwn", dcId);
 		printBufToLog ();
 	}
 
@@ -995,7 +995,16 @@ void Datacenter::pushDwn ()
 
 		// now we know that this chain wasn't previously placed, or pot-placed, on me
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			MyConfig::printToLog ("pushed-dwn chains: ");
+		}
+
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) {
+
+			if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+				snprintf (buf, bufSize, "c%d from l%d, ", chainPtr->id, chainPtr->curLvl);
+				printBufToLog ();
+			}
 			availCpu -= requiredCpuToLocallyPlaceThisChain;
 			placedChains.insert (chainPtr->id); 				
 			ChainsMaster::modifyLvl (chainPtr->id, lvl);
@@ -1020,6 +1029,14 @@ After sending the pkt, pushDwnAck is clear.
 *************************************************************************************************************************************************/
 void Datacenter::sndReshAsyncPktToPrnt ()
 {
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d sending to prnt", dcId);
+		printBufToLog ();
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			MyConfig::printToLog (pushDwnAck);
+		}
+	}
+
 	ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
 	pkt2snd -> setReshInitiatorLvl    (reshInitiatorLvl);
 	pkt2snd -> setDeficitCpu 		      (deficitCpu);
