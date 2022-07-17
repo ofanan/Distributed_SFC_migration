@@ -42,13 +42,14 @@ old_usrs: (0,0)(4,1)
 
 // empty te netw
 t = 6
-usrs_that_left: 0, 1, 2, 3, 4, 5, 6
+usrs_that_left: 0 1 2 3 4 5 6
 new_usrs: 
 old_usrs: 
 
 t = 7
 usrs_that_left: 
-new_usrs: old_usrs: 
+new_usrs: 
+old_usrs: 
 
 t = 8
 usrs_that_left: 
