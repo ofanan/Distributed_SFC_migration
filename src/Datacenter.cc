@@ -374,7 +374,7 @@ void Datacenter::pushUp ()
 				requiredCpuToLocallyPlaceThisChain > availCpu || // because not enough avail' cpu for pushing-up, or ...
 				!chainPtr->dcIsDelayFeasible (dcId, lvl) || // because I'm not delay-feasible for this chain, or ...
 				chainPtr->curDc == chainPtr->S_u[chainPtr->curLvl]) {// the chain's suggested new place is identical to its current place, thus saving mig' cost
-					ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl); // inform ChainMaster about the chain's place 
+//					ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl); // inform ChainMaster about the chain's place 
 					chainPtr++;
 					continue;
 		}
@@ -428,7 +428,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt = new PushUpPkt;
 		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
 		int idxInPushUpVec = 0;
-		for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {	// consider all the chains in pushUpVec
+		for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {	// consider all the chains in pushUpList
 			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
 				chainPtr = pushUpList.erase (chainPtr);
@@ -680,8 +680,9 @@ Handle a bottomUP pkt, when running in Async FMode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsyncFMode ()
 {
-	rdBottomUpPktFMode ();
+	rdBottomUpPkt ();
 	bottomUpFMode();
+	genNsndPushUpPktsToChildren (); // inform children that I haven't pushed-up anything
 }
 
 /*************************************************************************************************************************************************
@@ -702,13 +703,13 @@ void Datacenter::rdBottomUpPktFMode ()
 	Chain chain;
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		chain = pkt->getPushUpVec(i);
-		if (isRoot) {// $$$$
-			snprintf (buf, bufSize, "s0 rcvd c%d in PUList", chain.id);
-			printBufToLog ();
-		}
-		if (!ChainsMaster::modifyLvl (chain.id, chain.curLvl)) {
-			error ("error when trying to update about the new placement of chain %d", chain.id);
-		}
+//		if (isRoot) {// $$$$
+//			snprintf (buf, bufSize, "s0 rcvd c%d w curLvl=%d in PUList", chain.id, chain.curLvl);
+//			printBufToLog ();
+//		}
+//		if (!ChainsMaster::modifyLvl (chain.id, chain.curLvl)) {
+//			error ("error when trying to update about the new placement of chain %d", chain.id);
+//		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. I'm in F-mode. src=%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
