@@ -186,6 +186,9 @@ void Datacenter::handleMessage (cMessage *msg)
   if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
   	handleEndXmtMsg ();
   }
+  else if (dynamic_cast<EndFModeMsg*>(curHandledMsg) != nullptr) {
+  	isInFMode = false;
+  }
 	else if (MyConfig::discardAllMsgs) {
 		delete curHandledMsg;
 		return;
@@ -1006,12 +1009,12 @@ void Datacenter::clrRsrc ()
 
 
 /*************************************************************************************************************************************************
+* Cancel previous EndFModeEvent (if exists), and Schedule a new EndFModeEvent for the current sim time + FModePeriod.
 *************************************************************************************************************************************************/
 void Datacenter::scheduleEndFModeEvent () 
 {
   if (endFModeEvent!=nullptr && endFModeEvent->isScheduled()) { // there's currently an active schedule
- 		//	  cancel ... //$$$
-		// Schedule a new EndFModeEvent
+      cancelAndDelete (endFModeEvent);
 		endFModeEvent = new EndFModeMsg ("");
 		scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 	}
