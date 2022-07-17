@@ -110,8 +110,8 @@ void Datacenter::initialize(int stage)
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   if (MyConfig::mode==Async) {
 		rstReshAsync ();
-		endFMode  = nullptr;
-		isInFMode = false;
+		endFModeEvent  = nullptr;
+		isInFMode 		 = false;
   }
 
 }
@@ -826,6 +826,8 @@ void Datacenter::genNsndBottomUpPktAsync ()
 void Datacenter::initReshAsync ()
 {
 	reshInitiatorLvl = lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+	isInFMode 			 = true;
+	scheduleEndFModeEvent ();
 	pushDwnReq.clear (); // verify that the list doesn't contain left-overs from previous runs
 	pushDwnAck.clear (); // verify that the list doesn't contain left-overs from previous runs
 	deficitCpu = 0;
@@ -833,11 +835,6 @@ void Datacenter::initReshAsync ()
 		if (cannotPlaceThisChainHigher(chain)) {
 			Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(chain);
 			deficitCpu += requiredCpuToLocallyPlaceThisChain;
-//			Chain chainToPushDwn = chain; //$$$$ do we really need this copy?
-//			chainToPushDwn.curLvl = lvl;
-//			chainToPushDwn.potCpu = requiredCpuToLocallyPlaceThisChain;
-//			insertChainToList (pushDwnReq, chainToPushDwn);
-//			Chain chainToPushDwn = chain; //$$$$ do we really need this copy?
 			chain.curLvl = lvl;
 			chain.potCpu = requiredCpuToLocallyPlaceThisChain;
 			insertChainToList (pushDwnReq, chain);
@@ -1006,6 +1003,20 @@ void Datacenter::clrRsrc ()
 	availCpu 				 = cpuCapacity;
 }
 
+
+
+/*************************************************************************************************************************************************
+*************************************************************************************************************************************************/
+void Datacenter::scheduleEndFModeEvent () 
+{
+  if (endFModeEvent!=nullptr && endFModeEvent->isScheduled()) { // there's currently an active schedule
+ 		//	  cancel ... //$$$
+		// Schedule a new EndFModeEvent
+		endFModeEvent = new EndFModeMsg ("");
+		scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
+	}
+}
+
 /*************************************************************************************************************************************************
  * Send the given packet.
  * If the output port is free, xmt the pkt immediately.
@@ -1026,8 +1037,6 @@ void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 *************************************************************************************************************************************************/
 void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 {
-  EV << "Starting transmission of " << pkt2snd << endl;
-
 	send(pkt2snd, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.

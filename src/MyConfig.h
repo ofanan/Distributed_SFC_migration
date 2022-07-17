@@ -69,6 +69,7 @@ class MyConfig {
 		static bool useFullResh; // when true, a failure cause a global reshuffle, of all chains and datacenters
 		static bool discardAllMsgs; // when true, all DCs ignore all incoming msgs.
 		static vector <Cpu_t> minCpuToPlaceAnyChainAtLvl;
+		static float FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static float RtChainPr; // prob' that a new chain is an RT chain
