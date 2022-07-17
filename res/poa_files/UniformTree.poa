@@ -17,14 +17,13 @@ usrs_that_left:
 new_usrs: (0,0)
 old_usrs: 
 
-// Would need local resh in the left sub-tree; and later a whole resh. 
-// However, these all are only inst' mig', and not real migs', as chains don't change place w.r.t the previous period
+// Requires partial mig in the left sub-tree; and later a full resh. 
 t = 2
 usrs_that_left: 
 new_usrs: (2,1)(3,1)(4,1)
 old_usrs: 
 
-// Requires 2 migs
+// Requires a partial mig (in the left sub-tree), and 2 migs
 t = 3
 usrs_that_left: 
 new_usrs: 
@@ -35,8 +34,30 @@ usrs_that_left:
 new_usrs: (5,2)(6,3)
 old_usrs: 
 
+// Requires a partial reshuffle in the left sub-tree
 t = 5
 usrs_that_left: 
 new_usrs: 
 old_usrs: (0,0)(4,1)
+
+// empty te netw
+t = 6
+usrs_that_left: 0, 1, 2, 3, 4, 5, 6
+new_usrs: 
+old_usrs: 
+
+t = 7
+usrs_that_left: 
+new_usrs: old_usrs: 
+
+t = 8
+usrs_that_left: 
+new_usrs: 
+old_usrs: 
+
+t = 9
+usrs_that_left: 
+new_usrs: (0,0), (1,1), (2,2)
+old_usrs: 
+
 
