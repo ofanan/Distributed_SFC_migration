@@ -358,15 +358,17 @@ void Datacenter::pushUp ()
 		}
 		else { //the chain wasn't pushed-up --> need to locally place it
 			placedChains.			insert (chainPtr->id);
-			newlyPlacedChains.insert (chainPtr->id);
+			ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
+//			newlyPlacedChains.insert (chainPtr->id);
 		}
 		potPlacedChains.erase (chainPtr->id);
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
 	}
 
 	// Next, try to push-up chains of my descendants
-	list <Chain> pushedUpChains;
 	pushUpList.sort (SortChainsForPushUpList());
+	// to make no mess and to keep the sort while iterating on pushUpList, insert all modified chains to pushedUpChains. Later, will unify it again with pushUpList
+	list <Chain> pushedUpChains; 
 	Cpu_t requiredCpuToLocallyPlaceThisChain;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
@@ -384,7 +386,8 @@ void Datacenter::pushUp ()
 			pushedUpChain.curLvl = lvl;
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
-			newlyPlacedChains.insert (pushedUpChain.id);
+			ChainsMaster::modifyLvl  (pushedUpChain.id, lvl); // inform ChainMaster about the chain's place 
+//			newlyPlacedChains.insert (pushedUpChain.id);
 			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
 		}
 	}
@@ -471,7 +474,8 @@ void Datacenter::bottomUpFMode ()
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				placedChains.		  insert  (chainPtr->id);
-				newlyPlacedChains.insert  (chainPtr->id);
+ 				ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
+//				newlyPlacedChains.insert  (chainPtr->id);
 				chainPtr = notAssigned.erase (chainPtr);
 		}
 		else { 
@@ -563,6 +567,7 @@ void Datacenter::bottomUp ()
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.		  insert  (chainPtr->id);
+					ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
 					newlyPlacedChains.insert  (chainPtr->id);
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
@@ -683,41 +688,6 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 	rdBottomUpPkt ();
 	bottomUpFMode();
 	genNsndPushUpPktsToChildren (); // inform children that I haven't pushed-up anything
-}
-
-/*************************************************************************************************************************************************
-Read a BU pkt, and add the notAssigned chains,to the respective local ("this") data base.
-If not in "F mode", add the chains in pushUpVec into pushUpList
-*************************************************************************************************************************************************/
-void Datacenter::rdBottomUpPktFMode ()
-{
-
-	BottomUpPkt *pkt = (BottomUpPkt*)(curHandledMsg);
-	
-	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
-	for (int i(0); i < (pkt->getNotAssignedArraySize ());i++) {
-		notAssigned.push_back (pkt->getNotAssigned(i));
-	}
-	
-	// Consider chains in the pkt's pushUpVec field 
-	Chain chain;
-	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-		chain = pkt->getPushUpVec(i);
-//		if (isRoot) {// $$$$
-//			snprintf (buf, bufSize, "s0 rcvd c%d w curLvl=%d in PUList", chain.id, chain.curLvl);
-//			printBufToLog ();
-//		}
-//		if (!ChainsMaster::modifyLvl (chain.id, chain.curLvl)) {
-//			error ("error when trying to update about the new placement of chain %d", chain.id);
-//		}
-	}
-	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. I'm in F-mode. src=%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
-		printBufToLog ();
-		MyConfig::printToLog (notAssigned);
-		MyConfig::printToLog (" pushUpList=");
-		MyConfig::printToLog (pushUpList, false);
-	}
 }
 
 /*************************************************************************************************************************************************
