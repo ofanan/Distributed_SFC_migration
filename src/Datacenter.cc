@@ -326,7 +326,7 @@ void Datacenter::handlePushUpPkt ()
 	
 	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpList=", dcId);
-		MyConfig::printToLog (pushUpList);
+		MyConfig::printToLog (pushUpList, false);
 	}
 	pushUp ();
 }
@@ -702,6 +702,10 @@ void Datacenter::rdBottomUpPktFMode ()
 	Chain chain;
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		chain = pkt->getPushUpVec(i);
+		if (isRoot) {// $$$$
+			snprintf (buf, bufSize, "s0 rcvd c%d in PUList", chain.id);
+			printBufToLog ();
+		}
 		if (!ChainsMaster::modifyLvl (chain.id, chain.curLvl)) {
 			error ("error when trying to update about the new placement of chain %d", chain.id);
 		}
