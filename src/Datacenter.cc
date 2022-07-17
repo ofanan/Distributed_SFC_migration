@@ -568,7 +568,7 @@ void Datacenter::bottomUp ()
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.		  insert  (chainPtr->id);
 					ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
-					newlyPlacedChains.insert  (chainPtr->id);
+//					newlyPlacedChains.insert  (chainPtr->id);
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
 					potPlacedChains.insert (chainPtr->id);
@@ -653,10 +653,10 @@ Later, clear newlyPlacedChains.
 *************************************************************************************************************************************************/
 void Datacenter::updatePlacementInfo ()
 {
-	if (!ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
-		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
-	}
-	newlyPlacedChains.clear ();
+//	if (!ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
+//		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
+//	}
+//	newlyPlacedChains.clear ();
 }
 
 
