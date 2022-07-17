@@ -187,7 +187,12 @@ void Datacenter::handleMessage (cMessage *msg)
   	handleEndXmtMsg ();
   }
   else if (dynamic_cast<EndFModeMsg*>(curHandledMsg) != nullptr) {
-  	isInFMode = false;
+  	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+  		snprintf (buf, bufSize, "s%d exiting F mode", dcId);
+  		printBufToLog ();
+  	}
+  	isInFMode     = false;
+  	endFModeEvent = nullptr;
   }
 	else if (MyConfig::discardAllMsgs) {
 		delete curHandledMsg;
@@ -668,12 +673,12 @@ Handle a bottomUP pkt, when running in Async mode.
 void Datacenter::handleBottomUpPktAsync ()
 {
 	rdBottomUpPkt ();
-	bottomUp 			();
-
+	return (isInFMode)? bottomUpFMode() : bottomUp();
 }
 
 /*************************************************************************************************************************************************
-Read a BU pkt, and add the notAssigned chains, and the pushUpvec chains, to the respective local ("this") data bases.
+Read a BU pkt, and add the notAssigned chains,to the respective local ("this") data base.
+If not in "F mode", add the chains in pushUpVec into pushUpList
 *************************************************************************************************************************************************/
 void Datacenter::rdBottomUpPkt ()
 {
@@ -685,11 +690,13 @@ void Datacenter::rdBottomUpPkt ()
 		notAssigned.push_back (pkt->getNotAssigned(i));
 	}
 	
-	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
-	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-    if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
-			error ("Error in insertChainToList. See log file for details");
-		}        
+	// if not in "F" mode, Add each chain stated in the pkt's pushUpVec field into this->pushUpList
+	if (!isInFMode) {
+		for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
+		  if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
+				error ("Error in insertChainToList. See log file for details");
+			}        
+		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
@@ -1011,10 +1018,10 @@ void Datacenter::clrRsrc ()
 /*************************************************************************************************************************************************
 * Cancel previous EndFModeEvent (if exists), and Schedule a new EndFModeEvent for the current sim time + FModePeriod.
 *************************************************************************************************************************************************/
-void Datacenter::scheduleEndFModeEvent () 
+void Datacenter::scheduleEndFModeEvent ()
 {
   if (endFModeEvent!=nullptr && endFModeEvent->isScheduled()) { // there's currently an active schedule
-      cancelAndDelete (endFModeEvent);
+    cancelAndDelete (endFModeEvent);
 		endFModeEvent = new EndFModeMsg ("");
 		scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 	}
@@ -1069,6 +1076,7 @@ handle a reshAsyncPkt that arrived from a prnt:
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
+	scheduleEndFModeEvent (); // Restart the timer of being in F mode 
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
 	DcId_t reshInitiatorLvl = pkt->getReshInitiatorLvl ();
 	if (withinAnotherResh(reshInitiatorLvl)) {
