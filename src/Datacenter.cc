@@ -259,7 +259,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 			}
 			regainRsrcOfChain (chain);
 			potPlacedChains.erase (chainId);
-			continue; // this chainId was potentially-placed. Hence, it's surely not in the placedChains and newlyPlacedChains
+			continue; 
 		}
 		
 		// Next, remove the chain from the list of placedChains
@@ -273,9 +273,6 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 			placedChains.erase (chainId);
 		}
 
-		// Finally, remove the chain from the list of newlyPlacedChains
-		MyConfig::eraseKeyFromSet (newlyPlacedChains, 	chainId);
-		
 	}
 }
 
@@ -296,7 +293,6 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	}
 	pushUpList.				clear ();	
 	potPlacedChains.  clear ();
-	newlyPlacedChains.clear ();
 	notAssigned = vecOfChainsThatJoined;
 
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -359,7 +355,6 @@ void Datacenter::pushUp ()
 		else { //the chain wasn't pushed-up --> need to locally place it
 			placedChains.			insert (chainPtr->id);
 			ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
-//			newlyPlacedChains.insert (chainPtr->id);
 		}
 		potPlacedChains.erase (chainPtr->id);
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
@@ -387,7 +382,6 @@ void Datacenter::pushUp ()
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
 			ChainsMaster::modifyLvl  (pushedUpChain.id, lvl); // inform ChainMaster about the chain's place 
-//			newlyPlacedChains.insert (pushedUpChain.id);
 			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
 		}
 	}
@@ -396,9 +390,6 @@ void Datacenter::pushUp ()
 		insertChainToList (pushUpList, *chainPtr);
 	}
 	
-	// inform sim_ctrlr about all the newly placed chains
-	updatePlacementInfo ();
-
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finihsed PU.", dcId);
 		printBufToLog ();
@@ -475,7 +466,6 @@ void Datacenter::bottomUpFMode ()
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				placedChains.		  insert  (chainPtr->id);
  				ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
-//				newlyPlacedChains.insert  (chainPtr->id);
 				chainPtr = notAssigned.erase (chainPtr);
 		}
 		else { 
@@ -511,7 +501,6 @@ void Datacenter::bottomUpFMode ()
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
-					updatePlacementInfo ();
 					return initReshAsync ();
 				}
 			}
@@ -524,9 +513,6 @@ void Datacenter::bottomUpFMode ()
 		print (false, false, true, false);
 	}
 
-	if (MyConfig::mode==Async) {
-		updatePlacementInfo ();
-	}
   if (isRoot) { 
   	if (!(notAssigned.empty())) {
   		error ("notAssigned isn't empty after running BU on the root");
@@ -568,7 +554,6 @@ void Datacenter::bottomUp ()
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.		  insert  (chainPtr->id);
 					ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
-//					newlyPlacedChains.insert  (chainPtr->id);
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
 					potPlacedChains.insert (chainPtr->id);
@@ -614,7 +599,6 @@ void Datacenter::bottomUp ()
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
-					updatePlacementInfo ();
 					return initReshAsync ();
 				}
 			}
@@ -628,9 +612,6 @@ void Datacenter::bottomUp ()
 		print (true, true, true, true);
 	}
 
-	if (MyConfig::mode==Async) {
-		updatePlacementInfo ();
-	}
   if (isRoot) { 
   	if (MyConfig::printBuRes) {
   		MyConfig::printToLog ("\nAfter BU:");
@@ -648,21 +629,7 @@ void Datacenter::bottomUp ()
 }
 
 /*************************************************************************************************************************************************
-Update ChainMaster about (the IDs of) all the newly placed chains, as indicated in newlyPlacedChains.
-Later, clear newlyPlacedChains.
-*************************************************************************************************************************************************/
-void Datacenter::updatePlacementInfo ()
-{
-//	if (!ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
-//		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
-//	}
-//	newlyPlacedChains.clear ();
-}
-
-
-/*************************************************************************************************************************************************
-Update ChainMaster about (the IDs of) all the newly placed chains, as indicated in newlyPlacedChains.
-Later, clear newlyPlacedChains.
+Update ChainMaster about (the IDs of) all the newly placed chains, as indicated in the newlyPlacedChains input parameter
 *************************************************************************************************************************************************/
 void Datacenter::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChains)
 {
@@ -1020,7 +987,6 @@ void Datacenter::clrRsrc ()
 	pushUpList.   		clear ();
 	placedChains.			clear ();
 	potPlacedChains.	clear ();
-	newlyPlacedChains.clear ();
 	availCpu 				 = cpuCapacity;
 }
 

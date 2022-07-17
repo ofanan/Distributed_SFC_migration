@@ -86,7 +86,6 @@ class Datacenter : public cSimpleModule
     // Dynamic
     Cpu_t  								 availCpu;
     vector<Chain> notAssigned; 
-    unordered_set <ChainId_t>  newlyPlacedChains;    // IDs of the chains that I have placed after the last update I had sent to SimCtrlr.
 		
 		// A small buffer, used for printing results / log
 		static const int bufSize = 128;
@@ -124,7 +123,6 @@ class Datacenter : public cSimpleModule
 		void rstReshAsync 					();
     void genNsndBottomUpPktSync ();
     void sndPushUpPkt						();
-    void updatePlacementInfo 		();
     void pushDwn 								();
     bool arrivedFromPrnt        (); 
     void scheduleEndFModeEvent  ();
