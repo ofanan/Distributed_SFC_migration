@@ -704,24 +704,20 @@ void Datacenter::rdBottomUpPktFMode ()
 		notAssigned.push_back (pkt->getNotAssigned(i));
 	}
 	
-	// if not in "F" mode, Add each chain stated in the pkt's pushUpVec field into this->pushUpList
+	// Consider chains in the pkt's pushUpVec field 
+	Chain chain;
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-	  if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
-			error ("Error in insertChainToList. See log file for details");
-		}        
+		chain = pkt->getPushUpVec(i);
+		if (chain.curLvl == UNPLACED_LVL) { // the chain isn't placed yet - bottomUpF must consider it
+			insertSorted (notAssigned, chain);
+		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. I'm in F-mode. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList, false);
 	}
 }
-
-//	// Move all the chains that were in pushUpList into notAssigned
-//	for (auto chainPtr = pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
-//		insertChainToList (notAssigned, *chainPtr);
-//		chainPtr = pushUpList.erase (chainPtr);
-//	}
 
 /*************************************************************************************************************************************************
 Read a BU pkt, and add the notAssigned chains,to the respective local ("this") data base.
