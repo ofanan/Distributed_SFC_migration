@@ -381,6 +381,7 @@ void Datacenter::pushUp ()
 				requiredCpuToLocallyPlaceThisChain > availCpu || // because not enough avail' cpu for pushing-up, or ...
 				!chainPtr->dcIsDelayFeasible (dcId, lvl) || // because I'm not delay-feasible for this chain, or ...
 				chainPtr->curDc == chainPtr->S_u[chainPtr->curLvl]) {// the chain's suggested new place is identical to its current place, thus saving mig' cost
+					ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl); // inform ChainMaster about the chain's place 
 					chainPtr++;
 					continue;
 		}
@@ -838,6 +839,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	int idxInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
+			ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl); // inform ChainMaster about the chain's place 
 			chainPtr++;
 			continue;
 		}
@@ -856,10 +858,6 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		}
 
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
-		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "s %d sent BU pkt to prnt", dcId);
-			printBufToLog ();
-		}
 	}
 	else { // no really data to send; in async mode there's no use to send an empty pkt, so just destroy it
 		delete (pkt2snd);
@@ -913,7 +911,6 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
-//	$$reshuffled = true;
 	if (availCpu >= deficitCpu) { // Can finish the resh locally, by placing additional chains on me, w/o calling my children
 		pushDwn ();
 		if (deficitCpu > 0) {
