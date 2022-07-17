@@ -709,13 +709,15 @@ void Datacenter::rdBottomUpPktFMode ()
 	Chain chain;
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
 		chain = pkt->getPushUpVec(i);
-		if (chain.curLvl == UNPLACED_LVL) { // the chain isn't placed yet - bottomUpF must consider it
-			insertSorted (notAssigned, chain);
+		if (!ChainsMaster::modifyLvl (chain.id, chain.curLvl)) {
+			error ("error when trying to update about the new placement of chain %d", chain.id);
 		}
 	}
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. I'm in F-mode. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. I'm in F-mode. src=%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+		MyConfig::printToLog (" pushUpList=");
 		MyConfig::printToLog (pushUpList, false);
 	}
 }
@@ -839,7 +841,9 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	int idxInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
-			ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl); // inform ChainMaster about the chain's place 
+			if (!ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl)) { // inform ChainMaster about the chain's place 
+				error ("error in Datacenter::genNsndBottomUpPktAsync when trying to update about the new placement of chain %d", chainPtr->id);
+			}
 			chainPtr++;
 			continue;
 		}
