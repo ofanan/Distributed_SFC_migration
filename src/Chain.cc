@@ -220,15 +220,15 @@ We currently use only RT, and we assume that the input vector is sorted.
 Hence, the chain should be inserted either to the head if it's a RT chain, of to the tail otherwise.
 Currently unused, bacuase it's easier to insert chains wo sorting, and sort only when needed.
 **************************************************************************************************************************************************/
-//void insertSorted (vector <Chain> &vec, const Chain &c)
-//{
-//	if (c.isRtChain) {
-//		vec.insert (vec.begin(), c);
-//	}
-//	else {
-//		vec.push_back (c);
-//	}
-//}
+void insertSorted (vector <Chain> &vec, const Chain &c)
+{
+	if (c.isRtChain) {
+		vec.insert (vec.begin(), c);
+	}
+	else {
+		vec.push_back (c);
+	}
+}
 
 /*************************************************************************************************************************************************
 insert a chain to a list.

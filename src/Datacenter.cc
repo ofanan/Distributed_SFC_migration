@@ -459,7 +459,12 @@ Running the BU alg' at "feasibility" Async mode
 *************************************************************************************************************************************************/
 void Datacenter::bottomUpFMode ()
 {
-	pushUpList.clear();
+
+	// Move all the chains that were in pushUpList into notAssigned
+	for (auto chainPtr = pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
+		insertSorted (notAssigned, *chainPtr);
+		chainPtr = pushUpList.erase (chainPtr);
+	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning BU-f. notAssigned=", dcId);
 		printBufToLog ();
