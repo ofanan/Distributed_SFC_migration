@@ -318,23 +318,16 @@ void Datacenter::handlePushUpPkt ()
 
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-		if (pkt->getPushUpVecArraySize()==0) {
-			snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpVec rcvd is empty", dcId);
-			printBufToLog ();
-		}
-		else {
-			snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpVec[0].id=%d pushUpVec[0].curLvl = %d", dcId, pkt->getPushUpVec(0).id, pkt->getPushUpVec(0).curLvl);
-			printBufToLog ();
-		}
-	}
-	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		if (!insertChainToList (pushUpList, pkt->getPushUpVec (i))) {
 			error ("Error in insertChainToList. See log file for details");
 		}
 	}
 	
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpList=", dcId);
+		MyConfig::printToLog (pushUpList);
+	}
 	pushUp ();
 }
 
