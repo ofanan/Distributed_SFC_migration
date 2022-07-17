@@ -203,7 +203,12 @@ void Datacenter::handleMessage (cMessage *msg)
   		handleBottomUpPktSync();
   	} 
 		else {
-			handleBottomUpPktAsync();		
+			if (isInFMode) {
+				handleBottomUpPktAsyncFMode ();
+			}
+			else {
+				handleBottomUpPktAsync ();
+			}
 		} 
   }
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
@@ -460,11 +465,6 @@ Running the BU alg' at "feasibility" Async mode
 void Datacenter::bottomUpFMode ()
 {
 
-	// Move all the chains that were in pushUpList into notAssigned
-	for (auto chainPtr = pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
-		insertSorted (notAssigned, *chainPtr);
-		chainPtr = pushUpList.erase (chainPtr);
-	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning BU-f. notAssigned=", dcId);
 		printBufToLog ();
@@ -678,8 +678,50 @@ Handle a bottomUP pkt, when running in Async mode.
 void Datacenter::handleBottomUpPktAsync ()
 {
 	rdBottomUpPkt ();
-	return (isInFMode)? bottomUpFMode() : bottomUp();
+	bottomUp();
 }
+
+/*************************************************************************************************************************************************
+Handle a bottomUP pkt, when running in Async FMode.
+*************************************************************************************************************************************************/
+void Datacenter::handleBottomUpPktAsyncFMode ()
+{
+	rdBottomUpPktFMode ();
+	bottomUpFMode();
+}
+
+/*************************************************************************************************************************************************
+Read a BU pkt, and add the notAssigned chains,to the respective local ("this") data base.
+If not in "F mode", add the chains in pushUpVec into pushUpList
+*************************************************************************************************************************************************/
+void Datacenter::rdBottomUpPktFMode ()
+{
+
+	BottomUpPkt *pkt = (BottomUpPkt*)(curHandledMsg);
+	
+	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
+	for (int i(0); i < (pkt->getNotAssignedArraySize ());i++) {
+		notAssigned.push_back (pkt->getNotAssigned(i));
+	}
+	
+	// if not in "F" mode, Add each chain stated in the pkt's pushUpVec field into this->pushUpList
+	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
+	  if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
+			error ("Error in insertChainToList. See log file for details");
+		}        
+	}
+	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushUpList, false);
+	}
+}
+
+//	// Move all the chains that were in pushUpList into notAssigned
+//	for (auto chainPtr = pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
+//		insertChainToList (notAssigned, *chainPtr);
+//		chainPtr = pushUpList.erase (chainPtr);
+//	}
 
 /*************************************************************************************************************************************************
 Read a BU pkt, and add the notAssigned chains,to the respective local ("this") data base.
@@ -695,14 +737,13 @@ void Datacenter::rdBottomUpPkt ()
 		notAssigned.push_back (pkt->getNotAssigned(i));
 	}
 	
-	// if not in "F" mode, Add each chain stated in the pkt's pushUpVec field into this->pushUpList
-	if (!isInFMode) {
-		for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-		  if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
-				error ("Error in insertChainToList. See log file for details");
-			}        
-		}
+	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
+	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
+	  if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
+			error ("Error in insertChainToList. See log file for details");
+		}        
 	}
+	
 	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();

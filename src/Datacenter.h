@@ -110,13 +110,13 @@ class Datacenter : public cSimpleModule
     void xmt              											(int16_t portNum, cPacket *pkt2send);
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
-    void handleBottomUpPktAsync ();
     void handlePushUpPkt			 	();
     void sndReshAsyncPktToPrnt  ();
     void bottomUp         			();
     void bottomUpFMode     			(); // bottom-up at "feasibility" mode
     void pushUpFMode     		  	(); // bottom-up at "feasibility" mode
     void rdBottomUpPkt					();
+    void rdBottomUpPktFMode   	();
     void pushUp		        			();
     void prepareReshSync		 		();
 		void initReshAsync					(); // init an async reshuffle. called upon a failure to place a chain
@@ -130,6 +130,8 @@ class Datacenter : public cSimpleModule
     bool arrivedFromPrnt        (); 
     void scheduleEndFModeEvent  ();
     void updatePlacementInfo 		(unordered_set <ChainId_t> newlyPlacedChains);
+    void handleBottomUpPktAsync ();
+    void handleBottomUpPktAsyncFMode  ();
     void genNsndPushUpPktsToChildren  ();
     void handleReshAsyncPktFromPrnt   ();
     void handleReshAsyncPktFromChild  ();
