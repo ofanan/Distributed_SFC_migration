@@ -234,7 +234,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else
   {
-    error ("rcvd a pkt of an unknown type");
+    error ("t=%f : s%d rcvd a pkt of an unknown type", MyConfig::traceTime, dcId);
   }
   delete (curHandledMsg);
 }
@@ -255,7 +255,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		if (search!=potPlacedChains.end()) { 
 			Chain chain;
 			if (!ChainsMaster::findChain (chainId, chain)) {
-				error ("pot-placed chain %d was not found in ChainMaster", chainId);
+				error ("t=%f : pot-placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
 			}
 			regainRsrcOfChain (chain);
 			potPlacedChains.erase (chainId);
@@ -267,7 +267,7 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		if (search!=placedChains.end()) { 
 			Chain chain;
 			if (!ChainsMaster::findChain (chainId, chain)) {
-				error ("placed chain %d was not found in ChainMaster", chainId);
+				error ("t=%f : placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
 			}
 			regainRsrcOfChain (chain);
 			placedChains.erase (chainId);
@@ -289,7 +289,7 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	Enter_Method ("initBottomUp (vector<Chain>& vecOfChainsThatJoined)");
 
 	if (!isLeaf) { 
-		error ("Non-leaf s%d : was called by initBottomUp");
+		error ("t=%f, Non-leaf s%d : was called by initBottomUp", MyConfig::traceTime, dcId);
 	}
 	pushUpList.				clear ();	
 	potPlacedChains.  clear ();
@@ -316,7 +316,7 @@ void Datacenter::handlePushUpPkt ()
 	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
 		if (!insertChainToList (pushUpList, pkt->getPushUpVec (i))) {
-			error ("Error in insertChainToList. See log file for details");
+			 error ("t%f. Error in insertChainToList. See log file for details", MyConfig::traceTime);
 		}
 	}
 	
@@ -401,7 +401,7 @@ void Datacenter::pushUp ()
 		if (MyConfig::mode == Sync) {
 			simController->finishedAlg (dcId, leafId);
 			if (DEBUG_LVL > 0 && !pushUpList.empty()) {
-					error ("pushUpList isn't empty after running pushUp() on a leaf");
+					error ("t=%f : s%d : pushUpList isn't empty after running pushUp() on a leaf", MyConfig::traceTime, dcId);
 			}
 		}
 		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
