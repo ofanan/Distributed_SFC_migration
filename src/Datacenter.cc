@@ -57,7 +57,7 @@ bool Datacenter::arrivedFromPrnt ()
 		return false;
 	}
 	
-	return curHandledMsg->arrivedOn (prntGateId); //("port$0");
+	return curHandledMsg->arrivedOn (prntGateId); 
 }
 
 void Datacenter::initialize(int stage)
@@ -188,7 +188,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (dynamic_cast<EndFModeMsg*>(curHandledMsg) != nullptr) {
   	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-  		snprintf (buf, bufSize, "s%d exiting F mode", dcId);
+  		snprintf (buf, bufSize, "\ns%d exiting F mode", dcId);
   		printBufToLog ();
   	}
   	isInFMode     = false;
@@ -999,9 +999,9 @@ void Datacenter::scheduleEndFModeEvent ()
 {
   if (endFModeEvent!=nullptr && endFModeEvent->isScheduled()) { // there's currently an active schedule
     cancelAndDelete (endFModeEvent);
-		endFModeEvent = new EndFModeMsg ("");
-		scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 	}
+	endFModeEvent = new EndFModeMsg ("");
+	scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 }
 
 /*************************************************************************************************************************************************

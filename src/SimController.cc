@@ -19,7 +19,7 @@ bool 	MyConfig::useFullResh;
 int   MyConfig::mode, MyConfig::LOG_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
-float MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -117,7 +117,7 @@ void SimController::initialize (int stage)
 	if (stage==2) {
 		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
-		MyConfig::printBupuRes   = true; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBupuRes   = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
 		Lvl_t h;
 		for (h=0; h<RtChain::mu_u_len; h++) {
@@ -464,7 +464,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 		if (!ChainsMaster::findChain (chainId, chain)) { 
 			error ("t=%d: didn't find chain id %d that left", t, chainId);
 	  }
-	  if (chain.isBlocked) { //$$$
+	  if (chain.isBlocked) { 
 	  	continue;
 	  }
   	chainCurDc = chain.curDc;
