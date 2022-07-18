@@ -413,7 +413,7 @@ void SimController::concludeTimePeriod ()
 	}
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%d, BUPU results:", t);
+		snprintf (buf, bufSize, "\nt=%d, BUPU results (skipping empty DCs):", t);
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
 		if (DEBUG_LVL>1) {
