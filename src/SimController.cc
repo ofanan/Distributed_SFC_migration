@@ -296,7 +296,7 @@ void SimController::runTimePeriod ()
 
 			//Remove the left chains from ChainsMaster
 			if (!ChainsMaster::eraseChains (usrsThatLeft)){
-				error ("t=%d: ChainsMaster::eraseChains didn't find a chain to delete.", t);
+				error ("t=%f: ChainsMaster::eraseChains didn't find a chain to delete.", MyConfig::traceTime);
 			}
 			usrsThatLeft.clear ();
 		} 	
@@ -526,7 +526,7 @@ void SimController::rdNewUsrsLine (string line)
 		
 		chainsThatJoinedLeaf[poaId].push_back ( chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
 		if (!ChainsMaster::insert (chainId, chain)) {
-			error ("t=%d new chain %d was already found in ChainsMaster", t, chainId);
+			error ("t=%d new chain %d was already found in ChainsMaster", MyConfig::traceTime, chainId);
 		}
 	}	
 	
@@ -778,7 +778,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
 	if (DEBUG_LVL>0 && MyConfig::mode==Async) {
-		error ("t = %d DC %d called finishedAlg in Async mode", t, dcId);
+		error ("t = %f DC %d called finishedAlg in Async mode", MyConfig::traceTime, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
 	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
