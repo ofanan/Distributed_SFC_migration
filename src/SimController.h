@@ -50,7 +50,7 @@ class SimController : public cSimpleModule
     DcId_t numDatacenters;
     DcId_t numLeaves;
     Lvl_t  height; // height of the tree
-    int t=-1; //current discrete sim time (in seconds)
+    float t=-1; //current sim time (in seconds)
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
     int seed = 42;
@@ -86,7 +86,6 @@ class SimController : public cSimpleModule
 		void setOutputFileNames ();
 		void discoverPathsToRoot ();
 		Lvl_t dist (DcId_t i, DcId_t j);
-		char* gamad ();
 
 		// Termination functions
 		void finish ();

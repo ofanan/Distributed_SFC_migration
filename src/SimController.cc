@@ -20,6 +20,7 @@ int   MyConfig::mode, MyConfig::LOG_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+float MyConfig::traceTime = -1.0;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -49,6 +50,7 @@ void SimController::initialize (int stage)
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
 		MyConfig::mode 	= Async;
+		MyConfig::traceTime = -1.0;
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
 		if (MyConfig::mode==Sync) {
@@ -274,14 +276,14 @@ void SimController::runTimePeriod ()
 			char lineAsCharArray[line.length()+1];
 			strcpy (lineAsCharArray, line.c_str());
 			strtok (lineAsCharArray, " = ");
-			int new_t = atoi (strtok (NULL, " = "));
-			if (DEBUG_LVL>0 && new_t <= t) {
-				error ("error in trace file: t is not incremented. t=%d, new_t=%d", t, new_t);
+			float new_t = atof (strtok (NULL, " = "));
+			if (DEBUG_LVL>0 && new_t <= MyConfig::traceTime) {
+				error ("error in trace file: t is not incremented. t=%f, new_t=%f", MyConfig::traceTime, new_t);
 			}
-			t = new_t;
+			MyConfig::traceTime = new_t;
 
 			if (MyConfig::LOG_LVL>0) {
-				snprintf (buf, bufSize, "\n\nt = %d\n********************", t);
+				snprintf (buf, bufSize, "\n\nt = %f\n********************", t);
 				MyConfig::printToLog (buf); 
 			}
 		}
@@ -384,7 +386,7 @@ void SimController::printBuCost ()
 		}
 
 	}
-	snprintf (buf, bufSize, "\nt=%d, nonMigCost=%d, numMigs=%d, tot cost = %d", t, nonMigCost, numMigsAtThisPeriod, nonMigCost + numMigsAtThisPeriod * uniformChainMigCost);
+	snprintf (buf, bufSize, "\nt=%f, nonMigCost=%d, numMigs=%d, tot cost = %d", MyConfig::traceTime, nonMigCost, numMigsAtThisPeriod, nonMigCost + numMigsAtThisPeriod * uniformChainMigCost);
 	printBufToLog();
 }
 
@@ -401,7 +403,7 @@ void SimController::concludeTimePeriod ()
 	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
 	
 	if (stts!=0) {
-		snprintf (buf, bufSize, "sim t=%lf, t=%d: error during run of mode ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log `file.", simTime().dbl(), t, stts, errChainId);
+		snprintf (buf, bufSize, "sim t=%lf, t=%f: error during run of mode ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log `file.", simTime().dbl(), MyConfig::traceTime, stts, errChainId);
 		error (buf);
 	}
 	
@@ -413,7 +415,7 @@ void SimController::concludeTimePeriod ()
 	}
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%d, BUPU results (skipping empty DCs):", t);
+		snprintf (buf, bufSize, "\nt=%f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
 		if (DEBUG_LVL>1) {
@@ -462,7 +464,7 @@ void SimController::rdUsrsThatLeftLine (string line)
   // parse each old chain in the trace (.poa file), and find its current datacenter
   while (streamOfChainIds >> chainId) {
 		if (!ChainsMaster::findChain (chainId, chain)) { 
-			error ("t=%d: didn't find chain id %d that left", t, chainId);
+			error ("t=%f: didn't find chain id %d that left", MyConfig::traceTime, chainId);
 	  }
 	  if (chain.isBlocked) { 
 	  	continue;
@@ -551,7 +553,7 @@ void SimController::rdOldUsrsLine (string line)
 	
 	while (ss >> chainId) {
 		if (!ChainsMaster::checkIfBlocked (chainId, isBlocked)) {
-			error ("error in t=%d: ChainsMaster::checkIfBlocked didn't find chain %d", t, chainId); 
+			error ("error in t=%f: ChainsMaster::checkIfBlocked didn't find chain %d", MyConfig::traceTime, chainId); 
 		}
 		if (isBlocked) { // skip blocked usrs
 			continue;
@@ -559,10 +561,10 @@ void SimController::rdOldUsrsLine (string line)
 		ss >> poaId;
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
-			error ("t=%d: old chain id %d is not found, or not placed", t, chainId);  	
+			error ("t=%f: old chain id %d is not found, or not placed", MyConfig::traceTime, chainId);  	
   	}
 		if (DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
-			error ("t=%d: at rdOldUsrsLine, old usr %d wasn't placed yet\n", t, chainId);
+			error ("t=%f: at rdOldUsrsLine, old usr %d wasn't placed yet\n", MyConfig::traceTime, chainId);
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
 			numCritUsrs++;
@@ -642,7 +644,7 @@ void SimController::initFullReshSync ()
 		}
 		DcId_t leafId = datacenters[it.second.S_u[0]]->leafId;
 		if (leafId >= numLeaves || leafId<0) {
-			snprintf (buf, bufSize, "\t=%d. error in initFullReshSync: chain %d has leafId=%d", t, it.second.id, leafId);
+			snprintf (buf, bufSize, "\t=%f. error in initFullReshSync: chain %d has leafId=%d", MyConfig::traceTime, it.second.id, leafId);
 			printBufToLog();
 			error ("Error in initFullReshSync. Please check the log file.");
 		}
@@ -716,7 +718,7 @@ void SimController::initAlgSync ()
 	}
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
+		snprintf (buf, bufSize, "\nt=%f, initiating alg.", MyConfig::traceTime);
 		printBufToLog();
 	} 
 
@@ -750,7 +752,7 @@ void SimController::initAlgAsync ()
 {  	
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%d, initiating alg.", t);
+		snprintf (buf, bufSize, "\nt=%f, initiating alg.", MyConfig::traceTime);
 		printBufToLog();
 	} 
 
@@ -847,7 +849,7 @@ void SimController::handleMessage (cMessage *msg)
 inline void SimController::genSettingsBuf (bool printTime)
 {
   if (printTime) {
-  	snprintf (settingsBuf, settingsBufSize, "t%d_%s_cpu%d_p%.1f_sd%d_stts%d",	t, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts);
+  	snprintf (settingsBuf, settingsBufSize, "t%.3f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts);
   }
   else {
   	snprintf (settingsBuf, settingsBufSize, "running %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed);
@@ -863,7 +865,7 @@ void SimController::printResLine ()
 	MyConfig::printToRes (settingsBuf); 
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
 	if (periodNonMigCost < 0) {
-		error ("t=%d ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.");
+		error ("t=%f ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.", MyConfig::traceTime);
 	}
 
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;

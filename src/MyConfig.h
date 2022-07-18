@@ -70,6 +70,7 @@ class MyConfig {
 		static bool discardAllMsgs; // when true, all DCs ignore all incoming msgs.
 		static vector <Cpu_t> minCpuToPlaceAnyChainAtLvl;
 		static float FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+    static float traceTime; //current time (in the trace, in seconds)
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static float RtChainPr; // prob' that a new chain is an RT chain
