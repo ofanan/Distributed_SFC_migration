@@ -476,7 +476,6 @@ void Datacenter::bottomUpFMode (bool justFinishedResh)
 			// Not enough availCpu for this chain, and it cannot be placed higher
 			if (justFinishedResh) {
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
-					error ("sorry. blocking chains isn't supported yet");
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
