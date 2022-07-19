@@ -449,7 +449,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 /************************************************************************************************************************************************
 Running the BU alg' at "feasibility" Async mode
 *************************************************************************************************************************************************/
-void Datacenter::bottomUpFMode ()
+void Datacenter::bottomUpFMode (bool justFinishedResh)
 {
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
@@ -473,22 +473,36 @@ void Datacenter::bottomUpFMode ()
 				continue;
 			}
 			
-			// Not enough availCpu for this chain, and it cannot be placed higher; in BU-f mode, we don't try reshuffling again.
-			if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
-				error ("sorry. blocking chains isn't supported yet");
-				if (!ChainsMaster::blockChain (chainPtr->id)) {
-					error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+			// Not enough availCpu for this chain, and it cannot be placed higher
+			if (justFinishedResh) {
+				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
+					error ("sorry. blocking chains isn't supported yet");
+					if (!ChainsMaster::blockChain (chainPtr->id)) {
+						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+					}
+					chainPtr = notAssigned.erase (chainPtr); 
 				}
-				chainPtr = notAssigned.erase (chainPtr); 
+				else { // Failed to place an old chain even after resh
+					snprintf (buf, bufSize, "\ns%d : : couldn't place the old chain %d even after reshuffling", dcId, chainPtr->id);
+					printBufToLog ();
+					return printStateAndEndSim  ();
+				}
 			}
-			else { // Failed to place an old chain even after resh
-				snprintf (buf, bufSize, "\ns%d : : couldn't place an old chain even after reshuffling", dcId);
-				printBufToLog ();
-				return printStateAndEndSim  ();
+			else { // haven't reshuffled yet --> reshuffle				
+				if (MyConfig::mode==Sync) {
+					if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+						snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
+						printBufToLog();
+					}
+					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
+				}
+				else {
+					return initReshAsync ();
+				}
 			}
 		}
 	}
-
+	
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
 		printBufToLog ();
@@ -1109,7 +1123,7 @@ void Datacenter::finReshAsync ()
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		rstReshAsync ();
-		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
+		bottomUpFMode (true); // come back to bottomUp, but in F ("feasibility") mode, and while setting the justFinishedResh input to true
 	}
 	else {
 		sndReshAsyncPktToPrnt ();
