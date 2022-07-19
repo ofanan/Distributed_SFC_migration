@@ -825,9 +825,6 @@ void Datacenter::initReshAsync ()
 			insertChainToList (pushDwnReq, chain);
 		}
 	}
-	if (!potPlacedChains.empty()) {
-		error ("note: initReshAsync was called when potPlacedChains isn't empty");
-	} 
 	deficitCpu -= availCpu;
 	if (deficitCpu <= 0) {
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
