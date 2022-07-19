@@ -36,7 +36,11 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 		return false;
 	}
 	it->second.isBlocked = true;
-//	if (MyConfig::
+	if (MyConfig::DEBUG_LVL > 0 && (it->second.curLvl != UNPLACED_LVL || it-> second.curDc != UNPLACED_DC))  {
+	  	snprintf (buf, bufSize, "trace Time=%f, chain %d was blocked whlie having curLvl=%d and curDc=%d", MyConfig::traceTime, chainId, it->second.curLvl, it->second.curDc);
+	  	MyConfig::printToLog (buf);
+	  	return false;
+	}
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nblocked chain %d", chainId); 
 		MyConfig::printToLog(buf); 
