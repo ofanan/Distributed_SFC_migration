@@ -371,7 +371,6 @@ void Datacenter::pushUp ()
 				requiredCpuToLocallyPlaceThisChain > availCpu || // because not enough avail' cpu for pushing-up, or ...
 				!chainPtr->dcIsDelayFeasible (dcId, lvl) || // because I'm not delay-feasible for this chain, or ...
 				chainPtr->curDc == chainPtr->S_u[chainPtr->curLvl]) {// the chain's suggested new place is identical to its current place, thus saving mig' cost
-//					ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl); // inform ChainMaster about the chain's place 
 					chainPtr++;
 					continue;
 		}
@@ -815,6 +814,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 void Datacenter::initReshAsync ()
 {
 	reshInitiatorLvl = lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is higher then the highest lvl reshuffled at this period - update. 
 	isInFMode 			 = true;
 	scheduleEndFModeEvent ();
 	pushDwnReq.clear (); // verify that the list doesn't contain left-overs from previous runs
@@ -962,7 +962,7 @@ void Datacenter::prepareReshSync ()
 		return genNsndBottomUpPktSync ();	
 	}
 	reshuffled = true;
-	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is highest then the highest lvl reshuffled at this period - update. 
+	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is higher then the highest lvl reshuffled at this period - update. 
 
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
