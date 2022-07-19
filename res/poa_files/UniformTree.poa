@@ -46,14 +46,15 @@ usrs_that_left:
 new_usrs: (7,3)
 old_usrs: 
 
-// empty te netw
+// Requires blocking the new usr (8)
 t = 7
-usrs_that_left: 0 1 2 3 4 5 6
-new_usrs: 
+usrs_that_left: 
+new_usrs: (7,3)
 old_usrs: 
 
+// empty te netw
 t = 8
-usrs_that_left: 
+usrs_that_left: 0 1 2 3 4 5 6
 new_usrs: 
 old_usrs: 
 
@@ -63,6 +64,11 @@ new_usrs:
 old_usrs: 
 
 t = 10
+usrs_that_left: 
+new_usrs: 
+old_usrs: 
+
+t = 11
 usrs_that_left: 
 new_usrs: (0,0), (1,1), (2,2)
 old_usrs: 
