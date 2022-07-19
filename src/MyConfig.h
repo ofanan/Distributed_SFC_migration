@@ -39,8 +39,6 @@ const bool Sync  = 0;
 const bool Async = 1;
 
 // Determining the level of debug and log.
-const int  DEBUG_LVL=1, RES_LVL=1;
-
 const double CLEARNACE_DELAY = 0.1; 
 										 
 class MyConfig { 
@@ -83,6 +81,8 @@ class MyConfig {
 
     static string logFileName, resFileName;
 		static int LOG_LVL;
+		static int DEBUG_LVL;
+		static int RES_LVL;
 
 		//Init
 		static void init ();

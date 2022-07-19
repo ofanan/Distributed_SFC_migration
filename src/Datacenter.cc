@@ -399,7 +399,7 @@ void Datacenter::pushUp ()
 
 		if (MyConfig::mode == Sync) {
 			simController->finishedAlg (dcId, leafId);
-			if (DEBUG_LVL > 0 && !pushUpList.empty()) {
+			if (MyConfig::DEBUG_LVL > 0 && !pushUpList.empty()) {
 					error ("t=%f : s%d : pushUpList isn't empty after running pushUp() on a leaf", MyConfig::traceTime, dcId);
 			}
 		}
@@ -441,7 +441,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			delete (pkt);
 		}
 	}
-	if (DEBUG_LVL>0 && MyConfig::mode==Sync && !pushUpList.empty()) {
+	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==Sync && !pushUpList.empty()) {
 		error ("pushUpList not empty after sending PU pkts to all children");
 	}
 }
@@ -476,7 +476,6 @@ void Datacenter::bottomUpFMode ()
 			// Not enough availCpu for this chain, and it cannot be placed higher
 			if (reshuffled) {
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
-					MyConfig::overallNumBlockedUsrs++;
 					error ("sorry. blocking chains isn't supported yet");
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
@@ -1189,7 +1188,7 @@ void Datacenter::pushDwn ()
 			ChainsMaster::modifyLvl (chainPtr->id, lvl);
 			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
 				deficitCpu -= chainPtr->potCpu;
-				if (DEBUG_LVL>0 && requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl) != chainPtr->potCpu) {
+				if (MyConfig::DEBUG_LVL>0 && requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl) != chainPtr->potCpu) {
 					error ("s%d c%d chain.potCpu=%d reshInitiatorLvl=%d, requiredCpuToPlaceChainAtLvl=%d", 
 									dcId, chainPtr->id, chainPtr->potCpu, reshInitiatorLvl, requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl));
 				}

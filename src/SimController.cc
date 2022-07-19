@@ -16,7 +16,11 @@ Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
-int   MyConfig::mode, MyConfig::LOG_LVL;
+int   MyConfig::mode;
+int   MyConfig::LOG_LVL;
+int   MyConfig::DEBUG_LVL;
+int   MyConfig::RES_LVL;
+
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -118,6 +122,8 @@ void SimController::initialize (int stage)
 	
 	if (stage==2) {
 		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
+		MyConfig::DEBUG_LVL			 = 1;
+		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes   = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::discardAllMsgs = false;
@@ -277,7 +283,7 @@ void SimController::runTimePeriod ()
 			strcpy (lineAsCharArray, line.c_str());
 			strtok (lineAsCharArray, " = ");
 			float new_t = atof (strtok (NULL, " = "));
-			if (DEBUG_LVL>0 && new_t <= MyConfig::traceTime) {
+			if (MyConfig::DEBUG_LVL>0 && new_t <= MyConfig::traceTime) {
 				error ("error in trace file: t is not incremented. t=%.3f, new_t=%.3f", MyConfig::traceTime, new_t);
 			}
 			MyConfig::traceTime = new_t;
@@ -407,10 +413,10 @@ void SimController::concludeTimePeriod ()
 		error (buf);
 	}
 	
-	if (DEBUG_LVL > 0) {
+	if (MyConfig::DEBUG_LVL > 0) {
 		checkChainsMasterData ();
 	}
-	if (RES_LVL > 0) {
+	if (MyConfig::RES_LVL > 0) {
 		 printResLine ();
 	}
 
@@ -418,7 +424,7 @@ void SimController::concludeTimePeriod ()
 		snprintf (buf, bufSize, "\nt=%.3f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
-		if (DEBUG_LVL>1) {
+		if (MyConfig::DEBUG_LVL>1) {
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
 		}
@@ -470,7 +476,7 @@ void SimController::rdUsrsThatLeftLine (string line)
 	  	continue;
 	  }
   	chainCurDc = chain.curDc;
-  	if (DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
+  	if (MyConfig::DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
 			error ("Note: this chain was not placed before leaving\n"); 
   	}
 		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);//insert the id of the moved chain to the vec of chains that left its curreht Dc
@@ -563,7 +569,7 @@ void SimController::rdOldUsrsLine (string line)
   	{
 			error ("t=%.3f: old chain id %d is not found, or not placed", MyConfig::traceTime, chainId);  	
   	}
-		if (DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
+		if (MyConfig::DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%.3f: at rdOldUsrsLine, old usr %d wasn't placed yet\n", MyConfig::traceTime, chainId);
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
@@ -777,7 +783,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
 	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
-	if (DEBUG_LVL>0 && MyConfig::mode==Async) {
+	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==Async) {
 		error ("t = %f DC %d called finishedAlg in Async mode", MyConfig::traceTime, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 

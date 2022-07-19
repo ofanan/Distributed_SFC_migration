@@ -36,10 +36,12 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 		return false;
 	}
 	it->second.isBlocked = true;
+//	if (MyConfig::
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nblocked chain %d", chainId); 
 		MyConfig::printToLog(buf); 
 	}	
+	MyConfig::overallNumBlockedUsrs++;
 	return true;
 }
 
@@ -49,7 +51,7 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 **************************************************************************************************************************************************/
 bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 {
-	if (DEBUG_LVL>1) {
+	if (MyConfig::DEBUG_LVL>1) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
 			return false;
@@ -234,7 +236,7 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, Chai
 			curNumBlockedUsrs++;
 			continue;
 		}
-		if (DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
+		if (MyConfig::DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
 			errChainId = it->second.id;
 			snprintf (buf, bufSize, "\nerror: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", it->second.id);
 			MyConfig::printToLog (buf); 
