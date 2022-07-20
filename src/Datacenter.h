@@ -12,8 +12,6 @@
 #include "Chain.h"
 #include "ChainsMaster.h"
 #include "EndXmtMsg_m.h"
-/*#include "EndFModeMsg_m.h"*/
-#include "BottomUpSelfMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
