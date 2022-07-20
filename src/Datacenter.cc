@@ -46,9 +46,9 @@ Datacenter::~Datacenter()
       cancelAndDelete (endXmtEvents[i]);
     }
   }
-	if (endFModeEvent != nullptr) {
-	  cancelAndDelete (endFModeEvent);
-	}
+//	if (endFModeEvent != nullptr) {
+//	  cancelAndDelete (endFModeEvent);
+//	}
 }
 
 /*************************************************************************************************************************************************
@@ -985,15 +985,24 @@ void Datacenter::clrRsrc ()
 *************************************************************************************************************************************************/
 void Datacenter::scheduleEndFModeEvent ()
 {
-	error ("at least up to here");// $$$
+//	error ("at least up to here");// $$$
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		sprintf (buf, "s%d in scheduleEndFModeEvent", dcId);
+		sprintf (buf, "s%d in schedule", dcId);
 		printBufToLog ();
 	}
-	if (endFModeEvent->isScheduled()) {
-		endFModeEvent = cancelEvent(endFModeEvent);
-	}
-	endFModeEvent = new cMessage ("endFModeEvent");
+//	if (endFModeEvent==nullptr) { // first time need to schedule such an event --> generate a new event
+		endFModeEvent = new cMessage ("endFModeEvent");			
+//	}
+//	else { // event already exists - just need to recycle it
+//			endFModeEvent = cancelEvent(endFModeEvent);		
+//	}
+//	
+
+//	if (endFModeEvent!=nullptr) {
+////		if (endFModeEvent->isScheduled()) {
+//			endFModeEvent = cancelEvent(endFModeEvent);
+////		}
+//	}
 	scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 }
 
