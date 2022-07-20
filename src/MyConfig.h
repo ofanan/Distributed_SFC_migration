@@ -28,7 +28,7 @@ class Chain;
 struct ChainHash;
 
 const string tracePath = "res/poa_files/";
-const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3; // levels of log to be written to the log file.
+const int  NO_LOG=0, BASIC_LOG=1, DETAILED_LOG=2, VERY_DETAILED_LOG = 3, TLAT_DETAILED_LOG=4; // levels of log to be written to the log file.
 
 //costs and cpu demands of chains for different types of networks
 const int MonacoIdx=0, LuxIdx=1, UniformTreeIdx=2, NonUniformTreeIdx=3; // Possible NetType values

@@ -135,10 +135,12 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 		return;
 	}
 	if (beginWithNewLine) {
-		MyConfig::printToLog ("\n");
-	}
-	snprintf (buf, bufSize, "s%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
+		snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
 														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
+	}
+	else {
+		snprintf (buf, bufSize, " Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
+	}
 	printBufToLog ();
 	if (printChainIds) {
 		MyConfig::printToLog (" chains [");
@@ -323,8 +325,9 @@ void Datacenter::handlePushUpPkt ()
 		}
 	}
 	
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=TLAT_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpList=", dcId);
+		printBufToLog ();
 		MyConfig::printToLog (pushUpList, false);
 	}
 	pushUp ();
@@ -337,7 +340,7 @@ Assume that this->pushUpList already contains the relevant chains.
 void Datacenter::pushUp ()
 {
 
-	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=TLAT_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : beginning PU. pushUpList=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList, false);
@@ -393,9 +396,9 @@ void Datacenter::pushUp ()
 	}
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : finihsed PU.", dcId);
+		snprintf (buf, bufSize, "\ns%d : finished PU.", dcId);
 		printBufToLog ();
-		print ();
+		print (false, false, true, false);
 	}
 
 	if (isLeaf) {
@@ -607,7 +610,7 @@ void Datacenter::bottomUp ()
 		snprintf (buf, bufSize, "\ns%d : finished BU. notAssigned=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
-		print (true, true, true, true);
+		print (true, true, true, false);
 	}
 
   if (isRoot) { 
@@ -676,7 +679,7 @@ void Datacenter::rdBottomUpPkt ()
 		}        
 	}
 	
-	if (MyConfig::LOG_LVL == VERY_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL == TLAT_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList, false);
@@ -985,11 +988,6 @@ void Datacenter::clrRsrc ()
 *************************************************************************************************************************************************/
 void Datacenter::scheduleEndFModeEvent ()
 {
-//	error ("at least up to here");// $$$
-	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		sprintf (buf, "\ns%d in schedule", dcId);
-		printBufToLog ();
-	}
 	if (endFModeEvent==nullptr) { // first time need to schedule such an event --> generate a new event
 		endFModeEvent = new cMessage ("endFModeEvent");			
 	}
@@ -1097,7 +1095,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		if (isPotentiallyPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
 			regainRsrcOfChain (chain); 
-			continue; // finished handling this chain --> no need to enter it into pushDwnAck
+			continue; // /handling this chain --> no need to enter it into pushDwnAck
 		}	
 		if (isPlaced(chain.id)) { 
 			placedChains.erase (chain.id); 
@@ -1154,11 +1152,6 @@ Return when either availCpu doesn't suffice to place any additional chain, or wh
 *************************************************************************************************************************************************/
 void Datacenter::pushDwn ()
 {
-
-	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d push dwn", dcId);
-		printBufToLog ();
-	}
 
 	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 		if (deficitCpu <= 0 || availCpu < MyConfig::minCpuToPlaceAnyChainAtLvl [lvl]) { 

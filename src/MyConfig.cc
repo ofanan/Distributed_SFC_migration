@@ -122,7 +122,7 @@ void MyConfig::printToLog (list <Chain> list2print, bool printLvl)
 {
 	if (printLvl) {
 		for (auto chain : list2print) {
-			logFile << "id=" << chain.id << " l=" << (int)chain.curLvl << ", ";
+			logFile << "c" << chain.id << " l=" << (int)chain.curLvl << ", ";
 		}	
 	}
 	else {
