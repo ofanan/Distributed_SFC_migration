@@ -110,7 +110,7 @@ void Datacenter::initialize(int stage)
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   if (MyConfig::mode==Async) {
 		rstReshAsync ();
-		endFModeEvent  = nullptr;
+		endFModeEvent = new cMessage ("endFModeEvent");
 		isInFMode 		 = false;
   }
 
@@ -186,13 +186,12 @@ void Datacenter::handleMessage (cMessage *msg)
   if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
   	handleEndXmtMsg ();
   }
-  else if (dynamic_cast<EndFModeMsg*>(curHandledMsg) != nullptr) {
+  else if (msg->isSelfMessage() && strcmp (msg->getName(), "endFModeEvent")==0) { // (dynamic_cast<EndFModeMsg*>(curHandledMsg) != nullptr) {
   	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
   		snprintf (buf, bufSize, "\ns%d exiting F mode", dcId);
   		printBufToLog ();
   	}
   	isInFMode     = false;
-  	endFModeEvent = nullptr;
   }
 	else if (MyConfig::discardAllMsgs) {
 		delete curHandledMsg;
@@ -461,7 +460,7 @@ void Datacenter::bottomUpFMode (bool justFinishedResh)
 	sort (notAssigned.begin(), notAssigned.end(), SortChainsForNotAssignedList());
 	for (auto chainPtr=notAssigned.begin(); chainPtr!=notAssigned.end(); ) {
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(*chainPtr); 
-		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> assign it
+		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> place it
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				placedChains.		  insert  (chainPtr->id);
  				ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
@@ -843,14 +842,6 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
-	if (availCpu >= deficitCpu) { // Can finish the resh locally, by placing additional chains on me, w/o calling my children
-		pushDwn ();
-		if (deficitCpu > 0) {
-			error ("at this stage, we should have deficitCpu <= 0");
-		}
-		//now we know that deficitCpu <= 0, so we can finish the reshuflle
-		return finReshAsync ();
-	}
 	// add my potPlacedChains, and then placedChains, to the end of pushDwnReq
 	Chain chain;
 	for (ChainId_t chainId : potPlacedChains) {
@@ -990,10 +981,14 @@ void Datacenter::clrRsrc ()
 *************************************************************************************************************************************************/
 void Datacenter::scheduleEndFModeEvent ()
 {
-  if (endFModeEvent!=nullptr && endFModeEvent->isScheduled()) { // there's currently an active schedule
-    cancelAndDelete (endFModeEvent);
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		sprintf (buf, "s%d in scheduleEndFModeEvent", dcId);
+		printBufToLog ();
 	}
-	endFModeEvent = new EndFModeMsg ("");
+	if (endFModeEvent->isScheduled()) {
+		endFModeEvent = cancelEvent(endFModeEvent);
+	}
+	endFModeEvent = new cMessage ("endFModeEvent");
 	scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 }
 
@@ -1081,10 +1076,15 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	}
 	this->deficitCpu = pkt->getDeficitCpu ();
 	
+	// Remove from notAssigned and regain the rsrcs of chains that were pushed-down from me
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);
 		if (chain.curLvl >= lvl) { // the chain wasn't pushed down 
 			error ("s%d rcvd a reshAsync pkt from child with lvl above child's lvl", dcId);
+		}
+		
+		if (eraseChainFromVec(notAssigned, chain)) { // the chain was found (and now deleted) from notAssigned
+			continue;
 		}
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
@@ -1100,7 +1100,8 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		// now we know that the chain was pushed-down from someone else, above me
 		insertChainToList (pushDwnAck, chain);
 	 }
-	reshAsync ();
+	 
+	return (deficitCpu <= 0)? finReshAsync () :reshAsync ();
 }
 
 /*************************************************************************************************************************************************

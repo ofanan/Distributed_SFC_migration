@@ -143,6 +143,7 @@ void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to 
 
 inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
 bool insertChainToList (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
+bool eraseChainFromVec (vector<Chain> &vec, Chain &chain);
 
 //bool findChainInSet   (const UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
 /*bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); // Given chainId, erases the respective chain from the set. */

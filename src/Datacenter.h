@@ -12,7 +12,7 @@
 #include "Chain.h"
 #include "ChainsMaster.h"
 #include "EndXmtMsg_m.h"
-#include "EndFModeMsg_m.h"
+/*#include "EndFModeMsg_m.h"*/
 #include "BottomUpSelfMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
@@ -72,7 +72,7 @@ class Datacenter : public cSimpleModule
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
     vector <EndXmtMsg*> 	endXmtEvents; // endXmts[i] will hold the event of the end of the transmission of a pkt in output channel i
-		EndFModeMsg*					endFModeEvent; // will hold the event of finishing "F" mode
+		cMessage*							endFModeEvent; // will hold the event of finishing "F" mode
 		bool									isInFMode; 
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'

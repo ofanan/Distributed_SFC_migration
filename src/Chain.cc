@@ -149,6 +149,22 @@ vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcI
 }
 
 /*************************************************************************************************************************************************
+* Given a chain, if that chain is found in the given set vec, erase it from the vec.
+* Returns true iff the requested chain was found (and erased) from the set.
+**************************************************************************************************************************************************/
+bool eraseChainFromVec (vector<Chain> &vec, Chain &chain)
+{
+
+	for (auto chainPtr=vec.begin(); chainPtr!=vec.end(); chainPtr++) {
+		if (chainPtr->id == chain.id) { // found the requested chain
+			vec.erase (chainPtr);
+			return true;
+		}
+	}
+	return false;
+}
+
+/*************************************************************************************************************************************************
 * Given a chain id, if that chain is found in the given set - erase it from the set.
 * Returns true iff the requested chain was found (and erased) from the set.
 Currently unused
