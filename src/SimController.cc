@@ -836,12 +836,6 @@ void SimController::handleMessage (cMessage *msg)
 			}  
 		}
 	}
-//  if (dynamic_cast<RunTimePeriodMsg*> (msg)) {
-//		isFirstPeriod = false;
-//		if (!isLastPeriod) {
-//			runTimePeriod ();
-//		}  
-//  }  
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
   	printAllDatacenters ();
   }

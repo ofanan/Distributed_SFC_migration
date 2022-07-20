@@ -32,7 +32,6 @@ Controller of the simulation:
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
 #include "InitFullReshMsg_m.h"
-#include "RunTimePeriodMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
