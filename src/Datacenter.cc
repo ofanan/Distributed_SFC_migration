@@ -125,8 +125,7 @@ void Datacenter::initialize(int stage)
  * - printChainIds: when true, print in a format similar to that used in the centralized alg'.
  * - printPotPlaced: when true and there're potPlacedChains to print - print them.
  * - printPushUpList: when true and pushUpList isn't impty - print them.
- * - beginWithNewLine: when true, the print begins in a new line
- * - printNotAssigned: when true, print also the notAssigned list
+ * - beginWithNewLine: when true, the print begins in a new line, and with the dcId.
 *************************************************************************************************************************************************/
 void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
 {
@@ -184,6 +183,9 @@ void Datacenter::handleEndXmtMsg ()
 }
 
 
+/*************************************************************************************************************************************************
+* handleMessage
+*************************************************************************************************************************************************/
 void Datacenter::handleMessage (cMessage *msg)
 {
 
@@ -334,7 +336,7 @@ void Datacenter::handlePushUpPkt ()
 }
 
 /*************************************************************************************************************************************************
-Run the PU Sync alg'. 
+Run the PU alg' (either in Sync / Async) mode. 
 Assume that this->pushUpList already contains the relevant chains.
 *************************************************************************************************************************************************/
 void Datacenter::pushUp ()
@@ -525,15 +527,7 @@ void Datacenter::bottomUpFMode (bool justFinishedResh)
 }
 
 /************************************************************************************************************************************************
-Running the PU alg' at "feasibility" mode
-*************************************************************************************************************************************************/
-void Datacenter::pushUpFMode ()
-{
-	error ("sorry, pushUp in Feasibility mode isn't coded yet");
-}
-
-/************************************************************************************************************************************************
-Running the BU alg'. 
+Running the BU alg'.
 Assume that this->notAssigned and this->pushUpList already contain the relevant chains, and are sorted.
 *************************************************************************************************************************************************/
 void Datacenter::bottomUp ()
@@ -649,13 +643,13 @@ void Datacenter::handleBottomUpPktAsync ()
 }
 
 /*************************************************************************************************************************************************
-Handle a bottomUP pkt, when running in Async FMode.
+Handle a bottomUP pkt, when running in Async F-mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsyncFMode ()
 {
 	rdBottomUpPkt ();
 	bottomUpFMode();
-	genNsndPushUpPktsToChildren (); // inform children that I haven't pushed-up anything
+	genNsndPushUpPktsToChildren (); // inform children that requested a push-up (if any), that I haven't pushed-up anything
 }
 
 /*************************************************************************************************************************************************
