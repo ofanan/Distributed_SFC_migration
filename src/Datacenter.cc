@@ -881,7 +881,7 @@ void Datacenter::reshAsync ()
 
 
 /*************************************************************************************************************************************************
-Check whether there exists (at least one) additional child to which we should send a reshuffle (in async mode) - and if so, send to him.
+Check whether there exists (at least one) additional child to which we should send a reshuffle pkt (in async mode) - and if so, send to him.
 returns true iff found a relevant child, and sent him a reshAsyncPkt.
 *************************************************************************************************************************************************/
 bool Datacenter::sndReshAsyncPktToNxtChild ()
