@@ -46,6 +46,9 @@ Datacenter::~Datacenter()
       cancelAndDelete (endXmtEvents[i]);
     }
   }
+	if (endFModeEvent != nullptr) {
+	  cancelAndDelete (endFModeEvent);
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -110,7 +113,8 @@ void Datacenter::initialize(int stage)
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   if (MyConfig::mode==Async) {
 		rstReshAsync ();
-		endFModeEvent = new cMessage ("endFModeEvent");
+		endFModeEvent = nullptr;
+//		endFModeEvent = new cMessage ("endFModeEvent");
 		isInFMode 		 = false;
   }
 
@@ -186,7 +190,7 @@ void Datacenter::handleMessage (cMessage *msg)
   if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
   	handleEndXmtMsg ();
   }
-  else if (msg->isSelfMessage() && strcmp (msg->getName(), "endFModeEvent")==0) { // (dynamic_cast<EndFModeMsg*>(curHandledMsg) != nullptr) {
+  else if (msg->isSelfMessage() && strcmp (msg->getName(), "endFModeEvent")==0) { 
   	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
   		snprintf (buf, bufSize, "\ns%d exiting F mode", dcId);
   		printBufToLog ();
@@ -981,6 +985,7 @@ void Datacenter::clrRsrc ()
 *************************************************************************************************************************************************/
 void Datacenter::scheduleEndFModeEvent ()
 {
+	error ("at least up to here");// $$$
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 		sprintf (buf, "s%d in scheduleEndFModeEvent", dcId);
 		printBufToLog ();
