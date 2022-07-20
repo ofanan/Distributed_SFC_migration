@@ -672,7 +672,7 @@ void SimController::prepareFullReshSync ()
 {
 	Enter_Method ("prepareFullReshSync ()");
 	MyConfig::discardAllMsgs = true;
-	scheduleAt (simTime() + CLEARNACE_DELAY, new InitFullReshMsg); 
+	scheduleAt (simTime() + CLEARNACE_DELAY, new cMessage ("InitFullReshMsg"));
 }
 
 
@@ -833,17 +833,17 @@ void SimController::handleMessage (cMessage *msg)
 			isFirstPeriod = false;
 			if (!isLastPeriod) {
 				runTimePeriod ();
-			}  
+			}
 		}
-	}
+		else if (strcmp (msg->getName(), "InitFullReshMsg")) { 
+	  	initFullReshSync ();
+	  }
+  }
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
   	printAllDatacenters ();
   }
   else if (dynamic_cast<PrintStateAndEndSimMsg*> (msg)) { 
   	PrintStateAndEndSim ();
-  }
-  else if (dynamic_cast<InitFullReshMsg*> (msg)) { 
-  	initFullReshSync ();
   }
   else {
   	error ("Rcvd unknown msg type");

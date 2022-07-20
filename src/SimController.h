@@ -31,7 +31,6 @@ Controller of the simulation:
 #include "ChainsMaster.h"
 #include "PrintAllDatacentersMsg_m.h"
 #include "PrintStateAndEndSimMsg_m.h"
-#include "InitFullReshMsg_m.h"
 
 using namespace omnetpp;
 using namespace std;
