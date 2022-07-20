@@ -133,24 +133,14 @@ struct ChainHash {
 typedef unordered_set <Chain, ChainHash> UnorderedSetOfChains;
 
 /*************************************************************************************************************************************************
-Rcvs 2 sorted vectors of chains. 
-Put in the first vector (given by ref') a sorted vector, containing the union of the two input vectors. 
+Accessory functions for data structures of chains
 **************************************************************************************************************************************************/
-void MergeSort (vector <Chain> &vec, const vector <Chain> vec2union);
 
 // Insert a chain in its correct place to a sorted datastructure. Currently unused, bacuase it's easier to insert chains wo sorting, and sort only when needed.
 void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness. 
-
-inline bool CompareChainsByDecCpuUsage (const Chain & lhs, const Chain & rhs);
 bool insertChainToList (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 bool eraseChainFromVec (vector<Chain> &vec, Chain &chain);
-
-//bool findChainInSet   (const UnorderedSetOfChains setOfChains , ChainId_t chainId, Chain &c);
-/*bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId); // Given chainId, erases the respective chain from the set. */
-
 vector<Chain> findChainsByPoa (UnorderedSetOfChains setOfChains, DcId_t poa);
 
 #endif
-
-
 

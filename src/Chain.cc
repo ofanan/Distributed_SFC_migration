@@ -165,43 +165,6 @@ bool eraseChainFromVec (vector<Chain> &vec, Chain &chain)
 }
 
 /*************************************************************************************************************************************************
-* Given a chain id, if that chain is found in the given set - erase it from the set.
-* Returns true iff the requested chain was found (and erased) from the set.
-Currently unused
-**************************************************************************************************************************************************/
-//bool eraseChainFromSet (UnorderedSetOfChains &setOfChains, ChainId_t chainId)
-//{
-//	Chain dummy (chainId);
-//	auto search = setOfChains.find (dummy);
-
-//	if (search==setOfChains.end()) {
-//		return false;
-//	}
-//	setOfChains.erase(search);
-//	return true;
-//}
-
-/*************************************************************************************************************************************************
-* Given a chain id, find the respective chain within a given set of chains.
-* The chain is written to foundChain.
-* Output: true iff the requested chain was found.
-Currently unused, as we don't use sets.
-**************************************************************************************************************************************************/
-//bool findChainInSet (const unordered_set <Chain, ChainHash> setOfChains, ChainId_t chainId, Chain &c)
-//{
-//	Chain dummy (chainId);
-//	auto search = setOfChains.find (dummy);
-
-//	if (search==setOfChains.end()) {
-//		return false;
-//	}
-//	else {
-//		c = *search;
-//		return true;
-//	}
-//}
-
-/*************************************************************************************************************************************************
 * Returns the non-mig' cost at the current place. If the chain isn't placed, the function returns UNPLACED_COST.
 **************************************************************************************************************************************************/
 Cost_t Chain::getCost () const
