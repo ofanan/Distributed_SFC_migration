@@ -624,16 +624,6 @@ void Datacenter::bottomUp ()
 }
 
 /*************************************************************************************************************************************************
-Update ChainMaster about (the IDs of) all the newly placed chains, as indicated in the newlyPlacedChains input parameter
-*************************************************************************************************************************************************/
-void Datacenter::updatePlacementInfo (unordered_set <ChainId_t> newlyPlacedChains)
-{
-	if (!ChainsMaster::modifyLvl (newlyPlacedChains, lvl))	{
-		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
-	}
-}
-
-/*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in Async mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsync ()
@@ -735,8 +725,6 @@ void Datacenter::genNsndBottomUpPktSync ()
 		notAssigned.clear ();
 	}
 }
-
-
 
 /*************************************************************************************************************************************************
 Generate a BottomUpPkt in Async f-mode, based on the data currently found in notAssigned, and xmt it to my parent:
@@ -992,8 +980,6 @@ void Datacenter::clrRsrc ()
 	availCpu 				 = cpuCapacity;
 }
 
-
-
 /*************************************************************************************************************************************************
 * Cancel previous EndFModeEvent (if exists), and Schedule a new EndFModeEvent for the current sim time + FModePeriod.
 *************************************************************************************************************************************************/
@@ -1132,7 +1118,9 @@ void Datacenter::finReshAsync ()
 	for (ChainId_t chainId_t : potPlacedChains) {
 		placedChains.insert (chainId_t);
 	}
-	updatePlacementInfo (potPlacedChains);
+	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
+		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
+	}
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		rstReshAsync ();

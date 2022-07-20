@@ -121,7 +121,6 @@ class Datacenter : public cSimpleModule
     void pushDwn 								();
     bool arrivedFromPrnt        (); 
     void scheduleEndFModeEvent  ();
-    void updatePlacementInfo 		(unordered_set <ChainId_t> newlyPlacedChains);
     void handleBottomUpPktAsync ();
     void handleBottomUpPktAsyncFMode  ();
     void genNsndPushUpPktsToChildren  ();
