@@ -317,7 +317,7 @@ void SimController::runTimePeriod ()
 			chainsThatLeftDatacenter.clear ();
 		
 			initAlg (); // call a placement algorithm 
-			scheduleAt (simTime() + period, new RunTimePeriodMsg); // Schedule a self-event for reading the handling the next time-step
+			scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for reading the handling the next time-step
 			break;
 		}
   }
@@ -828,12 +828,20 @@ void SimController::PrintStateAndEndSim ()
 
 void SimController::handleMessage (cMessage *msg)
 {
-  if (dynamic_cast<RunTimePeriodMsg*> (msg)) {
-		isFirstPeriod = false;
-		if (!isLastPeriod) {
-			runTimePeriod ();
-		}  
-  }  
+	if (msg->isSelfMessage ()) {
+		if (strcmp (msg->getName(), "RunTimePeriodMsg")==0) {
+			isFirstPeriod = false;
+			if (!isLastPeriod) {
+				runTimePeriod ();
+			}  
+		}
+	}
+//  if (dynamic_cast<RunTimePeriodMsg*> (msg)) {
+//		isFirstPeriod = false;
+//		if (!isLastPeriod) {
+//			runTimePeriod ();
+//		}  
+//  }  
   else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
   	printAllDatacenters ();
   }
