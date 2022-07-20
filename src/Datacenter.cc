@@ -849,6 +849,23 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
+	// Check first if I can solve the deficit prob' locally, by pushing down to me, w/o calling children
+	bool canFinReshLocally = true;
+	Cpu_t deficitCpuThatCanBeResolvedLocally = 0;
+	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {
+		if (chainPtr->curLvl==reshInitiatorLvl) {
+				deficitCpuThatCanBeResolvedLocally += chainPtr->potCpu;
+		}
+		if (deficitCpuThatCanBeResolvedLocally > availCpu) { // don't have enough availCpu to resolve the prob' by placing chains locally
+			canFinReshLocally = false;
+			break;
+		}
+	}
+	if (canFinReshLocally) {
+		pushDwn ();
+		return finReshAsync ();
+	}
+
 	// add my potPlacedChains, and then placedChains, to the end of pushDwnReq
 	Chain chain;
 	for (ChainId_t chainId : potPlacedChains) {
@@ -1080,7 +1097,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		pkt->getReshInitiatorLvl (), this->reshInitiatorLvl);
 	}
 	this->deficitCpu = pkt->getDeficitCpu ();
-	
+
 	// Remove from notAssigned and regain the rsrcs of chains that were pushed-down from me
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);

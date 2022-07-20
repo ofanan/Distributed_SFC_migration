@@ -46,16 +46,16 @@ usrs_that_left:
 new_usrs: (7,3)
 old_usrs: 
 
-// Requires blocking the new usr (8)
+// 
 t = 7
-usrs_that_left: 
-new_usrs: (7,3)
+usrs_that_left: 1 4
+new_usrs: 
 old_usrs: 
 
-// empty te netw
+// Requires reshuffling in the left sub-tree, but only down to s1
 t = 8
-usrs_that_left: 0 1 2 3 4 5 6
-new_usrs: 
+usrs_that_left: 
+new_usrs: (2,8), (2,9)
 old_usrs: 
 
 t = 9
