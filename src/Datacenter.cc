@@ -114,7 +114,6 @@ void Datacenter::initialize(int stage)
   if (MyConfig::mode==Async) {
 		rstReshAsync ();
 		endFModeEvent = nullptr;
-//		endFModeEvent = new cMessage ("endFModeEvent");
 		isInFMode 		 = false;
   }
 
@@ -988,7 +987,7 @@ void Datacenter::scheduleEndFModeEvent ()
 {
 //	error ("at least up to here");// $$$
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		sprintf (buf, "s%d in schedule", dcId);
+		sprintf (buf, "\ns%d in schedule", dcId);
 		printBufToLog ();
 	}
 	if (endFModeEvent==nullptr) { // first time need to schedule such an event --> generate a new event
@@ -997,13 +996,6 @@ void Datacenter::scheduleEndFModeEvent ()
 	else if (endFModeEvent->isScheduled()) { // event already exists - just need to recycle it
 		endFModeEvent = cancelEvent(endFModeEvent);		
 	}
-	
-
-//	if (endFModeEvent!=nullptr) {
-////		if (endFModeEvent->isScheduled()) {
-//			endFModeEvent = cancelEvent(endFModeEvent);
-////		}
-//	}
 	scheduleAt(simTime() + MyConfig::FModePeriod, endFModeEvent);
 }
 
