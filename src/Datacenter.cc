@@ -46,9 +46,9 @@ Datacenter::~Datacenter()
       cancelAndDelete (endXmtEvents[i]);
     }
   }
-//	if (endFModeEvent != nullptr) {
-//	  cancelAndDelete (endFModeEvent);
-//	}
+	if (endFModeEvent != nullptr) {
+	  cancelAndDelete (endFModeEvent);
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -196,6 +196,7 @@ void Datacenter::handleMessage (cMessage *msg)
   		printBufToLog ();
   	}
   	isInFMode     = false;
+  	endFModeEvent = nullptr; 
   }
 	else if (MyConfig::discardAllMsgs) {
 		delete curHandledMsg;
@@ -990,13 +991,13 @@ void Datacenter::scheduleEndFModeEvent ()
 		sprintf (buf, "s%d in schedule", dcId);
 		printBufToLog ();
 	}
-//	if (endFModeEvent==nullptr) { // first time need to schedule such an event --> generate a new event
+	if (endFModeEvent==nullptr) { // first time need to schedule such an event --> generate a new event
 		endFModeEvent = new cMessage ("endFModeEvent");			
-//	}
-//	else { // event already exists - just need to recycle it
-//			endFModeEvent = cancelEvent(endFModeEvent);		
-//	}
-//	
+	}
+	else if (endFModeEvent->isScheduled()) { // event already exists - just need to recycle it
+		endFModeEvent = cancelEvent(endFModeEvent);		
+	}
+	
 
 //	if (endFModeEvent!=nullptr) {
 ////		if (endFModeEvent->isScheduled()) {
