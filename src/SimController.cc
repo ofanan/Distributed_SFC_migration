@@ -839,10 +839,10 @@ void SimController::handleMessage (cMessage *msg)
 	  	initFullReshSync ();
 	  }
   }
-  else if (dynamic_cast<PrintAllDatacentersMsg*> (msg)) { 
+  else if (strcmp (msg->getName(), "PrintAllDatacentersMsg")==0) { 
   	printAllDatacenters ();
   }
-  else if (dynamic_cast<PrintStateAndEndSimMsg*> (msg)) { 
+  else if (strcmp (msg->getName(), "PrintStateAndEndSimMsg")==0) { 
   	PrintStateAndEndSim ();
   }
   else {

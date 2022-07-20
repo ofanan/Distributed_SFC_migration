@@ -15,8 +15,6 @@
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
 #include "PrepareReshSyncPkt_m.h"
-#include "PrintAllDatacentersMsg_m.h"
-#include "PrintStateAndEndSimMsg_m.h"
 #include "ReshAsyncPkt_m.h"
 
 using namespace omnetpp;

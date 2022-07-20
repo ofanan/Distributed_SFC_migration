@@ -21,7 +21,7 @@ inline Lvl_t Datacenter::portToChild (const Lvl_t child) const {if (isRoot) retu
 
 inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
 
-inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new PrintStateAndEndSimMsg);}
+inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new cMessage ("PrintStateAndEndSimMsg"));}
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
@@ -957,7 +957,7 @@ Initiate a print of the content of all the datacenters
 *************************************************************************************************************************************************/
 void Datacenter::PrintAllDatacenters ()
 {
-	PrintAllDatacentersMsg* msg2snd = new PrintAllDatacentersMsg; 
+	cMessage* msg2snd = new cMessage ("PrintAllDatacentersMsg"); 
 	sendDirect (msg2snd, simController, "directMsgsPort");
 }
 
