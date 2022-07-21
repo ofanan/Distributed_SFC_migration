@@ -26,6 +26,7 @@ bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the l
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime = -1.0;
 float MyConfig::rsrcAugRatio;
+bool	MyConfig::runningBinSearchSim;  
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -154,8 +155,9 @@ void SimController::handleAlgFailure ()
 /*************************************************************************************************************************************************
 Run a binary search for the minimal amount of cpu required to find a feasible sol'
 **************************************************************************************************************************************************/
-void SimController::runBinarySearchSim ()
+void SimController::runBinSearchSim ()
 {
+	MyConfig::runningBinSearchSim = true;
 	runTrace ();
 }
 
@@ -853,6 +855,7 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 **************************************************************************************************************************************************/
 void SimController::continueBinarySearchAfterFailure () 
 {
+	error ("sorry, continueBinarySearchAfterFailure is not implemented yet");
 }
 
 

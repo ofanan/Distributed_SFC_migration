@@ -131,6 +131,7 @@ class Datacenter : public cSimpleModule
     void genNsndBottomUpFmodePktAsync ();
     void genNsndBottomUpPktAsync      ();
     bool sndReshAsyncPktToNxtChild    ();
+    void failedToPlaceOldChain (ChainId_t chainId);
     
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}

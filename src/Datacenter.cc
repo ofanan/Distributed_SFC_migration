@@ -488,9 +488,14 @@ void Datacenter::bottomUpFMode ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-					snprintf (buf, bufSize, "\ns%d : : failed to place the old chain %d even after reshuffling", dcId, chainPtr->id);
-					printBufToLog ();
-					return printStateAndEndSim  ();
+					if (MyConfig::runningBinSearchSim) {
+						simController->handleAlgFailure ();
+					}
+					else {
+						snprintf (buf, bufSize, "\ns%d : : failed to place the old chain %d even after reshuffling", dcId, chainPtr->id);
+						printBufToLog ();
+						return printStateAndEndSim  ();
+					}
 				}
 			}
 			else { // haven't reshuffled yet --> reshuffle				
@@ -511,6 +516,13 @@ void Datacenter::bottomUpFMode ()
   else {
   	return genNsndBottomUpFmodePktAsync ();
   }
+}
+
+/************************************************************************************************************************************************
+Handle a failure to place an old (exiting) chain
+*************************************************************************************************************************************************/
+void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
+{
 }
 
 /************************************************************************************************************************************************

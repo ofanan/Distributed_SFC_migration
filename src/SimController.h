@@ -113,8 +113,7 @@ class SimController : public cSimpleModule
 		inline DcId_t dcId2leafId (DcId_t dcId);
 		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
-		void runBinarySearchSim ();
-		void handleAlgFailure ();
+		void runBinSearchSim ();
 		void continueBinarySearchAfterFailure ();
     
     // Functions used for debugging
@@ -139,6 +138,7 @@ class SimController : public cSimpleModule
 		void preparePartialReshSync (DcId_t dcId, DcId_t leafId);
 		void prepareFullReshSync ();
 		void initFullReshSync ();
+		void handleAlgFailure ();
 		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printChainIds=true);
 		void printBuCost ();
 		void 
