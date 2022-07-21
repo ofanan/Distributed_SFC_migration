@@ -55,7 +55,7 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		this->mode = Sync; // either Sync / Async mode of running th sime
+		this->mode = Async; // either Sync / Async mode of running th sime
 		MyConfig::mode 	= Sync; // Always begin the sim' in Sync mode. When this->mode==Async, we'll change MyConfig::mode to Async at t=1.
 		MyConfig::traceTime = -1.0;
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives

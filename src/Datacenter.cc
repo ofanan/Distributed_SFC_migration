@@ -488,14 +488,7 @@ void Datacenter::bottomUpFMode ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-					if (MyConfig::runningBinSearchSim) {
-						simController->handleAlgFailure ();
-					}
-					else {
-						snprintf (buf, bufSize, "\ns%d : : failed to place the old chain %d even after reshuffling", dcId, chainPtr->id);
-						printBufToLog ();
-						return printStateAndEndSim  ();
-					}
+					failedToPlaceOldChain (chainPtr->id);
 				}
 			}
 			else { // haven't reshuffled yet --> reshuffle				
@@ -523,6 +516,14 @@ Handle a failure to place an old (exiting) chain
 *************************************************************************************************************************************************/
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
+	if (MyConfig::runningBinSearchSim) {
+		simController->handleAlgFailure ();
+	}
+	else {
+		snprintf (buf, bufSize, "\ns%d : : failed to place the old chain %d even after reshuffling", dcId, chainId);
+		printBufToLog ();
+		printStateAndEndSim  ();
+	}
 }
 
 /************************************************************************************************************************************************
@@ -577,11 +578,7 @@ void Datacenter::bottomUp ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-					snprintf (buf, bufSize, "\ns%d : : couldn't find a feasible sol' even after reshuffling", dcId);
-					printBufToLog ();
-					snprintf (buf, bufSize, "\ncpuCapacity=%d chain required cpu=%d", cpuCapacity, chainPtr->mu_u_at_lvl(lvl));
-					printBufToLog ();
-					printStateAndEndSim  ();
+					failedToPlaceOldChain (chainPtr->id);
 				}
 			}
 			else { // haven't reshuffled yet --> reshuffle				
