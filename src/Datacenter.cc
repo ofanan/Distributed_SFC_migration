@@ -113,7 +113,6 @@ void Datacenter::initialize(int stage)
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   if (MyConfig::mode==Async) {
-		reshInitiatorLvl = UNPLACED_LVL;
 		rstReshAsync ();
 		endFModeEvent = nullptr;
 		isInFMode 		 = false;
@@ -459,7 +458,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 /************************************************************************************************************************************************
 Running the BU alg' at "feasibility" Async mode
 *************************************************************************************************************************************************/
-void Datacenter::bottomUpFMode (bool justFinishedResh)
+void Datacenter::bottomUpFMode ()
 {
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
@@ -1123,7 +1122,7 @@ void Datacenter::finReshAsync ()
 	}
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
-		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode, and while setting the justFinishedResh input to true
+		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
 		rstReshAsync ();
 	}
 	else {

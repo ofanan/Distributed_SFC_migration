@@ -108,7 +108,7 @@ class Datacenter : public cSimpleModule
     void handlePushUpPkt			 	();
     void sndReshAsyncPktToPrnt  ();
     void bottomUp         			();
-    void bottomUpFMode     			(bool justFinishedResh=false); // bottom-up at "feasibility" mode
+    void bottomUpFMode     			(); // bottom-up at "feasibility" mode
     void rdBottomUpPkt					();
     void pushUp		        			();
     void prepareReshSync		 		();
