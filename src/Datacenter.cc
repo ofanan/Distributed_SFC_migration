@@ -188,7 +188,11 @@ void Datacenter::handleMessage (cMessage *msg)
 {
 
   curHandledMsg = msg;
-  if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
+	if (MyConfig::discardAllMsgs) {
+		delete curHandledMsg;
+		return;
+	}
+  else if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
   	handleEndXmtMsg ();
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "endFModeEvent")==0) { 
@@ -199,10 +203,6 @@ void Datacenter::handleMessage (cMessage *msg)
   	isInFMode     = false;
   	endFModeEvent = nullptr; 
   }
-	else if (MyConfig::discardAllMsgs) {
-		delete curHandledMsg;
-		return;
-	}
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==Sync) { 
   		handleBottomUpPktSync();

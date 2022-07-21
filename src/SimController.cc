@@ -143,9 +143,12 @@ Called by a dc when it fails to place an old (existing) chain.
 **************************************************************************************************************************************************/
 void SimController::handleAlgFailure ()
 {
+	Enter_Method ("handleAlgFailure ()");
+	MyConfig::discardAllMsgs = true;
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
 		datacenters[dc]->rst ();
 	}
+	scheduleAt (simTime() + CLEARNACE_DELAY, new cMessage ("continueBinarySearch"));
 }
 
 /*************************************************************************************************************************************************
