@@ -113,6 +113,8 @@ class SimController : public cSimpleModule
 		inline DcId_t dcId2leafId (DcId_t dcId);
 		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
+		void runBinarySearchSim ();
+		void handleAlgFailure ();
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.

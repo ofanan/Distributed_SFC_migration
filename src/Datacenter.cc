@@ -995,10 +995,13 @@ void Datacenter::prepareReshSync ()
 
 
 /*************************************************************************************************************************************************
-Rst all the datacenter's state variables to prepare it for a new run of the trace
+Rst the datacenterto prepare it for a new run of the trace:
+- Cancel all events, msgs, and pkts.
+- Rst all the datacenter's state variables.
 *************************************************************************************************************************************************/
 void Datacenter::rst () 
 {
+	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 	clrRsrc ();

@@ -131,11 +131,29 @@ void SimController::initialize (int stage)
 		for (h=0; h<RtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (min (RtChain::mu_u[h], NonRtChain::mu_u[h]));
 		}
-		for (h=RtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
+		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
 		runTrace ();
 	}
+}
+
+/*************************************************************************************************************************************************
+Called by a dc when it fails to place an old (existing) chain.
+**************************************************************************************************************************************************/
+void SimController::handleAlgFailure ()
+{
+	for (DcId_t dc(0); dc<numDatacenters; dc++) {
+		datacenters[dc]->rst ();
+	}
+}
+
+/*************************************************************************************************************************************************
+Run a binary search for the minimal amount of cpu required to find a feasible sol'
+**************************************************************************************************************************************************/
+void SimController::runBinarySearchSim ()
+{
+	runTrace ();
 }
 
 /*************************************************************************************************************************************************
