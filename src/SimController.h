@@ -50,6 +50,7 @@ class SimController : public cSimpleModule
     bool isLastPeriod = false;
     int seed = 42;
     int stts = 1; // stts of the last run of the alg'
+    bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
 

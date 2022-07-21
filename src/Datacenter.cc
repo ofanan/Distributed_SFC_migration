@@ -80,10 +80,11 @@ void Datacenter::initialize(int stage)
 		numPorts    = numParents + numChildren;
 		isRoot      = (numParents==0);
 		isLeaf      = (numChildren==0);
-		outputQ.        resize (numPorts);
-		xmtChnl.        resize (numPorts); // the xmt chnl towards each neighbor
-		endXmtEvents.   resize (numPorts);
-		idOfChildren.   resize (numChildren);
+		outputQ.       resize (numPorts);
+		xmtChnl.       resize (numPorts); // the xmt chnl towards each neighbor
+		endXmtEvents.  resize (numPorts);
+		dcIdOfChild.   resize (numChildren);
+		// gateIdToChild. resize (numChildren); // currently unused
 		
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
 		for (int portNum (0); portNum < numPorts; portNum++) {
@@ -91,14 +92,16 @@ void Datacenter::initialize(int stage)
 			xmtChnl[portNum]  = outGate->getTransmissionChannel();
 			cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
 			if (isRoot) {
-			  idOfChildren[portNum] = DcId_t (nghbr -> par ("dcId"));
+			  dcIdOfChild  [portNum] = DcId_t (nghbr -> par ("dcId"));
+//				gateIdToChild[portNum] = outGate->getId();
 			}
 			else {
 			  if (portNum==0) { // port 0 is towards the parents
 			    idOfParent = DcId_t (nghbr -> par ("dcId"));
 			  }
 			  else { // ports 1...numChildren are towards the children
-			    idOfChildren[portNum-1] = DcId_t (nghbr -> par ("dcId"));
+			    dcIdOfChild  [portNum-1] = DcId_t (nghbr -> par ("dcId"));
+//					gateIdToChild[portNum-1] = outGate->getId();
 			  }
 			}       
 		}
@@ -112,12 +115,9 @@ void Datacenter::initialize(int stage)
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
-  if (MyConfig::mode==Async) {
-		rstReshAsync ();
-		endFModeEvent = nullptr;
-		isInFMode 		 = false;
-  }
-
+	rstReshAsync ();
+	endFModeEvent = nullptr;
+	isInFMode 		 = false;
 }
 
 /*************************************************************************************************************************************************
@@ -431,7 +431,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
 		int idxInPushUpVec = 0;
 		for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {	// consider all the chains in pushUpList
-			if (chainPtr->S_u[lvl-1]==idOfChildren[child])   { /// this chain is associated with (the sub-tree of) this child
+			if (chainPtr->S_u[lvl-1]==dcIdOfChild[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
 				chainPtr = pushUpList.erase (chainPtr);
 			}
@@ -502,7 +502,6 @@ void Datacenter::bottomUpFMode ()
 		}
 	}
 	
-	this->reshInitiatorLvl = UNPLACED_LVL; // indicate that I'm not reshuffling anymore
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
 		printBufToLog ();
@@ -625,12 +624,50 @@ void Datacenter::handleBottomUpPktAsync ()
 
 /*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in Async F-mode.
+- If the pkt's pushUpVec field isn't empty, reply the sender with a PU pkt having the same pushUpVec.
+- Read notAssigned field from the pkt, and call bottomUpFMode() to process it.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsyncFMode ()
-{
-	rdBottomUpPkt ();
+{	
+
+	if (MyConfig::LOG_LVL == TLAT_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt, in f mode. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushUpList, false);
+	}
+
+	DcId_t sndrDcId = ((Datacenter*) curHandledMsg->getSenderModule())->dcId;
+
+	BottomUpPkt *arrivedPkt = (BottomUpPkt*)(curHandledMsg);
+	int pushUpVecArraySize = arrivedPkt->getPushUpVecArraySize();
+	if (pushUpVecArraySize>0) {
+
+//		int gateIdOfArrival = arrivedPkt->getArrivalGateId();
+		Lvl_t child;
+		for (child=0; child < numChildren; child++) {
+			if (dcIdOfChild[child] == sndrDcId) {
+				break;
+			}
+		}
+		if (child==numChildren) {
+			error ("t=%f s%d couldn't extract the sender's id", MyConfig::traceTime, dcId);
+		}
+
+		PushUpPkt* pkt2snd = new PushUpPkt;
+		pkt2snd->setPushUpVecArraySize (pushUpVecArraySize); 
+		int idxInPushUpVec = 0;
+		for (int i(0); i<pushUpVecArraySize; i++) {
+			pkt2snd->setPushUpVec (i, arrivedPkt->getPushUpVec (i));
+		}
+		sndViaQ (portToChild(child), pkt2snd); //send the pkt to the child
+	}
+
+	// Add each chain stated in the pkt's notAssigned field into its (sorted) place in this->notAssigned()
+	for (int i(0); i < (arrivedPkt->getNotAssignedArraySize ());i++) {
+		notAssigned.push_back (arrivedPkt->getNotAssigned(i));
+	}
+		
 	bottomUpFMode();
-	genNsndPushUpPktsToChildren (); // inform children that requested a push-up (if any), that I haven't pushed-up anything
 }
 
 /*************************************************************************************************************************************************
@@ -886,7 +923,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 
 	while (nxtChildToSndReshAsync < numChildren) {
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
-			if (chainPtr->S_u[lvl-1]==idOfChildren[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
+			if (chainPtr->S_u[lvl-1]==dcIdOfChild[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
 				if (!insertChainToList (pushDwnReqFromChild, *chainPtr)) {
 					error ("Error in insertChainToList. See log file for details");
 				}

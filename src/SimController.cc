@@ -53,11 +53,12 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		MyConfig::mode 	= Async;
+		mode = Async; // either Sync / Async mode of running th sime
+		MyConfig::mode 	= Sync; // Always begin the sim' in Sync mode. When this->mode==Async, we'll change MyConfig::mode to Async at t=1.
 		MyConfig::traceTime = -1.0;
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
-		if (MyConfig::mode==Sync) {
+		if (mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
 		}
 		else {
@@ -263,6 +264,13 @@ void SimController::runTimePeriod ()
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
+		MyConfig::mode = this->mode; // the first period is always sync; the next cycles may be either sync, or async. 
+		if (MyConfig::mode==Sync) {
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
+		}
+		else {
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
+		}
 	}
 	
 	MyConfig::notifiedReshInThisPeriod = false;

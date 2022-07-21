@@ -36,7 +36,7 @@ class Datacenter : public cSimpleModule
     Lvl_t 				numParents;
     Lvl_t 				numPorts;
     DcId_t 					idOfParent;
-    vector <DcId_t> idOfChildren; // idOfChildren[c] will hold the ID of child c.
+    vector <DcId_t> dcIdOfChild; // dcIdOfChild[c] will hold the dcId of child c.
     bool isRoot;
     bool isLeaf;
     int16_t dcId;
@@ -67,6 +67,7 @@ class Datacenter : public cSimpleModule
   	int prntGateId; // gateId of msgs arriving prnt
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
+    vector <int> 					gateIdToChild; // gateIdToChild[c] will hold the gateId of the gate towards child # c
     vector <EndXmtMsg*> 	endXmtEvents; // endXmts[i] will hold the event of the end of the transmission of a pkt in output channel i
 		cMessage*							endFModeEvent; // will hold the event of finishing "F" mode
 		bool									isInFMode; 
@@ -95,7 +96,7 @@ class Datacenter : public cSimpleModule
     
     Cpu_t requiredCpuToLocallyPlaceChain 			  (const Chain chain) const;
     Cpu_t requiredCpuToPlaceChainAtLvl 			    (const Chain chain, Lvl_t lvl) const;
-		inline Lvl_t 	portToChild 								  (const Lvl_t child) const; 
+		inline Lvl_t 	portToChild 								  (const Lvl_t child) const;  // returns the index of the port towards child # c
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);
 		inline bool IAmTheReshIniator 							() const;
