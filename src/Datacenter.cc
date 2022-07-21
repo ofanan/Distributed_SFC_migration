@@ -84,7 +84,6 @@ void Datacenter::initialize(int stage)
 		xmtChnl.       resize (numPorts); // the xmt chnl towards each neighbor
 		endXmtEvents.  resize (numPorts);
 		dcIdOfChild.   resize (numChildren);
-		// gateIdToChild. resize (numChildren); // currently unused
 		
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
 		for (int portNum (0); portNum < numPorts; portNum++) {
@@ -93,7 +92,6 @@ void Datacenter::initialize(int stage)
 			cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
 			if (isRoot) {
 			  dcIdOfChild  [portNum] = DcId_t (nghbr -> par ("dcId"));
-//				gateIdToChild[portNum] = outGate->getId();
 			}
 			else {
 			  if (portNum==0) { // port 0 is towards the parents
@@ -101,7 +99,6 @@ void Datacenter::initialize(int stage)
 			  }
 			  else { // ports 1...numChildren are towards the children
 			    dcIdOfChild  [portNum-1] = DcId_t (nghbr -> par ("dcId"));
-//					gateIdToChild[portNum-1] = outGate->getId();
 			  }
 			}       
 		}
@@ -994,6 +991,20 @@ void Datacenter::prepareReshSync ()
 	if (isLeaf) {
 		simController->preparePartialReshSync (dcId, leafId);
 	}
+}
+
+
+/*************************************************************************************************************************************************
+Rst all the datacenter's state variables to prepare it for a new run of the trace
+*************************************************************************************************************************************************/
+void Datacenter::rst () 
+{
+	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
+  availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
+	clrRsrc ();
+	rstReshAsync ();
+	endFModeEvent = nullptr;
+	isInFMode 		 = false;
 }
 
 /*************************************************************************************************************************************************

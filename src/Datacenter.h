@@ -53,6 +53,7 @@ class Datacenter : public cSimpleModule
   	
 		// Functions called by the sim controller
     void rlzRsrc (vector<int32_t> IdsOfChainsToRlz);
+    void rst (); // Rst all the datacenter's state variables to prepare it for a new run of the trace
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void initBottomUp (vector<Chain> &vecOfChainThatJoined);
     bool isPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
