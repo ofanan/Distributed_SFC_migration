@@ -992,7 +992,7 @@ void Datacenter::prepareReshSync ()
 	}
 	
 	if (isLeaf) {
-		simController->prepareReshSync (dcId, leafId);
+		simController->preparePartialReshSync (dcId, leafId);
 	}
 }
 

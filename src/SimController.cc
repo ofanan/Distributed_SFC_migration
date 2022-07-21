@@ -53,7 +53,7 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		mode = Async; // either Sync / Async mode of running th sime
+		mode = Sync; // either Sync / Async mode of running th sime
 		MyConfig::mode 	= Sync; // Always begin the sim' in Sync mode. When this->mode==Async, we'll change MyConfig::mode to Async at t=1.
 		MyConfig::traceTime = -1.0;
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -148,7 +148,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
-		MyConfig::traceFileName = "UniformTree_resh_downto1_short.poa"; 
+		MyConfig::traceFileName = "UniformTree_resh_downto1.poa"; 
 	}
 
 	setOutputFileNames ();
@@ -685,12 +685,12 @@ void SimController::prepareFullReshSync ()
 
 
 /*************************************************************************************************************************************************
-Prepare a reshuffle. This function is invoked separately (using a direct msg) by each leaf (poa) that takes part in a reshuffle.
+Prepare a (partial) reshuffle. This function is invoked separately (using a direct msg) by each leaf (poa) that takes part in a reshuffle.
 The function does the following:
 - rlz the rsrscs of all the chains associated with this poa.
 - Initiate a placement alg' from this poa, where notAssigned=all users currently associated with this PoA.
 **************************************************************************************************************************************************/
-void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
+void SimController::preparePartialReshSync (DcId_t dcId, DcId_t leafId)
 {
 
 	if (!	MyConfig::notifiedReshInThisPeriod && MyConfig::LOG_LVL>=BASIC_LOG) {
@@ -702,7 +702,7 @@ void SimController::prepareReshSync (DcId_t dcId, DcId_t leafId)
   vector<Chain> vecOfUsrsOfThisPoA; 
 
 	for (const auto &it : ChainsMaster::allChains) {
-		if (it.second.S_u[0] == dcId) { // if the chain's poa is the src of the msg that requested to prepare a sync resh...
+		if (!(it.second.isBlocked) && it.second.S_u[0] == dcId) { // if the chain's poa is the src of the msg that requested to prepare a sync resh...
 			DcId_t chainCurDatacenter = (it.second).curDc;
 			if (chainCurDatacenter != UNPLACED_DC) { // if this chain isn't already placed, no need to release it.
 				chainsToReplace[chainCurDatacenter].push_back (it.first); // If this chain's PoA is the leaf that requested resh, the chain should be released

@@ -9,7 +9,7 @@ char ChainsMaster::buf[bufSize];
 * Erases chains (given by a vector of chainIds) from allChains.
 * Returns false if one of the chains to erase wasn't found in allChains, else true.
 **************************************************************************************************************************************************/
-bool ChainsMaster::eraseChains (vector <ChainId_t> vec)
+bool ChainsMaster::eraseChains (vector <ChainId_t> &vec)
 {
 	for (auto chainId : vec) {
 		auto it = ChainsMaster::allChains.find(chainId);
@@ -112,7 +112,7 @@ void ChainsMaster::displaceAllChains ()
 * Output: true iff all the chains in the list were found, and their levels were updated to newLvl.
 * The function also increments the number of inst' migrations (numInstantMigs).
 **************************************************************************************************************************************************/
-bool ChainsMaster::modifyLvl (unordered_set <ChainId_t> listOfChainIds, Lvl_t newLvl)
+bool ChainsMaster::modifyLvl (unordered_set <ChainId_t> &listOfChainIds, Lvl_t newLvl)
 {
 	for (ChainId_t chainId : listOfChainIds) {
 		auto it = ChainsMaster::allChains.find(chainId);

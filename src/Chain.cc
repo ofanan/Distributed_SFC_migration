@@ -136,7 +136,7 @@ Cpu_t Chain::mu_u_at_lvl (Lvl_t lvl) const
 /*************************************************************************************************************************************************
 * Given a set of chains and a poa, return all the chains in the set associated with this poa.
 **************************************************************************************************************************************************/
-vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> setOfChains, DcId_t poa)
+vector<Chain> findChainsByPoa (unordered_set <Chain, ChainHash> &setOfChains, DcId_t poa)
 {
 	vector<Chain> res;
 	
