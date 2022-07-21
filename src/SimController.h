@@ -115,6 +115,7 @@ class SimController : public cSimpleModule
     void openFiles ();
 		void runBinarySearchSim ();
 		void handleAlgFailure ();
+		void continueBinarySearchAfterFailure ();
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
