@@ -144,7 +144,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa"; // 
+		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree_resh_downto1_short.poa"; 

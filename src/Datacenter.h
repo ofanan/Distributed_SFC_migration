@@ -99,7 +99,7 @@ class Datacenter : public cSimpleModule
 		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
 		inline void 		regainRsrcOfChain 					(const Chain  chain);
 		inline bool IAmTheReshIniator 							() const;
-/*		inline bool withinAnotherResh (const DcId_t reshInitiator) const;*/
+		inline bool withinResh () const;
 		inline bool withinAnotherResh (const Lvl_t reshInitiatorLvl) const;
     void sndViaQ         												(int16_t portNum, cPacket* pkt2send);
     void xmt              											(int16_t portNum, cPacket *pkt2send);

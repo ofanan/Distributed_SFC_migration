@@ -25,9 +25,11 @@ inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new cMessa
 
 inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
+inline bool Datacenter::withinResh () const {return this->reshInitiatorLvl!=UNPLACED_LVL;}
+
 inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const 
 {
-	return (this->reshInitiatorLvl!=UNPLACED_LVL && this->reshInitiatorLvl!=reshInitiatorLvl);
+	return (withinResh() && this->reshInitiatorLvl!=reshInitiatorLvl);
 }
 
 inline bool Datacenter::IAmTheReshIniator () const
@@ -74,7 +76,6 @@ void Datacenter::initialize(int stage)
 		lvl				  	= (Lvl_t)  (par("lvl"));
 		dcId					= (DcId_t) (par("dcId"));
 		numBuPktsRcvd = 0;
-		reshInitiatorLvl = UNPLACED_LVL;
 
 		numPorts    = numParents + numChildren;
 		isRoot      = (numParents==0);
@@ -112,6 +113,7 @@ void Datacenter::initialize(int stage)
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
   if (MyConfig::mode==Async) {
+		reshInitiatorLvl = UNPLACED_LVL;
 		rstReshAsync ();
 		endFModeEvent = nullptr;
 		isInFMode 		 = false;
@@ -482,7 +484,7 @@ void Datacenter::bottomUpFMode (bool justFinishedResh)
 			}
 			
 			// Not enough availCpu for this chain, and it cannot be placed higher
-			if (justFinishedResh) {
+			if (withinResh ()) { // within (or just finished) a reshuffle --> don't reshuffle again, even upon a failure to place a chain
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
@@ -490,36 +492,26 @@ void Datacenter::bottomUpFMode (bool justFinishedResh)
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-					snprintf (buf, bufSize, "\ns%d : : couldn't place the old chain %d even after reshuffling", dcId, chainPtr->id);
+					snprintf (buf, bufSize, "\ns%d : : failed to place the old chain %d even after reshuffling", dcId, chainPtr->id);
 					printBufToLog ();
 					return printStateAndEndSim  ();
 				}
 			}
 			else { // haven't reshuffled yet --> reshuffle				
-				if (MyConfig::mode==Sync) {
-					if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-						snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
-						printBufToLog();
-					}
-					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
-				}
-				else {
-					return initReshAsync ();
-				}
+				return initReshAsync ();
 			}
 		}
 	}
 	
+	this->reshInitiatorLvl = UNPLACED_LVL; // indicate that I'm not reshuffling anymore
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
 		printBufToLog ();
 		print (false, false, true, false);
 	}
 
-  if (isRoot) { 
-  	if (!(notAssigned.empty())) {
+  if (isRoot && !(notAssigned.empty())) {
   		error ("notAssigned isn't empty after running BU on the root");
-  	}
   }
   else {
   	return genNsndBottomUpFmodePktAsync ();
@@ -797,7 +789,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 *************************************************************************************************************************************************/
 void Datacenter::initReshAsync ()
 {
-	reshInitiatorLvl = lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+	this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is higher then the highest lvl reshuffled at this period - update. 
 	isInFMode 			 = true;
 	scheduleEndFModeEvent ();
@@ -835,7 +827,7 @@ void Datacenter::reshAsync ()
 	bool canFinReshLocally = true;
 	Cpu_t deficitCpuThatCanBeResolvedLocally = 0;
 	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {
-		if (chainPtr->curLvl==reshInitiatorLvl) {
+		if (chainPtr->curLvl==this->reshInitiatorLvl) { // pushed-down a chain from the resh initiator
 				deficitCpuThatCanBeResolvedLocally += chainPtr->potCpu;
 		}
 		if (deficitCpuThatCanBeResolvedLocally > availCpu) { // don't have enough availCpu to resolve the prob' by placing chains locally
@@ -913,7 +905,10 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		}
 		ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
 
-		pkt2snd -> setReshInitiatorLvl (reshInitiatorLvl); 
+		if (this->reshInitiatorLvl==UNPLACED_LVL) {
+			error ("t%f s%d have this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
+		}
+		pkt2snd -> setReshInitiatorLvl (this->reshInitiatorLvl); 
 		pkt2snd -> setDeficitCpu 		(deficitCpu);
 		pkt2snd -> setPushDwnVecArraySize (pushDwnReqFromChild.size());
 		
@@ -1045,14 +1040,16 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
 	scheduleEndFModeEvent (); // Restart the timer of being in F mode 
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
-	DcId_t reshInitiatorLvl = pkt->getReshInitiatorLvl ();
-	if (withinAnotherResh(reshInitiatorLvl)) {
+	if (pkt->getReshInitiatorLvl ()==UNPLACED_LVL) {
+		error ("t%f s%d rcvd from prnt a pkt with reshInitiatorLvl=-1", MyConfig::traceTime, dcId);
+	}
+	if (withinAnotherResh(pkt->getReshInitiatorLvl ())) {
 		// send the same pkt back to the prnt
 		return sndViaQ (portToPrnt, pkt);
 	}
 
 	// now we know that we're not within another reshuffle 	
-	this->reshInitiatorLvl = reshInitiatorLvl;
+	this->reshInitiatorLvl = pkt->getReshInitiatorLvl ();
 	this->deficitCpu = pkt->getDeficitCpu ();
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
     if (!insertChainToList (pushDwnReq, pkt->getPushDwnVec(i))) {
@@ -1072,8 +1069,11 @@ Handle a reshuffle async pkt, received from a child.
 void Datacenter::handleReshAsyncPktFromChild ()
 {
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
+	if (pkt->getReshInitiatorLvl ()==UNPLACED_LVL) {
+		error ("t%f s%d rcvd from child a pkt with reshInitiatorLvl=-1", MyConfig::traceTime, dcId);
+	}
 	if (withinAnotherResh(pkt->getReshInitiatorLvl ())) {
-		error ("rcvd from child a reshAsync pkt with reshInitiator=%d while running another resh with reshInitiatorLvl=%d", 
+		error ("rcvd from child a reshAsync pkt with reshInitiator==%d while running another resh with reshInitiatorLvl=%d", 
 		pkt->getReshInitiatorLvl (), this->reshInitiatorLvl);
 	}
 	this->deficitCpu = pkt->getDeficitCpu ();
@@ -1123,10 +1123,13 @@ void Datacenter::finReshAsync ()
 	}
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
+		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode, and while setting the justFinishedResh input to true
 		rstReshAsync ();
-		bottomUpFMode (true); // come back to bottomUp, but in F ("feasibility") mode, and while setting the justFinishedResh input to true
 	}
 	else {
+		if (this->reshInitiatorLvl==UNPLACED_LVL) {
+			error ("t%f s%d b4 calling sndReshAsyncToPrnt I have this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
+		}
 		sndReshAsyncPktToPrnt ();
 		rstReshAsync ();
 	}
@@ -1215,7 +1218,11 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 	}
 
 	ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
-	pkt2snd -> setReshInitiatorLvl    (reshInitiatorLvl);
+	if (this->reshInitiatorLvl==UNPLACED_LVL) {
+		error ("t%f s%d has this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
+	}
+
+	pkt2snd -> setReshInitiatorLvl    (this->reshInitiatorLvl);
 	pkt2snd -> setDeficitCpu 		      (deficitCpu);
 	pkt2snd -> setPushDwnVecArraySize (pushDwnAck.size());
 	int idxInPushDwnVec = 0;
