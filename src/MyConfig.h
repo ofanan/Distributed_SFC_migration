@@ -61,6 +61,7 @@ class MyConfig {
 		static const vector <vector <Cost_t>> NonRtChainCostAtLvl;
 		static const vector <vector <Cpu_t>>  RtChainMu_u;
 		static const vector <vector <Cpu_t>>  NonRtChainMu_u;
+		static float rsrcAugRatio;
 		static Cpu_t  cpuAtLeaf;
 		static vector <Cpu_t> cpuAtLvl; 
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period

@@ -25,6 +25,7 @@ int		MyConfig::overallNumBlockedUsrs;
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime = -1.0;
+float MyConfig::rsrcAugRatio;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -73,6 +74,7 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
+ 		MyConfig::rsrcAugRatio = 1;
 		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
 		for (Lvl_t lvl(0); lvl < height; lvl++) {
 			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
@@ -136,6 +138,17 @@ void SimController::initialize (int stage)
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
 		runTrace ();
+	}
+}
+
+/*************************************************************************************************************************************************
+update the cpu capacity at each level based on the current rsrc aug lvl
+**************************************************************************************************************************************************/
+void SimController::updateCpuAtLvl ()
+{
+	MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType]*MyConfig::rsrcAugRatio;
+	for (Lvl_t lvl(0); lvl < height; lvl++) {
+		MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
 	}
 }
 
