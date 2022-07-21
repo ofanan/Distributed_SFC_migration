@@ -54,7 +54,7 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		mode = Sync; // either Sync / Async mode of running th sime
+		this->mode = Async; // either Sync / Async mode of running th sime
 		MyConfig::mode 	= Sync; // Always begin the sim' in Sync mode. When this->mode==Async, we'll change MyConfig::mode to Async at t=1.
 		MyConfig::traceTime = -1.0;
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -75,10 +75,7 @@ void SimController::initialize (int stage)
 	
   if (stage==1) {
  		MyConfig::rsrcAugRatio = 1;
-		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
-		for (Lvl_t lvl(0); lvl < height; lvl++) {
-			MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
-		}
+		updateCpuAtLvl ();
 		openFiles ();
 		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		[MyConfig::netType];
 		NonRtChain::costAtLvl = MyConfig::NonRtChainCostAtLvl	[MyConfig::netType];
