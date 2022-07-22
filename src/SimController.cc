@@ -144,7 +144,7 @@ Called by a dc when it fails to place an old (existing) chain.
 **************************************************************************************************************************************************/
 void SimController::handleAlgFailure ()
 {
-	Enter_Method ("handleAlgFailure ()");
+	Enter_Method ("SimController::handleAlgFailure ()");
 	MyConfig::discardAllMsgs = true;
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
 		datacenters[dc]->rst ();
@@ -330,7 +330,12 @@ void SimController::runTimePeriod ()
 			MyConfig::traceTime = new_t;
 
 			if (MyConfig::LOG_LVL>0) {
-				snprintf (buf, bufSize, "\n\nt = %.3f\n********************", MyConfig::traceTime);
+				if (MyConfig::traceTime==int(MyConfig::traceTime)) {
+					snprintf (buf, bufSize, "\n\nt = %.0f\n********************", MyConfig::traceTime);
+				}
+				else {
+					snprintf (buf, bufSize, "\n\nt = %.3f\n********************", MyConfig::traceTime);
+				}
 				MyConfig::printToLog (buf); 
 			}
 		}
@@ -638,7 +643,7 @@ void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > 
 /*************************************************************************************************************************************************
 Initiate the run of placement alg'
 **************************************************************************************************************************************************/
-void SimController::initAlg () {  	
+void SimController::initAlg () {
 
 	return (MyConfig::mode==Sync)? initAlgSync() : initAlgAsync();
 }
@@ -711,7 +716,7 @@ The function does the following:
 **************************************************************************************************************************************************/
 void SimController::prepareFullReshSync ()
 {
-	Enter_Method ("prepareFullReshSync ()");
+	Enter_Method ("SimController::prepareFullReshSync ()");
 	MyConfig::discardAllMsgs = true;
 	scheduleAt (simTime() + CLEARNACE_DELAY, new cMessage ("InitFullReshMsg"));
 }
@@ -795,7 +800,7 @@ void SimController::initAlgSync ()
 Initiate the run of an Async placement alg'
 - initiate a run of the alg' in all the leaves associated with usrs that arrived at them.
 **************************************************************************************************************************************************/
-void SimController::initAlgAsync () 
+void SimController::initAlgAsync ()
 {  	
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
@@ -823,7 +828,7 @@ This func' is called on sync' mode, when a leaf finishes the alg'. The func'
 void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 {
 
-	Enter_Method ("finishedAlg (DcId_t dcId, DcId_t)");
+	Enter_Method ("SimController::finishedAlg (DcId_t dcId, DcId_t)");
 	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==Async) {
 		error ("t = %f DC %d called finishedAlg in Async mode", MyConfig::traceTime, dcId);
 	}
@@ -864,7 +869,7 @@ Print the "state" (PoAs of active users, and current placement of chains), and e
 **************************************************************************************************************************************************/
 void SimController::PrintStateAndEndSim () 
 {
-	Enter_Method ("PrintStateAndEndSim ()");
+	Enter_Method ("SimController::PrintStateAndEndSim ()");
 	MyConfig::printToLog ("\nPrinting state and finishing simulation\n");
 	printAllDatacenters (true, false);
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
@@ -883,7 +888,10 @@ void SimController::handleMessage (cMessage *msg)
 			runTimePeriod ();
 		}
 	}
-	else if (strcmp (msg->getName(), "InitFullReshMsg")) { 
+	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
+		if (this->mode==Async) {
+			error ("rcvd initFullReshMsg while being in Async mode"); 
+		}
   	initFullReshSync ();
   }
   else if (strcmp (msg->getName(), "continueBinarySearchAfterFailure")==0) { 

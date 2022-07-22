@@ -488,7 +488,7 @@ void Datacenter::bottomUpFMode ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-					failedToPlaceOldChain (chainPtr->id);
+					return failedToPlaceOldChain (chainPtr->id);
 				}
 			}
 			else { // haven't reshuffled yet --> reshuffle				
@@ -520,8 +520,9 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 		simController->handleAlgFailure ();
 	}
 	else {
-		snprintf (buf, bufSize, "\ns%d : : failed to place the old chain %d even after reshuffling", dcId, chainId);
+		snprintf (buf, bufSize, "\n*************************************\ns%d : : failed to place the old chain %d even after reshuffling\n*************************************", dcId, chainId);
 		printBufToLog ();
+		MyConfig::discardAllMsgs = true;
 		printStateAndEndSim  ();
 	}
 }
@@ -578,7 +579,7 @@ void Datacenter::bottomUp ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-					failedToPlaceOldChain (chainPtr->id);
+					return failedToPlaceOldChain (chainPtr->id);
 				}
 			}
 			else { // haven't reshuffled yet --> reshuffle				
