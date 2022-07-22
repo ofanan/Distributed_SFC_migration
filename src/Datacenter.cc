@@ -1014,7 +1014,6 @@ void Datacenter::rst ()
 	Enter_Method ("Datacenter::rst ()");
 	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
-  availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 	clrRsrc ();
 	rstReshAsync ();
 	endFModeEvent = nullptr;
