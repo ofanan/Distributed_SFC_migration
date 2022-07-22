@@ -60,6 +60,7 @@ class SimController : public cSimpleModule
 		float     period=1.0;
 		Cpu_t lb, ub; // lower bound, upper bound amount of the cpu at the leaf for the binary search alg'
 		bool lastBinSearchRun;
+		float maxTraceTime; // when reading from the trace time above maxTraceTime, the trace run will finish
 		
 		string line; //current line being read from the tracefile
 		

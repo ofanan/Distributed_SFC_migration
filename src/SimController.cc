@@ -81,6 +81,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
+    maxTraceTime					= 27008;
 
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -129,8 +130,8 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-//		runTrace ();
-		initBinSearchSim ();
+		runTrace ();
+//		initBinSearchSim ();
 	}
 }
 
@@ -224,7 +225,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
+		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree_fails_in_T1.poa"; //"UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
@@ -368,7 +369,6 @@ void SimController::runTimePeriod ()
 
 		if ( (line.substr(0,4)).compare("t = ")==0) {
 			
-			isLastPeriod = false;
 			// extract the t (time) from the traceFile, and update this->t accordingly.
 			char lineAsCharArray[line.length()+1];
 			strcpy (lineAsCharArray, line.c_str());
@@ -377,6 +377,10 @@ void SimController::runTimePeriod ()
 			if (MyConfig::DEBUG_LVL>0 && new_t <= MyConfig::traceTime) {
 				error ("error in trace file: t is not incremented. t=%.3f, new_t=%.3f", MyConfig::traceTime, new_t);
 			}
+			if (new_t > maxTraceTime) { // finish the requested trace time
+				break;
+			}
+			isLastPeriod = false;
 			MyConfig::traceTime = new_t;
 
 			if (MyConfig::LOG_LVL>0) {
@@ -416,7 +420,7 @@ void SimController::runTimePeriod ()
 			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
 		}
   }
-	return scheduleAt (simTime(), new cMessage ("RunTimePeriodMsg")); // Schedule an immidiate self-event for either concluding running the trace
+	return scheduleAt (simTime(), new cMessage ("RunTimePeriodMsg")); // Schedule an immidiate self-event for concluding the trace run
 }
 
 /*************************************************************************************************************************************************
