@@ -129,6 +129,7 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
+//		runTrace ();
 		initBinSearchSim ();
 	}
 }
@@ -167,6 +168,9 @@ void SimController::initBinSearchSim ()
 	ub = Cpu_t (MyConfig::cpuAtLeaf*max_R);
 	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
 	updateCpuAtLvl ();
+	MyConfig::printToLog ("\ncpuAtLvl="); //$$$$
+	MyConfig::printToLog (MyConfig::cpuAtLvl);	
+	error ("aleck error");
 	runTrace ();
 }
 
@@ -176,6 +180,9 @@ called after either a fail during the trace, or after successfully ran the whole
 **************************************************************************************************************************************************/
 void SimController::continueBinSearch () 
 {
+	if (MyConfig::LOG_LVL>=TLAT_DETAILED_LOG) {
+		MyConfig::printToLog ("\nin continueBinSearch");
+	}
 	if (lastBinSearchRun) {
 		if (algStts==FAIL) {
 			error ("failed at the last bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
@@ -208,8 +215,9 @@ update the cpu capacity at each level based on the current rsrc aug lvl
 **************************************************************************************************************************************************/
 void SimController::updateCpuAtLvl ()
 {
+	MyConfig::cpuAtLvl.clear ();
 	for (Lvl_t lvl(0); lvl < height; lvl++) {
-		MyConfig::cpuAtLvl.push_back (MyConfig::cpuAtLeaf*(lvl+1));
+		MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? MyConfig::cpuAtLeaf : (MyConfig::cpuAtLeaf*(lvl+1)));
 	}
 }
 
@@ -222,7 +230,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
-		MyConfig::traceFileName = "UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
+		MyConfig::traceFileName = "UniformTree_fails_in_T1.poa"; //"UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
 	}
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
   if (!traceFile.is_open ()) {
@@ -408,10 +416,10 @@ void SimController::runTimePeriod ()
 			chainsThatLeftDatacenter.clear ();
 		
 			initAlg (); // call a placement algorithm 
-			scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for reading the handling the next time-step
-			break;
+			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
 		}
   }
+	return scheduleAt (simTime(), new cMessage ("RunTimePeriodMsg")); // Schedule an immidiate self-event for either concluding running the trace
 }
 
 /*************************************************************************************************************************************************
