@@ -32,10 +32,11 @@ void MyConfig::init()
 **************************************************************************************************************************************************/
 void MyConfig::rst()
 {
-	MyConfig::traceTime = -1.0;
-	MyConfig::mode 	= Sync; // Always begin the sim' in Sync mode for. When this->mode==Async, we'll change MyConfig::mode to Async at the second period
+	MyConfig::traceTime 				  	= -1.0;
+	MyConfig::mode 									= Sync; // Begin the sim' in Sync mode for. When this->mode==Async, we'll change MyConfig::mode to Async at the second period
 	MyConfig::overallNumBlockedUsrs = 0; 
-	MyConfig::discardAllMsgs = false;
+	MyConfig::discardAllMsgs 				= false;
+	MyConfig::lvlOfHighestReshDc 		= UNPLACED_LVL;
 }
 
 /*************************************************************************************************************************************************

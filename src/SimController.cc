@@ -139,13 +139,20 @@ Called by a dc when it fails to place an old (existing) chain.
 void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
+	
+	MyConfig::printToLog ("\nin SimController::handleAlgFailure\n");
 	algStts = FAIL;
 	printResLine ();
-	MyConfig::discardAllMsgs = true;
-	for (DcId_t dc(0); dc<numDatacenters; dc++) {
-		datacenters[dc]->rst ();
+	if (MyConfig::runningBinSearchSim) {
+		MyConfig::discardAllMsgs = true;
+		for (DcId_t dc(0); dc<numDatacenters; dc++) {
+			datacenters[dc]->rst ();
+		}
+		printAllDatacenters (false, false, true); 
 	}
-	scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("continueBinSearch"));
+	else {
+		error ("alg failed not during a bin search run");
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -165,6 +172,7 @@ void SimController::initBinSearchSim ()
 
 /*************************************************************************************************************************************************
 continue running the binary search scheme for finding the min cpu rsrcs required to find a feasible sol, after the alg' fails.
+called after either a fail during the trace, or after successfully ran the whole trace.
 **************************************************************************************************************************************************/
 void SimController::continueBinSearch () 
 {
@@ -175,6 +183,7 @@ void SimController::continueBinSearch ()
 		error ("successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 	}
 	if (algStts==SCCS) {
+		concludeTimePeriod ();
 		lb = MyConfig::cpuAtLeaf;	
 	}
 	else {
@@ -200,7 +209,7 @@ update the cpu capacity at each level based on the current rsrc aug lvl
 void SimController::updateCpuAtLvl ()
 {
 	for (Lvl_t lvl(0); lvl < height; lvl++) {
-		MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
+		MyConfig::cpuAtLvl.push_back (MyConfig::cpuAtLeaf*(lvl+1));
 	}
 }
 
@@ -213,7 +222,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Lux_0730_0730_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
-		MyConfig::traceFileName = "UniformTree_resh_downto1.poa"; 
+		MyConfig::traceFileName = "UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
 	}
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
   if (!traceFile.is_open ()) {
@@ -420,7 +429,6 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
 
-	traceFile.seekg(0);
 	MyConfig::		rst ();
 	ChainsMaster::rst ();
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
@@ -428,11 +436,15 @@ void SimController::runTrace () {
 	}
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
-	
-	isFirstPeriod 								= true;
-  numMigsAtThisPeriod 					= 0; // will cnt the # of migrations in the current run
+	chainsThatJoinedLeaf.clear ();
+	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+	numMigsAtThisPeriod = 0; 
+	numCritUsrs					= 0;
+	isFirstPeriod 			= true;
+	isLastPeriod 				= false;
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
   
+	traceFile.seekg(0); // return to the beginning of the trace file
 	runTimePeriod ();
 }
 
@@ -914,12 +926,15 @@ void SimController::handleMessage (cMessage *msg)
 {
 	if (strcmp (msg->getName(), "RunTimePeriodMsg")==0) {
 		isFirstPeriod = false;
-		if (isLastPeriod) {
-			if (MyConfig::runningBinSearchSim) {
-				
+		if (MyConfig::runningBinSearchSim) {
+			if (isLastPeriod || algStts==FAIL) { 
+		  	continueBinSearch ();
+			}
+			else {
+				runTimePeriod ();			
 			}
 		}
-		else {
+		else if (!isLastPeriod) {
 			runTimePeriod ();
 		}
 	}
@@ -928,9 +943,6 @@ void SimController::handleMessage (cMessage *msg)
 			error ("rcvd initFullReshMsg while being in Async mode"); 
 		}
   	initFullReshSync ();
-  }
-  else if (strcmp (msg->getName(), "continueBinSearch")==0) { 
-  	continueBinSearch ();
   }
   else if (strcmp (msg->getName(), "PrintAllDatacentersMsg")==0) { 
   	printAllDatacenters ();
