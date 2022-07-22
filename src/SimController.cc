@@ -161,16 +161,13 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = 8; // maximum rsrc aug ratio to consider
+	float max_R = 16; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
 	ub = Cpu_t (MyConfig::cpuAtLeaf*max_R);
 	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
 	updateCpuAtLvl ();
-	MyConfig::printToLog ("\ncpuAtLvl="); //$$$$
-	MyConfig::printToLog (MyConfig::cpuAtLvl);	
-	error ("aleck error");
 	runTrace ();
 }
 
@@ -190,11 +187,11 @@ void SimController::continueBinSearch ()
 		error ("successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 	}
 	if (algStts==SCCS) {
-		concludeTimePeriod ();
-		lb = MyConfig::cpuAtLeaf;	
+//		concludeTimePeriod ();
+		ub = MyConfig::cpuAtLeaf;	
 	}
 	else {
-		ub = MyConfig::cpuAtLeaf;
+		lb = MyConfig::cpuAtLeaf;
 	}
 	if (ub<=lb+2) { // converged
 		if (MyConfig::cpuAtLeaf==ub && algStts==SCCS) { // already successfully tested this ub
@@ -452,6 +449,7 @@ void SimController::runTrace () {
 	isLastPeriod 				= false;
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
   
+	traceFile.clear();
 	traceFile.seekg(0); // return to the beginning of the trace file
 	runTimePeriod ();
 }
@@ -973,7 +971,7 @@ inline void SimController::genSettingsBuf (bool printTime)
   	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, algStts);
   }
   else {
-  	snprintf (settingsBuf, settingsBufSize, "running %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed);
+  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed);
   }
 }
 

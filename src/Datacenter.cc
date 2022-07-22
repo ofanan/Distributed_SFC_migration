@@ -662,7 +662,6 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 
 		PushUpPkt* pkt2snd = new PushUpPkt;
 		pkt2snd->setPushUpVecArraySize (pushUpVecArraySize); 
-		int idxInPushUpVec = 0;
 		for (int i(0); i<pushUpVecArraySize; i++) {
 			pkt2snd->setPushUpVec (i, arrivedPkt->getPushUpVec (i));
 		}
