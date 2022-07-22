@@ -45,7 +45,7 @@ class ChainsMaster {
 	static bool findChain (ChainId_t chainId, Chain &chain);
 	static bool getChainCurDc (ChainId_t chainId, DcId_t &dcId);
 	static bool insert (ChainId_t chainId, Chain chain); // insert a chain to the db
-	static void clear (); // clear the db
+	static void rst (); // clear the db
 	friend class SimController;
 };
 

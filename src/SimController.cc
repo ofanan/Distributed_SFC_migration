@@ -20,12 +20,10 @@ int   MyConfig::mode;
 int   MyConfig::LOG_LVL;
 int   MyConfig::DEBUG_LVL;
 int   MyConfig::RES_LVL;
-
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
-float MyConfig::traceTime = -1.0;
-float MyConfig::rsrcAugRatio;
+float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -56,7 +54,6 @@ void SimController::initialize (int stage)
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
 		this->mode = Async; // either Sync / Async mode of running th sime
-		MyConfig::mode 	= Sync; // Always begin the sim' in Sync mode. When this->mode==Async, we'll change MyConfig::mode to Async at t=1.
 		MyConfig::traceTime = -1.0;
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
@@ -66,7 +63,6 @@ void SimController::initialize (int stage)
 		else {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
 		}
-		MyConfig::overallNumBlockedUsrs = 0; 
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
@@ -75,7 +71,7 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
- 		MyConfig::rsrcAugRatio = 1;
+		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
 		updateCpuAtLvl ();
 		openFiles ();
 		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		[MyConfig::netType];
@@ -117,7 +113,6 @@ void SimController::initialize (int stage)
 		}
 		discoverPathsToRoot  ();
 		calcDistBetweenAllDcs				 ();
-		ChainsMaster::clear  ();
 		return;
 	}
 	
@@ -127,7 +122,6 @@ void SimController::initialize (int stage)
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes   = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
-		MyConfig::discardAllMsgs = false;
 		Lvl_t h;
 		for (h=0; h<RtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (min (RtChain::mu_u[h], NonRtChain::mu_u[h]));
@@ -135,7 +129,7 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-		runTrace ();
+		initBinSearchSim ();
 	}
 }
 
@@ -145,19 +139,58 @@ Called by a dc when it fails to place an old (existing) chain.
 void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
+	algStts = FAIL;
+	printResLine ();
 	MyConfig::discardAllMsgs = true;
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
 		datacenters[dc]->rst ();
 	}
-	scheduleAt (simTime() + CLEARNACE_DELAY, new cMessage ("continueBinarySearchAfterFailure"));
+	scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("continueBinSearch"));
 }
 
 /*************************************************************************************************************************************************
 Run a binary search for the minimal amount of cpu required to find a feasible sol'
 **************************************************************************************************************************************************/
-void SimController::runBinSearchSim ()
+void SimController::initBinSearchSim ()
 {
+	float max_R = 8; // maximum rsrc aug ratio to consider
+	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
+	lb = MyConfig::cpuAtLeaf;
+	ub = Cpu_t (MyConfig::cpuAtLeaf*max_R);
+	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
+	updateCpuAtLvl ();
+	runTrace ();
+}
+
+/*************************************************************************************************************************************************
+continue running the binary search scheme for finding the min cpu rsrcs required to find a feasible sol, after the alg' fails.
+**************************************************************************************************************************************************/
+void SimController::continueBinSearch () 
+{
+	if (lastBinSearchRun) {
+		if (algStts==FAIL) {
+			error ("failed at the last bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
+		}
+		error ("successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
+	}
+	if (algStts==SCCS) {
+		lb = MyConfig::cpuAtLeaf;	
+	}
+	else {
+		ub = MyConfig::cpuAtLeaf;
+	}
+	if (ub<=lb+2) { // converged
+		if (MyConfig::cpuAtLeaf==ub && algStts==SCCS) { // already successfully tested this ub
+			error ("finished BinSearch with cpuAtLeaf=%d", ub);
+		}
+		// need one last run to verify this ub
+		MyConfig::cpuAtLeaf = ub;
+		updateCpuAtLvl ();
+		lastBinSearchRun=true;
+	}
+	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
+	updateCpuAtLvl ();
 	runTrace ();
 }
 
@@ -166,7 +199,6 @@ update the cpu capacity at each level based on the current rsrc aug lvl
 **************************************************************************************************************************************************/
 void SimController::updateCpuAtLvl ()
 {
-	MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType]*MyConfig::rsrcAugRatio;
 	for (Lvl_t lvl(0); lvl < height; lvl++) {
 		MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? 1 : (MyConfig::cpuAtLeaf*(lvl+1)));
 	}
@@ -183,6 +215,10 @@ void SimController::openFiles ()
 	else {
 		MyConfig::traceFileName = "UniformTree_resh_downto1.poa"; 
 	}
+	traceFile = ifstream (tracePath + MyConfig::traceFileName);
+  if (!traceFile.is_open ()) {
+  	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
+  }
 
 	setOutputFileNames ();
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
@@ -383,7 +419,13 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 * Run the whole trace
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
-	traceFile = ifstream (tracePath + MyConfig::traceFileName);
+
+	traceFile.seekg(0);
+	MyConfig::		rst ();
+	ChainsMaster::rst ();
+	for (DcId_t dc(0); dc<numDatacenters; dc++) {
+		datacenters[dc]->rst ();
+	}
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
 	
@@ -391,9 +433,6 @@ void SimController::runTrace () {
   numMigsAtThisPeriod 					= 0; // will cnt the # of migrations in the current run
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
   
-  if (!traceFile.is_open ()) {
-  	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
-  }
 	runTimePeriod ();
 }
 
@@ -644,7 +683,7 @@ void SimController::rlzRsrcOfChains (unordered_map <DcId_t, vector<ChainId_t> > 
 Initiate the run of placement alg'
 **************************************************************************************************************************************************/
 void SimController::initAlg () {
-
+	algStts = SCCS; // default; will be overwritten upon a fail
 	return (MyConfig::mode==Sync)? initAlgSync() : initAlgAsync();
 }
 
@@ -718,7 +757,7 @@ void SimController::prepareFullReshSync ()
 {
 	Enter_Method ("SimController::prepareFullReshSync ()");
 	MyConfig::discardAllMsgs = true;
-	scheduleAt (simTime() + CLEARNACE_DELAY, new cMessage ("InitFullReshMsg"));
+	scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("InitFullReshMsg"));
 }
 
 
@@ -856,15 +895,6 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 }
 
 /*************************************************************************************************************************************************
-
-**************************************************************************************************************************************************/
-void SimController::continueBinarySearchAfterFailure () 
-{
-	error ("sorry, continueBinarySearchAfterFailure is not implemented yet");
-}
-
-
-/*************************************************************************************************************************************************
 Print the "state" (PoAs of active users, and current placement of chains), and end the sim'.
 **************************************************************************************************************************************************/
 void SimController::PrintStateAndEndSim () 
@@ -884,7 +914,12 @@ void SimController::handleMessage (cMessage *msg)
 {
 	if (strcmp (msg->getName(), "RunTimePeriodMsg")==0) {
 		isFirstPeriod = false;
-		if (!isLastPeriod) {
+		if (isLastPeriod) {
+			if (MyConfig::runningBinSearchSim) {
+				
+			}
+		}
+		else {
 			runTimePeriod ();
 		}
 	}
@@ -894,8 +929,8 @@ void SimController::handleMessage (cMessage *msg)
 		}
   	initFullReshSync ();
   }
-  else if (strcmp (msg->getName(), "continueBinarySearchAfterFailure")==0) { 
-  	continueBinarySearchAfterFailure ();
+  else if (strcmp (msg->getName(), "continueBinSearch")==0) { 
+  	continueBinSearch ();
   }
   else if (strcmp (msg->getName(), "PrintAllDatacentersMsg")==0) { 
   	printAllDatacenters ();
@@ -915,7 +950,7 @@ void SimController::handleMessage (cMessage *msg)
 inline void SimController::genSettingsBuf (bool printTime)
 {
   if (printTime) {
-  	snprintf (settingsBuf, settingsBufSize, "t%.3f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, stts);
+  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, algStts);
   }
   else {
   	snprintf (settingsBuf, settingsBufSize, "running %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed);

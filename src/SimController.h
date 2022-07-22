@@ -49,7 +49,7 @@ class SimController : public cSimpleModule
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
     int seed = 42;
-    int stts = 1; // stts of the last run of the alg'
+    int algStts; // stts of the last run of the alg'
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
@@ -58,6 +58,8 @@ class SimController : public cSimpleModule
 		int numBlockedUsrs;
 		int numCritUsrs=0; // number of critical usrs at the beginning of this period
 		float     period=1.0;
+		Cpu_t lb, ub; // lower bound, upper bound amount of the cpu at the leaf for the binary search alg'
+		bool lastBinSearchRun;
 		
 		string line; //current line being read from the tracefile
 		
@@ -113,8 +115,8 @@ class SimController : public cSimpleModule
 		inline DcId_t dcId2leafId (DcId_t dcId);
 		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
-		void runBinSearchSim ();
-		void continueBinarySearchAfterFailure ();
+		void initBinSearchSim  ();
+		void continueBinSearch ();
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.

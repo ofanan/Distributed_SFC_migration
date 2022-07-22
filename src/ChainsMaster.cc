@@ -305,10 +305,12 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 }
 
 /*************************************************************************************************************************************************
-* clear the db
+* Reset the db
 **************************************************************************************************************************************************/
-void ChainsMaster::clear ()
+void ChainsMaster::rst ()
 {
 	ChainsMaster::allChains.clear ();
+	ChainsMaster::numInstantMigs = 0;
 } 
+
 

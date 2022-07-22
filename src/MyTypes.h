@@ -14,5 +14,7 @@ const Lvl_t   	UNPLACED_LVL	 = -1;
 const Cost_t	  UNPLACED_COST  = -1;
 const Cpu_t		  UNPLACED_CPU   = -1;
 
+const int SCCS=1;
+const int FAIL=2;
 #endif
 

@@ -39,7 +39,7 @@ const bool Sync  = 0;
 const bool Async = 1;
 
 // Determining the level of debug and log.
-const double CLEARNACE_DELAY = 0.1; 
+const double CLEARANCE_DELAY = 0.2;
 										 
 class MyConfig { 
 
@@ -61,13 +61,12 @@ class MyConfig {
 		static const vector <vector <Cost_t>> NonRtChainCostAtLvl;
 		static const vector <vector <Cpu_t>>  RtChainMu_u;
 		static const vector <vector <Cpu_t>>  NonRtChainMu_u;
-		static float rsrcAugRatio;
+		static vector <Cpu_t> minCpuToPlaceAnyChainAtLvl;
 		static Cpu_t  cpuAtLeaf;
 		static vector <Cpu_t> cpuAtLvl; 
 		static Lvl_t lvlOfHighestReshDc; //lvl of the highest that reshuffled at the cur period; UNPLACED_LVL if there was no resh at this period
 		static bool useFullResh; // when true, a failure cause a global reshuffle, of all chains and datacenters
 		static bool discardAllMsgs; // when true, all DCs ignore all incoming msgs.
-		static vector <Cpu_t> minCpuToPlaceAnyChainAtLvl;
 		static float FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
     static float traceTime; //current time (in the trace, in seconds)
     static bool runningBinSearchSim; 
@@ -86,8 +85,9 @@ class MyConfig {
 		static int DEBUG_LVL;
 		static int RES_LVL;
 
-		//Init
+		//Init and reset
 		static void init ();
+		static void rst ();
 		static bool openFiles ();
 		
 		//print
