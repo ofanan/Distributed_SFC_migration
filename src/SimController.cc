@@ -55,6 +55,7 @@ void SimController::initialize (int stage)
 		networkName 		= (network -> par ("name")).stdstringValue();
 		this->mode = Async; // either Sync / Async mode of running th sime
 		MyConfig::traceTime = -1.0;
+		maxTraceTime = numeric_limits<float>::max();
 		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
 		if (mode==Sync) {
@@ -81,8 +82,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    maxTraceTime					= 27008;
-
+    simLenInSec           = 2;
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -130,8 +130,8 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-		runTrace ();
-//		initBinSearchSim ();
+//		runTrace ();
+		initBinSearchSim ();
 	}
 }
 
@@ -142,7 +142,9 @@ void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
 	
-	MyConfig::printToLog ("\nin SimController::handleAlgFailure\n");
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		MyConfig::printToLog ("\nin SimController::handleAlgFailure\n");
+	}
 	algStts = FAIL;
 	printResLine ();
 	if (MyConfig::runningBinSearchSim) {
@@ -188,7 +190,7 @@ void SimController::continueBinSearch ()
 		error ("successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 	}
 	if (algStts==SCCS) {
-//		concludeTimePeriod ();
+		concludeTimePeriod ();
 		ub = MyConfig::cpuAtLeaf;	
 	}
 	else {
@@ -228,7 +230,7 @@ void SimController::openFiles ()
 		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
-		MyConfig::traceFileName = "UniformTree_fails_in_T1.poa"; //"UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
+		MyConfig::traceFileName = "UniformTree_resh_downto1.poa"; //"UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
 	}
 	traceFile = ifstream (tracePath + MyConfig::traceFileName);
   if (!traceFile.is_open ()) {
@@ -382,6 +384,9 @@ void SimController::runTimePeriod ()
 			}
 			isLastPeriod = false;
 			MyConfig::traceTime = new_t;
+			if (isFirstPeriod) {
+				maxTraceTime = new_t + simLenInSec;
+			}
 
 			if (MyConfig::LOG_LVL>0) {
 				if (MyConfig::traceTime==int(MyConfig::traceTime)) {
@@ -420,7 +425,7 @@ void SimController::runTimePeriod ()
 			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
 		}
   }
-	return scheduleAt (simTime(), new cMessage ("RunTimePeriodMsg")); // Schedule an immidiate self-event for concluding the trace run
+	return scheduleAt (simTime(), new cMessage ("RunTimePeriodMsg")); // Schedule an immidiate self-event to conclude the trace run
 }
 
 /*************************************************************************************************************************************************
@@ -437,7 +442,7 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 * Run the whole trace
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
-
+	
 	MyConfig::		rst ();
 	ChainsMaster::rst ();
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
@@ -510,7 +515,6 @@ void SimController::printBuCost ()
 **************************************************************************************************************************************************/
 void SimController::concludeTimePeriod ()
 {
-
 	ChainId_t errChainId;
 	int curNumBlockedUsrs;
 	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
