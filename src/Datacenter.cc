@@ -1007,6 +1007,10 @@ void Datacenter::rst ()
 	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
 	clrRsrc ();
+	for (int portNum(0); portNum<numChildren; portNum++) { //$$$
+		outputQ[portNum].clear ();
+	}
+	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr); ///$$$$
 	rstReshAsync ();
 	endFModeEvent = nullptr;
 	isInFMode 		 = false;

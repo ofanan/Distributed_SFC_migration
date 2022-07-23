@@ -1,0 +1,5 @@
+c1255 arrives from leaf s1807, and is potPlaced there. 
+Then, s1255 appears in the pushUpList of -> s205 -> s55 -> s13 -> s3 -< s0. S13 indeed pushes it up.
+Then, somehow s57 also places it! s57 stored it in the previous run.
+Check the rst also fo Async in Dc.
+

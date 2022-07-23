@@ -143,7 +143,8 @@ void SimController::handleAlgFailure ()
 	Enter_Method ("SimController::handleAlgFailure ()");
 	
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		MyConfig::printToLog ("\nin SimController::handleAlgFailure\n");
+		sprintf (buf, "\nsimT=%f, in SimController::handleAlgFailure\n", simTime().dbl());
+		printBufToLog ();
 	}
 	algStts = FAIL;
 	printResLine ();
@@ -389,10 +390,10 @@ void SimController::runTimePeriod ()
 
 			if (MyConfig::LOG_LVL>0) {
 				if (MyConfig::traceTime==int(MyConfig::traceTime)) {
-					snprintf (buf, bufSize, "\n\nt = %.0f\n********************", MyConfig::traceTime);
+					snprintf (buf, bufSize, "\n\nt = %.0f, simTime=%f\n********************", MyConfig::traceTime, simTime().dbl());
 				}
 				else {
-					snprintf (buf, bufSize, "\n\nt = %.3f\n********************", MyConfig::traceTime);
+					snprintf (buf, bufSize, "\n\nt = %.3f, simTime=%f\n********************", MyConfig::traceTime, simTime().dbl());
 				}
 				MyConfig::printToLog (buf); 
 			}
@@ -447,6 +448,7 @@ void SimController::runTrace () {
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
 		datacenters[dc]->rst ();
 	}
+	printAllDatacenters ();
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
 	chainsThatJoinedLeaf.clear ();
