@@ -190,7 +190,6 @@ void SimController::continueBinSearch ()
 		error ("successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 	}
 	if (algStts==SCCS) {
-		concludeTimePeriod ();
 		ub = MyConfig::cpuAtLeaf;	
 	}
 	else {

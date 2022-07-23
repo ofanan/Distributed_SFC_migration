@@ -122,7 +122,7 @@ void Datacenter::initialize(int stage)
  * Inputs: 
  * - printChainIds: when true, print in a format similar to that used in the centralized alg'.
  * - printPotPlaced: when true and there're potPlacedChains to print - print them.
- * - printPushUpList: when true and pushUpList isn't impty - print them.
+ * - printPushUpList: when true and pushUpList isn't empty - print them.
  * - beginWithNewLine: when true, the print begins in a new line, and with the dcId.
 *************************************************************************************************************************************************/
 void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
@@ -401,15 +401,8 @@ void Datacenter::pushUp ()
 		print (false, false, true, false);
 	}
 
-	if (isLeaf) {
-
-		if (MyConfig::mode == Sync) {
-			simController->finishedAlg (dcId, leafId);
-			if (MyConfig::DEBUG_LVL > 0 && !pushUpList.empty()) {
-					error ("t=%f : s%d : pushUpList isn't empty after running pushUp() on a leaf", MyConfig::traceTime, dcId);
-			}
-		}
-		return; // finished; this actually concluded the run of the BUPU alg' for the path from me to the root
+	if (isLeaf && MyConfig::mode == Sync) {
+		return simController->finishedAlg (dcId, leafId);
 	}
 
 	genNsndPushUpPktsToChildren ();
