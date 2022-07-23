@@ -330,7 +330,7 @@ void Datacenter::handlePushUpPkt ()
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList, false);
 	}
-	pushUp ();
+	return (isInFMode)? genNsndPushUpPktsToChildren() :	pushUp();
 }
 
 /*************************************************************************************************************************************************
@@ -513,7 +513,7 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 		simController->handleAlgFailure ();
 	}
 	else {
-		snprintf (buf, bufSize, "\n*************************************\ns%d : : failed to place the old chain %d even after reshuffling\n*************************************", dcId, chainId);
+		snprintf (buf, bufSize, "\n*************************************\ntraceTime=%.3f, s%d : : failed to place the old chain %d even after reshuffling\n*************************************", MyConfig::traceTime, dcId, chainId);
 		printBufToLog ();
 		MyConfig::discardAllMsgs = true;
 		printStateAndEndSim  ();
@@ -636,13 +636,16 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 		MyConfig::printToLog (pushUpList, false);
 	}
 
+	if (withinResh ()) {
+		return rdBottomUpPkt ();	
+	}
+
 	DcId_t sndrDcId = ((Datacenter*) curHandledMsg->getSenderModule())->dcId;
 
 	BottomUpPkt *arrivedPkt = (BottomUpPkt*)(curHandledMsg);
 	int pushUpVecArraySize = arrivedPkt->getPushUpVecArraySize();
 	if (pushUpVecArraySize>0) {
 
-//		int gateIdOfArrival = arrivedPkt->getArrivalGateId();
 		Lvl_t child;
 		for (child=0; child < numChildren; child++) {
 			if (dcIdOfChild[child] == sndrDcId) {

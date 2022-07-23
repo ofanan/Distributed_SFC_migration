@@ -82,7 +82,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = numeric_limits<float>::max();;
+    simLenInSec           = 2; //numeric_limits<float>::max();;
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -118,7 +118,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = NO_LOG;
+		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -130,8 +130,8 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-//		runTrace ();
-		initBinSearchSim ();
+		runTrace ();
+//		initBinSearchSim ();
 	}
 }
 
@@ -394,9 +394,6 @@ void SimController::runTimePeriod ()
 			MyConfig::traceTime = new_t;
 			if (isFirstPeriod) {
 				maxTraceTime = new_t + simLenInSec;
-			}
-			if (MyConfig::cpuAtLeaf==235 && MyConfig::traceTime==29032) {
-				MyConfig::LOG_LVL = VERY_DETAILED_LOG;
 			}
 
 			if (MyConfig::LOG_LVL>0) {
