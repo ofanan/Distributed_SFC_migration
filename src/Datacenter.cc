@@ -1180,6 +1180,7 @@ void Datacenter::finReshAsync ()
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
+		genNsndPushUpPktsToChildren (); // in F mode, I'll not handle PU requests. Hence, just each such request "as is" back to the caller child
 		rstReshAsync ();
 	}
 	else {

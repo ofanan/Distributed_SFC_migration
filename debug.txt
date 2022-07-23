@@ -1,5 +1,20 @@
-c1255 arrives from leaf s1807, and is potPlaced there. 
-Then, s1255 appears in the pushUpList of -> s205 -> s55 -> s13 -> s3 -< s0. S13 indeed pushes it up.
-Then, somehow s57 also places it! s57 stored it in the previous run.
-Check the rst also fo Async in Dc.
+<!> Error: Model error: traceT=29034.000, sim t=2272.000000: error during run of ChainsMaster::concludeTimePeriod. 
+
+error: ChainsMaster::concludeTimePeriod encountered chain 1874 which is unplaced
+trecking after this chain at this run:
+t = 29032:
+placed on s143
+t = 29033:
+placed on s143
+t = 29034:
+placed on s143
+s1726 potPlaced. 
+s103 PuList. s26 PuList. s6 PuList. s1 PuList. s0 PuList. 
+s0 init resh.
+Possible sol: when finish resh, the reshInitiator should send a PU Nack, just as it would do upon rcvng a BU pkt while in f mode.
+
+
+
+
+
 

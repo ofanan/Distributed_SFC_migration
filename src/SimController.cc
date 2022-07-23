@@ -82,7 +82,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = 2;
+    simLenInSec           = numeric_limits<float>::max();;
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -118,7 +118,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
+		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -165,7 +165,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = 16; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.3; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
@@ -188,7 +188,11 @@ void SimController::continueBinSearch ()
 		if (algStts==FAIL) {
 			error ("failed at the last bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 		}
-		error ("successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
+		if (MyConfig::LOG_LVL>NO_LOG) {
+			sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
+			printBufToLog ();
+		}
+		return;
 	}
 	if (algStts==SCCS) {
 		ub = MyConfig::cpuAtLeaf;	
@@ -198,7 +202,11 @@ void SimController::continueBinSearch ()
 	}
 	if (ub<=lb+2) { // converged
 		if (MyConfig::cpuAtLeaf==ub && algStts==SCCS) { // already successfully tested this ub
-			error ("finished BinSearch with cpuAtLeaf=%d", ub);
+			if (MyConfig::LOG_LVL>NO_LOG) {
+				sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
+				printBufToLog ();
+			}
+			return;
 		}
 		// need one last run to verify this ub
 		MyConfig::cpuAtLeaf = ub;
@@ -387,6 +395,9 @@ void SimController::runTimePeriod ()
 			if (isFirstPeriod) {
 				maxTraceTime = new_t + simLenInSec;
 			}
+			if (MyConfig::cpuAtLeaf==235 && MyConfig::traceTime==29032) {
+				MyConfig::LOG_LVL = VERY_DETAILED_LOG;
+			}
 
 			if (MyConfig::LOG_LVL>0) {
 				if (MyConfig::traceTime==int(MyConfig::traceTime)) {
@@ -518,11 +529,12 @@ void SimController::concludeTimePeriod ()
 {
 	ChainId_t errChainId;
 	int curNumBlockedUsrs;
-	int stts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
+	int chainsMasterStts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
 	
-	if (stts!=0) {
-		snprintf (buf, bufSize, "sim t=%lf, t=%.3f: error during run of mode ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. For further details, plz Check the log `file.", simTime().dbl(), MyConfig::traceTime, stts, errChainId);
-		error (buf);
+	if (algStts==SCCS && chainsMasterStts!=0 ) {
+		sprintf (buf, "traceT=%.3f, sim t=%f: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. See the log file.", MyConfig::traceTime, simTime().dbl(), chainsMasterStts, errChainId);
+		error (buf); 
+//		MyConfig::printToLog (buf);
 	}
 	
 	if (MyConfig::DEBUG_LVL > 0) {
@@ -724,10 +736,10 @@ void SimController::checkChainsMasterData ()
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
 		for (auto chainId : datacenters[dcId]->placedChains) {
 			if (!ChainsMaster::findChain (chainId, chain)) {
-				error ("\nchain %d found in DC's %d placedChain isn't found in ChainsMaster", chainId, dcId);
+				error ("\nc%d found in s%d placedChain isn't found in ChainsMaster", chainId, dcId);
 			}
 			if (chain.curDc != dcId) {
-				error ("\nchain %d found in DC's %d placedChain is recorded in ChainsMaster as placed on DC %d", chainId, dcId, chain.curDc);
+				error ("\ntraceT=%f : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", MyConfig::traceTime, chainId, dcId, chain.curDc);
 			}
 		}
 	}
