@@ -332,14 +332,6 @@ void Datacenter::handlePushUpPkt ()
 		}
 	}
 	
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG && dcId==983 && MyConfig::traceTime==27001) { //$$$
-		snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpList=", dcId);
-		printBufToLog ();
-		MyConfig::printToLog (pushUpList, true);
-		MyConfig::printToLog ("potPlaced=");
-		MyConfig::printToLog (potPlacedChains);
-	}
-	
 	if (isInFMode) {
 		RegainRsrcOfpushedUpChains ();
 		genNsndPushUpPktsToChildren();
@@ -422,10 +414,6 @@ void Datacenter::pushUp ()
 		snprintf (buf, bufSize, "\ns%d : finished PU.", dcId);
 		printBufToLog ();
 		print (false, false, true, false);
-		MyConfig::printToLog ("PUL="); //$$$
-		MyConfig::printToLog (pushUpList); //$$$$
-		MyConfig::printToLog (",  potPlaced="); //$$$
-		MyConfig::printToLog (potPlacedChains); //$$$$
 	}
 
 	if (isLeaf && MyConfig::mode == Sync) {
