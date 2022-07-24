@@ -232,7 +232,7 @@ void Datacenter::handleMessage (cMessage *msg)
     	prepareReshSync ();
     }
     else {
-    	reshAsync();
+    	error ("rcvd a PrepareReshSyncPkt while being in Async mode");
     }
   }
   else if (dynamic_cast<ReshAsyncPkt*>(curHandledMsg) != nullptr)
@@ -332,29 +332,29 @@ void Datacenter::handlePushUpPkt ()
 		}
 	}
 	
-	if (MyConfig::LOG_LVL>=TLAT_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG && dcId==983 && MyConfig::traceTime==27001) { //$$$
 		snprintf (buf, bufSize, "\ns%d : rcvd PU pkt. pushUpList=", dcId);
 		printBufToLog ();
-		MyConfig::printToLog (pushUpList, false);
+		MyConfig::printToLog (pushUpList, true);
+		MyConfig::printToLog ("potPlaced=");
+		MyConfig::printToLog (potPlacedChains);
 	}
-	return (isInFMode)? genNsndPushUpPktsToChildren() :	pushUp();
+	
+	if (isInFMode) {
+		RegainRsrcOfpushedUpChains ();
+		genNsndPushUpPktsToChildren();
+	}
+	else {
+		pushUp();
+	}
 }
 
-/*************************************************************************************************************************************************
-Run the PU alg' (either in Sync / Async) mode. 
-Assume that this->pushUpList already contains the relevant chains.
-*************************************************************************************************************************************************/
-void Datacenter::pushUp ()
-{
 
-	if (MyConfig::LOG_LVL>=TLAT_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : beginning PU. pushUpList=", dcId);
-		printBufToLog ();
-		MyConfig::printToLog (pushUpList, false);
-	}
-	reshuffled = false;
-	
-	// Find all chains that were pushed-up for me, and regain resources for them.
+/*************************************************************************************************************************************************
+ Find all chains that were pushed-up for me, and regain resources for them.
+*************************************************************************************************************************************************/
+void Datacenter::RegainRsrcOfpushedUpChains ()
+{
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
 		auto search = potPlacedChains.find (chainPtr->id);
 		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do
@@ -372,7 +372,23 @@ void Datacenter::pushUp ()
 		potPlacedChains.erase (chainPtr->id);
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
 	}
+}
 
+/*************************************************************************************************************************************************
+Run the PU alg' (either in Sync / Async) mode. 
+Assume that this->pushUpList already contains the relevant chains.
+*************************************************************************************************************************************************/
+void Datacenter::pushUp ()
+{
+
+	if (MyConfig::LOG_LVL>=TLAT_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : beginning PU. pushUpList=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushUpList, false);
+	}
+	reshuffled = false;
+	
+	RegainRsrcOfpushedUpChains ();
 	// Next, try to push-up chains of my descendants
 	pushUpList.sort (SortChainsForPushUpList());
 	// to make no mess and to keep the sort while iterating on pushUpList, insert all modified chains to pushedUpChains. Later, will unify it again with pushUpList
@@ -406,6 +422,10 @@ void Datacenter::pushUp ()
 		snprintf (buf, bufSize, "\ns%d : finished PU.", dcId);
 		printBufToLog ();
 		print (false, false, true, false);
+		MyConfig::printToLog ("PUL="); //$$$
+		MyConfig::printToLog (pushUpList); //$$$$
+		MyConfig::printToLog (",  potPlaced="); //$$$
+		MyConfig::printToLog (potPlacedChains); //$$$$
 	}
 
 	if (isLeaf && MyConfig::mode == Sync) {
@@ -442,6 +462,10 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
+			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+				sprintf (buf, "\n s%d snding PU pkt to child", dcId);
+				printBufToLog ();
+			}
 		}
 		else {
 			delete (pkt);
@@ -875,6 +899,7 @@ run the async reshuffle algorithm. Called either by initReshAsync upon a failure
 void Datacenter::reshAsync ()
 {
 
+	isInFMode = true;
 	// Check first if I can solve the deficit prob' locally, by pushing down to me, w/o calling children
 	bool canFinReshLocally = true;
 	Cpu_t deficitCpuThatCanBeResolvedLocally = 0;
@@ -889,8 +914,15 @@ void Datacenter::reshAsync ()
 	}
 	if (canFinReshLocally) {
 	  if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-	  	sprintf (buf, "\ns%d in finReshAsync locally", dcId);
+	  	sprintf (buf, "\ns%d in finReshAsync locally. potPlaced=", dcId);
 	  	printBufToLog ();
+	  	MyConfig::printToLog(potPlacedChains);
+			if (isInFMode) {
+				MyConfig::printToLog (" is in F");
+			}
+			else {
+				MyConfig::printToLog (" isn't in F");
+			}
 	  }
 		pushDwn ();
 		return finReshAsync ();
@@ -1119,6 +1151,7 @@ handle a reshAsyncPkt that arrived from a prnt:
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromPrnt  ()
 {
+	isInFMode = true;
 	scheduleEndFModeEvent (); // Restart the timer of being in F mode 
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
 	if (pkt->getReshInitiatorLvl ()==UNPLACED_LVL) {
@@ -1212,10 +1245,10 @@ void Datacenter::finReshAsync ()
 	for (ChainId_t chainId_t : potPlacedChains) {
 		placedChains.insert (chainId_t);
 	}
-	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
-		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
-	}
-	potPlacedChains.clear ();
+//	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
+//		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
+//	}
+//	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 			sprintf (buf, "\nsimT=%.3f, s%d finReshAsync where I'm s*", simTime().dbl(), dcId);
@@ -1313,6 +1346,16 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog (" pushDwnAck=");
 			MyConfig::printToLog (pushDwnAck);
+			MyConfig::printToLog (" potPlaced=");
+			MyConfig::printToLog (potPlacedChains);
+			MyConfig::printToLog (" PUL=");
+			MyConfig::printToLog (pushUpList);
+			if (isInFMode) {
+				MyConfig::printToLog (" is in F");
+			}
+			else {
+				MyConfig::printToLog (" isn't in F");
+			}
 		}
 	}
 

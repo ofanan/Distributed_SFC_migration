@@ -1,6 +1,34 @@
-Added CLEARANCE_DELAY b4 (self-calling) initReshAsync.
-Seems to work OK. However, ChainsMaster::concludeTimePeriod claims that chain 2587 isn't placed.
-Trecking after c2587 in t = 27002.
-c2587 joined s1726. notAssigned. Then, in s103 notAssigend. Later, it disappears (not called anymore).
-By past slots, it seems that s103's prnt is s26. s26's prnt is s6. s6's prnt is s1.
-But s26 rcvs in notAssigned only 1460.
+traceT=27001.000000 : c337 found in s983.placedChain is recorded in ChainsMaster as placed on s5
+27000:
+c337 is in s769 potPlaced & PUList. in s112 PUL. in s29 PUL. 
+(2-337 in line 5182).
+in s7 PUL. 
+in s1 PUL.
+in s0 PUL. 
+
+Ln. 8984, s27001:
+c337 is pot-placed on s983.
+in s94 PUL.
+in s23 PUL.
+in s5 PUL.
+in s1 PUL.
+Ln. 11499: s0 init resh Async.
+Ln 11507: s86 in finReshAsync locally
+Ln.11575: s94 finishing resh.
+Ln. 11593: placed on s5.
+Ln. 11598: s23 finished PU.
+Ln. 11603: s94 finished PU.
+Ln. 11610:
+Ln. 13824 
+s983 : finished PU. Rcs=94, a=60, used cpu=34, num_of_placed_chains=2 chains [337, 1297, ] 
+
+But s983 doesn't know it was pushed-up - probably because the reshuffling node in the middle blocked the msg.
+The bug: we forgot to regain rsrc from pushed-up chains also while in f mode.
+Fixed.
+Next bug:
+s769 doesn't know that its chain was pushed-up, because it checks for its "pot-placed chains." However, during a resh, s769 may have deleted its pot-placed chains.
+Or - because it doesn't even checks whether it was pushed-up. Need not only to regain - but to finally place. Does it do it?
+Yes, he does.
+Now checking, why potPlacedChains was deleted from s769.
+
+

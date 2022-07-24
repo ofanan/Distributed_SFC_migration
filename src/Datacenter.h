@@ -111,6 +111,7 @@ class Datacenter : public cSimpleModule
     void bottomUpFMode     			(); // bottom-up at "feasibility" mode
     void rdBottomUpPkt					();
     void pushUp		        			();
+    void RegainRsrcOfpushedUpChains ();
     void prepareReshSync		 		();
 		void initReshAsync					(); // init an async reshuffle. called upon a failure to place a chain
 		void finReshAsync 					(); // finalize a run of aysnc resh on a single host
