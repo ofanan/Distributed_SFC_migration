@@ -39,7 +39,7 @@ const bool Sync  = 0;
 const bool Async = 1;
 
 // Determining the level of debug and log.
-const double CLEARANCE_DELAY = 0.2;
+const float CLEARANCE_DELAY = 0.1;
 										 
 class MyConfig { 
 

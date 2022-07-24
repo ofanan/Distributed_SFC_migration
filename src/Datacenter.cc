@@ -208,6 +208,10 @@ void Datacenter::handleMessage (cMessage *msg)
   		handleBottomUpPktSync();
   	} 
 		else {
+			if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+				sprintf (buf, "\ns%d rcvd BU pkt", dcI);
+				printBufToLog ();
+			}
 			if (isInFMode) {
 				handleBottomUpPktAsyncFMode ();
 			}
@@ -473,7 +477,7 @@ void Datacenter::bottomUpFMode ()
 			}
 			
 			// Not enough availCpu for this chain, and it cannot be placed higher
-			if (withinResh ()) { // within (or just finished) a reshuffle --> don't reshuffle again, even upon a failure to place a chain
+			if (withinResh ()) { // within (or just finished) a reshuffle --> don't initiate a new reshuffle, even upon a failure to place a chain
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
@@ -484,7 +488,7 @@ void Datacenter::bottomUpFMode ()
 					return failedToPlaceOldChain (chainPtr->id);
 				}
 			}
-			else { // haven't reshuffled yet --> reshuffle				
+			else { // not within a reshuffle
 				return initReshAsync ();
 			}
 		}
@@ -513,10 +517,11 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 		simController->handleAlgFailure ();
 	}
 	else {
-		snprintf (buf, bufSize, "\n*************************************\ntraceTime=%.3f, s%d : : failed to place the old chain %d even after reshuffling\n*************************************", MyConfig::traceTime, dcId, chainId);
+		snprintf (buf, bufSize, "\n*************************************\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling\n*************************************", MyConfig::traceTime, dcId, chainId);
 		printBufToLog ();
-		MyConfig::discardAllMsgs = true;
-		printStateAndEndSim  ();
+		error (buf);
+//		MyConfig::discardAllMsgs = true;
+//		printStateAndEndSim  ();
 	}
 }
 
@@ -584,7 +589,7 @@ void Datacenter::bottomUp ()
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
-					return initReshAsync ();
+					return scheduleAt (simTime() + CLEARANCE_DELAY, cMessage ("initReshAsync")); 
 				}
 			}
 		}
@@ -1127,6 +1132,10 @@ Handle a reshuffle async pkt, received from a child.
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromChild ()
 {
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		sprintf (buf, "\ns%d in handleReshAsyncPktFromChild", dcId);
+		printBufToLog ();
+	}
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
 	if (pkt->getReshInitiatorLvl ()==UNPLACED_LVL) {
 		error ("t%f s%d rcvd from child a pkt with reshInitiatorLvl=-1", MyConfig::traceTime, dcId);
@@ -1162,7 +1171,16 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		insertChainToList (pushDwnAck, chain);
 	 }
 	 
-	return (deficitCpu <= 0)? finReshAsync () :reshAsync ();
+	if (deficitCpu <= 0) {
+		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+			sprintf (buf, "s%d : defCpu=%d. finishing", dcId, deficitCpu);
+			printBufToLog ();
+			finReshAsync ();
+		}
+		else {
+			reshAsync ();
+		}
+	} 
 }
 
 /*************************************************************************************************************************************************
