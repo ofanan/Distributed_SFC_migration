@@ -1021,6 +1021,7 @@ void Datacenter::prepareReshSync ()
 Rst the datacenterto prepare it for a new run of the trace:
 - Cancel all events, msgs, and pkts.
 - Rst all the datacenter's state variables.
+- Clear all the output queues and scheduled event for packets' transmissions.
 *************************************************************************************************************************************************/
 void Datacenter::rst () 
 {
@@ -1028,10 +1029,13 @@ void Datacenter::rst ()
 	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
 	clrRsrc ();
-	for (int portNum(0); portNum<numChildren; portNum++) { //$$$
+	
+	// clear all the output queues and scheduled event for packets' transmissions
+	for (int portNum(0); portNum<numChildren; portNum++) { 
 		outputQ[portNum].clear ();
 	}
-	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr); ///$$$$
+	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr); 
+
 	rstReshAsync ();
 	endFModeEvent = nullptr;
 	isInFMode 		 = false;
@@ -1192,9 +1196,6 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		finReshAsync ();
 	}
 	else {
-//		if (dcId==101 && MyConfig::traceTime==27002) { $$
-//			error ("here2");
-//		}
 		reshAsync ();
 	}
 }

@@ -165,7 +165,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.3; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 2.5; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
