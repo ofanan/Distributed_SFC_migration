@@ -130,8 +130,8 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-		runTrace ();
-//		initBinSearchSim ();
+//		runTrace ();
+		initBinSearchSim ();
 	}
 }
 

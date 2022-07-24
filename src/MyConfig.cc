@@ -154,6 +154,7 @@ void MyConfig::printToLog (Chain chain)
 // print the IDs of all the chains in the set 
 void MyConfig::printToLog (UnorderedSetOfChains set2print)
 {
+	logFile << ",";
 	for (auto chain : set2print) {
 		logFile << chain.id << ",";
 	}
@@ -194,15 +195,17 @@ void MyConfig::printToLog (const int d)
 
 void MyConfig::printToLog (vector <Chain> vec) 
 {
+	logFile  << ",";
 	for (const auto &chain : vec) {
-		logFile << chain.id << ", ";
+		logFile << chain.id << ",";
 	}
 }
 
 void MyConfig::printToLog (vector <ChainId_t> vec) 
 {
+	logFile << ",";
 	for (const auto i : vec) {
-		logFile << i << ", ";
+		logFile << i << ",";
 	}
 }
 
