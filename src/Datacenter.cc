@@ -594,6 +594,10 @@ void Datacenter::bottomUp ()
 				else {
 					this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 					isInFMode 			 = true;
+					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+						sprintf (buf, "\ns%d schedules initReshAsync", dcId);
+						printBufToLog ();
+					}					
 					return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); 
 				}
 			}
@@ -837,10 +841,6 @@ void Datacenter::genNsndBottomUpPktAsync ()
 *************************************************************************************************************************************************/
 void Datacenter::initReshAsync ()
 {
-	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d in initReshAsync", dcId);
-		printBufToLog ();
-	}
 	this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is higher then the highest lvl reshuffled at this period - update. 
 	isInFMode 			 = true;
@@ -862,7 +862,7 @@ void Datacenter::initReshAsync ()
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
 	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\n************** s%d : init resh at lvl %d. pushDwnReq=", dcId, lvl);
+		snprintf (buf, bufSize, "\n************** simT=%.3f, s%d : init resh at lvl %d. pushDwnReq=", simTime().dbl(), dcId, lvl);
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
@@ -888,6 +888,10 @@ void Datacenter::reshAsync ()
 		}
 	}
 	if (canFinReshLocally) {
+	  if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+	  	sprintf (buf, "\ns%d in finReshAsync locally", dcId);
+	  	printBufToLog ();
+	  }
 		pushDwn ();
 		return finReshAsync ();
 	}
@@ -1181,15 +1185,18 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	 }
 	 
 	if (deficitCpu <= 0) {
-		if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-			sprintf (buf, "s%d : defCpu=%d. finishing", dcId, deficitCpu);
+		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+			sprintf (buf, "\ns%d : defCpu=%d. finishing", dcId, deficitCpu);
 			printBufToLog ();
-			finReshAsync ();
 		}
-		else {
-			reshAsync ();
-		}
-	} 
+		finReshAsync ();
+	}
+	else {
+//		if (dcId==101 && MyConfig::traceTime==27002) { $$
+//			error ("here2");
+//		}
+		reshAsync ();
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -1209,6 +1216,10 @@ void Datacenter::finReshAsync ()
 	}
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
+		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+			sprintf (buf, "\nsimT=%.3f, s%d finReshAsync where I'm s*", simTime().dbl(), dcId);
+			printBufToLog ();
+		}
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
 		genNsndPushUpPktsToChildren (); // in F mode, I'll not handle PU requests. Hence, just each such request "as is" back to the caller child
 		rstReshAsync ();
@@ -1258,7 +1269,7 @@ void Datacenter::pushDwn ()
 		// now we know that this chain wasn't previously placed, or pot-placed, on me
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-			MyConfig::printToLog ("pushed-dwn chains: ");
+			MyConfig::printToLog ("\npushed-dwn chains: ");
 		}
 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) {

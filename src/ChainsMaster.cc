@@ -242,14 +242,14 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, Chai
 		}
 		if (MyConfig::DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
 			errChainId = it->second.id;
-			snprintf (buf, bufSize, "\nerror: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", it->second.id);
+			sprintf (buf, "\nsimT=%.3f, error: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", simTime().dbl(), it->second.id);
 			MyConfig::printToLog (buf); 
 			return 1;
 		}
     if ((int)(it->second.S_u).size()<(it->second.curLvl-1)) {
 				errChainId = it->second.id;
-        MyConfig::printToLog ("\nerror: ChainsMaster::concludeTimePeriod encountered the following problematic chain:\n");
-        MyConfig::printToLog (it->second);
+				sprintf (buf, "\nsimT=%.3f, error: ChainsMaster::concludeTimePeriod encountered problematic chain %d:\n", simTime().dbl(), it->second.id);
+				MyConfig::printToLog (buf); 
         return 2;
     }
 		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Did that chain migrate?

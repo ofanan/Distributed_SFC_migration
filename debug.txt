@@ -1,20 +1,6 @@
-<!> Error: Model error: traceT=29034.000, sim t=2272.000000: error during run of ChainsMaster::concludeTimePeriod. 
-
-error: ChainsMaster::concludeTimePeriod encountered chain 1874 which is unplaced
-trecking after this chain at this run:
-t = 29032:
-placed on s143
-t = 29033:
-placed on s143
-t = 29034:
-placed on s143
-s1726 potPlaced. 
-s103 PuList. s26 PuList. s6 PuList. s1 PuList. s0 PuList. 
-s0 init resh.
-Possible sol: when finish resh, the reshInitiator should send a PU Nack, just as it would do upon rcvng a BU pkt while in f mode.
-
-
-
-
-
-
+Added CLEARANCE_DELAY b4 (self-calling) initReshAsync.
+Seems to work OK. However, ChainsMaster::concludeTimePeriod claims that chain 2587 isn't placed.
+Trecking after c2587 in t = 27002.
+c2587 joined s1726. notAssigned. Then, in s103 notAssigend. Later, it disappears (not called anymore).
+By past slots, it seems that s103's prnt is s26. s26's prnt is s6. s6's prnt is s1.
+But s26 rcvs in notAssigned only 1460.
