@@ -203,6 +203,9 @@ void Datacenter::handleMessage (cMessage *msg)
   	isInFMode     = false;
   	endFModeEvent = nullptr; 
   }
+  else if (msg->isSelfMessage() && strcmp (msg->getName(), "initReshAsync")==0) {
+  	initReshAsync (); 
+  }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==Sync) { 
   		handleBottomUpPktSync();
@@ -589,6 +592,8 @@ void Datacenter::bottomUp ()
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
+					this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+					isInFMode 			 = true;
 					return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); 
 				}
 			}
@@ -832,6 +837,10 @@ void Datacenter::genNsndBottomUpPktAsync ()
 *************************************************************************************************************************************************/
 void Datacenter::initReshAsync ()
 {
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d in initReshAsync", dcId);
+		printBufToLog ();
+	}
 	this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 	MyConfig::lvlOfHighestReshDc = max (MyConfig::lvlOfHighestReshDc, lvl); // If my lvl is higher then the highest lvl reshuffled at this period - update. 
 	isInFMode 			 = true;
