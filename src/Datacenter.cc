@@ -209,7 +209,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	} 
 		else {
 			if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-				sprintf (buf, "\ns%d rcvd BU pkt", dcI);
+				sprintf (buf, "\ns%d rcvd BU pkt", dcId);
 				printBufToLog ();
 			}
 			if (isInFMode) {
@@ -589,7 +589,7 @@ void Datacenter::bottomUp ()
 					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
 				}
 				else {
-					return scheduleAt (simTime() + CLEARANCE_DELAY, cMessage ("initReshAsync")); 
+					return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); 
 				}
 			}
 		}
