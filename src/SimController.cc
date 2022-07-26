@@ -118,7 +118,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
+		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -392,6 +392,9 @@ void SimController::runTimePeriod ()
 			}
 			isLastPeriod = false;
 			MyConfig::traceTime = new_t;
+			if (MyConfig::cpuAtLeaf==111) { //$$$
+					MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
+			}
 			if (isFirstPeriod) {
 				maxTraceTime = new_t + simLenInSec;
 			}

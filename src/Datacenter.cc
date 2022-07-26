@@ -515,6 +515,7 @@ void Datacenter::bottomUpFMode ()
 		print (false, false, true, false);
 	}
 
+	genNsndPushUpPktsToChildren (); // if there're any "left-over" push-up requests from children, just send them "as is" to the caller.
   if (isRoot && !(notAssigned.empty())) {
   		error ("notAssigned isn't empty after running BU on the root");
   }
@@ -1158,18 +1159,22 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 	}
 
 	// now we know that we're not within another reshuffle 	
+	if (MyConfig::DEBUG_LVL>0 && !pushDwnReq.empty()) {
+		sprintf (buf, "\ns%d rcvd ReshAsyncPktFromPrnt while pushDwnReq wasn't empty. pushDwnReq=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushDwnReq);
+		error ("s%d rcvd ReshAsyncPktFromPrnt while pushDwnReq wasn't empty", dcId);
+	}
+	if (!pushDwnAck.empty()) {
+		error ("s%d rcvd ReshAsyncPktFromPrnt while pushDwnAck wasn't empty", dcId);
+	}
+
 	this->reshInitiatorLvl = pkt->getReshInitiatorLvl ();
 	this->deficitCpu = pkt->getDeficitCpu ();
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
     if (!insertChainToList (pushDwnReq, pkt->getPushDwnVec(i))) {
 			error ("Error in insertChainToList. See log file for details");
 		}        
-	}
-	if (!pushDwnReq.empty()) {
-		error ("pushDwnReq wasn't empty while rcving a reshAsyncPkt from prnt");
-	}
-	if (!pushDwnAck.empty()) {
-		error ("pushDwnAck wasn't empty while rcving a reshAsyncPkt from prnt");
 	}
 	insertMyAssignedChainsIntoPushUpReq ();
 	reshAsync ();
@@ -1205,9 +1210,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 			error ("s%d rcvd a reshAsync pkt from child with lvl above child's lvl", dcId);
 		}
 		
-		if (eraseChainFromVec(notAssigned, chain)) { // the chain was found (and now deleted) from notAssigned
-			error ("traceT=%f, s%d why did chain %d appear in my notAssigned?", MyConfig::traceTime, dcId, chain.id);
-		}
+		eraseChainFromVec(notAssigned, chain); // if the chain was found in notAssigned, remove it from notAssigned
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
@@ -1248,21 +1251,16 @@ void Datacenter::finReshAsync ()
 	for (ChainId_t chainId_t : potPlacedChains) {
 		placedChains.insert (chainId_t);
 	}
-//	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
-//		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
-//	}
-//	potPlacedChains.clear ();
+	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
+		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
+	}
+	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 			sprintf (buf, "\nsimT=%.3f, s%d finReshAsync where I'm s*", simTime().dbl(), dcId);
 			printBufToLog ();
 		}
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
-		if (!pushUpList.empty()) {
-			error ("traceT=%f, s%d at this time I should have an empty pushUpList", MyConfig::traceTime, dcId); 
-			genNsndPushUpPktsToChildren (); // in F mode, I'll not handle PU requests. Hence, just each such request "as is" back to the caller child
-		}
-
 		rstReshAsync ();
 	}
 	else {
