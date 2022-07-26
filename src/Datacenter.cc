@@ -141,7 +141,7 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	printBufToLog ();
 	if (printChainIds) {
 		MyConfig::printToLog (" chains [");
-		MyConfig::printToLog (placedChains);	
+		MyConfig::printToLog (placedChains);
 		MyConfig::printToLog ("] ");
 	}
 
@@ -892,7 +892,7 @@ void Datacenter::reshAsync ()
 	bool canFinReshLocally = true;
 	Cpu_t deficitCpuThatCanBeResolvedLocally = 0;
 	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {
-		if (chainPtr->curLvl==this->reshInitiatorLvl) { // pushed-down a chain from the resh initiator
+		if (chainPtr->curLvl==this->reshInitiatorLvl) { // can pushed-down a chain from the resh initiator
 				deficitCpuThatCanBeResolvedLocally += chainPtr->potCpu;
 		}
 		if (deficitCpuThatCanBeResolvedLocally > availCpu) { // don't have enough availCpu to resolve the prob' by placing chains locally
@@ -905,18 +905,12 @@ void Datacenter::reshAsync ()
 	  	sprintf (buf, "\ns%d in finReshAsync locally. potPlaced=", dcId);
 	  	printBufToLog ();
 	  	MyConfig::printToLog(potPlacedChains);
-			if (isInFMode) {
-				MyConfig::printToLog (" is in F");
-			}
-			else {
-				MyConfig::printToLog (" isn't in F");
-			}
 	  }
 		pushDwn ();
 		return finReshAsync ();
 	}
 
-	// add my potPlacedChains, and then placedChains, to the end of pushDwnReq
+	// Cannot free enough space alone --> need to call additional child. Also, add my potPlacedChains, and then placedChains, to the end of pushDwnReq
 	Chain chain;
 	for (ChainId_t chainId : potPlacedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
@@ -940,7 +934,6 @@ void Datacenter::reshAsync ()
 		MyConfig::printToLog (pushDwnReq);
 	}
 
-	// Cannot free enough space --> need to call children. Also, add my 
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
 		return finReshAsync ();
@@ -1146,7 +1139,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		error ("t%f s%d rcvd from prnt a pkt with reshInitiatorLvl=-1", MyConfig::traceTime, dcId);
 	}
 	if (withinAnotherResh(pkt->getReshInitiatorLvl ())) {
-		// send the same pkt back to the prnt
+// $$$		send to parent a packet with an empty ack $$$$ 
 		return sndViaQ (portToPrnt, pkt);
 	}
 
@@ -1187,12 +1180,12 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	// Remove from notAssigned and regain the rsrcs of chains that were pushed-down from me
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
 		Chain chain = pkt->getPushDwnVec(i);
-		if (chain.curLvl >= lvl) { // the chain wasn't pushed down 
+		if (chain.curLvl >= lvl) { // the chain is still placed on me (or above me) - it wasn't pushed down 
 			error ("s%d rcvd a reshAsync pkt from child with lvl above child's lvl", dcId);
 		}
 		
 		if (eraseChainFromVec(notAssigned, chain)) { // the chain was found (and now deleted) from notAssigned
-			continue;
+			error ("traceT=%f, s%d why did chain %d appear in my notAssigned?", MyConfig::traceTime, dcId, chain.id);
 		}
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
@@ -1207,6 +1200,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		}			
 		// now we know that the chain was pushed-down from someone else, above me
 		insertChainToList (pushDwnAck, chain);
+		eraseChainFromList (pushDwnReq, chain);
 	 }
 	 
 	if (deficitCpu <= 0) {
@@ -1243,7 +1237,11 @@ void Datacenter::finReshAsync ()
 			printBufToLog ();
 		}
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
-		genNsndPushUpPktsToChildren (); // in F mode, I'll not handle PU requests. Hence, just each such request "as is" back to the caller child
+		if (!pushUpList.empty()) {
+			error ("traceT=%f, s%d at this time I should have an empty pushUpList", MyConfig::traceTime, dcId); 
+			genNsndPushUpPktsToChildren (); // in F mode, I'll not handle PU requests. Hence, just each such request "as is" back to the caller child
+		}
+
 		rstReshAsync ();
 	}
 	else {
@@ -1310,7 +1308,7 @@ void Datacenter::pushDwn ()
 									dcId, chainPtr->id, chainPtr->potCpu, reshInitiatorLvl, requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl));
 				}
 			}
-			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from the an ancestor of me?
+			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from an ancestor of me?
 				Chain pushedDwnChain = *chainPtr;
 				pushedDwnChain.curLvl = lvl;
 				insertChainToList (pushDwnAck, pushedDwnChain);

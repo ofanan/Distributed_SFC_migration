@@ -140,6 +140,7 @@ Accessory functions for data structures of chains
 void insertSorted (vector <Chain> &vec, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness. 
 bool insertChainToList (list <Chain> &sortedList, const Chain &c); // Insert a chain c to the correct place in the vector, based on its latency tightness.
 bool eraseChainFromVec (vector<Chain> &vec, Chain &chain);
+bool eraseChainFromList (list<Chain> &listOfChains, Chain &chain);
 vector<Chain> findChainsByPoa (UnorderedSetOfChains &setOfChains, DcId_t poa);
 
 #endif
