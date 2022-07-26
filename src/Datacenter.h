@@ -130,6 +130,7 @@ class Datacenter : public cSimpleModule
     void genNsndBottomUpFmodePktAsync ();
     void genNsndBottomUpPktAsync      ();
     bool sndReshAsyncPktToNxtChild    ();
+    void insertMyAssignedChainsIntoPushUpReq ();
     void failedToPlaceOldChain (ChainId_t chainId);
     
     // Print functions

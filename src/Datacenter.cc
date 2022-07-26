@@ -878,6 +878,7 @@ void Datacenter::initReshAsync ()
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
+	insertMyAssignedChainsIntoPushUpReq ();
 	reshAsync ();
 }
 
@@ -910,7 +911,25 @@ void Datacenter::reshAsync ()
 		return finReshAsync ();
 	}
 
-	// Cannot free enough space alone --> need to call additional child. Also, add my potPlacedChains, and then placedChains, to the end of pushDwnReq
+	// Cannot free enough space alone --> need to call additional child. 
+		if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d in reshAsync. pushDwnReq=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushDwnReq);
+	}
+
+	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
+		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
+		return finReshAsync ();
+	}
+}
+
+/*************************************************************************************************************************************************
+* add my potPlacedChains, and then placedChains, to the end of pushDwnReq
+*************************************************************************************************************************************************/
+void Datacenter::insertMyAssignedChainsIntoPushUpReq ()
+{
+	
 	Chain chain;
 	for (ChainId_t chainId : potPlacedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
@@ -928,18 +947,7 @@ void Datacenter::reshAsync ()
 		chain.potCpu = requiredCpuToLocallyPlaceChain (chain);
 		insertChainToList (pushDwnReq, chain);
 	}
-	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d in reshAsync. pushDwnReq=", dcId);
-		printBufToLog ();
-		MyConfig::printToLog (pushDwnReq);
-	}
-
-	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
-		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
-		return finReshAsync ();
-	}
 }
-
 
 /*************************************************************************************************************************************************
 Check whether there exists (at least one) additional child to which we should send a reshuffle pkt (in async mode) - and if so, send to him.
@@ -1135,11 +1143,17 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 	isInFMode = true;
 	scheduleEndFModeEvent (); // Restart the timer of being in F mode 
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
+	
 	if (pkt->getReshInitiatorLvl ()==UNPLACED_LVL) {
 		error ("t%f s%d rcvd from prnt a pkt with reshInitiatorLvl=-1", MyConfig::traceTime, dcId);
 	}
-	if (withinAnotherResh(pkt->getReshInitiatorLvl ())) {
-// $$$		send to parent a packet with an empty ack $$$$ 
+	if (withinAnotherResh(pkt->getReshInitiatorLvl ())) { // if I'm within another resh, send to parent a packet with an empty pushUpAck
+	
+		ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
+		pkt2snd -> setReshInitiatorLvl    (pkt->getReshInitiatorLvl ());
+		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
+		pkt2snd -> setPushDwnVecArraySize (0);
+		sndViaQ (portToPrnt, pkt2snd);
 		return sndViaQ (portToPrnt, pkt);
 	}
 
@@ -1151,6 +1165,13 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 			error ("Error in insertChainToList. See log file for details");
 		}        
 	}
+	if (!pushDwnReq.empty()) {
+		error ("pushDwnReq wasn't empty while rcving a reshAsyncPkt from prnt");
+	}
+	if (!pushDwnAck.empty()) {
+		error ("pushDwnAck wasn't empty while rcving a reshAsyncPkt from prnt");
+	}
+	insertMyAssignedChainsIntoPushUpReq ();
 	reshAsync ();
 }
 
