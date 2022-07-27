@@ -1215,15 +1215,14 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		if (isPotentiallyPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
 			regainRsrcOfChain (chain); 
-			continue; // /handling this chain --> no need to enter it into pushDwnAck
 		}	
-		if (isPlaced(chain.id)) { 
+		else if (isPlaced(chain.id)) { 
 			placedChains.erase (chain.id); 
 			regainRsrcOfChain (chain); 
-			continue; // finished handling this chain --> no need to enter it into pushDwnAck
-		}			
-		// now we know that the chain was pushed-down from someone else, above me
-		insertChainToList (pushDwnAck, chain);
+		}
+		else { // now we know that the chain was pushed-down from someone else, above me --> inform my ancestors by pushing this chain to pushDwnAck
+			insertChainToList (pushDwnAck, chain);
+		}
 		eraseChainFromList (pushDwnReq, chain);
 	 }
 	 
@@ -1292,6 +1291,11 @@ Return when either availCpu doesn't suffice to place any additional chain, or wh
 void Datacenter::pushDwn ()
 {
 
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		sprintf (buf, "\ns%d chains pushed-dwn to me: ", dcId);
+		printBufToLog ();
+	}
+
 	for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 		if (deficitCpu <= 0 || availCpu < MyConfig::minCpuToPlaceAnyChainAtLvl [lvl]) { 
 			break;
@@ -1307,9 +1311,6 @@ void Datacenter::pushDwn ()
 
 		// now we know that this chain wasn't previously placed, or pot-placed, on me
 		Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain (*chainPtr);
-		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-			MyConfig::printToLog ("\npushed-dwn chains: ");
-		}
 
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) {
 

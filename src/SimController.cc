@@ -392,7 +392,7 @@ void SimController::runTimePeriod ()
 			}
 			isLastPeriod = false;
 			MyConfig::traceTime = new_t;
-			if (MyConfig::cpuAtLeaf==111) { //$$$
+			if (MyConfig::cpuAtLeaf==96 && MyConfig::traceTime>27001) { //$$$
 					MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
 			}
 			if (isFirstPeriod) {

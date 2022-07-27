@@ -1,28 +1,2 @@
-traceT=27001.000000 : c227 found in s86.placedChain is recorded in ChainsMaster as placed on s21 
-2000:
-c227 on s21 PUL. and on 25 PUL. ln 5206: s0 PUL. 
-Ln. 10807 t = 27001
-Ln. 12170 c227 placed on s5. And also on s21.
-Ln. 13661: c227 is in s5 pushDwnReq. -> arrives to s21. -> pushed dwn to s86. 
-Ln. 13624: s86 states it in pushDwnAck.
-Ln. 13631: s21 views it as a pushed-dwn chain. 
+<!> Error: Model error: traceT=27002.000, sim t=18.000000: error during run of ChainsMaster::concludeTimePeriod. err type=1. errChainId=1143. See the log file. -- in module (SimController) Lux.sim_controller (id=2), at t=18s, event #61017
 
-These are the problematic lines:
-s86 in finReshAsync locally. potPlaced=, is in F
-pushed-dwn chains: c227 from l3, 
-pushed-dwn chains: c224 from l3, 
-pushed-dwn chains: c205 from l3, 
-pushed-dwn chains: c204 from l3, 
-pushed-dwn chains: c180 from l2, 
-pushed-dwn chains: c833 from l2, 
-pushed-dwn chains: c559 from l2, 
-pushed-dwn chains: c814 from l2, 
-s86 snding to prnt pushDwnAck=c227 l=1, c224 l=1, c205 l=1, c204 l=1, c180 l=1, c833 l=1, c559 l=1, c814 l=1,  potPlaced=, PUL= is in F
-s1586 exiting F mode
-s21 in handleReshAsyncPktFromChild
-s21 in finReshAsync locally. potPlaced=, is in F
-pushed-dwn chains: c38 from l5, 
-pushed-dwn chains: c37 from l5, 
-pushed-dwn chains: c36 from l5, 
-pushed-dwn chains: c227 from l3, 
-The bug: it does finResh locally before removing from pushDwnReq the chains that were pushed-dwn by a child.
