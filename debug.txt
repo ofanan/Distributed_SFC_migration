@@ -1,2 +1,8 @@
-<!> Error: Model error: traceT=27002.000, sim t=18.000000: error during run of ChainsMaster::concludeTimePeriod. err type=1. errChainId=1143. See the log file. -- in module (SimController) Lux.sim_controller (id=2), at t=18s, event #61017
+simT=18.000, error: ChainsMaster::concludeTimePeriod encountered chain 1143 which is unplaced
+
+c1143 is notAssigned on s1597. notAssigned on s101. 
+- so resh.
+: notAssigned on s26. notAssigned on s6. 
+ln 2766: notAssigned in s1. 
+
 

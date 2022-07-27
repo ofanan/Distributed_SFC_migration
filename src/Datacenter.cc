@@ -197,7 +197,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "endFModeEvent")==0) { 
   	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-  		snprintf (buf, bufSize, "\ns%d exiting F mode", dcId);
+  		snprintf (buf, bufSize, "\ns%d : exiting F mode", dcId);
   		printBufToLog ();
   	}
   	isInFMode     = false;
@@ -211,8 +211,8 @@ void Datacenter::handleMessage (cMessage *msg)
   		handleBottomUpPktSync();
   	} 
 		else {
-			if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-				sprintf (buf, "\ns%d rcvd BU pkt", dcId);
+			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+				sprintf (buf, "\ns%d : rcvd BU pkt", dcId);
 				printBufToLog ();
 			}
 			if (isInFMode) {
@@ -246,7 +246,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else
   {
-    error ("t=%f : s%d rcvd a pkt of an unknown type", MyConfig::traceTime, dcId);
+    error ("t=%f : s%d : rcvd a pkt of an unknown type", MyConfig::traceTime, dcId);
   }
   delete (curHandledMsg);
 }
@@ -451,7 +451,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-				sprintf (buf, "\n s%d snding PU pkt to child", dcId);
+				sprintf (buf, "\n s%d : snding PU pkt to child", dcId);
 				printBufToLog ();
 			}
 		}
@@ -496,6 +496,10 @@ void Datacenter::bottomUpFMode ()
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+					}
+					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
+						printBufToLog ();
 					}
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
@@ -608,7 +612,7 @@ void Datacenter::bottomUp ()
 					this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 					isInFMode 			 = true;
 					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-						sprintf (buf, "\ns%d schedules initReshAsync", dcId);
+						sprintf (buf, "\ns%d : schedules initReshAsync", dcId);
 						printBufToLog ();
 					}					
 					return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); 
@@ -645,6 +649,13 @@ Handle a bottomUP pkt, when running in Async mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsync ()
 {
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+		MyConfig::printToLog (", pushUpList=");
+		MyConfig::printToLog (pushUpList, false);
+	}
 	rdBottomUpPkt ();
 	bottomUp();
 }
@@ -657,14 +668,12 @@ Handle a bottomUP pkt, when running in Async F-mode.
 void Datacenter::handleBottomUpPktAsyncFMode ()
 {	
 
-	if (MyConfig::LOG_LVL == TLAT_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt, in f mode. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
-		printBufToLog ();
-		MyConfig::printToLog (pushUpList, false);
-	}
-
 	if (withinResh ()) {
-		return rdBottomUpPkt ();	
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "\ns%d : handling a BU pkt in f mode from s%d. I'm within resh", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+			printBufToLog ();
+		}
+		return rdBottomUpPkt ();
 	}
 
 	DcId_t sndrDcId = ((Datacenter*) curHandledMsg->getSenderModule())->dcId;
@@ -696,12 +705,18 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 		notAssigned.push_back (arrivedPkt->getNotAssigned(i));
 	}
 		
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt in f mode from s%d. not within resh. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+		MyConfig::printToLog (", pushUpList=");
+		MyConfig::printToLog (pushUpList, false);
+	}
 	bottomUpFMode();
 }
 
 /*************************************************************************************************************************************************
-Read a BU pkt, and add the notAssigned chains,to the respective local ("this") data base.
-If not in "F mode", add the chains in pushUpVec into pushUpList
+Read a BU pkt, and add the notAssigned chains, and the pushUpVec, to the respective local ("this") data base.
 *************************************************************************************************************************************************/
 void Datacenter::rdBottomUpPkt ()
 {
@@ -720,9 +735,11 @@ void Datacenter::rdBottomUpPkt ()
 		}        
 	}
 	
-	if (MyConfig::LOG_LVL == TLAT_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. pushUpList=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		snprintf (buf, bufSize, "\ns%d : finished reading a BU pkt from s%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
+		MyConfig::printToLog (notAssigned);
+		MyConfig::printToLog (" pushUpList=");
 		MyConfig::printToLog (pushUpList, false);
 	}
 }
@@ -904,7 +921,7 @@ void Datacenter::reshAsync ()
 	}
 	if (canFinReshLocally) {
 	  if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-	  	sprintf (buf, "\ns%d in finReshAsync locally. potPlaced=", dcId);
+	  	sprintf (buf, "\ns%d : in finReshAsync locally. potPlaced=", dcId);
 	  	printBufToLog ();
 	  	MyConfig::printToLog(potPlacedChains);
 	  }
@@ -914,7 +931,7 @@ void Datacenter::reshAsync ()
 
 	// Cannot free enough space alone --> need to call additional child. 
 		if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d in reshAsync. pushDwnReq=", dcId);
+		snprintf (buf, bufSize, "\ns%d : in reshAsync. pushDwnReq=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushDwnReq);
 	}
@@ -958,7 +975,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
 	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
-		snprintf (buf, bufSize, "\ns%d in sndToNxtchild. nxtChildToSndReshAsync=%d", dcId, nxtChildToSndReshAsync);
+		snprintf (buf, bufSize, "\ns%d : in sndToNxtchild. nxtChildToSndReshAsync=%d", dcId, nxtChildToSndReshAsync);
 		printBufToLog ();
 	}
 	list<Chain>  pushDwnReqFromChild; 
@@ -984,7 +1001,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		ReshAsyncPkt* pkt2snd = new ReshAsyncPkt;
 
 		if (this->reshInitiatorLvl==UNPLACED_LVL) {
-			error ("t%f s%d have this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
+			error ("t%f s%d has this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
 		}
 		pkt2snd -> setReshInitiatorLvl (this->reshInitiatorLvl); 
 		pkt2snd -> setDeficitCpu 		(deficitCpu);
@@ -1000,7 +1017,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		return true; // successfully sent pkt to the next child	
 	}
 	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
-		snprintf (buf, bufSize, "\ns%d finished sending to all children", dcId);
+		snprintf (buf, bufSize, "\ns%d : finished sending to all children", dcId);
 		printBufToLog ();
 	}
 	return false; // no additional relevant child to send to
@@ -1160,7 +1177,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 
 	// now we know that we're not within another reshuffle 	
 	if (MyConfig::DEBUG_LVL>0 && !pushDwnReq.empty()) {
-		sprintf (buf, "\ns%d rcvd ReshAsyncPktFromPrnt while pushDwnReq wasn't empty. pushDwnReq=", dcId);
+		sprintf (buf, "\ns%d : rcvd ReshAsyncPktFromPrnt while pushDwnReq wasn't empty. pushDwnReq=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushDwnReq);
 		error ("s%d rcvd ReshAsyncPktFromPrnt while pushDwnReq wasn't empty", dcId);
@@ -1190,7 +1207,7 @@ Handle a reshuffle async pkt, received from a child.
 void Datacenter::handleReshAsyncPktFromChild ()
 {
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		sprintf (buf, "\ns%d in handleReshAsyncPktFromChild", dcId);
+		sprintf (buf, "\ns%d : in handleReshAsyncPktFromChild", dcId);
 		printBufToLog ();
 	}
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
@@ -1256,7 +1273,7 @@ void Datacenter::finReshAsync ()
 	potPlacedChains.clear ();
 	if (IAmTheReshIniator()) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			sprintf (buf, "\nsimT=%.3f, s%d finReshAsync where I'm s*", simTime().dbl(), dcId);
+			sprintf (buf, "\nsimT=%.3f, s%d : finReshAsync where I'm s*", simTime().dbl(), dcId);
 			printBufToLog ();
 		}
 		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
@@ -1267,6 +1284,7 @@ void Datacenter::finReshAsync ()
 			error ("t%f s%d b4 calling sndReshAsyncToPrnt I have this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
 		}
 		sndReshAsyncPktToPrnt ();
+		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
 		rstReshAsync ();
 	}
 }
@@ -1292,7 +1310,7 @@ void Datacenter::pushDwn ()
 {
 
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		sprintf (buf, "\ns%d chains pushed-dwn to me: ", dcId);
+		sprintf (buf, "\ns%d : chains pushed-dwn to me: ", dcId);
 		printBufToLog ();
 	}
 
@@ -1347,7 +1365,7 @@ After sending the pkt, pushDwnAck is clear.
 void Datacenter::sndReshAsyncPktToPrnt ()
 {
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d snding to prnt", dcId);
+		snprintf (buf, bufSize, "\ns%d : snding to prnt", dcId);
 		printBufToLog ();
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog (" pushDwnAck=");
