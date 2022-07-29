@@ -1077,7 +1077,8 @@ void Datacenter::rst ()
 
 	rstReshAsync ();
 	endFModeEvent = nullptr;
-	isInFMode 		 = false;
+	isInFMode 		= false;
+	reshuffled    = false;
 }
 
 /*************************************************************************************************************************************************
