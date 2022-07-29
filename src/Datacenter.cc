@@ -504,6 +504,11 @@ void Datacenter::bottomUpFMode ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
+//					if (MyConfig::LOG_LVL >= DETAILED_LOG) { //$$$
+						sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=", MyConfig::traceTime, dcId, chainPtr->id);
+						printBufToLog ();
+						MyConfig::printToLog (notAssigned);
+//					}
 					return failedToPlaceOldChain (chainPtr->id);
 				}
 			}
@@ -533,15 +538,16 @@ Handle a failure to place an old (exiting) chain
 *************************************************************************************************************************************************/
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
+	snprintf (buf, bufSize, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling\n", MyConfig::traceTime, dcId, chainId);
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+		printBufToLog ();
+	}
+
 	if (MyConfig::runningBinSearchSim) {
 		simController->handleAlgFailure ();
 	}
 	else {
-		snprintf (buf, bufSize, "\n*************************************\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling\n*************************************", MyConfig::traceTime, dcId, chainId);
-		printBufToLog ();
 		error (buf);
-//		MyConfig::discardAllMsgs = true;
-//		printStateAndEndSim  ();
 	}
 }
 
@@ -579,7 +585,6 @@ void Datacenter::bottomUp ()
 					}
 				}
 				chainPtr = notAssigned.erase (chainPtr);
-
 		}
 		else { 
 			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
@@ -597,6 +602,11 @@ void Datacenter::bottomUp ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
+//					if (MyConfig::LOG_LVL >= DETAILED_LOG) { //$$$
+						sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainPtr->id);
+						printBufToLog ();
+						MyConfig::printToLog (notAssigned);
+//					}
 					return failedToPlaceOldChain (chainPtr->id);
 				}
 			}

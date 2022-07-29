@@ -82,7 +82,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = 271; //numeric_limits<float>::max();;
+    simLenInSec           = numeric_limits<float>::max();;
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -141,8 +141,6 @@ Called by a dc when it fails to place an old (existing) chain.
 void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
-	
-	
 	
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 		sprintf (buf, "\nsimT=%f, in SimController::handleAlgFailure\n", simTime().dbl());
