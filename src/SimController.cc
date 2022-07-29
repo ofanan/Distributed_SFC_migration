@@ -153,7 +153,9 @@ void SimController::handleAlgFailure ()
 		for (DcId_t dc(0); dc<numDatacenters; dc++) {
 			datacenters[dc]->rst ();
 		}
-		printAllDatacenters (false, false, true); 
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			printAllDatacenters (false, false, true); 
+		}
 	}
 	else {
 		error ("alg failed not during a bin search run");

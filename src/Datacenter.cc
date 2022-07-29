@@ -1277,17 +1277,15 @@ void Datacenter::finReshAsync ()
 			sprintf (buf, "\nsimT=%.3f, s%d : finReshAsync where I'm s*", simTime().dbl(), dcId);
 			printBufToLog ();
 		}
-		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
-		rstReshAsync ();
 	}
 	else {
 		if (this->reshInitiatorLvl==UNPLACED_LVL) {
 			error ("t%f s%d b4 calling sndReshAsyncToPrnt I have this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
 		}
 		sndReshAsyncPktToPrnt ();
-		bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
-		rstReshAsync ();
 	}
+	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
+	rstReshAsync ();
 }
 
 /*************************************************************************************************************************************************
