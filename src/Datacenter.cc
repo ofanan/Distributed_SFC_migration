@@ -588,7 +588,7 @@ void Datacenter::bottomUp ()
 			}
 			
 			// Not enough availCpu for this chain, and it cannot be placed higher
-			if (reshuffled) {
+			if (MyConfig::mode==Sync && reshuffled) {
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 					MyConfig::overallNumBlockedUsrs++;
 					if (!ChainsMaster::blockChain (chainPtr->id)) {

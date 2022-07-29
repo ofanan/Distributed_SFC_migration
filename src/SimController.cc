@@ -118,7 +118,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = BASIC_LOG;
+		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -141,6 +141,8 @@ Called by a dc when it fails to place an old (existing) chain.
 void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
+	
+	
 	
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 		sprintf (buf, "\nsimT=%f, in SimController::handleAlgFailure\n", simTime().dbl());
