@@ -488,14 +488,7 @@ void SimController::finish ()
   	MyConfig::printToLog ("\nfinished sim\n");
   }
   std::chrono::time_point<std::chrono::high_resolution_clock> finishTime = std::chrono::high_resolution_clock::now();
-  //    /* Getting number of milliseconds as a double. */
   duration<double, std::micro> ms_double = finishTime - startTime;
-//    duration<double, std::milli> ms_double = t2 - t1;
-//  std::cout << ms_double.count() << "ms\n";
-
-  //auto ms_int = duration_cast<milliseconds>(finishTime - startTime);
-//	duration<double, std::chrono::seconds> ms_double = finishTime - startTime;
-
   sprintf (buf, "\nsimTime=%f", float(ms_double.count()/1000000));
 	printBufToLog ();
 }
