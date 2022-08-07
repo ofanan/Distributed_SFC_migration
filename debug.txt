@@ -1,8 +1,4 @@
-simT=18.000, error: ChainsMaster::concludeTimePeriod encountered chain 1143 which is unplaced
-
-c1143 is notAssigned on s1597. notAssigned on s101. 
-- so resh.
-: notAssigned on s26. notAssigned on s6. 
-ln 2766: notAssigned in s1. 
-
-
+FMODEPeriod=2 --> cpu188.
+FMODEPeriod=60 --> cpu183.
+FMODEPeriod=600 --> cpu188.
+FMODEPeriod=3600 --> cpu194.

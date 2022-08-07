@@ -70,6 +70,7 @@ class MyConfig {
 		static float FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
     static float traceTime; //current time (in the trace, in seconds)
     static bool runningBinSearchSim; 
+    static bool measureRunTime;
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static float RtChainPr; // prob' that a new chain is an RT chain

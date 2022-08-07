@@ -48,14 +48,17 @@ void MyConfig::rst()
 bool MyConfig::openFiles()
 {
 	logFile.open (logFileName);
-	resFile.open (resFileName);
-
-	resFile << "	// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where\n";
-	resFile << "T is the slot cnt (read from the input file)\nMode is the algorithm / solver used.\n";
-	resFile << "C is the num of CPU units used in the leaf\n[c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp.";
-	resFile << "lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else.\n\n";
+  resFile.open(resFileName, std::ios_base::app | std::ios_base::in);
+    
+	resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
+	resFile << "// T is the slot cnt (read from the input file)" << endl;
+	resFile << "// Mode is the algorithm / solver used."  << endl;
+	resFile << "// C is the num of CPU units used in the leaf"  << endl;
+	resFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
+	resFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else."  << endl  << endl;
 	return true;
 }
+
 
 /*************************************************************************************************************************************************
 * parses the given string, and set MyConfig::netType accordingly.

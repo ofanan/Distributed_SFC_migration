@@ -16,6 +16,7 @@ Controller of the simulation:
 #include <regex>
 #include <utility>
 #include <cstdlib>
+#include <chrono>
 
 #include <vector>
 #include <set>
@@ -33,6 +34,10 @@ Controller of the simulation:
 using namespace omnetpp;
 using namespace std;
 using namespace boost;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 const DcId_t root_id = 0;
 
@@ -53,6 +58,7 @@ class SimController : public cSimpleModule
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
 		int numBlockedUsrs;

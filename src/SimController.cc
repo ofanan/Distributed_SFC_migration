@@ -25,6 +25,7 @@ bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the l
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
+bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 // returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
@@ -53,13 +54,15 @@ void SimController::initialize (int stage)
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
 		networkName 		= (network -> par ("name")).stdstringValue();
-		this->mode = Async; // either Sync / Async mode of running th sime
+		this->mode = Sync; // either Sync / Async mode of running th sime
 		MyConfig::traceTime = -1.0;
 		maxTraceTime = numeric_limits<float>::max();
-		MyConfig::FModePeriod = 2.0; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+		MyConfig::FModePeriod = 3600; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
+		MyConfig::measureRunTime = true;
+
 		if (mode==Sync) {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}
 		else {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
@@ -130,8 +133,12 @@ void SimController::initialize (int stage)
 		for (h=NonRtChain::mu_u_len; h<NonRtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
-//		runTrace ();
-		initBinSearchSim ();
+		
+		if (MyConfig::measureRunTime==true) {
+    	startTime = high_resolution_clock::now();
+		}
+		runTrace ();
+//		initBinSearchSim ();
 	}
 }
 
@@ -167,7 +174,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 2.5; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.1; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
@@ -234,10 +241,10 @@ void SimController::updateCpuAtLvl ()
 void SimController::openFiles ()
 {
 	if (MyConfig::netType==MonacoIdx) {
-		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
+		MyConfig::traceFileName = "Monaco_0820_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa"; // 
+		MyConfig::traceFileName = "Lux_0820_0830_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree_resh_downto1.poa"; //"UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
@@ -362,7 +369,7 @@ void SimController::runTimePeriod ()
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 		MyConfig::mode = this->mode; // the first period is always sync; the next cycles may be either sync, or async. 
 		if (MyConfig::mode==Sync) {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "Sync");
+			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}
 		else {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
@@ -480,6 +487,17 @@ void SimController::finish ()
 	if (MyConfig::LOG_LVL>0) {
   	MyConfig::printToLog ("\nfinished sim\n");
   }
+  std::chrono::time_point<std::chrono::high_resolution_clock> finishTime = std::chrono::high_resolution_clock::now();
+  //    /* Getting number of milliseconds as a double. */
+  duration<double, std::micro> ms_double = finishTime - startTime;
+//    duration<double, std::milli> ms_double = t2 - t1;
+//  std::cout << ms_double.count() << "ms\n";
+
+  //auto ms_int = duration_cast<milliseconds>(finishTime - startTime);
+//	duration<double, std::chrono::seconds> ms_double = finishTime - startTime;
+
+  sprintf (buf, "\nsimTime=%f", float(ms_double.count()/1000000));
+	printBufToLog ();
 }
 
 /*************************************************************************************************************************************************
@@ -1031,6 +1049,34 @@ void SimController::setOutputFileNames ()
 }
 
 
+//void long_operation()
+//{
+//    /* Simulating a long, heavy operation. */
+
+
+//}
+
+//int main()
+//{
+//    using std::chrono::high_resolution_clock;
+//    using std::chrono::duration_cast;
+//    using std::chrono::duration;
+//    using std::chrono::milliseconds;
+
+//    auto t1 = high_resolution_clock::now();
+//    long_operation();
+//    auto t2 = high_resolution_clock::now();
+
+//    /* Getting number of milliseconds as an integer. */
+//    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+//    /* Getting number of milliseconds as a double. */
+//    duration<double, std::milli> ms_double = t2 - t1;
+
+//    std::cout << ms_int.count() << "ms\n";
+//    std::cout << ms_double.count() << "ms\n";
+//    return 0;
+//}
 
 
 
@@ -1045,5 +1091,5 @@ void SimController::setOutputFileNames ()
 
 
 
-
+//https://stackoverflow.com/questions/22387586/measuring-execution-time-of-a-function-in-c
 
