@@ -552,8 +552,7 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 }
 
 /************************************************************************************************************************************************
-Running the BU alg'.
-Assume that this->notAssigned and this->pushUpList already contain the relevant chains, and are sorted.
+Run the BU alg', assuming that this->notAssigned and this->pushUpList already contain the relevant chains, and are sorted.
 *************************************************************************************************************************************************/
 void Datacenter::bottomUp ()
 {
@@ -591,45 +590,43 @@ void Datacenter::bottomUp ()
 				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
 				continue;
 			}
-			
 			// Not enough availCpu for this chain, and it cannot be placed higher
-			if (MyConfig::mode==Sync && reshuffled) {
-				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
-					MyConfig::overallNumBlockedUsrs++;
-					if (!ChainsMaster::blockChain (chainPtr->id)) {
-						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+			if (MyConfig::mode==Sync) {
+				if (reshuffled) {
+					if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
+						MyConfig::overallNumBlockedUsrs++;
+						if (!ChainsMaster::blockChain (chainPtr->id)) {
+							error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
+						}
+						chainPtr = notAssigned.erase (chainPtr); 
 					}
-					chainPtr = notAssigned.erase (chainPtr); 
+					else { // Failed to place an old chain even after resh
+	//					if (MyConfig::LOG_LVL >= DETAILED_LOG) { //$$$
+							sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainPtr->id);
+							printBufToLog ();
+							MyConfig::printToLog (notAssigned);
+						return failedToPlaceOldChain (chainPtr->id);
+					}
 				}
-				else { // Failed to place an old chain even after resh
-//					if (MyConfig::LOG_LVL >= DETAILED_LOG) { //$$$
-						sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainPtr->id);
-						printBufToLog ();
-						MyConfig::printToLog (notAssigned);
-//					}
-					return failedToPlaceOldChain (chainPtr->id);
-				}
-			}
-			else { // haven't reshuffled yet --> reshuffle				
-				if (MyConfig::mode==Sync) {
+				else { // I'm in sync mode, and haven't reshuffled yet at this cycle
 					if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 						snprintf (buf, bufSize, "\n************** s%d : initiating a reshuffle at lvl %d", dcId, lvl);
 						printBufToLog();
 					}
-					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();
-				}
-				else {
-					this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
-					isInFMode 			 = true;
-					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-						sprintf (buf, "\ns%d : schedules initReshAsync", dcId);
-						printBufToLog ();
-					}					
-					return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); 
+					return (MyConfig::useFullResh)? simController->prepareFullReshSync () : prepareReshSync ();	// perform full / partial resh, 
 				}
 			}
-		}
-	}
+			else { // Async mode
+				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+				isInFMode 			 			 = true;      // set myself to "F" mode
+				if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+					sprintf (buf, "\ns%d : schedules initReshAsync", dcId);
+					printBufToLog ();
+				}					
+				return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
+			}
+		} // end case of not enough avail capacity
+	} // end "for each chain ...loop"
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU. notAssigned=", dcId);
@@ -649,13 +646,16 @@ void Datacenter::bottomUp ()
   	}
 	  pushUp ();
   }
-  else {
-  	return (MyConfig::mode==Sync)? genNsndBottomUpPktSync () : genNsndBottomUpPktAsync ();
+  else { 
+  	return (MyConfig::mode==Sync)? genNsndBottomUpPktSync () : genNsndBottomUpPktAsync (); // if needed, send my parent a BU pkt
   }
 }
 
 /*************************************************************************************************************************************************
-Handle a bottomUP pkt, when running in Async mode.
+Handle a bottomUP pkt, when running in Async mode:
+- Write log messages, if needed.
+- Read the pkt's content into this->notAssigned, and this->pushUpList.
+- Call bottomUp () for running the BU algorithm.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsync ()
 {
@@ -834,6 +834,8 @@ Generate a BottomUpPkt, based on the data currently found in notAssigned and pus
 	- if the chain can be placed higher, include it in pushUpList to be xmtd to prnt, and remove it from the this->pushUpList.
 For each chain in this->notAssigned:
 	- insert the chain into the "notAssigned" field in the pkt to be xmtd to prnt, and remove it from this->notAssigned.
+If, after this process, there's no data to send to my parent, return without doing anything.
+(else), xmt this generated BU pkt to my prnt.
 *************************************************************************************************************************************************/
 void Datacenter::genNsndBottomUpPktAsync ()
 {
@@ -888,6 +890,8 @@ void Datacenter::initReshAsync ()
 	pushDwnReq.clear (); // verify that the list doesn't contain left-overs from previous runs
 	pushDwnAck.clear (); // verify that the list doesn't contain left-overs from previous runs
 	deficitCpu = 0;
+	
+	// init pushDwnReq (list of chains I will request to to push down), and calc deficitCpu.
 	for (auto chain : notAssigned ) {
 		if (cannotPlaceThisChainHigher(chain)) {
 			Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(chain);
@@ -940,7 +944,7 @@ void Datacenter::reshAsync ()
 	}
 
 	// Cannot free enough space alone --> need to call additional child. 
-		if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : in reshAsync. pushDwnReq=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushDwnReq);
@@ -1014,7 +1018,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			error ("t%f s%d has this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
 		}
 		pkt2snd -> setReshInitiatorLvl (this->reshInitiatorLvl); 
-		pkt2snd -> setDeficitCpu 		(deficitCpu);
+		pkt2snd -> setDeficitCpu 			 	  (deficitCpu);
 		pkt2snd -> setPushDwnVecArraySize (pushDwnReqFromChild.size());
 		
 		int idxInPushDwnVec = 0;
@@ -1281,7 +1285,7 @@ void Datacenter::finReshAsync ()
 	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
 		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
 	}
-	potPlacedChains.clear ();
+	potPlacedChains.clear (); // in F mode, there're no "pot-placed" chains.
 	if (IAmTheReshIniator()) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 			sprintf (buf, "\nsimT=%.3f, s%d : finReshAsync where I'm s*", simTime().dbl(), dcId);
@@ -1294,7 +1298,7 @@ void Datacenter::finReshAsync ()
 		}
 		sndReshAsyncPktToPrnt ();
 	}
-	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode
+	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode //$$$ maybe this should be called only if I'm the initiator?
 	rstReshAsync ();
 }
 
@@ -1356,7 +1360,7 @@ void Datacenter::pushDwn ()
 				}
 			}
 			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from an ancestor of me?
-				Chain pushedDwnChain = *chainPtr;
+				Chain pushedDwnChain = *chainPtr; // yep --> insert info about this chain to the pushDwnAc, which I'l later send to my prnt.
 				pushedDwnChain.curLvl = lvl;
 				insertChainToList (pushDwnAck, pushedDwnChain);
 			}
