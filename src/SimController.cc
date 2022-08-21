@@ -241,10 +241,10 @@ void SimController::updateCpuAtLvl ()
 void SimController::openFiles ()
 {
 	if (MyConfig::netType==MonacoIdx) {
-		MyConfig::traceFileName = "Monaco_0730_0830_1secs_Telecom.poa";
+		MyConfig::traceFileName = "Monaco_0820_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
-		MyConfig::traceFileName = "Lux_0730_0830_1secs_post.poa";  //"Lux_short.poa"; // 
+		MyConfig::traceFileName = "Lux_0820_0830_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
 		MyConfig::traceFileName = "UniformTree_resh_downto1.poa"; //"UniformTree_fails_in_T1.poa"; //"UniformTree_resh_downto1.poa"; 
@@ -404,6 +404,10 @@ void SimController::runTimePeriod ()
 			if (isFirstPeriod) {
 				maxTraceTime = new_t + simLenInSec;
 			}
+			
+			if (MyConfig::traceTime == 30062){ //$$$
+				MyConfig::LOG_LVL = VERY_DETAILED_LOG;
+			}
 
 			if (MyConfig::LOG_LVL>0) {
 				if (MyConfig::traceTime==int(MyConfig::traceTime)) {
@@ -542,9 +546,9 @@ void SimController::concludeTimePeriod ()
 	int chainsMasterStts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
 	
 	if (algStts==SCCS && chainsMasterStts!=0 ) {
-		sprintf (buf, "traceT=%.3f, sim t=%f: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. See the log file.", MyConfig::traceTime, simTime().dbl(), chainsMasterStts, errChainId);
+		sprintf (buf, "traceT=%.3f, sim t=%f: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. See the log file.", 	
+					   MyConfig::traceTime, simTime().dbl(), chainsMasterStts, errChainId);
 		error (buf); 
-//		MyConfig::printToLog (buf);
 	}
 	
 	if (MyConfig::DEBUG_LVL > 0) {
@@ -556,6 +560,9 @@ void SimController::concludeTimePeriod ()
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%.3f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
+		if (MyConfig::traceTime==30062) { //$$
+			error ("t = %.0f, finished printing BUPU res.", MyConfig::traceTime);
+		}
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
 		if (MyConfig::DEBUG_LVL>1) {
@@ -570,6 +577,10 @@ void SimController::concludeTimePeriod ()
 	numMigsAtThisPeriod = 0; 
 	numCritUsrs					= 0;
 	MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
+	if (MyConfig::traceTime==30062) { //$$
+		error ("t = %.0f, finished concludeTimePeriod.", MyConfig::traceTime);
+	}
+
 }
 
 
@@ -1011,6 +1022,9 @@ inline void SimController::genSettingsBuf (bool printTime)
 *************************************************************************************************************************************************/
 void SimController::printResLine ()
 {
+//	if (MyConfig::traceTime==30063) { //$$
+//		error ("t = %.0f, beginning printResLine", MyConfig::traceTime);
+//	}
 	genSettingsBuf ();
 	MyConfig::printToRes (settingsBuf); 
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
@@ -1021,6 +1035,9 @@ void SimController::printResLine ()
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
+//	if (MyConfig::traceTime==30063) { //$$
+//		error ("t = %.0f, finished printResLine", MyConfig::traceTime);
+//	}
   snprintf (buf, bufSize, 
   					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,

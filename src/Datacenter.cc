@@ -504,8 +504,8 @@ void Datacenter::bottomUpFMode ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-//					if (MyConfig::LOG_LVL >= DETAILED_LOG) { //$$$
-						sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=", MyConfig::traceTime, dcId, chainPtr->id);
+						sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=", 
+														MyConfig::traceTime, dcId, chainPtr->id);
 						printBufToLog ();
 						MyConfig::printToLog (notAssigned);
 //					}
@@ -525,8 +525,13 @@ void Datacenter::bottomUpFMode ()
 	}
 
 	genNsndPushUpPktsToChildren (); // if there're any "left-over" push-up requests from children, just send them "as is" to the caller.
-  if (isRoot && !(notAssigned.empty())) {
+  if (isRoot) {
+  	if (notAssigned.empty()) {
+  		return; // I'm the root and no PU happens in F-mode, so there's nothing to do anymore
+  	}
+  	else {
   		error ("notAssigned isn't empty after running BU on the root");
+	  }
   }
   else {
   	return genNsndBottomUpFmodePktAsync ();
@@ -601,8 +606,8 @@ void Datacenter::bottomUp ()
 						chainPtr = notAssigned.erase (chainPtr); 
 					}
 					else { // Failed to place an old chain even after resh
-	//					if (MyConfig::LOG_LVL >= DETAILED_LOG) { //$$$
-							sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainPtr->id);
+							sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=\n", 
+											 MyConfig::traceTime, dcId, chainPtr->id);
 							printBufToLog ();
 							MyConfig::printToLog (notAssigned);
 						return failedToPlaceOldChain (chainPtr->id);

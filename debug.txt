@@ -1,4 +1,7 @@
-FMODEPeriod=2 --> cpu188.
-FMODEPeriod=60 --> cpu183.
-FMODEPeriod=600 --> cpu188.
-FMODEPeriod=3600 --> cpu194.
+Lux 144 causes seg. fault. Last written period is t = 30061.
+However, for some reason, .res is written only up to to t = 30043. 
+Prob' because "filling buf" / "silly window" issue, beacuse some "error" pints that the prog. fails indeed only later, due to seg. fault.
+Hence, start logging only in t = 30062.
+
+
+	
