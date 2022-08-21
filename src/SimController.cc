@@ -85,7 +85,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = numeric_limits<float>::max();;
+    simLenInSec           = 65; //$$numeric_limits<float>::max();;
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -405,12 +405,11 @@ void SimController::runTimePeriod ()
 				maxTraceTime = new_t + simLenInSec;
 			}
 			
-			if (MyConfig::traceTime == 30062){ //$$$
+			if (MyConfig::traceTime == 300063){ //$$$
 				MyConfig::LOG_LVL = VERY_DETAILED_LOG;
 			}
-
 			if (MyConfig::LOG_LVL>0) {
-				if (MyConfig::traceTime==int(MyConfig::traceTime)) {
+				if (MyConfig::traceTime==int(MyConfig::traceTime)) { // trace time is integer --> print it as an integer
 					snprintf (buf, bufSize, "\n\nt = %.0f, simTime=%f\n********************", MyConfig::traceTime, simTime().dbl());
 				}
 				else {
@@ -418,6 +417,7 @@ void SimController::runTimePeriod ()
 				}
 				MyConfig::printToLog (buf); 
 			}
+
 		}
 		else if ( (line.substr(0,15)).compare("usrs_that_left:")==0) {			
 			rdUsrsThatLeftLine (line.substr(16));
@@ -437,11 +437,17 @@ void SimController::runTimePeriod ()
 		}
 		else if ( (line.substr(0,9)).compare("old_usrs:")==0) {
 			rdOldUsrsLine (line.substr(10));
+			if (MyConfig::traceTime == 30063){ //$$$
+				error ("t=%f. after rd old usrs", MyConfig::traceTime);
+			}
 			
 			// rlz rsrcs of chains that left their current location 
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			chainsThatLeftDatacenter.clear ();
 		
+			if (MyConfig::traceTime == 30063){ //$$$
+				error ("t=%f. b4 init alg", MyConfig::traceTime);
+			}
 			initAlg (); // call a placement algorithm 
 			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
 		}
@@ -560,9 +566,6 @@ void SimController::concludeTimePeriod ()
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\nt=%.3f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
-		if (MyConfig::traceTime==30062) { //$$
-			error ("t = %.0f, finished printing BUPU res.", MyConfig::traceTime);
-		}
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
 		if (MyConfig::DEBUG_LVL>1) {
@@ -577,9 +580,9 @@ void SimController::concludeTimePeriod ()
 	numMigsAtThisPeriod = 0; 
 	numCritUsrs					= 0;
 	MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
-	if (MyConfig::traceTime==30062) { //$$
-		error ("t = %.0f, finished concludeTimePeriod.", MyConfig::traceTime);
-	}
+//	if (MyConfig::traceTime==30062) { //$$
+//		error ("t = %.0f, finished concludeTimePeriod.", MyConfig::traceTime);
+//	}
 
 }
 
@@ -692,23 +695,24 @@ Inputs:
 **************************************************************************************************************************************************/
 void SimController::rdOldUsrsLine (string line)
 {
-//  char_separator<char> sep("() ");
-//  tokenizer<char_separator<char>> tokens(line, sep);
   ChainId_t chainId;
   DcId_t poaId;
 	Chain chain; 
-	bool isBlocked;
 	
 	replace_if(begin(line), end(line), [] (char x) { return ispunct(x); }, ' ');
 	stringstream ss (line); 
 	
+//	if (MyConfig::traceTime == 30063){ //$$$
+//		error ("t=%f. beginning rd old usrs", MyConfig::traceTime);
+//	}
 	while (ss >> chainId) {
-		if (!ChainsMaster::checkIfBlocked (chainId, isBlocked)) {
-			error ("error in t=%.3f: ChainsMaster::checkIfBlocked didn't find chain %d", MyConfig::traceTime, chainId); 
-		}
-		if (isBlocked) { // skip blocked usrs
-			continue;
-		}
+		if (!ChainsMaster::findChain (chainId, chain)) { 
+			error ("t=%.3f: didn't find old chain %d", MyConfig::traceTime, chainId);
+	  }
+	  // now "chain" contains the chain, found by the chainId that was read from the trace
+	  if (chain.isBlocked) { 
+	  	continue;
+	  }
 		ss >> poaId;
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
@@ -717,11 +721,18 @@ void SimController::rdOldUsrsLine (string line)
 		if (MyConfig::DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%.3f: at rdOldUsrsLine, old usr %d wasn't placed yet\n", MyConfig::traceTime, chainId);
 		}
+		if (MyConfig::traceTime == 30063){ //$$$
+			sprintf (buf, "\nrd old usr %d, poa %d", chainId, poaId);
+			MyConfig::printToLog (buf);
+		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
 			numCritUsrs++;
 			chainsThatJoinedLeaf[poaId].push_back(chain); 
 			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
+//		if (MyConfig::traceTime == 30063){ //$$$
+//			error ("t=%f. finished while iteration in rd old usrs", MyConfig::traceTime);
+//		}
 	}
 }
 

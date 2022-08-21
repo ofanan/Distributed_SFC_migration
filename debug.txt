@@ -2,6 +2,13 @@ Lux 144 causes seg. fault. Last written period is t = 30061.
 However, for some reason, .res is written only up to to t = 30043. 
 Prob' because "filling buf" / "silly window" issue, beacuse some "error" pints that the prog. fails indeed only later, due to seg. fault.
 Hence, start logging only in t = 30062.
+the seg. flt. happens after the end of conclude time period 30062, and b4 the beginning of 30063.
 
-
-	
+New error:
+!> Error: Model error: t=30063.000: at rdOldUsrsLine, old usr 631 wasn't placed yet
+chain 631 appears in the trace as a new chain in 30019, and moves (as an old chain) for the first time in 30063.
+Indeed, by the log, this chain isn't placed in 30063.
+Now checking whether it's placed in 30019.
+Check shows, that this chain is blocked in 30019.
+Hence, it should appear as blocked also in 30063. Let's check this.
+Fixed it! compushing.
