@@ -313,7 +313,7 @@ void ChainsMaster::printAllDatacenters (int numDatacenters)
 	
 	// print the data
 	for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
-		snprintf (ChainsMaster::buf, ChainsMaster::bufSize, "DC %d, placed chains: ", dcId);
+		snprintf (ChainsMaster::buf, ChainsMaster::bufSize, "s%d, placed chains: ", dcId);
 		MyConfig::printToLog(buf);
 		MyConfig::printToLog (chainsPlacedOnDatacenter[dcId]);
 		MyConfig::printToLog ("\n");

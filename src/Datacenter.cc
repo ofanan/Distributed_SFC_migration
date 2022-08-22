@@ -124,19 +124,19 @@ void Datacenter::checkEndTimePeriod ()
 {
 	Enter_Method ("Datacenter::checkEndTimePeriod ()");
 	if (!potPlacedChains.empty()) {
-		error ("t=%f. DC %d : potPlacedChains is not empty\n", MyConfig::traceTime, dcId);
+		error ("t=%f. s%d : potPlacedChains is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!pushUpList.empty()) {
-		error ("t=%f. DC %d : pushUpList is not empty\n", MyConfig::traceTime, dcId);
+		error ("t=%f. s%d : pushUpList is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!notAssigned.empty()) {
-		error ("t=%f. DC %d : notAssigned is not empty\n", MyConfig::traceTime, dcId);
+		error ("t=%f. s%d : notAssigned is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!pushDwnReq.empty()) {
-		error ("t=%f. DC %d : pushDwnReq is not empty\n", MyConfig::traceTime, dcId);
+		error ("t=%f. s%d : pushDwnReq is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!pushDwnAck.empty()) {
-		error ("t=%f. DC %d : pushDwnAck is not empty\n", MyConfig::traceTime, dcId);
+		error ("t=%f. %d : pushDwnAck is not empty\n", MyConfig::traceTime, dcId);
 	}
 }
 

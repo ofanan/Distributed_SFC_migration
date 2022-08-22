@@ -348,7 +348,7 @@ void SimController::calcDistBetweenAllDcs () {
 		for (DcId_t j=1; i+j < numDatacenters; j++) {
 			Lvl_t dist = calcDistBetweenTwoDcs (i, i+j);
 			if (dist < 0) {
-				error ("couldn't calc the dist between Dc %d and Dc %d", i, i+j);
+				error ("couldn't calc the dist between s%d and s%d", i, i+j);
 			}
 			distTable[i].push_back (dist);
 		}
