@@ -127,6 +127,9 @@ void Datacenter::checkEndTimePeriod ()
 		error ("t=%f. s%d : potPlacedChains is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!pushUpList.empty()) {
+		sprintf (buf, "t=%f. s%d : error: pushUpList is not empty. PUL=\n", MyConfig::traceTime, dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushUpList);
 		error ("t=%f. s%d : pushUpList is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!notAssigned.empty()) {
