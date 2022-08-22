@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-// returns true iff the given datacenter dcId, at the given level, is delay-feasible for this chain (namely, appears in its S_u)
+float beginVeryDetailedLogAtTraceTime=30060; // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 
@@ -85,7 +85,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = 65; //$$numeric_limits<float>::max();;
+    simLenInSec           = 65; //$$numeric_limits<float>::max();
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -405,7 +405,7 @@ void SimController::runTimePeriod ()
 				maxTraceTime = new_t + simLenInSec;
 			}
 			
-			if (MyConfig::traceTime == 300063){ //$$$
+			if (MyConfig::traceTime == beginVeryDetailedLogAtTraceTime){ 
 				MyConfig::LOG_LVL = VERY_DETAILED_LOG;
 			}
 			if (MyConfig::LOG_LVL>0) {
@@ -620,7 +620,10 @@ void SimController::rdUsrsThatLeftLine (string line)
 		if (!ChainsMaster::findChain (chainId, chain)) { 
 			error ("t=%.3f: didn't find chain id %d that left", MyConfig::traceTime, chainId);
 	  }
-	  if (chain.isBlocked) { 
+	  if (chain.isBlocked) { // this chain isn't placed anywhere. However, need to remove it from ChainsMaster
+			if (!ChainsMaster::eraseChain (chainId)){
+				error ("t=%f: ChainsMaster::eraseChain didn't find blocked chainId %d to delete.", MyConfig::traceTime, chainId);
+			}
 	  	continue;
 	  }
   	chainCurDc = chain.curDc;

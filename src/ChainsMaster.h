@@ -33,6 +33,7 @@ class ChainsMaster {
 	static void displaceAllChains (); 
 	static int  concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, ChainId_t &errChainId);
 	static bool eraseChains (vector <ChainId_t> &vec); // a vector of chains ids to erase 
+	static bool eraseChain (ChainId_t chainId);
 	static bool modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRoot, Chain &modifiedChain);
 	static bool modifyLvl   (ChainId_t chainId, Lvl_t newLvl); // Change t	he level of the given chain
 	static bool modifyLvl   (unordered_set <ChainId_t> &listOfChainIds, Lvl_t newLvl);

@@ -11,4 +11,11 @@ Indeed, by the log, this chain isn't placed in 30063.
 Now checking whether it's placed in 30019.
 Check shows, that this chain is blocked in 30019.
 Hence, it should appear as blocked also in 30063. Let's check this.
-Fixed it! compushing.
+Fixed it! compushed.
+However, still seg. fault, while reading old users in t=30063.
+It happens when reading old user 629.
+This user was old already in 30063. Hence, now starting debugging from 30060.
+30060: 629 is placed on s197.
+30062: 629 is placed on s197.
+But now the prob' in 30063 appears after reading 479. Namely, while reading 480.
+Checking in the .res blocked users.

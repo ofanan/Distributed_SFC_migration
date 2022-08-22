@@ -9,6 +9,22 @@ char ChainsMaster::buf[bufSize];
 * Erases chains (given by a vector of chainIds) from allChains.
 * Returns false if one of the chains to erase wasn't found in allChains, else true.
 **************************************************************************************************************************************************/
+bool ChainsMaster::eraseChain (ChainId_t chainId)
+{
+	auto it = ChainsMaster::allChains.find(chainId);
+	if (it == ChainsMaster::allChains.end()) { 
+		snprintf (buf, bufSize, "\nERROR: ChainsMaster::eraseChains didn't find chain %d", chainId);
+		MyConfig::printToLog (buf);
+		return false;
+	}
+	ChainsMaster::allChains.erase (it);
+	return true;
+}
+
+/*************************************************************************************************************************************************
+* Erases chains (given by a vector of chainIds) from allChains.
+* Returns false if one of the chains to erase wasn't found in allChains, else true.
+**************************************************************************************************************************************************/
 bool ChainsMaster::eraseChains (vector <ChainId_t> &vec)
 {
 	for (auto chainId : vec) {
