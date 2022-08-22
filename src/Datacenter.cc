@@ -118,6 +118,29 @@ void Datacenter::initialize(int stage)
 }
 
 /*************************************************************************************************************************************************
+ * Sanity-check for the DC's state at the end of a time period.
+*************************************************************************************************************************************************/
+void Datacenter::checkEndTimePeriod ()
+{
+	Enter_Method ("Datacenter::checkEndTimePeriod ()");
+	if (!potPlacedChains.empty()) {
+		error ("t=%f. DC %d : potPlacedChains is not empty\n", MyConfig::traceTime, dcId);
+	}
+	if (!pushUpList.empty()) {
+		error ("t=%f. DC %d : pushUpList is not empty\n", MyConfig::traceTime, dcId);
+	}
+	if (!notAssigned.empty()) {
+		error ("t=%f. DC %d : notAssigned is not empty\n", MyConfig::traceTime, dcId);
+	}
+	if (!pushDwnReq.empty()) {
+		error ("t=%f. DC %d : pushDwnReq is not empty\n", MyConfig::traceTime, dcId);
+	}
+	if (!pushDwnAck.empty()) {
+		error ("t=%f. DC %d : pushDwnAck is not empty\n", MyConfig::traceTime, dcId);
+	}
+}
+
+/*************************************************************************************************************************************************
  * Print to the log file data about chains on this DC. 
  * Inputs: 
  * - printChainIds: when true, print in a format similar to that used in the centralized alg'.
@@ -127,6 +150,8 @@ void Datacenter::initialize(int stage)
 *************************************************************************************************************************************************/
 void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)
 {
+
+	Enter_Method ("Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)");
 
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
 		return;
@@ -497,10 +522,10 @@ void Datacenter::bottomUpFMode ()
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
-					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
+//					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
+						sprintf (buf, "\ns%d : blocked chain %d\n", dcId, chainPtr->id);
 						printBufToLog ();
-					}
+//					} //$$
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
@@ -603,6 +628,11 @@ void Datacenter::bottomUp ()
 						if (!ChainsMaster::blockChain (chainPtr->id)) {
 							error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 						}
+						error ("BU blocked a chain");
+//					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
+						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
+						printBufToLog ();
+//					} //$$
 						chainPtr = notAssigned.erase (chainPtr); 
 					}
 					else { // Failed to place an old chain even after resh

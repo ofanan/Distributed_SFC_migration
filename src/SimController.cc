@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime=30060; // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 
@@ -121,7 +121,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = NO_LOG;
+		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -437,7 +437,7 @@ void SimController::runTimePeriod ()
 		}
 		else if ( (line.substr(0,9)).compare("old_usrs:")==0) {
 			rdOldUsrsLine (line.substr(10));
-			if (MyConfig::traceTime == 30063){ //$$$
+			if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
 				error ("t=%f. after rd old usrs", MyConfig::traceTime);
 			}
 			
@@ -445,9 +445,6 @@ void SimController::runTimePeriod ()
 			rlzRsrcOfChains (chainsThatLeftDatacenter);
 			chainsThatLeftDatacenter.clear ();
 		
-			if (MyConfig::traceTime == 30063){ //$$$
-				error ("t=%f. b4 init alg", MyConfig::traceTime);
-			}
 			initAlg (); // call a placement algorithm 
 			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
 		}
@@ -559,6 +556,7 @@ void SimController::concludeTimePeriod ()
 	
 	if (MyConfig::DEBUG_LVL > 0) {
 		checkChainsMasterData ();
+		checkDcsEndTimePeriod ();
 	}
 	if (MyConfig::RES_LVL > 0) {
 		 printResLine ();
@@ -571,6 +569,13 @@ void SimController::concludeTimePeriod ()
 		if (MyConfig::DEBUG_LVL>1) {
 			MyConfig::printToLog ("\nBy ChainsMaster:\n");
 			ChainsMaster::printAllDatacenters (numDatacenters);
+		}
+	}
+	if (MyConfig::DEBUG_LVL > 0) {
+		for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
+			if (!datacenters[dcId]->potPlacedChains.empty()) {
+				error ("t=%f. potPlacedChains of DC %d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
+			}
 		}
 	}
 	
@@ -717,6 +722,10 @@ void SimController::rdOldUsrsLine (string line)
 	  	continue;
 	  }
 		ss >> poaId;
+		if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
+			sprintf (buf, "\nrd old usr %d, poa %d", chainId, poaId);
+			MyConfig::printToLog (buf);
+		}
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
 			error ("t=%.3f: old chain id %d is not found, or not placed", MyConfig::traceTime, chainId);  	
@@ -724,18 +733,11 @@ void SimController::rdOldUsrsLine (string line)
 		if (MyConfig::DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%.3f: at rdOldUsrsLine, old usr %d wasn't placed yet\n", MyConfig::traceTime, chainId);
 		}
-		if (MyConfig::traceTime == 30063){ //$$$
-			sprintf (buf, "\nrd old usr %d, poa %d", chainId, poaId);
-			MyConfig::printToLog (buf);
-		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
 			numCritUsrs++;
 			chainsThatJoinedLeaf[poaId].push_back(chain); 
 			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
-//		if (MyConfig::traceTime == 30063){ //$$$
-//			error ("t=%f. finished while iteration in rd old usrs", MyConfig::traceTime);
-//		}
 	}
 }
 
@@ -762,6 +764,16 @@ void SimController::initAlg () {
 }
 
 /*************************************************************************************************************************************************
+Sanity check for the data stored in the DCs
+**************************************************************************************************************************************************/
+void SimController::checkDcsEndTimePeriod  ()
+{
+	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
+		datacenters[dcId]->checkEndTimePeriod ();
+	}	
+}
+
+/*************************************************************************************************************************************************
 Compare the chainsMaster's chains' location data to the datacenters' placedChains data.
 Raise an error in case of data inconsistency.
 **************************************************************************************************************************************************/
@@ -769,12 +781,30 @@ void SimController::checkChainsMasterData ()
 {
 	Chain chain;
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
+//		if (!datacenters[dcId]->potPlacedChains.empty()) {
+//			error ("t=%f. potPlacedChains of DC %d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
+//		}
+//		if (!datacenters[dcId]->pushUpList.empty()) {
+//			error ("t=%f. potPlacedChains of DC %d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
+//		}
 		for (auto chainId : datacenters[dcId]->placedChains) {
 			if (!ChainsMaster::findChain (chainId, chain)) {
 				error ("\nc%d found in s%d placedChain isn't found in ChainsMaster", chainId, dcId);
 			}
 			if (chain.curDc != dcId) {
 				error ("\ntraceT=%f : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", MyConfig::traceTime, chainId, dcId, chain.curDc);
+			}
+		}
+	}
+	for (const auto &it : ChainsMaster::allChains) {
+		if (it.second.isBlocked) {
+			if (it.second.curDc!=UNPLACED_DC) {
+				error ("\nt=%f. chain %d is blocked, but its curDc is %d", MyConfig::traceTime, it.second.id, it.second.curDc);
+			}
+		}
+		else { // the chain isn't blocked		
+			if (it.second.curDc == UNPLACED_DC) {
+				error ("t=%f. non-blocked chain %d is not placed yet.%d", MyConfig::traceTime, it.second.id);
 			}
 		}
 	}
@@ -872,7 +902,7 @@ void SimController::preparePartialReshSync (DcId_t dcId, DcId_t leafId)
 
 /*************************************************************************************************************************************************
 Initiate the run of a Sync placement alg':
-- initiate a run of the alg' in all the leaves, be calling initBottomUp. If there're no usrs that joined the respective PoA, the leaf is called 
+- initiate a run of the alg' in all the leaves, by calling initBottomUp. If there're no usrs that joined the respective PoA, the leaf is called 
 with an empty notAssigned list.
 **************************************************************************************************************************************************/
 void SimController::initAlgSync () 
@@ -1049,7 +1079,7 @@ void SimController::printResLine ()
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-//	if (MyConfig::traceTime==30063) { //$$
+//	if (MyConfig::traceTime==30062) { //$$
 //		error ("t = %.0f, finished printResLine", MyConfig::traceTime);
 //	}
   snprintf (buf, bufSize, 

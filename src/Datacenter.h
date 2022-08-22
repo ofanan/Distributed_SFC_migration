@@ -60,6 +60,7 @@ class Datacenter : public cSimpleModule
     bool isPotentiallyPlaced (ChainId_t chainId); // return true iff the queried chain id is locally potentially-placed
 
     // Log / debug funcs
+    void checkEndTimePeriod (); // sanity check at the end of a time period
     void print (bool printPotPlaced=true, bool printPushUpList=true, bool printChainIds=true, bool beginWithNewLine=true); // print the Datacenter's content (placed and pot-placed chains, and pushUpList).
     unordered_set <ChainId_t>  placedChains, potPlacedChains;
     
@@ -84,7 +85,7 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned; 
 		
 		// A small buffer, used for printing results / log
-		static const int bufSize = 128;
+		static const int bufSize = 512;
 		char 	 buf[bufSize];
 
     void initialize(int stage);

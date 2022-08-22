@@ -23,7 +23,7 @@ using namespace std;
 class ChainsMaster {
 
 	private:
-		static const int 	bufSize = 128; // buffer for print-outs
+		static const int 	bufSize = 512; // buffer for print-outs
 		static char 			buf[bufSize];
 		static int 				numInstantMigs; // Instantaneous num of migs, including those happen and later "cancelled" by a reshuffle in the same period.
 		static unordered_map <ChainId_t, Chain> allChains; // All the currently active chains. 

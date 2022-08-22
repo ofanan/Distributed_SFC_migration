@@ -44,7 +44,7 @@ const float CLEARANCE_DELAY = 0.1;
 class MyConfig { 
 
 		// A buffer for print-outs
-		static const int 	bufSize = 128;
+		static const int 	bufSize = 512;
 		static char 			buf[bufSize];
     static ofstream 	logFile, resFile;
 

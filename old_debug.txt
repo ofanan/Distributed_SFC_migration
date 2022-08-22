@@ -1,0 +1,32 @@
+Lux 144 causes seg. fault. Last written period is t = 30061.
+However, for some reason, .res is written only up to to t = 30043. 
+Prob' because "filling buf" / "silly window" issue, beacuse some "error" pints that the prog. fails indeed only later, due to seg. fault.
+Hence, start logging only in t = 30062.
+the seg. flt. happens after the end of conclude time period 30062, and b4 the beginning of 30063.
+
+New error:
+!> Error: Model error: t=30063.000: at rdOldUsrsLine, old usr 631 wasn't placed yet
+chain 631 appears in the trace as a new chain in 30019, and moves (as an old chain) for the first time in 30063.
+Indeed, by the log, this chain isn't placed in 30063.
+Now checking whether it's placed in 30019.
+Check shows, that this chain is blocked in 30019.
+Hence, it should appear as blocked also in 30063. Let's check this.
+Fixed it! compushed.
+However, still seg. fault, while reading old users in t=30063.
+It happens when reading old user 629.
+This user was old already in 30063. Hence, now starting debugging from 30060.
+30060: 629 is placed on s197.
+30062: 629 is placed on s197.
+But now the prob' in 30063 appears after reading 479. Namely, while reading 480.
+Checking in the .res blocked users.
+Fixed it! compushed.
+However, now still, in t=30063, successfully reads old users only up to chainId 621 --> fails to read 629.
+Checking that again in the trace. In t=30062, 629 was "old", and stored on s197.
+Now checking whether c629 was blocked. So, printing only info about blocked chains.
+For some reason, while the log shows that there where blocked chain, it doesn't print the "blocked chain %d" msg.
+
+Also, trying to understand: why is the last traceTime written to .res 30043?
+Maybe it's the usual "buffer" issue: the relevant code is visited, but the prints are not done immediately.
+This only happens sometimes when NOT printing error from SimController::printResLine (). when printing from there, Opt stops only at 30062 / 30063.
+
+ToDo: check whether initBottomUp and/or missing handling of "old" potPlacedChains causes seg. flt.

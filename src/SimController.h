@@ -128,6 +128,7 @@ class SimController : public cSimpleModule
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
+    void checkDcsEndTimePeriod (); // Sanity check for the DCs when concluding a time period
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 		void printErrStrAndExit (const string &errorMsgStr);
@@ -136,7 +137,7 @@ class SimController : public cSimpleModule
 		int netType;
     ifstream traceFile;
  		string LogFileName   = "example.txt";
-		static const int bufSize = 200;
+		static const int bufSize = 512;
 		char buf[bufSize];
 		static const int settingsBufSize = 128;
 		char settingsBuf [settingsBufSize];
