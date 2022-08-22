@@ -127,7 +127,7 @@ void Datacenter::checkEndTimePeriod ()
 		error ("t=%f. s%d : potPlacedChains is not empty\n", MyConfig::traceTime, dcId);
 	}
 	if (!pushUpList.empty()) {
-		sprintf (buf, "t=%f. s%d : error: pushUpList is not empty. PUL=\n", MyConfig::traceTime, dcId);
+		sprintf (buf, "\nt=%f. s%d : error: pushUpList is not empty. PUL=\n", MyConfig::traceTime, dcId);
 		printBufToLog ();
 		MyConfig::printToLog (pushUpList);
 		error ("t=%f. s%d : pushUpList is not empty\n", MyConfig::traceTime, dcId);
@@ -378,7 +378,12 @@ void Datacenter::RegainRsrcOfpushedUpChains ()
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
 		auto search = potPlacedChains.find (chainPtr->id);
 		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do
-			chainPtr++;
+			if (isLeaf) { // no children for which we need the info about this chain --> erase it from my PUL.
+				chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain			
+			}
+			else {
+				chainPtr++;
+			}
 			continue;
 		}	
 		
@@ -441,7 +446,7 @@ void Datacenter::pushUp ()
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished PU.", dcId);
 		printBufToLog ();
-		print (false, false, true, false);
+		print (false, true, true, false);
 	}
 
 	if (isLeaf && MyConfig::mode == Sync) {
@@ -479,7 +484,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-				sprintf (buf, "\n s%d : snding PU pkt to child", dcId);
+				sprintf (buf, "\n s%d : snding PU pkt to child %d", dcId, dcIdOfChild[child]);
 				printBufToLog ();
 			}
 		}
@@ -549,7 +554,7 @@ void Datacenter::bottomUpFMode ()
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
 		printBufToLog ();
-		print (false, false, true, false);
+		print (false, true, true, false);
 	}
 
 	genNsndPushUpPktsToChildren (); // if there're any "left-over" push-up requests from children, just send them "as is" to the caller.
@@ -1374,7 +1379,7 @@ void Datacenter::pushDwn ()
 		}
 		
 		// If this chain is placed / potPlaced on me, then availCpu was already decreased when it was placed / pot-placed. No need to decrease it again
-		if (isPlaced (chainPtr->id) || isPotentiallyPlaced (chainPtr->id)) { 
+		if (isPlaced (chainPtr->id) || isPotentiallyPlaced (chainPtr->id)) { //$$$$ if it's only potPlaced, we could already place it now; in practice, this happens in BU-f. 
 			continue; 
 		}
 

@@ -1,3 +1,15 @@
 <!> Error: Model error: t=30003.000000. DC 799 : pushUpList is not empty
  -- in module (Datacenter) Lux.datacenters[799] (id=802), at t=4s, event #10648
 
+
+The prob' chain is 230.
+s26, the grandpa of s799, has 230 in its PUL. It probably sends it to s101, the prnt of s799.
+The prnt of s799 is s101, which is also in F-mode, and therefore immediately sends to its children the PUL, without trying to PU.
+Maybe the prob' is that the root causes a clearance delay, and shortly later finishes the time period, and then the PU nack pkg doesn't arrive to s799.
+Maybe the prob' is:
+RegainRsrcOfpushedUpChains indeed checks for potPlaced chains that were / weren't pushed-up. But maybe it should do a similar thing with chains in the PUL?
+
+Improvements:
+- need to finish reshAsync much earlier if I'm a leaf?
+- in pushDwn (), add a check if the pushed-dwn chain was in my PUL. If so -> remove it from the PUL.
+Or simply - clear PUL in finReshAsync, just as we clear potPlacedChains.
