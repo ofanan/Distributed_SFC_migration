@@ -141,6 +141,18 @@ void Datacenter::checkEndTimePeriod ()
 	if (!pushDwnAck.empty()) {
 		error ("t=%f. %d : pushDwnAck is not empty\n", MyConfig::traceTime, dcId);
 	}
+	for (auto item : endXmtEvents) {
+		if (item!=nullptr) {
+			error ("t=%f s%d still have xmt event in end of time period", MyConfig::traceTime, dcId);
+		}
+	}
+	for (int portNum(0); portNum<numPorts; portNum++) { 
+		if (!outputQ[portNum].isEmpty() 	 	) {
+			error ("t=%f s%d : outputQ %d isn't empty in the end of a time period", MyConfig::traceTime, dcId, portNum);
+		}
+	}
+
+
 }
 
 /*************************************************************************************************************************************************
@@ -1127,7 +1139,7 @@ void Datacenter::rst ()
 	clrRsrc ();
 	
 	// clear all the output queues and scheduled event for packets' transmissions
-	for (int portNum(0); portNum<numChildren; portNum++) { 
+	for (int portNum(0); portNum<numPorts; portNum++) { 
 		outputQ[portNum].clear ();
 	}
 	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr); 
