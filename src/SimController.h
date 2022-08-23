@@ -116,6 +116,7 @@ class SimController : public cSimpleModule
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
+		void insertToMap (unordered_map <DcId_t, vector<Chain>>, DcId_t dcId, Chain chain);
 		void calcDistBetweenAllDcs (); // Calculate the distance (in num of hops) between each pair of datacenters.
 		Lvl_t calcDistBetweenTwoDcs (DcId_t i, DcId_t); // Calculate the distance (in num of hops) between Dc i and Dc j
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);

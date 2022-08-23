@@ -703,6 +703,13 @@ void SimController::rdNewUsrsLine (string line)
 	
 }
 
+void SimController::insertToMap (unordered_map <DcId_t, vector<Chain>>, DcId_t dcId, Chain chain) 
+/*************************************************************************************************************************************************
+- Push-back a given chain to the vector associated with the given dcId within the given unordered_map. 
+**************************************************************************************************************************************************/
+{
+
+}
 /*************************************************************************************************************************************************
 - Read a trace line that includes data about old chains, that moved and thus became critical.
 - Find the chain in the db "ChainsMaster::allChains". 
