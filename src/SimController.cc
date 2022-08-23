@@ -121,7 +121,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = NO_LOG;
+		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -437,9 +437,9 @@ void SimController::runTimePeriod ()
 		}
 		else if ( (line.substr(0,9)).compare("old_usrs:")==0) {
 			rdOldUsrsLine (line.substr(10));
-			if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
-				error ("t=%f. after rd old usrs", MyConfig::traceTime);
-			}
+//			if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
+//				error ("t=%f. after rdOldUsrs", MyConfig::traceTime);
+//			}
 			
 			// rlz rsrcs of chains that left their current location 
 			rlzRsrcOfChains (chainsThatLeftDc);
@@ -877,7 +877,6 @@ void SimController::initFullReshSync ()
 			error ("Error in initFullReshSync. Please check the log file.");
 		}
 		insertToChainsThatJoinedLeaf (leafId, it.second);
-//		chainsThatJoinedLeaf[leafId].push_back(it.second); // push the chain id into the vec' of chains that "joined" this usr's poa.
 	}
 	MyConfig::discardAllMsgs = false;
 	ChainsMaster::displaceAllChains ();

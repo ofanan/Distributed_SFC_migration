@@ -1419,7 +1419,12 @@ void Datacenter::pushDwn ()
 				pushedDwnChain.curLvl = lvl;
 				insertChainToList (pushDwnAck, pushedDwnChain);
 			}
-		}
+			else {
+				if (chainPtr->curLvl == this->lvl) { // I "pushed-down" a chain from myself 
+					eraseChainFromVec (notAssigned, *chainPtr); 
+				}	
+			}
+		}	
 	}
 }
 

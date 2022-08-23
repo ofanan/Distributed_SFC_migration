@@ -14,6 +14,19 @@ Improvements:
 - in pushDwn (), add a check if the pushed-dwn chain was in my PUL. If so -> remove it from the PUL.
 Or simply - clear PUL in finReshAsync, just as we clear potPlacedChains.
 
-Seems that chainsThatJoinedLeaf is never init (and also is never correctly rst?).
-It's a map. Is this the way to init / insert into map?
-Same works for chainsThatLeft etc.
+Corrected the insertions / clearance of chainsThatJoined and chainsThatLeft in SimController.
+Changed SimController, so that now Async-mode sim begins by Async mode (rather than having first "warmup" cycle as Sync).
+However, this causes:
+<!> Error: Model error: s39 tried to block chain 2251 that wasn't found in ChainsMaster -- in module (Datacenter) Lux.datacenters[39] (id=42), at t=0.068000000745s, 
+
+The prob': chain 2251 is in s39.notAssigned. S39 begins initReshAsync due to another chain. Then, s39 inserts c2251 to pushDwnReq, with lvl=s39.lvl==2.
+Then, after running resh, when running again BU / BU-f, s39 blocks c2251. When it asks chainsMaster to block c2251, c2251 realizes that it tried to block 
+a chain that already has a lvl!=UNPLACED_LVL.
+
+But why does c2251 have l=2 in chainsMaster? 
+indeed in Datacenter.cc ln.1407 we have
+			availCpu -= requiredCpuToLocallyPlaceThisChain;
+			placedChains.insert (chainPtr->id); 				
+			ChainsMaster::modifyLvl (chainPtr->id, lvl);
+
+seems that we have to check whether this chain was in s39.notAssigned. If this is the case, and we place it on s39, than we should remove it from notAssigned.
