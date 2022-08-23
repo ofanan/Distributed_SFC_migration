@@ -13,7 +13,7 @@ int			 MyConfig::netType;
 ofstream MyConfig::logFile, MyConfig::resFile;
 char 		 MyConfig::buf[MyConfig::bufSize];
 // Lux w 144 causes seg fault
-const vector <Cpu_t>  				 MyConfig::nonAugmentedCpuAtLeaf = {1100, 144, 1,	30,};  //min feasible cpu: {842, 94, 1,	30,}; // for T_len_sim: {926, 103, 1, 30} 
+const vector <Cpu_t>  				 MyConfig::nonAugmentedCpuAtLeaf = {1300, 144, 1,	30,};  //min feasible cpu: {842, 94, 1,	30,}; // for T_len_sim: {926, 103, 1, 30} 
 const vector <vector <Cost_t>> MyConfig::RtChainCostAtLvl      = {{544, 278, 164}, 							{544, 278, 164},						 {100, 10   }, {68, 40, 31}};
 const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl   = {{544, 278, 148, 86, 58, 47}, 	{544, 278, 148, 86, 58, 47}, {100, 10, 1}, {68, 40, 29}};
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				   = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};

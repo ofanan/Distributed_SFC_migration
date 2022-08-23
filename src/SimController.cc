@@ -423,8 +423,8 @@ void SimController::runTimePeriod ()
 			rdUsrsThatLeftLine (line.substr(16));
 
 			// rlz the rsrcs of chains that left from their current datacenters 
-			rlzRsrcOfChains (chainsThatLeftDatacenter);
-			chainsThatLeftDatacenter.clear ();
+			rlzRsrcOfChains (chainsThatLeftDc);
+			chainsThatLeftDc.clear ();
 
 			//Remove the left chains from ChainsMaster
 			if (!ChainsMaster::eraseChains (usrsThatLeft)){
@@ -442,8 +442,8 @@ void SimController::runTimePeriod ()
 			}
 			
 			// rlz rsrcs of chains that left their current location 
-			rlzRsrcOfChains (chainsThatLeftDatacenter);
-			chainsThatLeftDatacenter.clear ();
+			rlzRsrcOfChains (chainsThatLeftDc);
+			chainsThatLeftDc.clear ();
 		
 			initAlg (); // call a placement algorithm 
 			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
@@ -605,7 +605,7 @@ void SimController::printAllDatacenters (bool printPotPlaced, bool printPushUpLi
 
 /*************************************************************************************************************************************************
 Read and handle a trace line that details the IDs of chains that left the simulated area.
-- insert all the IDs of chains that left some datacenter dc to this->chainsThatLeftDatacenter[dc].
+- insert all the IDs of chains that left some datacenter dc to this->chainsThatLeftDc[dc].
 - insert all the IDs of chains that left ANY dc to this->usrsThatLeft.
 Inputs:
 - line: a string, containing a list of the IDs of the chains that left the simulated area.
@@ -635,7 +635,8 @@ void SimController::rdUsrsThatLeftLine (string line)
   	if (MyConfig::DEBUG_LVL>0 && chainCurDc == UNPLACED_DC) {
 			error ("Note: this chain was not placed before leaving\n"); 
   	}
-		chainsThatLeftDatacenter[chainCurDc].push_back (chainId);//insert the id of the moved chain to the vec of chains that left its curreht Dc
+		insertToChainsThatLeftDc (chainCurDc, chain.id);
+		//chainsThatLeftDc[chainCurDc].push_back (chainId);//insert the id of the moved chain to the vec of chains that left its curreht Dc
 		usrsThatLeft.push_back (chainId);
   }
 }
@@ -686,16 +687,7 @@ void SimController::rdNewUsrsLine (string line)
 			chain = NonRtChain (chainId, S_u); 
 		}
 		
-		auto it = chainsThatJoinedLeaf.find (poaId);
-		if (it==chainsThatJoinedLeaf.end()) { // first chain joining this leaf at this time period
-			vector<Chain> vecOfChains;
-			vecOfChains.push_back (chain);
-			chainsThatJoinedLeaf.insert ({poaId, vecOfChains});
-		}
-		else { // there's already a list of chains that joined this leaf at the cur time period
-			it->second.push_back (chain);
-		}
-//		chainsThatJoinedLeaf[poaId].push_back ( chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
+		insertToChainsThatJoinedLeaf (poaId, chain);
 		if (!ChainsMaster::insert (chainId, chain)) {
 			error ("t=%d new chain %d was already found in ChainsMaster", MyConfig::traceTime, chainId);
 		}
@@ -703,13 +695,37 @@ void SimController::rdNewUsrsLine (string line)
 	
 }
 
-void SimController::insertToMap (unordered_map <DcId_t, vector<Chain>>, DcId_t dcId, Chain chain) 
+void SimController::insertToChainsThatLeftDc (DcId_t dcId, ChainId_t chainId) 
+/*************************************************************************************************************************************************
+- Push-back a given chainId to the vector associated with the given dcId within this->chainsThatLeftDc. **************************************************************************************************************************************************/
+{
+	auto it = chainsThatLeftDc.find (dcId);
+	if (it==chainsThatLeftDc.end()) { // first chain joining this leaf at this time period
+		vector<ChainId_t> vecOfChainIds;
+		vecOfChainIds.push_back (chainId);
+		chainsThatLeftDc.insert ({dcId, vecOfChainIds});
+	}
+	else { // there's already a list of chains that joined this leaf at the cur time period
+		it->second.push_back (chainId);
+	}
+}
+
+void SimController::insertToChainsThatJoinedLeaf (DcId_t dcId, Chain chain) 
 /*************************************************************************************************************************************************
 - Push-back a given chain to the vector associated with the given dcId within the given unordered_map. 
 **************************************************************************************************************************************************/
 {
-
+	auto it = chainsThatJoinedLeaf.find (dcId);
+	if (it==chainsThatJoinedLeaf.end()) { // first chain joining this leaf at this time period
+		vector<Chain> vecOfChains;
+		vecOfChains.push_back (chain);
+		chainsThatJoinedLeaf.insert ({dcId, vecOfChains});
+	}
+	else { // there's already a list of chains that joined this leaf at the cur time period
+		it->second.push_back (chain);
+	}
 }
+
 /*************************************************************************************************************************************************
 - Read a trace line that includes data about old chains, that moved and thus became critical.
 - Find the chain in the db "ChainsMaster::allChains". 
@@ -751,8 +767,9 @@ void SimController::rdOldUsrsLine (string line)
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
 			numCritUsrs++;
-			chainsThatJoinedLeaf[poaId].push_back(chain); 
-			chainsThatLeftDatacenter[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
+			insertToChainsThatJoinedLeaf (poaId, chain);
+			insertToChainsThatLeftDc (chain.curDc, chain.id);
+//			chainsThatLeftDc[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
 		}
 	}
 }
@@ -859,7 +876,8 @@ void SimController::initFullReshSync ()
 			printBufToLog();
 			error ("Error in initFullReshSync. Please check the log file.");
 		}
-		chainsThatJoinedLeaf[leafId].push_back(it.second); // push the chain id into the vec' of chains that "joined" this usr's poa.
+		insertToChainsThatJoinedLeaf (leafId, it.second);
+//		chainsThatJoinedLeaf[leafId].push_back(it.second); // push the chain id into the vec' of chains that "joined" this usr's poa.
 	}
 	MyConfig::discardAllMsgs = false;
 	ChainsMaster::displaceAllChains ();

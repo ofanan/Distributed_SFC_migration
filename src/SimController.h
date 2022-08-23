@@ -71,8 +71,8 @@ class SimController : public cSimpleModule
 		
 		string line; //current line being read from the tracefile
 		
-		//chainsThatLeftDatacenter[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
-    unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDatacenter;
+		//chainsThatLeftDc[i] will hold a vector of the (IDs of) chains that left DC i (either towards another leaf, or left the sim').
+    unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDc;
     unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined the leaf with leafId i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
 		vector <ChainId_t> usrsThatLeft; // list of chains that left the relevant chain in the cur time priod.
@@ -116,7 +116,8 @@ class SimController : public cSimpleModule
 		void handlePlacementInfoMsg (cMessage *msg);
 		void handleAlgMsg (cMessage *msg);
 		void concludeTimePeriod (); // calc costs, move cur<--nxt in state variables, etc.
-		void insertToMap (unordered_map <DcId_t, vector<Chain>>, DcId_t dcId, Chain chain);
+		void insertToChainsThatJoinedLeaf (DcId_t dcId, Chain chain);
+		void insertToChainsThatLeftDc     (DcId_t dcId, ChainId_t chainId);//insert the given chainId to the vector of chains that left the given DC 
 		void calcDistBetweenAllDcs (); // Calculate the distance (in num of hops) between each pair of datacenters.
 		Lvl_t calcDistBetweenTwoDcs (DcId_t i, DcId_t); // Calculate the distance (in num of hops) between Dc i and Dc j
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
