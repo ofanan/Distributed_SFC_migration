@@ -50,3 +50,7 @@ So why is s0 trying to block c295?
 
 
 because s0 finished sending to all children, but didn't wait for their replies!
+Found a prob': before sending the reshAsyncPkt to prnt, a Dc may better wait a little for the last child's reply?
+But indeed, it should send reshAsyncPkt to prnt, only after finished calling all children (and have their replies?).
+
+

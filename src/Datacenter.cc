@@ -1297,9 +1297,9 @@ void Datacenter::handleReshAsyncPktFromChild ()
 			error ("s%d rcvd a reshAsync pkt from child with lvl above child's lvl", dcId);
 		}
 		
-		if (chain.curLvl==lvl) {
-			eraseChainFromVec(notAssigned, chain); // if the chain was found in notAssigned, remove it from notAssigned
-		}
+		// now we know that the chain is currently placed below me --> it was pushed-down from me, or from an ancestor of me.
+		eraseChainFromVec(notAssigned, chain); // if the chain was found in notAssigned, remove it from notAssigned
+		
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
