@@ -797,16 +797,26 @@ void SimController::initAlg () {
 }
 
 /*************************************************************************************************************************************************
-Sanity check for the data stored in the DCs
+Sanity check for the data stored in the DCs:
+- check that each chain is stored in at most one Dc.
+- Call all the DCs for their own sanity checks -- mainly, verify that all databases that should be empty (e.g., notAssigned) are indeed empty now.
 **************************************************************************************************************************************************/
 void SimController::checkDcsEndTimePeriod  ()
 {
-  unordered_map <ChainId_t, DcId_t> chainToDcMap;
+  unordered_map <ChainId_t, DcId_t> chainToDc;
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
+		for (auto chainId : datacenters[dcId]->placedChains) {
+			auto it = chainToDc.find (chainId);
+			if (it==chainToDc.end()) { // this chainId isn't found yet in our chainToDc
+				chainToDc.insert ({chainId, dcId});
+			}
+			else {
+				error ("c%d is placed on both s%d and s%d", chainId, it->second, dcId);			
+			}
+		}
 		datacenters[dcId]->checkEndTimePeriod ();
-		
 	}
-	
+
 }
 
 /*************************************************************************************************************************************************
