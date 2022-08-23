@@ -30,3 +30,10 @@ indeed in Datacenter.cc ln.1407 we have
 			ChainsMaster::modifyLvl (chainPtr->id, lvl);
 
 seems that we have to check whether this chain was in s39.notAssigned. If this is the case, and we place it on s39, than we should remove it from notAssigned.
+
+Another prob': a pushed-down chain should be moved from "not assigned" of ALL DCs?
+ - not exactly, as only the initiator inserts notAssigned chains into pushDwnReq.
+ - but then, isn't it better to remove any chain inserted to pushDwnReq from notAssigned? - not exactly, because, not if it's not pushedDwn?...
+Also, should check pushDwnAck: do we really removed pushed-down chains from my notAssigned.
+
+Now, add a check, to verify that no chain is placed in 2 DCs.

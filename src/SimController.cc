@@ -801,9 +801,12 @@ Sanity check for the data stored in the DCs
 **************************************************************************************************************************************************/
 void SimController::checkDcsEndTimePeriod  ()
 {
+  unordered_map <ChainId_t, DcId_t> chainToDcMap;
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
 		datacenters[dcId]->checkEndTimePeriod ();
-	}	
+		
+	}
+	
 }
 
 /*************************************************************************************************************************************************
