@@ -13,3 +13,7 @@ Improvements:
 - need to finish reshAsync much earlier if I'm a leaf?
 - in pushDwn (), add a check if the pushed-dwn chain was in my PUL. If so -> remove it from the PUL.
 Or simply - clear PUL in finReshAsync, just as we clear potPlacedChains.
+
+Seems that chainsThatJoinedLeaf is never init (and also is never correctly rst?).
+It's a map. Is this the way to init / insert into map?
+Same works for chainsThatLeft etc.

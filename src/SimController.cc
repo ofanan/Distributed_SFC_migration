@@ -686,7 +686,16 @@ void SimController::rdNewUsrsLine (string line)
 			chain = NonRtChain (chainId, S_u); 
 		}
 		
-		chainsThatJoinedLeaf[poaId].push_back ( chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
+		auto it = chainsThatJoinedLeaf.find (poaId);
+		if (it==chainsThatJoinedLeaf.end()) { // first chain joining this leaf at this time period
+			vector<Chain> vecOfChains;
+			vecOfChains.push_back (chain);
+			chainsThatJoinedLeaf.insert ({poaId, vecOfChains});
+		}
+		else { // there's already a list of chains that joined this leaf at the cur time period
+			it->second.push_back (chain);
+		}
+//		chainsThatJoinedLeaf[poaId].push_back ( chain); // insert the chain to chainsThatJoinedLeaf[poaId].		
 		if (!ChainsMaster::insert (chainId, chain)) {
 			error ("t=%d new chain %d was already found in ChainsMaster", MyConfig::traceTime, chainId);
 		}
