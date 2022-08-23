@@ -37,3 +37,16 @@ Another prob': a pushed-down chain should be moved from "not assigned" of ALL DC
 Also, should check pushDwnAck: do we really removed pushed-down chains from my notAssigned.
 
 Now, add a check, to verify that no chain is placed in 2 DCs.
+
+trace Time=30000.000f, chain 295 was blocked whlie having curLvl=2 and curDc=-1
+The wrong error msg is:  
+	<!> Error: Model error: s0 tried to block chain 295 that wasn't found in ChainsMaster -- in module (Datacenter) Lux.datacenters[0] (id=3), at t=0.479000000745s, 
+c295 belongs to s1682.
+s24.lvl == 2.
+
+s24 : chains pushed-dwn to me: c1476 from l5, c2564 from l5, c295 from l5, 
+s24 : snding to prnt pushDwnAck=c1708 l=0, c1476 l=2, c2564 l=2, c295 l=2,  potPlaced=, PUL= is in F
+So why is s0 trying to block c295?
+
+
+because s0 finished sending to all children, but didn't wait for their replies!

@@ -53,7 +53,7 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 	}
 	it->second.isBlocked = true;
 	if (MyConfig::DEBUG_LVL > 0 && (it->second.curLvl != UNPLACED_LVL || it-> second.curDc != UNPLACED_DC))  {
-	  	snprintf (buf, bufSize, "\ntrace Time=%.3ff, chain %d was blocked whlie having curLvl=%d and curDc=%d", MyConfig::traceTime, chainId, it->second.curLvl, it->second.curDc);
+	  	snprintf (buf, bufSize, "\ntrace Time=%.3f, chain %d was blocked whlie having curLvl=%d and curDc=%d", MyConfig::traceTime, chainId, it->second.curLvl, it->second.curDc);
 	  	MyConfig::printToLog (buf);
 	  	return false;
 	}
