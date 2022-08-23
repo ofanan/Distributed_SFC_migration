@@ -116,7 +116,7 @@ void SimController::initialize (int stage)
 			}
 		}
 		discoverPathsToRoot  ();
-		calcDistBetweenAllDcs				 ();
+//		calcDistBetweenAllDcs				 ();
 		return;
 	}
 	

@@ -75,7 +75,7 @@ class SimController : public cSimpleModule
     unordered_map <DcId_t, vector<ChainId_t> > chainsThatLeftDc;
     unordered_map <DcId_t, vector<Chain>> chainsThatJoinedLeaf; // chainsThatJoinedLeaf[i] will hold the list of chains that joined the leaf with leafId i
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
-		vector <ChainId_t> usrsThatLeft; // list of chains that left the relevant chain in the cur time priod.
+		vector <ChainId_t> usrsThatLeft; // list of chains that left the simulated area in the cur time priod.
     
     //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
     vector <bool> rcvdFinishedAlgMsgFromLeaves; 
@@ -141,7 +141,7 @@ class SimController : public cSimpleModule
  		string LogFileName   = "example.txt";
 		static const int bufSize = 512;
 		char buf[bufSize];
-		static const int settingsBufSize = 128;
+		static const int settingsBufSize = 256;
 		char settingsBuf [settingsBufSize];
 		ofstream logFile;
     SimController ();
