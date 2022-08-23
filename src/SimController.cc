@@ -827,12 +827,6 @@ void SimController::checkChainsMasterData ()
 {
 	Chain chain;
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
-//		if (!datacenters[dcId]->potPlacedChains.empty()) {
-//			error ("t=%f. potPlacedChains of DC %d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
-//		}
-//		if (!datacenters[dcId]->pushUpList.empty()) {
-//			error ("t=%f. potPlacedChains of DC %d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
-//		}
 		for (auto chainId : datacenters[dcId]->placedChains) {
 			if (!ChainsMaster::findChain (chainId, chain)) {
 				error ("\nc%d found in s%d placedChain isn't found in ChainsMaster", chainId, dcId);
