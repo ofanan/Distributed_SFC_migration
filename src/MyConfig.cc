@@ -32,7 +32,7 @@ void MyConfig::init()
 void MyConfig::rst()
 {
 	MyConfig::traceTime 				  	= -1.0;
-	MyConfig::mode 									= Async; // Begin the sim' in Sync mode for. When this->mode==Async, we'll change MyConfig::mode to Async at the second period
+	MyConfig::mode 									= Async; // Possibley, Begin the sim' in Sync mode, for easy init; switch to mode==Async at the second period
 	MyConfig::overallNumBlockedUsrs = 0; 
 	MyConfig::discardAllMsgs 				= false;
 	MyConfig::lvlOfHighestReshDc 		= UNPLACED_LVL;
@@ -149,7 +149,7 @@ void MyConfig::printToLog (list <Chain> list2print, bool printLvl)
 // print all the chain's data
 void MyConfig::printToLog (Chain chain)
 {
-	logFile << "chain " << chain.id << " curDc=" << chain.curDc << " lvl=" << chain.curLvl << " S_u="; 
+	logFile << "c " << chain.id << ", l=" << chain.curLvl << ", curDc=" << chain.curDc << " S_u="; 
 	printToLog (chain.S_u);
 }
 

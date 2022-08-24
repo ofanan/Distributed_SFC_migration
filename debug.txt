@@ -53,4 +53,23 @@ because s0 finished sending to all children, but didn't wait for their replies!
 Found a prob': before sending the reshAsyncPkt to prnt, a Dc may better wait a little for the last child's reply?
 But indeed, it should send reshAsyncPkt to prnt, only after finished calling all children (and have their replies?).
 
+Prob': pushDwnReq sends to child many chains (pushDwnReqFromChild). The child includes in its answer, in pushDwnAck, only the chains it succeeded to push-down.
+Then, in handlePushDwnFromChild, the parent considers only the chains that appeared in the ack. Hence, the chains remain in pushDwnReq, 
+even if there's no hope anymore to push them down.
+Possible sol: while sending to child, keep this->pushDwnReqFromChild. As we send to children serially, one such state var is enough.
+Then, when getting the child's reply, may move from pushDwnReq all chains that are from my level, and the child didn't push-down.
+If the chains are from above me, maybe later, when I have more space, I'll succeed to push-them down to myself.
 
+traceT=30000.000000 : c2256 found in s4.placedChain is recorded in ChainsMaster as placed on s0
+c2256 is orginiated from s1443. not Assigned in s1443, s300, s80, s19, s4, s0. 
+Ln. 20797 ************** simT=0.050, s0 : init resh at lvl 5. 
+In Ln. 23047: s0, already reshuffling, has s1443 in its pushDwnReq.
+24114: s4 has c2256 l=5 in its pushDwnReq. And then s19, s80, s300.
+Ln. 24381: 
+s80 : chains pushed-dwn to me: c2256 from l5, c2487 from l5, c2665 from l5, c2074 from l4, c1990 from l2, 
+Ln. 24390:
+s19 : snding to prnt pushDwnAck=c2139 l=2, c2819 l=2, c2256 l=2, c2487 l=2, c2665 l=2, c2074 l=2,  potPlaced=, PUL= is in F
+Ln. 24393:
+s4 : in handleReshAsyncPktFromChild
+Ln. 24397:
+s4 : chains pushed-dwn to me: c2256 from l5,  BANG@@@

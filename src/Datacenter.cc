@@ -648,7 +648,7 @@ void Datacenter::bottomUp ()
 						if (!ChainsMaster::blockChain (chainPtr->id)) {
 							error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 						}
-						error ("BU blocked a chain");
+						error ("BU Sync blocked a chain");
 //					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
 						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
 						printBufToLog ();
@@ -1047,8 +1047,8 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		snprintf (buf, bufSize, "\ns%d : in sndToNxtchild. nxtChildToSndReshAsync=%d", dcId, nxtChildToSndReshAsync);
 		printBufToLog ();
 	}
-	list<Chain>  pushDwnReqFromChild; 
 
+	pushDwnReqFromChild.clear ();
 	while (nxtChildToSndReshAsync < numChildren) {
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 			if (chainPtr->S_u[lvl-1]==dcIdOfChild[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
@@ -1077,9 +1077,13 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		pkt2snd -> setPushDwnVecArraySize (pushDwnReqFromChild.size());
 		
 		int idxInPushDwnVec = 0;
-		for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {	
-			pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
-			chainPtr = pushDwnReqFromChild.erase (chainPtr);
+//		for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {	
+//			pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
+//			chainPtr = pushDwnReqFromChild.erase (chainPtr);
+//		}
+	
+		for (auto chain : pushDwnReqFromChild) {	
+			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
@@ -1298,7 +1302,8 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		}
 		
 		// now we know that the chain is currently placed below me --> it was pushed-down from me, or from an ancestor of me.
-		eraseChainFromVec(notAssigned, chain); // if the chain was found in notAssigned, remove it from notAssigned
+		eraseChainFromList (pushDwnReq,  chain); 
+		eraseChainFromVec  (notAssigned, chain); // if the chain was found in notAssigned, remove it from notAssigned
 		
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
@@ -1312,9 +1317,20 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		else { // now we know that the chain was pushed-down from someone else, above me --> inform my ancestors by pushing this chain to pushDwnAck
 			insertChainToList (pushDwnAck, chain);
 		}
-		eraseChainFromList (pushDwnReq, chain);
+		eraseChainFromList (pushDwnReqFromChild, chain);
 	 }
 	 
+	Lvl_t childFromWhichReshAckArrived = nxtChildToSndReshAsync-1;
+	//	for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {
+
+//	// remove from pushDwnReq all the chains that I requested from this child to push-down from me, but weren't pushed-dwn 
+//	for (auto chain : pushDwnReqFromChild) {
+//		if (chain.curLvl==lvl && // this is a request to push-dwn a chain from me, and the child didn't push-dwn this chain, AND
+//	   		chain.S_u[lvl-1]==dcIdOfChild[childFromWhichReshAckArrived])   { /// this chain is associated with (the sub-tree of) the child that sent me this ack
+//				eraseChainFromList (pushDwnReq, chain);
+//		}
+//	} 
+	
 	if (deficitCpu <= 0) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 			sprintf (buf, "\ns%d : defCpu=%d. finishing", dcId, deficitCpu);
@@ -1392,8 +1408,17 @@ void Datacenter::pushDwn ()
 			error ("my pushDwnReq should include only chains with curLvl >= this.lvl");
 		}
 		
-		// If this chain is placed / potPlaced on me, then availCpu was already decreased when it was placed / pot-placed. No need to decrease it again
-		if (isPlaced (chainPtr->id) || isPotentiallyPlaced (chainPtr->id)) { //$$$$ if it's only potPlaced, we could already place it now; in practice, this happens in BU-f. 
+		// If this chain is placed on me, then availCpu was already decreased, and ChainMaster was updated, when it was placed. No need for further actions
+		if (isPlaced (chainPtr->id)) { 
+			continue; 
+		}
+		
+		// If this chain is potPlaced on me, then availCpu was already decreased when it was pot-placed. No need to decrease it again
+		if (isPotentiallyPlaced (chainPtr->id)) { 
+			// finally place this pot-placed chain
+			potPlacedChains.erase   (chainPtr->id); 
+			placedChains.insert 		(chainPtr->id); 
+			ChainsMaster::modifyLvl (chainPtr->id, lvl);		// update ChainMaster about the new placement	
 			continue; 
 		}
 
@@ -1407,8 +1432,9 @@ void Datacenter::pushDwn ()
 				printBufToLog ();
 			}
 			availCpu -= requiredCpuToLocallyPlaceThisChain;
-			placedChains.insert (chainPtr->id); 				
-			ChainsMaster::modifyLvl (chainPtr->id, lvl);
+			placedChains.insert 		(chainPtr->id); 				// locally-place the chain
+			ChainsMaster::modifyLvl (chainPtr->id, lvl);		// update ChainMaster about the new placement
+			eraseChainFromVec (notAssigned, *chainPtr); // verify that the chain I pushed-down to myself isn't in my notAssigned list
 			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
 				deficitCpu -= chainPtr->potCpu;
 				if (MyConfig::DEBUG_LVL>0 && requiredCpuToPlaceChainAtLvl (*chainPtr, reshInitiatorLvl) != chainPtr->potCpu) {
@@ -1417,16 +1443,11 @@ void Datacenter::pushDwn ()
 				}
 			}
 			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from an ancestor of me?
-				Chain pushedDwnChain = *chainPtr; // yep --> insert info about this chain to the pushDwnAc, which I'l later send to my prnt.
+				Chain pushedDwnChain = *chainPtr; // yep --> insert info about this chain to the pushDwnAck, which I'l later send to my prnt.
 				pushedDwnChain.curLvl = lvl;
 				insertChainToList (pushDwnAck, pushedDwnChain);
 			}
-			else {
-				if (chainPtr->curLvl == this->lvl) { // I "pushed-down" a chain from myself 
-					eraseChainFromVec (notAssigned, *chainPtr); 
-				}	
-			}
-		}	
+		}
 	}
 }
 

@@ -76,6 +76,7 @@ class Datacenter : public cSimpleModule
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'
 		list <Chain> 					pushDwnReq, pushDwnAck; // List of chains requested to be pushed-down, acknowledged that were pushed-down
+		list<Chain>  pushDwnReqFromChild; // List of chains requested to be pushed-down lastly sent to a child
 		Lvl_t  nxtChildToSndReshAsync; // will hold the serial num (0, 1, ..., numChildren-1) of the next child to which the Dc may try to snd a reshAsyncPkt.
 		int deficitCpu;
 		Lvl_t reshInitiatorLvl; // will hold the level of the initiator of the currently running async reshuffle
