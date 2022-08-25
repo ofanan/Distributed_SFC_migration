@@ -73,6 +73,7 @@ class Datacenter : public cSimpleModule
     vector <EndXmtMsg*> 	endXmtEvents; // endXmts[i] will hold the event of the end of the transmission of a pkt in output channel i
 		cMessage*							endFModeEvent; // will hold the event of finishing "F" mode
 		bool									isInFMode; 
+		bool 									isInAccumDelay; // when true, only accumulate and parse arriving pkts, but don't run the relevant placing algs.
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'
 		list <Chain> 					pushDwnReq, pushDwnAck; // List of chains requested to be pushed-down, acknowledged that were pushed-down

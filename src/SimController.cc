@@ -901,7 +901,7 @@ void SimController::prepareFullReshSync ()
 {
 	Enter_Method ("SimController::prepareFullReshSync ()");
 	MyConfig::discardAllMsgs = true;
-	scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("InitFullReshMsg"));
+	scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("InitFullReshMsg"));
 }
 
 

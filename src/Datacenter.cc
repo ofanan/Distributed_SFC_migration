@@ -113,8 +113,9 @@ void Datacenter::initialize(int stage)
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
 	rstReshAsync ();
-	endFModeEvent = nullptr;
+	endFModeEvent  = nullptr;
 	isInFMode 		 = false;
+	isInAccumDelay = false;
 }
 
 /*************************************************************************************************************************************************
@@ -244,6 +245,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	endFModeEvent = nullptr; 
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "initReshAsync")==0) {
+  	isInAccumDelay = false;
   	initReshAsync (); 
   }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
@@ -372,6 +374,13 @@ void Datacenter::handlePushUpPkt ()
 		}
 	}
 	
+	if (isInAccumDelay) {
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "\ns%d : rding PU pkt during accum delay", dcId);
+			printBufToLog ();
+		}
+		return;
+	}
 	if (isInFMode) {
 		RegainRsrcOfpushedUpChains ();
 		genNsndPushUpPktsToChildren();
@@ -674,11 +683,12 @@ void Datacenter::bottomUp ()
 			else { // Async mode
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
+				isInAccumDelay				 = true;
 				if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
 					printBufToLog ();
-				}					
-				return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
+				}	
+				return scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
 			}
 		} // end case of not enough avail capacity
 	} // end "for each chain ...loop"
@@ -732,6 +742,14 @@ Handle a bottomUP pkt, when running in Async F-mode.
 *************************************************************************************************************************************************/
 void Datacenter::handleBottomUpPktAsyncFMode ()
 {	
+
+	if (isInAccumDelay) {
+		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			snprintf (buf, bufSize, "\ns%d : rding BU pkt from s%d during accum delay", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+			printBufToLog ();
+		}
+		return rdBottomUpPkt ();
+	}
 
 	if (withinResh ()) {
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
@@ -961,7 +979,7 @@ void Datacenter::initReshAsync ()
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
 	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : *** simT=%.3f, s%d : init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
+		snprintf (buf, bufSize, "\ns%d : *** simT=%.3f init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
@@ -1149,9 +1167,10 @@ void Datacenter::rst ()
 	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr); 
 
 	rstReshAsync ();
-	endFModeEvent = nullptr;
-	isInFMode 		= false;
-	reshuffled    = false;
+	endFModeEvent  = nullptr;
+	isInFMode 		 = false;
+	isInAccumDelay = false;
+	reshuffled     = false;
 }
 
 /*************************************************************************************************************************************************
