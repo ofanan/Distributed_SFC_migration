@@ -675,7 +675,7 @@ void Datacenter::bottomUp ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-					sprintf (buf, "\ns%d : schedules initReshAsync", dcId);
+					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
 					printBufToLog ();
 				}					
 				return scheduleAt (simTime() + CLEARANCE_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
@@ -961,7 +961,7 @@ void Datacenter::initReshAsync ()
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
 	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\n************** simT=%.3f, s%d : init resh at lvl %d. pushDwnReq=", simTime().dbl(), dcId, lvl);
+		snprintf (buf, bufSize, "\ns%d : *** simT=%.3f, s%d : init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
@@ -1302,22 +1302,22 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		}
 		
 		// now we know that the chain is currently placed below me --> it was pushed-down from me, or from an ancestor of me.
-		eraseChainFromList (pushDwnReq,  chain); 
-		eraseChainFromVec  (notAssigned, chain); // if the chain was found in notAssigned, remove it from notAssigned
+		eraseChainFromList (pushDwnReq,  				 chain); 
+		eraseChainFromVec  (notAssigned, 				 chain); // if the chain was found in notAssigned, remove it from notAssigned
+		eraseChainFromList (pushDwnReqFromChild, chain);
 		
 		// now we know that the chain was pushed-down to a Dc below me
 		if (isPotentiallyPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
-			regainRsrcOfChain (chain); 
+			regainRsrcOfChain		  (chain); 
 		}	
 		else if (isPlaced(chain.id)) { 
 			placedChains.erase (chain.id); 
-			regainRsrcOfChain (chain); 
+			regainRsrcOfChain  (chain); 
 		}
 		else { // now we know that the chain was pushed-down from someone else, above me --> inform my ancestors by pushing this chain to pushDwnAck
 			insertChainToList (pushDwnAck, chain);
 		}
-		eraseChainFromList (pushDwnReqFromChild, chain);
 	 }
 	 
 	Lvl_t childFromWhichReshAckArrived = nxtChildToSndReshAsync-1;

@@ -60,16 +60,5 @@ Possible sol: while sending to child, keep this->pushDwnReqFromChild. As we send
 Then, when getting the child's reply, may move from pushDwnReq all chains that are from my level, and the child didn't push-down.
 If the chains are from above me, maybe later, when I have more space, I'll succeed to push-them down to myself.
 
-traceT=30000.000000 : c2256 found in s4.placedChain is recorded in ChainsMaster as placed on s0
-c2256 is orginiated from s1443. not Assigned in s1443, s300, s80, s19, s4, s0. 
-Ln. 20797 ************** simT=0.050, s0 : init resh at lvl 5. 
-In Ln. 23047: s0, already reshuffling, has s1443 in its pushDwnReq.
-24114: s4 has c2256 l=5 in its pushDwnReq. And then s19, s80, s300.
-Ln. 24381: 
-s80 : chains pushed-dwn to me: c2256 from l5, c2487 from l5, c2665 from l5, c2074 from l4, c1990 from l2, 
-Ln. 24390:
-s19 : snding to prnt pushDwnAck=c2139 l=2, c2819 l=2, c2256 l=2, c2487 l=2, c2665 l=2, c2074 l=2,  potPlaced=, PUL= is in F
-Ln. 24393:
-s4 : in handleReshAsyncPktFromChild
-Ln. 24397:
-s4 : chains pushed-dwn to me: c2256 from l5,  BANG@@@
+Currently, msgs are still passing during the accum' delay (CLEARANCE DELAY), waited before the init of a new resh. This wastes pkts, by sending irrelevant
+pkts (especially to parents); and may cause confusion. Hence, during CLEARANCE_DELAY should only rcv pkts and aggregate their info, but don't run new pkts.
