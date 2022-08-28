@@ -62,3 +62,10 @@ If the chains are from above me, maybe later, when I have more space, I'll succe
 
 Currently, msgs are still passing during the accum' delay (CLEARANCE DELAY), waited before the init of a new resh. This wastes pkts, by sending irrelevant
 pkts (especially to parents); and may cause confusion. Hence, during CLEARANCE_DELAY should only rcv pkts and aggregate their info, but don't run new pkts.
+
+
+Cur prob' is in ln. 1081 of Datacenter.cc, in insertMyAssignedChainsIntoPushUpReq. Maybe ChainsMaster::findChain doesn't really answer a correct new chain.
+Indeed, prob' is:
+<!> Model error: pot-placed chain 399 was not found in ChainMaster, or chain has wrong S_u. See log file. -- in module (Datacenter) Lux.datacenters[0] (id=3), at t=1.000005s, event #10563
+
+Should check in ChainsMaster::insert whether the inserted chain is OK.

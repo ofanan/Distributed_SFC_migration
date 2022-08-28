@@ -149,6 +149,7 @@ void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
 	
+	error ("in SimController::handleAlgFailure");
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 		sprintf (buf, "\nsimT=%f, in SimController::handleAlgFailure\n", simTime().dbl());
 		printBufToLog ();
@@ -742,18 +743,15 @@ void SimController::rdOldUsrsLine (string line)
 	replace_if(begin(line), end(line), [] (char x) { return ispunct(x); }, ' ');
 	stringstream ss (line); 
 	
-//	if (MyConfig::traceTime == 30063){ //$$$
-//		error ("t=%f. beginning rd old usrs", MyConfig::traceTime);
-//	}
 	while (ss >> chainId) {
 		if (!ChainsMaster::findChain (chainId, chain)) { 
 			error ("t=%.3f: didn't find old chain %d", MyConfig::traceTime, chainId);
 	  }
 	  // now "chain" contains the chain, found by the chainId that was read from the trace
+      ss >> poaId;
 	  if (chain.isBlocked) { 
 	  	continue;
 	  }
-		ss >> poaId;
 		if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
 			sprintf (buf, "\nrd old usr %d, poa %d", chainId, poaId);
 			MyConfig::printToLog (buf);

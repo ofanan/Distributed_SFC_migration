@@ -349,6 +349,14 @@ void Datacenter::initBottomUp (vector<Chain>& vecOfChainsThatJoined)
 	potPlacedChains.  clear ();
 	notAssigned = vecOfChainsThatJoined;
 
+	if (MyConfig::DEBUG_LVL>0) {
+		for (auto chain : notAssigned) {
+		  if (chain.S_u.size() ==0) {
+		    error ("s%d : encountered c%d with S_u_len=0", dcId, chain.id);
+		  }
+		}
+	}
+
  	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : rcvd vecOfChainsThatJoined=", dcId);
 		printBufToLog (); 
@@ -369,7 +377,8 @@ void Datacenter::handlePushUpPkt ()
   PushUpPkt *pkt = (PushUpPkt*) this->curHandledMsg;
 	
 	for (int i(0); i< (pkt->getPushUpVecArraySize()); i++) {
-		if (!insertChainToList (pushUpList, pkt->getPushUpVec (i))) {
+		
+		if (!checkNinsertChainToList (pushUpList, pkt->getPushUpVec (i))) {
 			 error ("t%f. Error in insertChainToList. See log file for details", MyConfig::traceTime);
 		}
 	}
@@ -461,7 +470,11 @@ void Datacenter::pushUp ()
 	}
 	
 	for (auto chainPtr=pushedUpChains.begin(); chainPtr!=pushedUpChains.end(); chainPtr++) {
-		insertChainToList (pushUpList, *chainPtr);
+		if (MyConfig::DEBUG_LVL>0 && chainPtr->S_u.size() ==0) {
+			error ("s%d : encountered pushedUpChain c%d with S_u_len=0", dcId, chainPtr->id);
+		}
+
+		checkNinsertChainToList (pushUpList, *chainPtr);
 	}
 	
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
@@ -483,6 +496,9 @@ Generate pushUpPkts, based on the data currently found in pushUpList, and xmt th
 *************************************************************************************************************************************************/
 void Datacenter::genNsndPushUpPktsToChildren ()
 {
+    if (isLeaf) {
+        return;
+    }
 	PushUpPkt* pkt;	 // the packet to be sent 
 	
 	for (Lvl_t child(0); child<numChildren; child++) { // for each child...
@@ -638,7 +654,10 @@ void Datacenter::bottomUp ()
 					Chain modifiedChain = *chainPtr;
 					modifiedChain.curLvl = lvl;
 					modifiedChain.potCpu = requiredCpuToLocallyPlaceThisChain; // set the chain's "potCpu" field to the cpu required, if I'll host it
-					if (!insertChainToList (pushUpList, modifiedChain)) {
+					if (MyConfig::DEBUG_LVL>0 && modifiedChain.S_u.size() ==0) {
+						error ("s%d : encountered modifiedChain c%d with S_u_len=0", dcId, modifiedChain.id);
+					}
+					if (!checkNinsertChainToList (pushUpList, modifiedChain)) {
 						error ("Error in insertChainToList. See log file for details");
 					}
 				}
@@ -813,9 +832,9 @@ void Datacenter::rdBottomUpPkt ()
 	
 	// Add each chain stated in the pkt's pushUpVec field into this->pushUpList
 	for (int i(0); i<pkt -> getPushUpVecArraySize (); i++) {
-	  if (!insertChainToList (pushUpList, pkt->getPushUpVec(i))) {
+	  if (!checkNinsertChainToList (pushUpList, pkt->getPushUpVec(i))) {
 			error ("Error in insertChainToList. See log file for details");
-		}        
+		}
 	}
 	
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
@@ -927,7 +946,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
 		pkt2snd->setPushUpVec (idxInPushUpVec++, *chainPtr);
-		chainPtr = pushUpList.erase (chainPtr); //delete the local entry for this chain in pushUpList; once the push-up repy arrives from the prnt, we'll re-insert it
+		chainPtr = pushUpList.erase (chainPtr); //erase the local entry for this chain in pushUpList; once the push-up repy arrives from the prnt, we'll re-insert it
 	}
 	
 	if (idxInPushUpVec>0 || !notAssigned.empty()) { // there's either pushUp, or notAssigned data to send to prnt
@@ -969,9 +988,10 @@ void Datacenter::initReshAsync ()
 		if (cannotPlaceThisChainHigher(chain)) {
 			Cpu_t requiredCpuToLocallyPlaceThisChain = requiredCpuToLocallyPlaceChain(chain);
 			deficitCpu += requiredCpuToLocallyPlaceThisChain;
-			chain.curLvl = lvl;
-			chain.potCpu = requiredCpuToLocallyPlaceThisChain;
-			insertChainToList (pushDwnReq, chain);
+			Chain chain2pushDwn = chain;
+			chain2pushDwn.curLvl = lvl;
+			chain2pushDwn.potCpu = requiredCpuToLocallyPlaceThisChain;
+			checkNinsertChainToList (pushDwnReq, chain2pushDwn);
 		}
 	}
 	deficitCpu -= availCpu;
@@ -987,6 +1007,19 @@ void Datacenter::initReshAsync ()
 	reshAsync ();
 }
 
+/*************************************************************************************************************************************************
+insert a chain to a list.
+If the chain (recognized equivocally by its id) is already found in the list, the old occurance in the list is deleted.
+If DEBUG_LVL requests it, then before inserting the chain to the list, perform a sanity check to the chain.
+*************************************************************************************************************************************************/
+bool Datacenter::checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain)
+{
+  if (MyConfig::DEBUG_LVL>0 && chain.S_u.size()==0) {
+    error ("s%d : encountered c%d with S_u_len==0", dcId, chain.id);
+  }
+	return insertChainToList (listOfChains, chain); 
+}
+ 
 /*************************************************************************************************************************************************
 run the async reshuffle algorithm. Called either by initReshAsync upon a failure to place a chain, or by an arrival of reshAsyncPkt
 *************************************************************************************************************************************************/
@@ -1006,7 +1039,7 @@ void Datacenter::reshAsync ()
 			break;
 		}
 	}
-	if (canFinReshLocally) {
+	if (canFinReshLocally || isLeaf) {
 	  if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 	  	sprintf (buf, "\ns%d : in finReshAsync locally. potPlaced=", dcId);
 	  	printBufToLog ();
@@ -1038,19 +1071,21 @@ void Datacenter::insertMyAssignedChainsIntoPushUpReq ()
 	Chain chain;
 	for (ChainId_t chainId : potPlacedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
-			error ("pot-placed chain %d was not found in ChainMaster", chainId);
+			error ("pot-placed chain %d was not found in ChainMaster, or has wrong S_u. S_u_len=%d.", chainId, chain.S_u.size());
 		}
-		chain.curLvl = lvl;
-		chain.potCpu = requiredCpuToLocallyPlaceChain (chain);
-		insertChainToList (pushDwnReq, chain);
+		Chain chain2insert = chain;
+		chain2insert.curLvl = lvl;
+		chain2insert.potCpu = requiredCpuToLocallyPlaceChain (chain2insert);
+		checkNinsertChainToList (pushDwnReq, chain2insert);
 	}
 	for (ChainId_t chainId : placedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
-			error ("pot-placed chain %d was not found in ChainMaster", chainId);
+			error ("placed chain %d was not found in ChainMaster, or has wrong S_u. S_u_len=%d.", chainId, chain.S_u.size());
 		}
-		chain.curLvl = lvl;
-		chain.potCpu = requiredCpuToLocallyPlaceChain (chain);
-		insertChainToList (pushDwnReq, chain);
+		Chain chain2insert = chain;
+		chain2insert.curLvl = lvl;
+		chain2insert.potCpu = requiredCpuToLocallyPlaceChain (chain2insert);
+		checkNinsertChainToList (pushDwnReq, chain2insert);
 	}
 }
 
@@ -1061,6 +1096,9 @@ returns true iff found a relevant child, and sent him a reshAsyncPkt.
 bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
 
+    if (isLeaf) {
+        return false;
+    }
 	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
 		snprintf (buf, bufSize, "\ns%d : in sndToNxtchild. nxtChildToSndReshAsync=%d", dcId, nxtChildToSndReshAsync);
 		printBufToLog ();
@@ -1069,8 +1107,11 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 	pushDwnReqFromChild.clear ();
 	while (nxtChildToSndReshAsync < numChildren) {
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
+		    if (MyConfig::DEBUG_LVL>0 && chainPtr->S_u.size() < lvl) {
+		        error ("s%d : sndReshAsyncPktToNxtChild encountered in pushDwnReq c%d with S_u_len=%d while my lvl=%d", dcId, chainPtr->id, chainPtr->S_u.size(), lvl);
+		    }
 			if (chainPtr->S_u[lvl-1]==dcIdOfChild[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
-				if (!insertChainToList (pushDwnReqFromChild, *chainPtr)) {
+				if (!checkNinsertChainToList (pushDwnReqFromChild, *chainPtr)) {
 					error ("Error in insertChainToList. See log file for details");
 				}
 			}
@@ -1265,7 +1306,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
 		sndViaQ (portToPrnt, pkt2snd);
-		return sndViaQ (portToPrnt, pkt);
+		return; // $$$ sndViaQ (portToPrnt, pkt);
 	}
 
 	// now we know that we're not within another reshuffle 	
@@ -1282,7 +1323,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 	this->reshInitiatorLvl = pkt->getReshInitiatorLvl ();
 	this->deficitCpu = pkt->getDeficitCpu ();
 	for (int i(0); i<pkt->getPushDwnVecArraySize(); i++) {
-    if (!insertChainToList (pushDwnReq, pkt->getPushDwnVec(i))) {
+    if (!checkNinsertChainToList (pushDwnReq, pkt->getPushDwnVec(i))) {
 			error ("Error in insertChainToList. See log file for details");
 		}        
 	}
@@ -1335,11 +1376,10 @@ void Datacenter::handleReshAsyncPktFromChild ()
 			regainRsrcOfChain  (chain); 
 		}
 		else { // now we know that the chain was pushed-down from someone else, above me --> inform my ancestors by pushing this chain to pushDwnAck
-			insertChainToList (pushDwnAck, chain);
+			checkNinsertChainToList (pushDwnAck, chain);
 		}
 	 }
 	 
-	Lvl_t childFromWhichReshAckArrived = nxtChildToSndReshAsync-1;
 	//	for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {
 
 //	// remove from pushDwnReq all the chains that I requested from this child to push-down from me, but weren't pushed-dwn 
@@ -1380,7 +1420,7 @@ void Datacenter::finReshAsync ()
 	potPlacedChains.clear (); // in F mode, there're no "pot-placed" chains.
 	if (IAmTheReshIniator()) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			sprintf (buf, "\nsimT=%.3f, s%d : finReshAsync where I'm s*", simTime().dbl(), dcId);
+			sprintf (buf, "\ns%d : finReshAsync where I'm s*", dcId);
 			printBufToLog ();
 		}
 	}
@@ -1464,7 +1504,7 @@ void Datacenter::pushDwn ()
 			if (chainPtr->curLvl > this->lvl) { // Did I push-down this chain from an ancestor of me?
 				Chain pushedDwnChain = *chainPtr; // yep --> insert info about this chain to the pushDwnAck, which I'l later send to my prnt.
 				pushedDwnChain.curLvl = lvl;
-				insertChainToList (pushDwnAck, pushedDwnChain);
+				checkNinsertChainToList (pushDwnAck, pushedDwnChain);
 			}
 		}
 	}

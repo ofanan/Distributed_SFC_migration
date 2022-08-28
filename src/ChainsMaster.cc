@@ -57,10 +57,6 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 	  	MyConfig::printToLog (buf);
 	  	return false;
 	}
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nblocked chain %d", chainId); 
-		MyConfig::printToLog(buf); 
-	}	
 	MyConfig::overallNumBlockedUsrs++;
 	return true;
 }
@@ -71,13 +67,18 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 **************************************************************************************************************************************************/
 bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 {
-	if (MyConfig::DEBUG_LVL>1) {
+  if (MyConfig::DEBUG_LVL>0 && chain.S_u.size()==0) {
+  	sprintf (buf, "ChainsMaster::insert was called with c%d with S_u_len==0", chain.id);
+  	return false;
+  }
+	if (MyConfig::DEBUG_LVL>0) {
 		auto it = ChainsMaster::allChains.find(chainId);
-		if (it == ChainsMaster::allChains.end()) { 
+		if (it != ChainsMaster::allChains.end()) {
 			return false;
 		}
 	}
-	ChainsMaster::allChains.insert ({chainId, chain}); 
+	Chain chain2insert = chain;
+	ChainsMaster::allChains.insert ({chainId, chain2insert}); 
 	return true;
 }
 
@@ -88,11 +89,16 @@ bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 **************************************************************************************************************************************************/
 bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
 {
-	auto it = ChainsMaster::allChains.find(chainId);
+  auto it = ChainsMaster::allChains.find(chainId);
 	if (it == ChainsMaster::allChains.end()) { 
 		return false;
   }
-  chain = it->second;
+  if (MyConfig::DEBUG_LVL>0 && it->second.S_u.size()==0) {
+  	sprintf (buf, "ChainsMaster::findChain encountered c%d with S_u_len==0", it->second.id);
+  	return false;
+  }
+  Chain foundChain = it->second;
+  chain = foundChain;
   return true;
 }
 
@@ -133,7 +139,7 @@ bool ChainsMaster::modifyLvl (unordered_set <ChainId_t> &listOfChainIds, Lvl_t n
 	for (ChainId_t chainId : listOfChainIds) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
-			snprintf (buf, bufSize, "\nerror: ChainsMaster::modifyLvl didn't find chain %d", chainId);
+			sprintf (buf, "\nerror: ChainsMaster::modifyLvl didn't find chain %d", chainId);
 			MyConfig::printToLog (buf);
 			return false;
 		}
@@ -193,11 +199,15 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 		return false;
   }
 
-	it->second.S_u = {pathToRoot.begin(), pathToRoot.begin()+it->second.mu_u_len ()}; //update the chain's S_u
+	vector<DcId_t>::const_iterator first = pathToRoot.begin();
+	vector<DcId_t>::const_iterator last  = pathToRoot.begin();
+	vector<DcId_t> newS_u (first, last);
+  it->second.S_u = newS_u; 
 	if (!(it->second.dcIsDelayFeasible (it->second.curDc, it->second.curLvl))) {
 		it->second.curLvl = UNPLACED_LVL;
 	}
-	modifiedChain = it->second;
+    vector<DcId_t> newS_u_forModifiedChain (first, last);
+	modifiedChain.S_u = newS_u_forModifiedChain;
 	return true;
 }
 

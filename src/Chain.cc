@@ -37,7 +37,8 @@ Chain::Chain (ChainId_t id)
 Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl) 
 {
 	this->id 					= id;
-	this->S_u 				= S_u;
+	vector<DcId_t> newS_u (S_u.begin(), S_u.end());
+	this->S_u 				= newS_u;
 	this->curLvl 			= curLvl;
 	this->curDc 			= UNPLACED_DC;
 	this->potCpu			= UNPLACED_CPU;
@@ -47,7 +48,8 @@ Chain::Chain (ChainId_t id, vector <DcId_t> &S_u, Lvl_t curLvl)
 
 Chain::Chain (const Chain &c) {
 	this->id 					= c.id;
-  this->S_u 				= c.S_u;
+	vector<DcId_t> newS_u (c.S_u.begin(), c.S_u.end());
+	this->S_u 				= newS_u;
   this->curLvl			= c.curLvl;
   this->curDc 			= c.curDc;
 	this->potCpu			= c.potCpu;
@@ -57,7 +59,8 @@ Chain::Chain (const Chain &c) {
 
 RtChain::RtChain (const RtChain &c) {
 	this->id 					= c.id;
-  this->S_u 				= c.S_u;
+	vector<DcId_t> newS_u (c.S_u.begin(), c.S_u.end());
+	this->S_u 				= newS_u;
   this->curLvl			= c.curLvl;
   this->curDc 			= c.curDc;
 	this->potCpu			= c.potCpu;
@@ -67,7 +70,8 @@ RtChain::RtChain (const RtChain &c) {
 
 NonRtChain::NonRtChain (const NonRtChain &c) {
 	this->id 					= c.id;
-  this->S_u 				= c.S_u;
+	vector<DcId_t> newS_u (c.S_u.begin(), c.S_u.end());
+	this->S_u 				= newS_u;
   this->curLvl			= c.curLvl;
   this->curDc 			= c.curDc;
 	this->potCpu			= c.potCpu;
@@ -77,7 +81,8 @@ NonRtChain::NonRtChain (const NonRtChain &c) {
 
 RtChain::RtChain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id        	= id;
-  this->S_u       	= S_u;
+	vector<DcId_t> newS_u (S_u.begin(), S_u.end());
+	this->S_u 				= newS_u;
 	this->curLvl 			= UNPLACED_LVL;
   this->curDc 			= UNPLACED_DC;
 	this->potCpu			= UNPLACED_CPU;
@@ -87,7 +92,8 @@ RtChain::RtChain (ChainId_t id, vector <DcId_t> &S_u) {
 
 NonRtChain::NonRtChain (ChainId_t id, vector <DcId_t> &S_u) {
   this->id       		= id;
-  this->S_u      	 	= S_u;
+	vector<DcId_t> newS_u (S_u.begin(), S_u.end());
+	this->S_u 				= newS_u;
 	this->curLvl 			= UNPLACED_LVL;
   this->curDc 			= UNPLACED_DC;
 	this->potCpu			= UNPLACED_CPU;
@@ -217,11 +223,12 @@ Currently unused, bacuase it's easier to insert chains wo sorting, and sort only
 **************************************************************************************************************************************************/
 void insertSorted (vector <Chain> &vec, const Chain &c)
 {
+	Chain chain2insert = c;
 	if (c.isRtChain) {
-		vec.insert (vec.begin(), c);
+		vec.insert (vec.begin(), chain2insert);
 	}
 	else {
-		vec.push_back (c);
+		vec.push_back (chain2insert);
 	}
 }
 
@@ -250,7 +257,8 @@ bool insertChainToList (list <Chain> &listOfChains, const Chain &chain)
 	}
 
 	// insert the chain
-  listOfChains.insert(listOfChains.end(), chain);
+	Chain chain2insert = chain;
+  listOfChains.insert(listOfChains.end(), chain2insert);
   return true;
 }
 

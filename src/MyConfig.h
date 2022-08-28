@@ -100,6 +100,7 @@ class MyConfig {
 		static void printToLog (const int d); // print "d,", where d is the integer, to the log file
 		static void printToLog (vector <Chain> vec); // print all the IDs of the chains in the vec.
 		static void printToLog (vector <ChainId_t> vec); // print a vec of ChainId_t to the log file
+/*		static void printToLog (vector <DcId_t> vec);*/
 		static void printToLog (unordered_set <ChainId_t> set2print);
 		static void printToLog (list <Chain> list2print, bool printLvl=true);
 		static void printToLog (unordered_set <Chain, ChainHash> set2print);

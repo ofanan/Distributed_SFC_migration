@@ -135,6 +135,7 @@ class Datacenter : public cSimpleModule
     bool sndReshAsyncPktToNxtChild    ();
     void insertMyAssignedChainsIntoPushUpReq ();
     void failedToPlaceOldChain (ChainId_t chainId);
+    bool checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain);
     
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
