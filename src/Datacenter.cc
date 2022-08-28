@@ -422,7 +422,9 @@ void Datacenter::RegainRsrcOfpushedUpChains ()
 		}
 		else { //the chain wasn't pushed-up --> need to locally place it
 			placedChains.			insert (chainPtr->id);
-			ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
+			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
+				error ("Datacenter::RegainRsrcOfpushedUpChains failed to update the lvl of c%d", chainPtr->id);
+			}
 		}
 		potPlacedChains.erase (chainPtr->id);
 		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
@@ -464,7 +466,9 @@ void Datacenter::pushUp ()
 			pushedUpChain.curLvl = lvl;
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
-			ChainsMaster::modifyLvl  (pushedUpChain.id, lvl); // inform ChainMaster about the chain's place 
+			if (!ChainsMaster::modifyLvl  (.pushedUpChainid, lvl)){ // inform ChainMaster about the chain's place 
+				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+			}
 			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
 		}
 	}
@@ -552,7 +556,9 @@ void Datacenter::bottomUpFMode ()
 		if (availCpu >= requiredCpuToLocallyPlaceThisChain) { // I have enough avail' cpu for this chain --> place it
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				placedChains.		  insert  (chainPtr->id);
- 				ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
+				if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
+					error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+				}
 				chainPtr = notAssigned.erase (chainPtr);
 		}
 		else { 
@@ -647,7 +653,9 @@ void Datacenter::bottomUp ()
 				availCpu -= requiredCpuToLocallyPlaceThisChain;				
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.		  insert  (chainPtr->id);
-					ChainsMaster::modifyLvl  (chainPtr->id, lvl); // inform ChainMaster about the chain's place 
+					if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
+						error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+					}
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
 					potPlacedChains.insert (chainPtr->id);
@@ -1477,7 +1485,10 @@ void Datacenter::pushDwn ()
 			// finally place this pot-placed chain
 			potPlacedChains.erase   (chainPtr->id); 
 			placedChains.insert 		(chainPtr->id); 
-			ChainsMaster::modifyLvl (chainPtr->id, lvl);		// update ChainMaster about the new placement	
+
+			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
+				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+			}
 			continue; 
 		}
 
@@ -1492,7 +1503,9 @@ void Datacenter::pushDwn ()
 			}
 			availCpu -= requiredCpuToLocallyPlaceThisChain;
 			placedChains.insert 		(chainPtr->id); 				// locally-place the chain
-			ChainsMaster::modifyLvl (chainPtr->id, lvl);		// update ChainMaster about the new placement
+			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
+				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+			}
 			eraseChainFromVec (notAssigned, *chainPtr); // verify that the chain I pushed-down to myself isn't in my notAssigned list
 			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
 				deficitCpu -= chainPtr->potCpu;
