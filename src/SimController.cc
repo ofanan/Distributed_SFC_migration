@@ -545,6 +545,11 @@ void SimController::concludeTimePeriod ()
 	ChainId_t errChainId;
 	int curNumBlockedUsrs;
 	int chainsMasterStts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
+
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+		sprintf (buf, "\ntraceT=%.3f, sim t=%f: in concludeTimePeriod.", MyConfig::traceTime, simTime().dbl());
+		printBufToLog ();
+	}
 	
 	if (algStts==SCCS && chainsMasterStts!=0 ) {
 		sprintf (buf, "traceT=%.3f, sim t=%f: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. See the log file.", 	
@@ -824,10 +829,15 @@ void SimController::checkChainsMasterData ()
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {
 		for (auto chainId : datacenters[dcId]->placedChains) {
 			if (!ChainsMaster::findChain (chainId, chain)) {
-				error ("\nc%d found in s%d placedChain isn't found in ChainsMaster", chainId, dcId);
+				if (chain.S_u.size()==0) {
+					error ("\nt=%f : checkChainsMasterData() : c%d has S_u_size==0", MyConfig::traceTime, chainId);
+				}
+				else {
+					error ("\nt=%f : checkChainsMasterData() : c%d isn't found in ChainsMaster", MyConfig::traceTime, chainId);
+				}
 			}
 			if (chain.curDc != dcId) {
-				error ("\ntraceT=%f : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", MyConfig::traceTime, chainId, dcId, chain.curDc);
+				error ("\ntraceT=%f : checkChainsMasterData() : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", MyConfig::traceTime, chainId, dcId, chain.curDc);
 			}
 		}
 	}
@@ -948,7 +958,7 @@ void SimController::initAlgSync ()
 	}
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%.3f, initiating alg.", MyConfig::traceTime);
+		snprintf (buf, bufSize, "\nt=%.3f, initiating Sync alg.", MyConfig::traceTime);
 		printBufToLog();
 	} 
 
@@ -982,7 +992,7 @@ void SimController::initAlgAsync ()
 {  	
 
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%.3f, initiating alg.", MyConfig::traceTime);
+		snprintf (buf, bufSize, "\nt=%.3f, initiating Async alg.", MyConfig::traceTime);
 		printBufToLog();
 	} 
 
@@ -1114,9 +1124,6 @@ void SimController::printResLine ()
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-//	if (MyConfig::traceTime==30062) { //$$
-//		error ("t = %.0f, finished printResLine", MyConfig::traceTime);
-//	}
   snprintf (buf, bufSize, 
   					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
