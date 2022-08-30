@@ -309,7 +309,12 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		if (search!=potPlacedChains.end()) { 
 			Chain chain;
 			if (!ChainsMaster::findChain (chainId, chain)) {
-				error ("t=%f : pot-placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
+				if (chain.S_u.size()==0) {
+					error ("rlzRsrc () : placed chain %d has S_u_len=0%", chainId);
+				}
+				else {
+					error ("rlzRsrc () : placed chain %d was not found in ChainMaster", chainId);
+				}
 			}
 			regainRsrcOfChain (chain);
 			potPlacedChains.erase (chainId);
@@ -321,7 +326,12 @@ void Datacenter::rlzRsrc (vector<int32_t> IdsOfChainsToRlz)
 		if (search!=placedChains.end()) { 
 			Chain chain;
 			if (!ChainsMaster::findChain (chainId, chain)) {
-				error ("t=%f : placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
+				if (chain.S_u.size()==0) {
+					error ("rlzRsrc () : placed chain %d has S_u_len=0%", chainId);
+				}
+				else {
+					error ("rlzRsrc () : placed chain %d was not found in ChainMaster", chainId);
+				}
 			}
 			regainRsrcOfChain (chain);
 			placedChains.erase (chainId);
@@ -466,7 +476,7 @@ void Datacenter::pushUp ()
 			pushedUpChain.curLvl = lvl;
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
-			if (!ChainsMaster::modifyLvl  (.pushedUpChainid, lvl)){ // inform ChainMaster about the chain's place 
+			if (!ChainsMaster::modifyLvl  (pushedUpChain.id, lvl)){ // inform ChainMaster about the chain's place 
 				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
 			}
 			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
@@ -595,7 +605,7 @@ void Datacenter::bottomUpFMode ()
 	}
 	
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : finished BU-f.", dcId);
+		snprintf (buf, bufSize, "\ns%d : traceTime=%f. finished BU-f.", dcId, MyConfig::traceTime);
 		printBufToLog ();
 		print (false, true, true, false);
 	}
@@ -1011,7 +1021,7 @@ void Datacenter::initReshAsync ()
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
-	insertMyAssignedChainsIntoPushUpReq ();
+	insertMyAssignedChainsIntoPushDwnReq ();
 	reshAsync ();
 }
 
@@ -1073,13 +1083,18 @@ void Datacenter::reshAsync ()
 /*************************************************************************************************************************************************
 * add my potPlacedChains, and then placedChains, to the end of pushDwnReq
 *************************************************************************************************************************************************/
-void Datacenter::insertMyAssignedChainsIntoPushUpReq ()
+void Datacenter::insertMyAssignedChainsIntoPushDwnReq ()
 {
 	
 	Chain chain;
 	for (ChainId_t chainId : potPlacedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
-			error ("pot-placed chain %d was not found in ChainMaster, or has wrong S_u. S_u_len=%d.", chainId, chain.S_u.size());
+			if (chain.S_u.size()==0) {
+				error ("traceTime=%f : insertMyAssignedChainsIntoPushDwnReq () : potPlaced chain %d has S_u_len=0%", MyConfig::traceTime, chainId);
+			}
+			else {
+				error ("traceTime=%f : insertMyAssignedChainsIntoPushDwnReq () : potPlaced chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
+			}
 		}
 		Chain chain2insert = chain;
 		chain2insert.curLvl = lvl;
@@ -1088,7 +1103,12 @@ void Datacenter::insertMyAssignedChainsIntoPushUpReq ()
 	}
 	for (ChainId_t chainId : placedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
-			error ("placed chain %d was not found in ChainMaster, or has wrong S_u. S_u_len=%d.", chainId, chain.S_u.size());
+			if (chain.S_u.size()==0) {
+				error ("traceTime=%f: insertMyAssignedChainsIntoPushDwnReq () : placed chain %d has S_u_len=0%", MyConfig::traceTime, chainId);
+			}
+			else {
+				error ("traceTime=%f: insertMyAssignedChainsIntoPushDwnReq () : placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
+			}
 		}
 		Chain chain2insert = chain;
 		chain2insert.curLvl = lvl;
@@ -1335,7 +1355,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 			error ("Error in insertChainToList. See log file for details");
 		}        
 	}
-	insertMyAssignedChainsIntoPushUpReq ();
+	insertMyAssignedChainsIntoPushDwnReq ();
 	reshAsync ();
 }
 

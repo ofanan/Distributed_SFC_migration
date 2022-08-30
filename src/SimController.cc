@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = 30062; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = 30001; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 
@@ -438,9 +438,6 @@ void SimController::runTimePeriod ()
 		}
 		else if ( (line.substr(0,9)).compare("old_usrs:")==0) {
 			rdOldUsrsLine (line.substr(10));
-//			if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
-//				error ("t=%f. after rdOldUsrs", MyConfig::traceTime);
-//			}
 			
 			// rlz rsrcs of chains that left their current location 
 			rlzRsrcOfChains (chainsThatLeftDc);
@@ -564,7 +561,7 @@ void SimController::concludeTimePeriod ()
 	}
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nt=%.3f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
+		snprintf (buf, bufSize, "\ntraceTime=%.3f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
 		printBufToLog ();
 		printAllDatacenters (false, false, true); 
 		if (MyConfig::DEBUG_LVL>1) {
@@ -748,11 +745,11 @@ void SimController::rdOldUsrsLine (string line)
 			error ("t=%.3f: didn't find old chain %d", MyConfig::traceTime, chainId);
 	  }
 	  // now "chain" contains the chain, found by the chainId that was read from the trace
-      ss >> poaId;
+    ss >> poaId;
 	  if (chain.isBlocked) { 
 	  	continue;
 	  }
-		if (MyConfig::traceTime > beginVeryDetailedLogAtTraceTime){ //$$$
+		if (MyConfig::traceTime >= beginVeryDetailedLogAtTraceTime){ //$$$
 			sprintf (buf, "\nrd old usr %d, poa %d", chainId, poaId);
 			MyConfig::printToLog (buf);
 		}
