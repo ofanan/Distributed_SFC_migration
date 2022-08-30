@@ -199,22 +199,11 @@ bool ChainsMaster::modifyS_u (ChainId_t chainId, const vector <DcId_t> &pathToRo
 		return false;
   }
 
-	vector<DcId_t>::const_iterator first = pathToRoot.begin();
-	vector<DcId_t>::const_iterator last  = pathToRoot.end  ();
-	vector<DcId_t> newS_u (first, last);
-  it->second.S_u = newS_u; 
+  it->second.S_u = {pathToRoot.begin(), pathToRoot.end  ()}; // newS_u; 
 	if (!(it->second.dcIsDelayFeasible (it->second.curDc, it->second.curLvl))) {
 		it->second.curLvl = UNPLACED_LVL;
 	}
 	modifiedChain = it->second;
-	MyConfig::printToLog ("\nmodified chain is ");
-	MyConfig::printToLog (modifiedChain);
-	sprintf (buf, " Su_u_len=%d", (int)newS_u.size());
-	MyConfig::printToLog (buf);
-  vector<DcId_t> newS_u_forModifiedChain (first, last);
-	modifiedChain.S_u = newS_u_forModifiedChain;
-	MyConfig::printToLog ("\nAfter copying S_u, modified chain is ");
-	MyConfig::printToLog (modifiedChain);
 	return true;
 }
 
