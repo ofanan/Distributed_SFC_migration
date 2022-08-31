@@ -402,6 +402,8 @@ void Datacenter::handlePushUpPkt ()
 			snprintf (buf, bufSize, "\ns%d : rding PU pkt during accum delay", dcId);
 			printBufToLog ();
 		}
+		RegainRsrcOfpushedUpChains ();
+		genNsndPushUpPktsToChildren();
 		return;
 	}
 	if (isInFMode) {

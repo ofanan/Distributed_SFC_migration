@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = 30002; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = 30345; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 
@@ -125,7 +125,7 @@ void SimController::initialize (int stage)
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
-		MyConfig::printBupuRes   = true;  // when true, print to the log and to the .res file the results of the BUPU
+		MyConfig::printBupuRes   = false;  // when true, print to the log and to the .res file the results of the BUPU
 		Lvl_t h;
 		for (h=0; h<RtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (min (RtChain::mu_u[h], NonRtChain::mu_u[h]));
