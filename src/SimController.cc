@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = 30001; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = 30002; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 
@@ -57,7 +57,7 @@ void SimController::initialize (int stage)
 		this->mode = Async; // either Sync / Async mode of running the sim
 		MyConfig::traceTime = -1.0;
 		maxTraceTime = numeric_limits<float>::max();
-		MyConfig::FModePeriod = 3600; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+		MyConfig::FModePeriod = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
 		MyConfig::measureRunTime = true;
 
@@ -85,7 +85,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = 65; //$$numeric_limits<float>::max();
+    simLenInSec           = numeric_limits<float>::max();
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -121,11 +121,11 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
+		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 1;
 		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
-		MyConfig::printBupuRes   = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
+		MyConfig::printBupuRes   = true;  // when true, print to the log and to the .res file the results of the BUPU
 		Lvl_t h;
 		for (h=0; h<RtChain::mu_u_len; h++) {
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (min (RtChain::mu_u[h], NonRtChain::mu_u[h]));
@@ -162,6 +162,7 @@ void SimController::handleAlgFailure ()
 			datacenters[dc]->rst ();
 		}
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+			MyConfig::printToLog ("\n**** SimController::handleAlgFailure () : printing state and exiting\n");
 			printAllDatacenters (false, false, true); 
 		}
 	}
@@ -397,7 +398,7 @@ void SimController::runTimePeriod ()
 			if (MyConfig::DEBUG_LVL>0 && new_t <= MyConfig::traceTime) {
 				error ("error in trace file: t is not incremented. t=%.3f, new_t=%.3f", MyConfig::traceTime, new_t);
 			}
-			if (new_t > maxTraceTime) { // finish the requested trace time
+			if (new_t >= maxTraceTime) { // finish the requested trace time
 				break;
 			}
 			isLastPeriod = false;
@@ -470,7 +471,6 @@ void SimController::runTrace () {
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
 		datacenters[dc]->rst ();
 	}
-	printAllDatacenters ();
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
 	chainsThatJoinedLeaf.clear ();
@@ -754,10 +754,6 @@ void SimController::rdOldUsrsLine (string line)
 	  if (chain.isBlocked) { 
 	  	continue;
 	  }
-		if (MyConfig::traceTime >= beginVeryDetailedLogAtTraceTime){ //$$$
-			sprintf (buf, "\nrd old usr %d, poa %d", chainId, poaId);
-			MyConfig::printToLog (buf);
-		}
   	if (!ChainsMaster::modifyS_u (chainId, pathFromLeafToRoot[poaId], chain))
   	{
 			error ("t=%.3f: old chain id %d is not found, or not placed", MyConfig::traceTime, chainId);  	

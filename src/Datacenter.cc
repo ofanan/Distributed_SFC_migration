@@ -133,15 +133,6 @@ void Datacenter::checkEndTimePeriod ()
 		MyConfig::printToLog (pushUpList);
 		error ("t=%f. s%d : pushUpList is not empty\n", MyConfig::traceTime, dcId);
 	}
-	if (!notAssigned.empty()) {
-		error ("t=%f. s%d : notAssigned is not empty\n", MyConfig::traceTime, dcId);
-	}
-	if (!pushDwnReq.empty()) {
-		error ("t=%f. s%d : pushDwnReq is not empty\n", MyConfig::traceTime, dcId);
-	}
-	if (!pushDwnAck.empty()) {
-		error ("t=%f. %d : pushDwnAck is not empty\n", MyConfig::traceTime, dcId);
-	}
 	for (auto item : endXmtEvents) {
 		if (item!=nullptr) {
 			error ("t=%f s%d still have xmt event in end of time period", MyConfig::traceTime, dcId);
@@ -152,8 +143,18 @@ void Datacenter::checkEndTimePeriod ()
 			error ("t=%f s%d : outputQ %d isn't empty in the end of a time period", MyConfig::traceTime, dcId, portNum);
 		}
 	}
-
-
+	if (MyConfig::mode==Sync) {
+		return; // the next checks are for Async mode only
+	}
+	if (!notAssigned.empty()) {
+		error ("t=%f. s%d : notAssigned is not empty\n", MyConfig::traceTime, dcId);
+	}
+	if (!pushDwnReq.empty()) {
+		error ("t=%f. s%d : pushDwnReq is not empty\n", MyConfig::traceTime, dcId);
+	}
+	if (!pushDwnAck.empty()) {
+		error ("t=%f. %d : pushDwnAck is not empty\n", MyConfig::traceTime, dcId);
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -170,6 +171,8 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	Enter_Method ("Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)");
 
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
+//		sprintf (buf, "\ns%d : empty", dcId);
+//		printBufToLog ();
 		return;
 	}
 	if (beginWithNewLine) {
@@ -572,8 +575,8 @@ void Datacenter::bottomUpFMode ()
 				chainPtr = notAssigned.erase (chainPtr);
 		}
 		else { 
-			if (canPlaceThisChainHigher(*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
-				chainPtr++; //No enough availCpu for this chain, but it may be placed above me --> go on to the next notAssigned chain  
+			if (canPlaceThisChainHigher(*chainPtr)) { // If I'm not the highest delay-feasible DC of this chain...
+				chainPtr++; // go on to the next notAssigned chain  
 				continue;
 			}
 			
@@ -584,7 +587,7 @@ void Datacenter::bottomUpFMode ()
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
 //					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
-						sprintf (buf, "\ns%d : blocked chain %d\n", dcId, chainPtr->id);
+						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
 						printBufToLog ();
 //					} //$$
 					chainPtr = notAssigned.erase (chainPtr); 
@@ -599,10 +602,17 @@ void Datacenter::bottomUpFMode ()
 				}
 			}
 			else { // not within a reshuffle
-				return initReshAsync ();
+				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
+				isInFMode 			 			 = true;      // set myself to "F" mode
+				isInAccumDelay				 = true;
+				if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
+					printBufToLog ();
+				}	
+				return scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //schedule a reshuffle
 			}
-		}
-	}
+		} // end case of not enough avail capacity
+	} // end for
 	
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : traceTime=%f. finished BU-f.", dcId, MyConfig::traceTime);
@@ -637,7 +647,7 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 	if (MyConfig::runningBinSearchSim) {
 		simController->handleAlgFailure ();
 	}
-	else {
+	else { //$$$
 		error (buf);
 	}
 }
@@ -1017,7 +1027,7 @@ void Datacenter::initReshAsync ()
 		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
 	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : *** simT=%.3f init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
+		snprintf (buf, bufSize, "\ns%d : *** simT=%.6f init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
