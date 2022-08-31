@@ -109,6 +109,7 @@ void Datacenter::initialize(int stage)
 		return;
 	}
 	
+	MY_ACCUMULATION_DELAY = ACCUMULATION_DELAY * (lvl+1);
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
@@ -609,7 +610,7 @@ void Datacenter::bottomUpFMode ()
 					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
 					printBufToLog ();
 				}	
-				return scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //schedule a reshuffle
+				return scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //schedule a reshuffle
 			}
 		} // end case of not enough avail capacity
 	} // end for
@@ -735,7 +736,7 @@ void Datacenter::bottomUp ()
 					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
 					printBufToLog ();
 				}	
-				return scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
+				return scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
 			}
 		} // end case of not enough avail capacity
 	} // end "for each chain ...loop"

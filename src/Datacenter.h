@@ -81,6 +81,7 @@ class Datacenter : public cSimpleModule
 		Lvl_t  nxtChildToSndReshAsync; // will hold the serial num (0, 1, ..., numChildren-1) of the next child to which the Dc may try to snd a reshAsyncPkt.
 		int deficitCpu;
 		Lvl_t reshInitiatorLvl; // will hold the level of the initiator of the currently running async reshuffle
+		float MY_ACCUMULATION_DELAY;
 		
     // Dynamic
     Cpu_t  								 availCpu;
