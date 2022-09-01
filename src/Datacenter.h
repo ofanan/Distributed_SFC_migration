@@ -39,8 +39,8 @@ class Datacenter : public cSimpleModule
     vector <DcId_t> dcIdOfChild; // dcIdOfChild[c] will hold the dcId of child c.
     bool isRoot;
     bool isLeaf;
-    int16_t dcId;
-    int16_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
+    DcId_t dcId;
+    DcId_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
 		Cpu_t cpuCapacity;
 		int numBuPktsRcvd; 
   	bool 									reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
@@ -126,6 +126,7 @@ class Datacenter : public cSimpleModule
     void pushDwn 								();
     bool arrivedFromPrnt        (); 
     void scheduleEndFModeEvent  ();
+    void scheduleErrMsgAndExit  ();
     void handleBottomUpPktAsync ();
     void handleBottomUpPktAsyncFMode  ();
     void genNsndPushUpPktsToChildren  ();

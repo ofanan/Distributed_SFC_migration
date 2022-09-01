@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = 30345; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 
@@ -137,8 +137,8 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
-		runTrace ();
-//		initBinSearchSim ();
+//		runTrace ();
+		initBinSearchSim ();
 	}
 }
 
@@ -149,7 +149,6 @@ void SimController::handleAlgFailure ()
 {
 	Enter_Method ("SimController::handleAlgFailure ()");
 	
-	error ("in SimController::handleAlgFailure");
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 		sprintf (buf, "\nsimT=%f, in SimController::handleAlgFailure\n", simTime().dbl());
 		printBufToLog ();
@@ -410,7 +409,7 @@ void SimController::runTimePeriod ()
 			if (MyConfig::traceTime == beginVeryDetailedLogAtTraceTime){ 
 				MyConfig::LOG_LVL = VERY_DETAILED_LOG;
 			}
-			if (MyConfig::LOG_LVL>0) {
+			if (MyConfig::LOG_LVL>0) { 
 				if (MyConfig::traceTime==int(MyConfig::traceTime)) { // trace time is integer --> print it as an integer
 					snprintf (buf, bufSize, "\n\nt = %.0f, simTime=%f\n********************", MyConfig::traceTime, simTime().dbl());
 				}
@@ -552,14 +551,18 @@ void SimController::concludeTimePeriod ()
 	}
 	
 	if (algStts==SCCS && chainsMasterStts!=0 ) {
-		sprintf (buf, "traceT=%.3f, sim t=%f: error during run of ChainsMaster::concludeTimePeriod. err type=%d. errChainId=%d. See the log file.", 	
-					   MyConfig::traceTime, simTime().dbl(), chainsMasterStts, errChainId);
-		error (buf); 
+		sprintf (buf, "traceT=%.3f, sim t=%f: error type %d at ChainsMaster::concludeTimePeriod. c%d. See log file.", 
+								MyConfig::traceTime, simTime().dbl(), chainsMasterStts, errChainId);
+		if (MyConfig::DEBUG_LVL >= 0) {
+			error (buf); 
+		}
 	}
 	
 	if (MyConfig::DEBUG_LVL > 0) {
-		checkChainsMasterData ();
-		checkDcsEndTimePeriod ();
+		if (MyConfig::DEBUG_LVL >= 0) {
+			checkChainsMasterData (); 
+			checkDcsEndTimePeriod (); 
+		}
 	}
 	if (MyConfig::RES_LVL > 0) {
 		 printResLine ();

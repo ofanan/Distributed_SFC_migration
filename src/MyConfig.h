@@ -39,7 +39,7 @@ const bool Sync  = 0;
 const bool Async = 1;
 
 // Determining the level of debug and log.
-const float ACCUMULATION_DELAY = 0.05;
+const float ACCUMULATION_DELAY = 0.01;
 										 
 class MyConfig { 
 

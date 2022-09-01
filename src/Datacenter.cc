@@ -86,30 +86,37 @@ void Datacenter::initialize(int stage)
 		dcIdOfChild.   resize (numChildren);
 		
 		// Discover the xmt channels to the neighbors, and the neighbors' id's.
-		for (int portNum (0); portNum < numPorts; portNum++) {
-			cGate *outGate    = gate("port$o", portNum);
-			xmtChnl[portNum]  = outGate->getTransmissionChannel();
-			cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
-			if (isRoot) {
-			  dcIdOfChild  [portNum] = DcId_t (nghbr -> par ("dcId"));
+		if (isRoot) {
+			if (dcId > 0) {
+				error ("s%d was characterized as root", dcId);
 			}
-			else {
-			  if (portNum==0) { // port 0 is towards the parents
-			    idOfParent = DcId_t (nghbr -> par ("dcId"));
-			  }
-			  else { // ports 1...numChildren are towards the children
-			    dcIdOfChild  [portNum-1] = DcId_t (nghbr -> par ("dcId"));
-			  }
-			}       
+			for (int portNum (0); portNum < numPorts; portNum++) {
+				cGate *outGate    = gate("port$o", portNum);
+				xmtChnl[portNum]  = outGate->getTransmissionChannel();
+				cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
+				dcIdOfChild  [portNum] = DcId_t (nghbr -> par ("dcId"));
+			}
 		}
-		if (!isRoot) {
+		else {
+			cGate *outGate    = gate("port$o", 0);
+			xmtChnl[0]  			= outGate->getTransmissionChannel();
+			cModule *nghbr    = outGate->getNextGate()->getOwnerModule();
+			idOfParent = DcId_t (nghbr -> par ("dcId"));
+
+			// ports 1...numChildren are towards the children
+			for (int portNum (1); portNum < numPorts; portNum++) {
+				outGate    			 = gate("port$o", portNum);
+				xmtChnl[portNum] = outGate->getTransmissionChannel();
+				nghbr   			   = outGate->getNextGate()->getOwnerModule();
+			  dcIdOfChild  [portNum-1] = DcId_t (nghbr -> par ("dcId"));
+			}
 			prntGateId = gate("port$i", 0)->getId();
 		}
 		fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr);
 		return;
 	}
 	
-	MY_ACCUMULATION_DELAY = ACCUMULATION_DELAY * (lvl+1);
+	MY_ACCUMULATION_DELAY = ACCUMULATION_DELAY * (1+float(lvl/2));
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
@@ -117,6 +124,15 @@ void Datacenter::initialize(int stage)
 	endFModeEvent  = nullptr;
 	isInFMode 		 = false;
 	isInAccumDelay = false;
+}
+
+/*************************************************************************************************************************************************
+ * Schedule an error msg and exit.
+ * The exit isn't done immediately, for letting other modules print their data before finishing the sim, thus easing the debugging.
+*************************************************************************************************************************************************/
+void Datacenter::scheduleErrMsgAndExit ()
+{
+	scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("errorMsg")); 
 }
 
 /*************************************************************************************************************************************************
@@ -252,15 +268,17 @@ void Datacenter::handleMessage (cMessage *msg)
   	isInAccumDelay = false;
   	initReshAsync (); 
   }
+  else if (strcmp (msg->getName(), "errorMsg")==0) {
+ 		printBufToLog ();
+ 		if (MyConfig::DEBUG_LVL >=0) {
+	 		error (buf);
+	 	}
+  }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==Sync) { 
   		handleBottomUpPktSync();
   	} 
 		else {
-			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-				sprintf (buf, "\ns%d : rcvd BU pkt", dcId);
-				printBufToLog ();
-			}
 			if (isInFMode) {
 				handleBottomUpPktAsyncFMode ();
 			}
@@ -596,11 +614,6 @@ void Datacenter::bottomUpFMode ()
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
-						sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=", 
-														MyConfig::traceTime, dcId, chainPtr->id);
-						printBufToLog ();
-						MyConfig::printToLog (notAssigned);
-//					}
 					return failedToPlaceOldChain (chainPtr->id);
 				}
 			}
@@ -642,16 +655,14 @@ Handle a failure to place an old (exiting) chain
 *************************************************************************************************************************************************/
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
-	snprintf (buf, bufSize, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling\n", MyConfig::traceTime, dcId, chainId);
-	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		printBufToLog ();
-	}
+	sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place the old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
+	printBufToLog ();
 
 	if (MyConfig::runningBinSearchSim) {
 		simController->handleAlgFailure ();
 	}
-	else { //$$$
-		error (buf);
+	else { 
+		scheduleErrMsgAndExit ();
 	}
 }
 
@@ -715,10 +726,6 @@ void Datacenter::bottomUp ()
 						chainPtr = notAssigned.erase (chainPtr); 
 					}
 					else { // Failed to place an old chain even after resh
-							sprintf (buf, "\ntraceTime=%.3f, s%d : failed to place the old chain %d even after reshuffling. notAssigned=\n", 
-											 MyConfig::traceTime, dcId, chainPtr->id);
-							printBufToLog ();
-							MyConfig::printToLog (notAssigned);
 						return failedToPlaceOldChain (chainPtr->id);
 					}
 				}
@@ -1026,8 +1033,8 @@ void Datacenter::initReshAsync ()
 		}
 	}
 	deficitCpu -= availCpu;
-	if (deficitCpu <= 0) {
-		error ("initReshAsync was called, but deficitCpu=%d", deficitCpu);
+	if (deficitCpu <= 0) { // there's no deficit anymore
+		return bottomUpFMode ();
 	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ns%d : *** simT=%.6f init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
@@ -1158,12 +1165,18 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			}
 		}
 		if (pushDwnReqFromChild.empty()) { // no push-down data to send to this child --> skip it
+	    if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+	        sprintf (buf, "\ns%d : skipping child %d dcId %d - empty pushDwn req from this child", dcId, nxtChildToSndReshAsync, dcIdOfChild[nxtChildToSndReshAsync]);
+		    printBufToLog ();
+	    }
 			nxtChildToSndReshAsync++;
 			continue;
 		}
 
 		// now we know that pushDwnReqFromChild isn't empty
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+      sprintf (buf, "\ns%d snding reshAsync pkt to child %d, dcId=%d", dcId, nxtChildToSndReshAsync, dcIdOfChild[nxtChildToSndReshAsync]);
+	    printBufToLog ();
 			MyConfig::printToLog (". pushDwnReq=");
 			MyConfig::printToLog (pushDwnReqFromChild);
 		}
@@ -1347,7 +1360,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
 		sndViaQ (portToPrnt, pkt2snd);
-		return; // $$$ sndViaQ (portToPrnt, pkt);
+		return; 
 	}
 
 	// now we know that we're not within another reshuffle 	

@@ -69,3 +69,15 @@ Indeed, prob' is:
 <!> Model error: pot-placed chain 399 was not found in ChainMaster, or chain has wrong S_u. See log file. -- in module (Datacenter) Lux.datacenters[0] (id=3), at t=1.000005s, event #10563
 
 Should check in ChainsMaster::insert whether the inserted chain is OK.
+
+dcId==26 && MyConfig::traceTime==30139
+
+while running directly, w/o it: 
+traceTime=30139.000, s26 : failed to place the old chain 582 even after reshuffling. notAssigned=
+
+
+s26 : in reshAsync. pushDwnReq=c
+[2692,582,310,41,1310,402,309,947,2484,1521,45,1413,404,1100,30,1652,1264,104,2251,105]
+[30,41,45,104,105,309,310,402,404,703,947,1100,1264,1310,1413,1521,1652,2251,2484,] 
+
+Current prob: dcIdOfChild[0] is wrong?
