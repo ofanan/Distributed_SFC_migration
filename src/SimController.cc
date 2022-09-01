@@ -137,8 +137,8 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
-//		runTrace ();
-		initBinSearchSim ();
+		runTrace ();
+//		initBinSearchSim ();
 	}
 }
 

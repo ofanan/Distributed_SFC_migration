@@ -1280,6 +1280,8 @@ void Datacenter::clrRsrc ()
 	pushUpList.   		clear ();
 	placedChains.			clear ();
 	potPlacedChains.	clear ();
+	pushDwnReq.				clear ();
+	pushDwnAck.				clear ();
 	availCpu 				 = cpuCapacity;
 }
 
