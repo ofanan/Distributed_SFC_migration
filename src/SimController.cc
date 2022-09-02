@@ -472,6 +472,7 @@ void SimController::runTrace () {
 	}
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
+	cout << settingsBuf;
 	chainsThatJoinedLeaf.clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	numMigsAtThisPeriod = 0; 
@@ -488,6 +489,7 @@ void SimController::runTrace () {
 void SimController::finish () 
 {
   traceFile.close ();
+  cout << endl << "finished running trace at traceTime " << MyConfig::traceTime;
 	if (MyConfig::LOG_LVL>0) {
   	MyConfig::printToLog ("\nfinished sim\n");
   }
