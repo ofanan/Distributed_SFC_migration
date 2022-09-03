@@ -30,3 +30,89 @@ Maybe it's the usual "buffer" issue: the relevant code is visited, but the print
 This only happens sometimes when NOT printing error from SimController::printResLine (). when printing from there, Opt stops only at 30062 / 30063.
 
 ToDo: check whether initBottomUp and/or missing handling of "old" potPlacedChains causes seg. flt.
+
+<!> Error: Model error: t=30003.000000. DC 799 : pushUpList is not empty
+ -- in module (Datacenter) Lux.datacenters[799] (id=802), at t=4s, event #10648
+
+
+The prob' chain is 230.
+s26, the grandpa of s799, has 230 in its PUL. It probably sends it to s101, the prnt of s799.
+The prnt of s799 is s101, which is also in F-mode, and therefore immediately sends to its children the PUL, without trying to PU.
+Maybe the prob' is that the root causes a clearance delay, and shortly later finishes the time period, and then the PU nack pkg doesn't arrive to s799.
+Maybe the prob' is:
+RegainRsrcOfpushedUpChains indeed checks for potPlaced chains that were / weren't pushed-up. But maybe it should do a similar thing with chains in the PUL?
+
+Improvements:
+- need to finish reshAsync much earlier if I'm a leaf?
+- in pushDwn (), add a check if the pushed-dwn chain was in my PUL. If so -> remove it from the PUL.
+Or simply - clear PUL in finReshAsync, just as we clear potPlacedChains.
+
+Corrected the insertions / clearance of chainsThatJoined and chainsThatLeft in SimController.
+Changed SimController, so that now Async-mode sim begins by Async mode (rather than having first "warmup" cycle as Sync).
+However, this causes:
+<!> Error: Model error: s39 tried to block chain 2251 that wasn't found in ChainsMaster -- in module (Datacenter) Lux.datacenters[39] (id=42), at t=0.068000000745s, 
+
+The prob': chain 2251 is in s39.notAssigned. S39 begins initReshAsync due to another chain. Then, s39 inserts c2251 to pushDwnReq, with lvl=s39.lvl==2.
+Then, after running resh, when running again BU / BU-f, s39 blocks c2251. When it asks chainsMaster to block c2251, c2251 realizes that it tried to block 
+a chain that already has a lvl!=UNPLACED_LVL.
+
+But why does c2251 have l=2 in chainsMaster? 
+indeed in Datacenter.cc ln.1407 we have
+			availCpu -= requiredCpuToLocallyPlaceThisChain;
+			placedChains.insert (chainPtr->id); 				
+			ChainsMaster::modifyLvl (chainPtr->id, lvl);
+
+seems that we have to check whether this chain was in s39.notAssigned. If this is the case, and we place it on s39, than we should remove it from notAssigned.
+
+Another prob': a pushed-down chain should be moved from "not assigned" of ALL DCs?
+ - not exactly, as only the initiator inserts notAssigned chains into pushDwnReq.
+ - but then, isn't it better to remove any chain inserted to pushDwnReq from notAssigned? - not exactly, because, not if it's not pushedDwn?...
+Also, should check pushDwnAck: do we really removed pushed-down chains from my notAssigned.
+
+Now, add a check, to verify that no chain is placed in 2 DCs.
+
+trace Time=30000.000f, chain 295 was blocked whlie having curLvl=2 and curDc=-1
+The wrong error msg is:  
+	<!> Error: Model error: s0 tried to block chain 295 that wasn't found in ChainsMaster -- in module (Datacenter) Lux.datacenters[0] (id=3), at t=0.479000000745s, 
+c295 belongs to s1682.
+s24.lvl == 2.
+
+s24 : chains pushed-dwn to me: c1476 from l5, c2564 from l5, c295 from l5, 
+s24 : snding to prnt pushDwnAck=c1708 l=0, c1476 l=2, c2564 l=2, c295 l=2,  potPlaced=, PUL= is in F
+So why is s0 trying to block c295?
+
+
+because s0 finished sending to all children, but didn't wait for their replies!
+Found a prob': before sending the reshAsyncPkt to prnt, a Dc may better wait a little for the last child's reply?
+But indeed, it should send reshAsyncPkt to prnt, only after finished calling all children (and have their replies?).
+
+Prob': pushDwnReq sends to child many chains (pushDwnReqFromChild). The child includes in its answer, in pushDwnAck, only the chains it succeeded to push-down.
+Then, in handlePushDwnFromChild, the parent considers only the chains that appeared in the ack. Hence, the chains remain in pushDwnReq, 
+even if there's no hope anymore to push them down.
+Possible sol: while sending to child, keep this->pushDwnReqFromChild. As we send to children serially, one such state var is enough.
+Then, when getting the child's reply, may move from pushDwnReq all chains that are from my level, and the child didn't push-down.
+If the chains are from above me, maybe later, when I have more space, I'll succeed to push-them down to myself.
+
+Currently, msgs are still passing during the accum' delay (CLEARANCE DELAY), waited before the init of a new resh. This wastes pkts, by sending irrelevant
+pkts (especially to parents); and may cause confusion. Hence, during CLEARANCE_DELAY should only rcv pkts and aggregate their info, but don't run new pkts.
+
+
+Cur prob' is in ln. 1081 of Datacenter.cc, in insertMyAssignedChainsIntoPushUpReq. Maybe ChainsMaster::findChain doesn't really answer a correct new chain.
+Indeed, prob' is:
+<!> Model error: pot-placed chain 399 was not found in ChainMaster, or chain has wrong S_u. See log file. -- in module (Datacenter) Lux.datacenters[0] (id=3), at t=1.000005s, event #10563
+
+Should check in ChainsMaster::insert whether the inserted chain is OK.
+
+dcId==26 && MyConfig::traceTime==30139
+
+while running directly, w/o it: 
+traceTime=30139.000, s26 : failed to place the old chain 582 even after reshuffling. notAssigned=
+
+
+s26 : in reshAsync. pushDwnReq=c
+[2692,582,310,41,1310,402,309,947,2484,1521,45,1413,404,1100,30,1652,1264,104,2251,105]
+[30,41,45,104,105,309,310,402,404,703,947,1100,1264,1310,1413,1521,1652,2251,2484,] 
+
+Current prob: dcIdOfChild[0] is wrong?
+
+

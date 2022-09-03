@@ -28,7 +28,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = 30449; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 
 Define_Module(SimController);
 

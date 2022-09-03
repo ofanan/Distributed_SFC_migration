@@ -480,7 +480,7 @@ void Datacenter::pushUp ()
 	reshuffled = false;
 	
 	RegainRsrcOfpushedUpChains ();
-	// Next, try to push-up chains of my descendants
+	// Try to push-up chains of my descendants
 	pushUpList.sort (SortChainsForPushUpList());
 	// to make no mess and to keep the sort while iterating on pushUpList, insert all modified chains to pushedUpChains. Later, will unify it again with pushUpList
 	list <Chain> pushedUpChains; 
@@ -511,7 +511,6 @@ void Datacenter::pushUp ()
 		if (MyConfig::DEBUG_LVL>0 && chainPtr->S_u.size() ==0) {
 			error ("s%d : encountered pushedUpChain c%d with S_u_len=0", dcId, chainPtr->id);
 		}
-
 		checkNinsertChainToList (pushUpList, *chainPtr);
 	}
 	
@@ -538,7 +537,6 @@ void Datacenter::genNsndPushUpPktsToChildren ()
         return;
     }
 	PushUpPkt* pkt;	 // the packet to be sent 
-	
 	for (Lvl_t child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
 		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
@@ -559,8 +557,13 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-				sprintf (buf, "\n s%d : snding PU pkt to child %d", dcId, dcIdOfChild[child]);
+				sprintf (buf, "\n s%d : snding PU pkt to child %d. PUL=", dcId, dcIdOfChild[child]);
 				printBufToLog ();
+				for (int i(0); i<idxInPushUpVec; i++) {
+					Chain chain2print = pkt-> getPushUpVec (i);
+					sprintf (buf, ",c%d,l%d ", chain2print.id, chain2print.curLvl);
+					printBufToLog ();				
+				}
 			}
 		}
 		else {
@@ -1079,9 +1082,13 @@ void Datacenter::reshAsync ()
 	}
 	if (canFinReshLocally || isLeaf) {
 	  if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-	  	sprintf (buf, "\ns%d : in finReshAsync locally. potPlaced=", dcId);
+	  	sprintf (buf, "\ns%d : in finReshAsync locally. Placed=", dcId);
 	  	printBufToLog ();
+	  	MyConfig::printToLog(placedChains);
+	  	MyConfig::printToLog ("potPlaced=");
 	  	MyConfig::printToLog(potPlacedChains);
+	  	MyConfig::printToLog ("pushDwnReq=");
+	  	MyConfig::printToLog(pushDwnReq);
 	  }
 		pushDwn ();
 		return finReshAsync ();
@@ -1471,6 +1478,12 @@ void Datacenter::finReshAsync ()
 		placedChains.insert (chainId_t);
 	}
 	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
+		if (MyConfig::traceTime==30449 && dcId==398) { //$$$
+			cout << endl << "s398 placing chains ";
+			for (auto chainId : potPlacedChains) {
+				cout << chainId << ",";
+			}
+		}
 		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
 	}
 	potPlacedChains.clear (); // in F mode, there're no "pot-placed" chains.
@@ -1536,6 +1549,10 @@ void Datacenter::pushDwn ()
 
 			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
 				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+			}
+			if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+				snprintf (buf, bufSize, "c%d from l%d, ", chainPtr->id, chainPtr->curLvl);
+				printBufToLog ();
 			}
 			continue; 
 		}
