@@ -5,4 +5,10 @@ Later, s398 reshuffles (not clear why it reshuffles after it finished BU, becaus
 During the resh, s398 places the potPlaced chain, c728.
 Later, s398's ancestor, s9, push-ups s398 to itsef. 
 s9 informs its son, s37, about this push-up.
+s37 : snding PU pkt to child 141. PUL=,c728,l3 
+s141 : snding PU pkt to child 398. PUL=,c728,l3 
+s398 : rcvd PU pkt
+
+
+MyConfig::traceTime==30449  && dcId==141  
 

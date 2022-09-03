@@ -276,7 +276,7 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, Chai
     }
 		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Did that chain migrate?
 			numMigs++;
-			if (MyConfig::LOG_LVL >= DETAILED_LOG) {
+			if (MyConfig::LOG_LVL >= TLAT_DETAILED_LOG) {
 				snprintf (buf, bufSize, "\nchain %d migrated from %d to %d", it->second.id, it->second.curDc, it->second.S_u[it->second.curLvl]);
 				MyConfig::printToLog (buf);
 			}

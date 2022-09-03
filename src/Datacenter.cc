@@ -23,7 +23,7 @@ inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, si
 
 inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new cMessage ("PrintStateAndEndSimMsg"));}
 
-inline void Datacenter::regainRsrcOfChain (const Chain chain) {availCpu += chain.mu_u_at_lvl(lvl); }
+inline void Datacenter::regainRsrcOfChain (const Chain &chain) {availCpu += chain.mu_u_at_lvl(lvl); }
 
 inline bool Datacenter::withinResh () const {return this->reshInitiatorLvl!=UNPLACED_LVL;}
 
@@ -35,6 +35,11 @@ inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const
 inline bool Datacenter::IAmTheReshIniator () const
 {
 	return (this->reshInitiatorLvl == this->lvl);
+}
+
+inline bool Datacenter::wasPushedUp (const Chain &chain) const 
+{
+	return chain.curLvl > this->lvl; 
 }
 
 Datacenter::Datacenter()
@@ -415,17 +420,27 @@ void Datacenter::handlePushUpPkt ()
 		}
 	}
 	
+	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
+		sprintf (buf, "\ns%d : rcvd PU pkt. PUL=", dcId);
+		printBufToLog ();
+		MyConfig::printToLog (pushUpList);
+		MyConfig::printToLog (" placed=");
+		MyConfig::printToLog (placedChains);
+		MyConfig::printToLog (" potPlaced=");
+		MyConfig::printToLog (potPlacedChains);
+		sprintf (buf, " my lvl=%d", this->lvl);
+		printBufToLog ();
+	}
+
+	regainRsrcOfpushedUpChains ();
 	if (isInAccumDelay) {
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			snprintf (buf, bufSize, "\ns%d : rding PU pkt during accum delay", dcId);
 			printBufToLog ();
 		}
-		RegainRsrcOfpushedUpChains ();
-		genNsndPushUpPktsToChildren();
-		return;
+		return genNsndPushUpPktsToChildren();
 	}
 	if (isInFMode) {
-		RegainRsrcOfpushedUpChains ();
 		genNsndPushUpPktsToChildren();
 	}
 	else {
@@ -437,31 +452,41 @@ void Datacenter::handlePushUpPkt ()
 /*************************************************************************************************************************************************
  Find all chains that were pushed-up for me, and regain resources for them.
 *************************************************************************************************************************************************/
-void Datacenter::RegainRsrcOfpushedUpChains ()
+void Datacenter::regainRsrcOfpushedUpChains ()
 {
+//			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+//				if (dcId==398 && MyConfig::traceTime==30449) {// $$
+//					error ("here");
+//				}
+//			}
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
-		auto search = potPlacedChains.find (chainPtr->id);
-		if (search==potPlacedChains.end()) { // If this chain doesn't appear in my potPlacedChains, nothing to do
-			if (isLeaf) { // no children for which we need the info about this chain --> erase it from my PUL.
-				chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain			
+		if (isPotPlaced(chainPtr->id)) { 
+			potPlacedChains.erase (chainPtr->id);
+			if (!wasPushedUp (*chainPtr)) {
+				placedChains.insert (chainPtr->id); 
+				ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl);
 			}
-			else {
-				chainPtr++;
-			}
+			chainPtr = pushUpList.erase (chainPtr); // finished handling this chain --> remove it from the pushUpList, and go on to the next chain
 			continue;
-		}	
-		
-		if (chainPtr->curLvl > (this->lvl) ) { // was the chain pushed-up?
-			regainRsrcOfChain (*chainPtr); // Yes --> regain its resources
 		}
-		else { //the chain wasn't pushed-up --> need to locally place it
-			placedChains.			insert (chainPtr->id);
-			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
-				error ("Datacenter::RegainRsrcOfpushedUpChains failed to update the lvl of c%d", chainPtr->id);
+		if (isPlaced (chainPtr->id)) { 
+			if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==Sync) {
+				error ("c%d that I already placed appears in a PUL that I recevied. This is illegal in Sync mode", chainPtr->id);
+			}
+		
+			if (wasPushedUp (*chainPtr)) { //This chain was placed on me, but later it was pushed-up by an ancestor --> displace the chain
+				regainRsrcOfChain (*chainPtr);
+				placedChains.erase (chainPtr -> id);
+				ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl);
+				chainPtr = pushUpList.erase (chainPtr); // finished handling this chain --> remove it from the pushUpList, and go on to the next chain
+				continue;
 			}
 		}
-		potPlacedChains.erase (chainPtr->id);
-		chainPtr = pushUpList.erase (chainPtr); // finished handling this chain pushUpList --> remove it from the pushUpList, and go on to the next chain
+		if (isLeaf) { // no children to which I'll have to send info about this chain --> erase it from my PUL.
+			chainPtr = pushUpList.erase (chainPtr); 
+			continue;
+		}
+		chainPtr++;
 	}
 }
 
@@ -479,7 +504,6 @@ void Datacenter::pushUp ()
 	}
 	reshuffled = false;
 	
-	RegainRsrcOfpushedUpChains ();
 	// Try to push-up chains of my descendants
 	pushUpList.sort (SortChainsForPushUpList());
 	// to make no mess and to keep the sort while iterating on pushUpList, insert all modified chains to pushedUpChains. Later, will unify it again with pushUpList
@@ -557,7 +581,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-				sprintf (buf, "\n s%d : snding PU pkt to child %d. PUL=", dcId, dcIdOfChild[child]);
+				sprintf (buf, "\n s%d : snding PU pkt to child %d. simTime=%f, PUL=", dcId, dcIdOfChild[child], simTime().dbl());
 				printBufToLog ();
 				for (int i(0); i<idxInPushUpVec; i++) {
 					Chain chain2print = pkt-> getPushUpVec (i);
@@ -571,7 +595,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		}
 	}
 	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==Sync && !pushUpList.empty()) {
-		error ("pushUpList not empty after sending PU pkts to all children");
+		error ("pushUpList is not empty after sending PU pkts to all children");
 	}
 }
 
@@ -1342,7 +1366,7 @@ bool Datacenter::isPlaced (ChainId_t chainId)
 }
 
 // return true iff the queried chain id is locally placed
-bool Datacenter::isPotentiallyPlaced (ChainId_t chainId) 
+bool Datacenter::isPotPlaced (ChainId_t chainId) 
 {
 	auto search = potPlacedChains.find (chainId);
 	return (search!=potPlacedChains.end()); 	
@@ -1430,7 +1454,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		eraseChainFromList (pushDwnReqFromChild, chain);
 		
 		// now we know that the chain was pushed-down to a Dc below me
-		if (isPotentiallyPlaced (chain.id)) {
+		if (isPotPlaced (chain.id)) {
 			potPlacedChains.erase (chain.id); 
 			regainRsrcOfChain		  (chain); 
 		}	
@@ -1542,7 +1566,7 @@ void Datacenter::pushDwn ()
 		}
 		
 		// If this chain is potPlaced on me, then availCpu was already decreased when it was pot-placed. No need to decrease it again
-		if (isPotentiallyPlaced (chainPtr->id)) { 
+		if (isPotPlaced (chainPtr->id)) { 
 			// finally place this pot-placed chain
 			potPlacedChains.erase   (chainPtr->id); 
 			placedChains.insert 		(chainPtr->id); 

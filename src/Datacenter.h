@@ -57,7 +57,7 @@ class Datacenter : public cSimpleModule
     void clrRsrc 								(); // Dis-place all the placed and pot-placed chains, clear pushUpSet and notAssigned, reset availCpu
     void initBottomUp (vector<Chain> &vecOfChainThatJoined);
     bool isPlaced (ChainId_t chainId); // return true iff the queried chain id is locally placed
-    bool isPotentiallyPlaced (ChainId_t chainId); // return true iff the queried chain id is locally potentially-placed
+    bool isPotPlaced (ChainId_t chainId); // return true iff the queried chain id is locally potentially-placed
 
     // Log / debug funcs
     void checkEndTimePeriod (); // sanity check at the end of a time period
@@ -97,14 +97,15 @@ class Datacenter : public cSimpleModule
 
 		// Functions related to the alg' running    
     
-    Cpu_t requiredCpuToLocallyPlaceChain 			  (const Chain chain) const;
-    Cpu_t requiredCpuToPlaceChainAtLvl 			    (const Chain chain, Lvl_t lvl) const;
-		inline Lvl_t 	portToChild 								  (const Lvl_t child) const;  // returns the index of the port towards child # c
-		inline void     sndDirectToSimCtrlr 				(cMessage* msg);
-		inline void 		regainRsrcOfChain 					(const Chain  chain);
-		inline bool IAmTheReshIniator 							() const;
-		inline bool withinResh () const;
-		inline bool withinAnotherResh (const Lvl_t reshInitiatorLvl) const;
+    Cpu_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
+    Cpu_t requiredCpuToPlaceChainAtLvl 		(const Chain chain, Lvl_t lvl) const;
+		inline Lvl_t 	portToChild 						(const Lvl_t child) const;  // returns the index of the port towards child # c
+		inline void   sndDirectToSimCtrlr 		(cMessage* msg);
+		inline void 	regainRsrcOfChain 			(const Chain &chain);
+		inline bool 	IAmTheReshIniator 			() const;
+		inline bool 	withinResh 							() const;
+		inline bool 	withinAnotherResh 			(const Lvl_t reshInitiatorLvl) const;
+		inline bool 	wasPushedUp 						(const Chain &chain) const;
     void sndViaQ         												(int16_t portNum, cPacket* pkt2send);
     void xmt              											(int16_t portNum, cPacket *pkt2send);
     void handleEndXmtMsg   		  ();
@@ -115,7 +116,7 @@ class Datacenter : public cSimpleModule
     void bottomUpFMode     			(); // bottom-up at "feasibility" mode
     void rdBottomUpPkt					();
     void pushUp		        			();
-    void RegainRsrcOfpushedUpChains ();
+    void regainRsrcOfpushedUpChains ();
     void prepareReshSync		 		();
 		void initReshAsync					(); // init an async reshuffle. called upon a failure to place a chain
 		void finReshAsync 					(); // finalize a run of aysnc resh on a single host
