@@ -39,7 +39,7 @@ inline bool Datacenter::IAmTheReshIniator () const
 
 inline bool Datacenter::wasPushedUp (const Chain &chain) const 
 {
-	return chain.curLvl > this->lvl; 
+	return (chain.curLvl > this->lvl); 
 }
 
 Datacenter::Datacenter()
@@ -450,22 +450,23 @@ void Datacenter::handlePushUpPkt ()
 
 
 /*************************************************************************************************************************************************
- Find all chains that were pushed-up for me, and regain resources for them.
+ Find all chains that were pushed-up from me, and regain resources for them.
 *************************************************************************************************************************************************/
 void Datacenter::regainRsrcOfpushedUpChains ()
 {
-//			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-//				if (dcId==398 && MyConfig::traceTime==30449) {// $$
-//					error ("here");
-//				}
-//			}
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) { // for each chain in pushUpList
 		if (isPotPlaced(chainPtr->id)) { 
 			potPlacedChains.erase (chainPtr->id);
-			if (!wasPushedUp (*chainPtr)) {
-				placedChains.insert (chainPtr->id); 
-				ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl);
+			if (wasPushedUp (*chainPtr)) {
+				regainRsrcOfChain (*chainPtr);
 			}
+			else {
+				placedChains.insert (chainPtr->id); 			
+				if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
+					error ("Datacenter::RegainRsrcOfPushedUpChains failed to update the lvl of c%d", chainPtr->id);
+				}
+			}
+			potPlacedChains.erase (chainPtr->id);
 			chainPtr = pushUpList.erase (chainPtr); // finished handling this chain --> remove it from the pushUpList, and go on to the next chain
 			continue;
 		}
@@ -477,7 +478,11 @@ void Datacenter::regainRsrcOfpushedUpChains ()
 			if (wasPushedUp (*chainPtr)) { //This chain was placed on me, but later it was pushed-up by an ancestor --> displace the chain
 				regainRsrcOfChain (*chainPtr);
 				placedChains.erase (chainPtr -> id);
-				ChainsMaster::modifyLvl (chainPtr->id, chainPtr->curLvl);
+				
+				// We don't inform ChainsMaster, as the Dc that pushed-up that chain should have already informed ChainsMaster.
+				// if (!ChainsMaster::modifyLvl  (chainPtr->id,  chainPtr->curLvl)){ // inform ChainMaster about the chain's place 
+				//	error ("Datacenter::RegainRsrcOfPushedUpChains failed to update the lvl of c%d", chainPtr->id);
+				// }
 				chainPtr = pushUpList.erase (chainPtr); // finished handling this chain --> remove it from the pushUpList, and go on to the next chain
 				continue;
 			}
@@ -1141,10 +1146,10 @@ void Datacenter::insertMyAssignedChainsIntoPushDwnReq ()
 	for (ChainId_t chainId : potPlacedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
 			if (chain.S_u.size()==0) {
-				error ("traceTime=%f : insertMyAssignedChainsIntoPushDwnReq () : potPlaced chain %d has S_u_len=0%", MyConfig::traceTime, chainId);
+				error ("traceTime=%.0ff : insertMyAssignedChainsIntoPushDwnReq () : potPlaced chain %d has S_u_len=0%", MyConfig::traceTime, chainId);
 			}
 			else {
-				error ("traceTime=%f : insertMyAssignedChainsIntoPushDwnReq () : potPlaced chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
+				error ("traceTime=%.0f : insertMyAssignedChainsIntoPushDwnReq () : potPlaced chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
 			}
 		}
 		Chain chain2insert = chain;

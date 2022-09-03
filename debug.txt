@@ -9,6 +9,7 @@ s37 : snding PU pkt to child 141. PUL=,c728,l3
 s141 : snding PU pkt to child 398. PUL=,c728,l3 
 s398 : rcvd PU pkt
 
+Re-wrote regainRsrcOfPushedUpChains(), and got:
+traceTime=30001.000, s26 : error : failed to place the old chain 92 even after reshuffling. notAssigned=
 
-MyConfig::traceTime==30449  && dcId==141  
 
