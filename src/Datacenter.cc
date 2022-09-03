@@ -691,7 +691,7 @@ Handle a failure to place an old (exiting) chain
 *************************************************************************************************************************************************/
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
-	sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place the old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
+	sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
 	printBufToLog ();
 
 	if (MyConfig::runningBinSearchSim) {
