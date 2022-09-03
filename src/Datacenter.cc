@@ -273,6 +273,10 @@ void Datacenter::handleMessage (cMessage *msg)
   	isInAccumDelay = false;
   	initReshAsync (); 
   }
+  else if (msg->isSelfMessage() && strcmp (msg->getName(), "bottomUp")==0) {
+	  isInBuAccumDelay = false;
+  	bottomUp();
+	}
   else if (strcmp (msg->getName(), "errorMsg")==0) {
  		printBufToLog ();
  		if (MyConfig::DEBUG_LVL >=0) {
@@ -821,7 +825,11 @@ void Datacenter::handleBottomUpPktAsync ()
 		MyConfig::printToLog (pushUpList, false);
 	}
 	rdBottomUpPkt ();
-	bottomUp();
+	if (isInBuAccumDelay) {
+		return;
+	}	
+	isInBuAccumDelay = true;
+	scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("bottomUp")); //schedule a run of bottomUp
 }
 
 /*************************************************************************************************************************************************
@@ -1301,6 +1309,7 @@ void Datacenter::rst ()
 	endFModeEvent  = nullptr;
 	isInFMode 		 = false;
 	isInAccumDelay = false;
+	isInBuAccumDelay = false;
 	reshuffled     = false;
 }
 

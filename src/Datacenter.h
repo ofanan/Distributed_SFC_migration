@@ -74,6 +74,7 @@ class Datacenter : public cSimpleModule
 		cMessage*							endFModeEvent; // will hold the event of finishing "F" mode
 		bool									isInFMode; 
 		bool 									isInAccumDelay; // when true, only accumulate and parse arriving pkts, but don't run the relevant placing algs.
+		bool 									isInBuAccumDelay; // when true, I've already scheduled a Bu accum' delay
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'
 		list <Chain> 					pushDwnReq, pushDwnAck; // List of chains requested to be pushed-down, acknowledged that were pushed-down

@@ -137,8 +137,8 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
-		runTrace ();
-//		initBinSearchSim ();
+//		runTrace ();
+		initBinSearchSim ();
 	}
 }
 
@@ -175,7 +175,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.03; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.1; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
