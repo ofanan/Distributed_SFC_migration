@@ -8,7 +8,7 @@ Controller of the simulation:
 
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
-float MyConfig::RtChainPr; // prob' that a new chain is an RT chain
+float MyConfig::probOfRt; // prob' that a new chain is an RT chain
 bool  MyConfig::randomlySetChainType = false;
 bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
@@ -84,16 +84,16 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    RtChainRandInt 				= (int) (MyConfig::RtChainPr * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = numeric_limits<float>::max();
+    RtChainRandInt 				= (int) (MyConfig::probOfRt * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
+    simLenInSec           = 2; // $$  numeric_limits<float>::max();
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
 			MyConfig::evenChainsAreRt			 = false;
-			MyConfig::RtChainPr = 0.3; // prob' that a new chain is an RT chain
+			MyConfig::probOfRt = 0.4; // prob' that a new chain is an RT chain
 		}
 		else {
-			MyConfig::RtChainPr = 0.5; // prob' that a new chain is an RT chain
+			MyConfig::probOfRt = 0.5; // prob' that a new chain is an RT chain
 			MyConfig::evenChainsAreRt			 = true;
 		}
 
@@ -171,6 +171,19 @@ void SimController::handleAlgFailure ()
 }
 
 /*************************************************************************************************************************************************
+Run a binary search for multiple values of probOfRt
+**************************************************************************************************************************************************/
+void SimController::runRtProbSim ()
+{
+  float probOfRtVals[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1};
+	for (short j=0; j<sizeof(probOfRtVals)/sizeof(*probOfRtVals); j++) {
+		MyConfig::probOfRt = probOfRtVals[j];
+		initBinSearchSim ();
+	}
+}
+
+
+/*************************************************************************************************************************************************
 Run a binary search for the minimal amount of cpu required to find a feasible sol'
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
@@ -180,7 +193,7 @@ void SimController::initBinSearchSim ()
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
 	ub = Cpu_t (MyConfig::cpuAtLeaf*max_R);
-	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
+	// $$ MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
 	updateCpuAtLvl ();
 	runTrace ();
 }
@@ -663,7 +676,7 @@ bool SimController::genRtChain (ChainId_t chainId)
 		return (chainId%2==0);
 	}
 	else {
-		return (float(chainId % 10)/10) < MyConfig::RtChainPr;
+		return (float(chainId % 10)/10) < MyConfig::probOfRt;
 	}
 }			
 			
@@ -1101,10 +1114,10 @@ void SimController::handleMessage (cMessage *msg)
 inline void SimController::genSettingsBuf (bool printTime)
 {
   if (printTime) {
-  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed, algStts);
+  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::probOfRt, seed, algStts);
   }
   else {
-  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::RtChainPr, seed);
+  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::probOfRt, seed);
   }
 }
 

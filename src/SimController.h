@@ -125,7 +125,9 @@ class SimController : public cSimpleModule
 		inline DcId_t dcId2leafId (DcId_t dcId);
 		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
-		void initBinSearchSim  ();
+		void initBinSearchSim  (); // run a binary search for the minimum required rsrc aug' (actually, cpu at leaf) for finding a feasible sol'
+		void runRtProbSim (); // Run a binary search for multiple values of probOfRt
+
 		void continueBinSearch ();
     
     // Functions used for debugging
