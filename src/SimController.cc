@@ -9,7 +9,7 @@ Controller of the simulation:
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
 float MyConfig::probOfRt; // prob' that a new chain is an RT chain
-bool  MyConfig::randomlySetChainType = false;
+bool  MyConfig::randomlySetChainType = true;
 bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
@@ -85,7 +85,7 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     RtChainRandInt 				= (int) (MyConfig::probOfRt * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = 2; // $$  numeric_limits<float>::max();
+    simLenInSec           = numeric_limits<float>::max();
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -137,8 +137,9 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
-//		runTrace ();
-		initBinSearchSim ();
+		runTrace ();
+		// initBinSearchSim ();
+		runRtProbSim ();
 	}
 }
 
@@ -171,14 +172,17 @@ void SimController::handleAlgFailure ()
 }
 
 /*************************************************************************************************************************************************
-Run a binary search for multiple values of probOfRt
+Run a binary search for multiple values of probOfRt, and for multiple seeds for each run
 **************************************************************************************************************************************************/
 void SimController::runRtProbSim ()
 {
   float probOfRtVals[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1};
 	for (short j=0; j<sizeof(probOfRtVals)/sizeof(*probOfRtVals); j++) {
 		MyConfig::probOfRt = probOfRtVals[j];
-		initBinSearchSim ();
+		for (int seed(0); seed < 20; seed++) {
+			this->seed = seed;
+			initBinSearchSim ();
+		}
 	}
 }
 
@@ -188,7 +192,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.1; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.2; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;

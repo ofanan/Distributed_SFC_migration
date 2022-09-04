@@ -53,7 +53,7 @@ class SimController : public cSimpleModule
     Lvl_t  height; // height of the tree
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
-    int seed = 42;
+    int seed = 42; // default randomization value; may be overwritten when running a sim' campaign
     int algStts; // stts of the last run of the alg'
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
