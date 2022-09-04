@@ -9,7 +9,7 @@ Controller of the simulation:
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
 float MyConfig::probOfRt; // prob' that a new chain is an RT chain
-bool  MyConfig::randomlySetChainType = true;
+bool  MyConfig::randomlySetChainType = false; // default value; will be overwritten when running a rand sim
 bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
@@ -176,6 +176,7 @@ Run a binary search for multiple values of probOfRt, and for multiple seeds for 
 **************************************************************************************************************************************************/
 void SimController::runRtProbSim ()
 {
+	MyConfig::randomlySetChainType = true;
   float probOfRtVals[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1};
 	for (short j=0; j<sizeof(probOfRtVals)/sizeof(*probOfRtVals); j++) {
 		MyConfig::probOfRt = probOfRtVals[j];
