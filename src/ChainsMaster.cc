@@ -333,6 +333,7 @@ void ChainsMaster::rst ()
 {
 	ChainsMaster::allChains.clear ();
 	ChainsMaster::numInstantMigs = 0;
+	sprintf (buf, "");
 } 
 
 

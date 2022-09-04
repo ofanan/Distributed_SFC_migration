@@ -1306,12 +1306,26 @@ void Datacenter::rst ()
 	fill(endXmtEvents. begin(), endXmtEvents. end(), nullptr); 
 
 	rstReshAsync ();
-	endFModeEvent  = nullptr;
-	isInFMode 		 = false;
-	isInAccumDelay = false;
+	endFModeEvent    = nullptr; 
+	isInFMode 		   = false;
+	isInAccumDelay   = false;
 	isInBuAccumDelay = false;
-	reshuffled     = false;
+	reshuffled       = false;
 }
+
+/*************************************************************************************************************************************************
+Reset the run of an async resh, and prepare for the next run
+*************************************************************************************************************************************************/
+void Datacenter::rstReshAsync ()
+{
+	reshInitiatorLvl 			 = UNPLACED_LVL; // reset the initiator of the currently run reshuffling
+	nxtChildToSndReshAsync = 0; 					 // begin the passing over children from child 0
+	deficitCpu						 = 0;
+	pushDwnAck.					clear ();
+	pushDwnReq.				  clear ();
+	pushDwnReqFromChild.clear ();
+}
+
 
 /*************************************************************************************************************************************************
 Clear all the resources currently allocated at this datastore:
@@ -1481,16 +1495,6 @@ void Datacenter::handleReshAsyncPktFromChild ()
 		}
 	 }
 	 
-	//	for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {
-
-//	// remove from pushDwnReq all the chains that I requested from this child to push-down from me, but weren't pushed-dwn 
-//	for (auto chain : pushDwnReqFromChild) {
-//		if (chain.curLvl==lvl && // this is a request to push-dwn a chain from me, and the child didn't push-dwn this chain, AND
-//	   		chain.S_u[lvl-1]==dcIdOfChild[childFromWhichReshAckArrived])   { /// this chain is associated with (the sub-tree of) the child that sent me this ack
-//				eraseChainFromList (pushDwnReq, chain);
-//		}
-//	} 
-	
 	if (deficitCpu <= 0) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 			sprintf (buf, "\ns%d : defCpu=%d. finishing", dcId, deficitCpu);
@@ -1503,8 +1507,7 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	}
 }
 
-/*************************************************************************************************************************************************
-Finish the local run of a reshAsync alg':
+/*************************************************************************************************************************************************Finish the local run of a reshAsync alg':
 - if I'm the initiator, come back to run bottomUp, but in "F" (feasibility) mode.
 - Else, send a reshAsyncPkt to prnt.
 *************************************************************************************************************************************************/
@@ -1516,12 +1519,6 @@ void Datacenter::finReshAsync ()
 		placedChains.insert (chainId_t);
 	}
 	if (!ChainsMaster::modifyLvl (potPlacedChains, lvl))	{
-		if (MyConfig::traceTime==30449 && dcId==398) { //$$$
-			cout << endl << "s398 placing chains ";
-			for (auto chainId : potPlacedChains) {
-				cout << chainId << ",";
-			}
-		}
 		error ("error in ChainsMaster::modifyLvl. See .log file for details.");
 	}
 	potPlacedChains.clear (); // in F mode, there're no "pot-placed" chains.
@@ -1539,18 +1536,6 @@ void Datacenter::finReshAsync ()
 	}
 	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode //$$$ maybe this should be called only if I'm the initiator?
 	rstReshAsync ();
-}
-
-/*************************************************************************************************************************************************
-Reset the run of an async resh, and prepare for the next run
-*************************************************************************************************************************************************/
-void Datacenter::rstReshAsync ()
-{
-	reshInitiatorLvl 			 = UNPLACED_LVL; // reset the initiator of the currently run reshuffling
-	nxtChildToSndReshAsync = 0; 					 // begin the passing over children from child 0
-	deficitCpu						 = 0;
-	pushDwnReq.clear        ();
-	pushDwnAck.clear        ();
 }
 
 /*************************************************************************************************************************************************

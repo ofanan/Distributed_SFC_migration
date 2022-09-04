@@ -1,4 +1,4 @@
-/*************************************************************************************************************************************************
+// = {0.1}; // 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1};/*************************************************************************************************************************************************
 Controller of the simulation:
 - reads the trace.
 - runs ths placing algorithm, by calling the relevant datacenter.
@@ -8,7 +8,6 @@ Controller of the simulation:
 
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
-float MyConfig::probOfRt; // prob' that a new chain is an RT chain
 bool  MyConfig::randomlySetChainType = false; // default value; will be overwritten when running a rand sim
 bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
@@ -25,6 +24,8 @@ bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the l
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
+bool  MyConfig::runningRtProbSim;
+
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -38,6 +39,16 @@ inline Lvl_t  SimController::idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl) {return
 // convert leafId <--> dcId
 inline DcId_t SimController::leafId2DcId (DcId_t leafId) {return leaves		 [leafId]->dcId;}
 inline DcId_t SimController::dcId2leafId (DcId_t dcId)   {return datacenters[dcId]  ->leafId;}
+
+/*************************************************************************************************************************************************
+RtChainRandInt is used to speedup the random decision, whether a new geenrated chain is RT or not.
+This function calculates RtChainRandInt based on the current RtProb.
+**************************************************************************************************************************************************/
+inline void SimController::updateRtChainRandInt ()
+{
+	RtChainRandInt = (int) (RtProb) * (float) (RAND_MAX);
+}
+
 
 SimController::SimController() {
 }
@@ -84,16 +95,16 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    RtChainRandInt 				= (int) (MyConfig::probOfRt * (float) (RAND_MAX));//the max integer, for which we'll consider a new chain as a RTChain.
-    simLenInSec           = numeric_limits<float>::max();
+    simLenInSec           = 2; //numeric_limits<float>::max();
+    updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
 			MyConfig::evenChainsAreRt			 = false;
-			MyConfig::probOfRt = 0.4; // prob' that a new chain is an RT chain
+			RtProb = 0.0; // prob' that a new chain is an RT chain
 		}
 		else {
-			MyConfig::probOfRt = 0.5; // prob' that a new chain is an RT chain
+			RtProb = 0.5; // prob' that a new chain is an RT chain
 			MyConfig::evenChainsAreRt			 = true;
 		}
 
@@ -137,9 +148,9 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
-		runTrace ();
-		// initBinSearchSim ();
-		runRtProbSim ();
+//		 runTrace ();
+//		 initBinSearchSim ();
+		initRtProbSim ();
 	}
 }
 
@@ -172,19 +183,34 @@ void SimController::handleAlgFailure ()
 }
 
 /*************************************************************************************************************************************************
-Run a binary search for multiple values of probOfRt, and for multiple seeds for each run
+Init a binary search for a single values of probOfRt, and for multiple seeds for each run
 **************************************************************************************************************************************************/
-void SimController::runRtProbSim ()
+void SimController::initRtProbSim ()
 {
 	MyConfig::randomlySetChainType = true;
-  float probOfRtVals[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1};
-	for (short j=0; j<sizeof(probOfRtVals)/sizeof(*probOfRtVals); j++) {
-		MyConfig::probOfRt = probOfRtVals[j];
-		for (int seed(0); seed < 20; seed++) {
-			this->seed = seed;
-			initBinSearchSim ();
-		}
+	short RtProbsNum=2;
+	for (int i(0); i<RtProbsNum; i++) {
+		RtProbsVec.push_back (i*0.1);
 	}
+	RtProb = RtProbAr [idxInRtProbAr++];
+	updateRtChainRandInt ();
+  idxInRtProbsVec = 0;
+  seed = 0; // initial seed value
+  numSeeds = 2; 
+	initBinSearchSim 		 ();
+}
+
+
+/*************************************************************************************************************************************************
+Init a binary search for a single values of probOfRt, and for multiple seeds for each run
+**************************************************************************************************************************************************/
+void SimController::continueRtProbSim ()
+{
+	MyConfig::randomlySetChainType = true;
+		if (idxInRtProbsVec==RtProbsVec.size()) {
+			finished simulation // 
+		}
+			initBinSearchSim ();
 }
 
 
@@ -220,7 +246,7 @@ void SimController::continueBinSearch ()
 			sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 			printBufToLog ();
 		}
-		return;
+		return scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
 	}
 	if (algStts==SCCS) {
 		ub = MyConfig::cpuAtLeaf;	
@@ -478,6 +504,25 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 	error (errorMsg); 
 }
 
+
+/*************************************************************************************************************************************************
+* Reset all the data structures and counters before running a trace
+**************************************************************************************************************************************************/
+void SimController::rst () 
+{
+	chainsThatJoinedLeaf.clear ();
+	chainsThatLeftDc.		 clear ();
+	usrsThatLeft.				 clear ();
+	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+	numMigsAtThisPeriod = 0; 
+	numCritUsrs					= 0;
+	isFirstPeriod 			= true;
+	isLastPeriod 				= false;
+  MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
+	traceFile.clear();
+	traceFile.seekg(0); // return to the beginning of the trace file
+}
+
 /*************************************************************************************************************************************************
 * Run the whole trace
 **************************************************************************************************************************************************/
@@ -485,6 +530,7 @@ void SimController::runTrace () {
 	
 	MyConfig::		rst ();
 	ChainsMaster::rst ();
+	rst 							();
 	for (DcId_t dc(0); dc<numDatacenters; dc++) {
 		datacenters[dc]->rst ();
 	}
@@ -492,16 +538,6 @@ void SimController::runTrace () {
 	MyConfig::printToLog (settingsBuf); 
 	cout << settingsBuf;
 	cout << ". debug lvl=" << MyConfig::DEBUG_LVL << ", log lvl=" << MyConfig::LOG_LVL << ", sim len=" << simLenInSec << endl;
-	chainsThatJoinedLeaf.clear ();
-	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	numMigsAtThisPeriod = 0; 
-	numCritUsrs					= 0;
-	isFirstPeriod 			= true;
-	isLastPeriod 				= false;
-  MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
-  
-	traceFile.clear();
-	traceFile.seekg(0); // return to the beginning of the trace file
 	runTimePeriod ();
 }
 
@@ -572,8 +608,14 @@ void SimController::concludeTimePeriod ()
 	int chainsMasterStts = ChainsMaster::concludeTimePeriod (numMigsAtThisPeriod, curNumBlockedUsrs, errChainId);
 
 	if (algStts==SCCS && chainsMasterStts!=0 ) {
-		sprintf (buf, "traceT=%.3f, sim t=%f: error type %d at ChainsMaster::concludeTimePeriod. c%d. See log file.", 
-								MyConfig::traceTime, simTime().dbl(), chainsMasterStts, errChainId);
+		if (chainsMasterStts==1) {
+			sprintf (buf, "error: traceT=%.3f, sim t=%f: ChainsMaster::concludeTimePeriod. encounterd unplaced c%d", 
+								MyConfig::traceTime, simTime().dbl(), errChainId);
+		}
+		if (chainsMasterStts==1) {
+			sprintf (buf, "error: traceT=%.3f, sim t=%f: ChainsMaster::concludeTimePeriod. encounterd problematic c%d", 
+								MyConfig::traceTime, simTime().dbl(), errChainId);
+		}
 		if (MyConfig::DEBUG_LVL >= 0) {
 			error (buf); 
 		}
@@ -612,10 +654,6 @@ void SimController::concludeTimePeriod ()
 	numMigsAtThisPeriod = 0; 
 	numCritUsrs					= 0;
 	MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
-//	if (MyConfig::traceTime==30062) { //$$
-//		error ("t = %.0f, finished concludeTimePeriod.", MyConfig::traceTime);
-//	}
-
 }
 
 
@@ -681,7 +719,7 @@ bool SimController::genRtChain (ChainId_t chainId)
 		return (chainId%2==0);
 	}
 	else {
-		return (float(chainId % 10)/10) < MyConfig::probOfRt;
+		return (float(chainId % 10)/10) < RtProb;
 	}
 }			
 			
@@ -1081,7 +1119,7 @@ void SimController::PrintStateAndEndSim ()
 
 void SimController::handleMessage (cMessage *msg)
 {
-	if (strcmp (msg->getName(), "RunTimePeriodMsg")==0) {
+	if (msg->isSelfMessage() && strcmp (msg->getName(), "RunTimePeriodMsg")==0) {
 		isFirstPeriod = false;
 		if (MyConfig::runningBinSearchSim) {
 			if (isLastPeriod || algStts==FAIL) { 
@@ -1095,7 +1133,13 @@ void SimController::handleMessage (cMessage *msg)
 			runTimePeriod ();
 		}
 	}
-	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
+  else if (msg->isSelfMessage() && strcmp (msg->getName(), "finBinSearchMsg")==0) { 
+		if (MyConfig::runningRtProbSim) {
+			continueRtProbSim (); 
+		}
+  }
+  
+  	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
 		if (this->mode==Async) {
 			error ("rcvd initFullReshMsg while being in Async mode"); 
 		}
@@ -1119,10 +1163,10 @@ void SimController::handleMessage (cMessage *msg)
 inline void SimController::genSettingsBuf (bool printTime)
 {
   if (printTime) {
-  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::probOfRt, seed, algStts);
+  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts);
   }
   else {
-  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, MyConfig::probOfRt, seed);
+  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed);
   }
 }
 
@@ -1131,9 +1175,6 @@ inline void SimController::genSettingsBuf (bool printTime)
 *************************************************************************************************************************************************/
 void SimController::printResLine ()
 {
-//	if (MyConfig::traceTime==30063) { //$$
-//		error ("t = %.0f, beginning printResLine", MyConfig::traceTime);
-//	}
 	genSettingsBuf ();
 	MyConfig::printToRes (settingsBuf); 
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();

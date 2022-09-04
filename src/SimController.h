@@ -53,12 +53,23 @@ class SimController : public cSimpleModule
     Lvl_t  height; // height of the tree
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
-    int seed = 42; // default randomization value; may be overwritten when running a sim' campaign
+    int seed = 0; // default randomization value; may be overwritten when running a sim' campaign
+    int numSeeds; // num of seeds to run a sim' for in a sim' camapaign
     int algStts; // stts of the last run of the alg'
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+
+		float RtProb; // prob' that a new chain is an RT chain
+  	vector <float> RtProbsVec []; // array of prob' that a new chain is an RT chain; used for a sim' campaign checking multiple probabilities
+  	short idxInRtProbsVec;
+
+    //pathFromLeafToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. E.g., pathFromLeafToRoot[i][0] will hold the dcId of leaf # i.
+    vector <vector<DcId_t>> pathFromLeafToRoot; 
+    //pathFromDcToRoot[i][j] will hold the j-th hop in the path from Dc i to the root. 
+    vector <vector<DcId_t>> pathFromDcToRoot; 
+    vector <vector <Lvl_t>> distTable; // dist[i][j] will hold the distance (in # of hosts) from DC i to DC i+j, where j>0
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
 		int numBlockedUsrs;
@@ -80,11 +91,6 @@ class SimController : public cSimpleModule
     //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
     vector <bool> rcvdFinishedAlgMsgFromLeaves; 
     
-    //pathFromLeafToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. E.g., pathFromLeafToRoot[i][0] will hold the dcId of leaf # i.
-    vector <vector<DcId_t>> pathFromLeafToRoot; 
-    //pathFromDcToRoot[i][j] will hold the j-th hop in the path from Dc i to the root. 
-    vector <vector<DcId_t>> pathFromDcToRoot; 
-    vector <vector <Lvl_t>> distTable; // dist[i][j] will hold the distance (in # of hosts) from DC i to DC i+j, where j>0
 
 		// Init Functions
     void initialize(int stage);
@@ -92,6 +98,7 @@ class SimController : public cSimpleModule
 		void setOutputFileNames ();
 		void discoverPathsToRoot ();
 		Lvl_t dist (DcId_t i, DcId_t j);
+		void rst ();
 
 		// Termination functions
 		void finish ();
@@ -111,6 +118,7 @@ class SimController : public cSimpleModule
   	void initAlgAsync (); // init an async placement alg'
   	inline void printBufToLog () {MyConfig::printToLog(buf);}
   	inline void printBufToRes () {MyConfig::printToRes(buf);}
+		inline void updateRtChainRandInt (); // update the int (that is used to efficiently randomize whether a new cahin is RT or not), based on MyConfig::probOfRt.
 		
     void handleMessage (cMessage *msg);
 		void handlePlacementInfoMsg (cMessage *msg);
@@ -126,9 +134,10 @@ class SimController : public cSimpleModule
 		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
 		void initBinSearchSim  (); // run a binary search for the minimum required rsrc aug' (actually, cpu at leaf) for finding a feasible sol'
-		void runRtProbSim (); // Run a binary search for multiple values of probOfRt
+		void initRtProbSim (); // Run a binary search for multiple values of probOfRt
 
-		void continueBinSearch ();
+		void continueBinSearch (); // After a failure / succesfully finishing the whole trace, this func' is called, to continue the binary search
+		void continueRtProbSim (); // After finishing a single run of a binary search,  this func' is called, to continue the RtProbSim
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.

@@ -31,19 +31,19 @@ class Datacenter : public cSimpleModule
     cModule 				*network; // Pointer to the network on which the simulation is running
     SimController 	*simController;
   	string 					networkName;
-  	Lvl_t   			lvl; // level in the tree (leaf's lvl is 0).
-    Lvl_t 				numChildren;
-    Lvl_t 				numParents;
-    Lvl_t 				numPorts;
+  	Lvl_t   				lvl; // level in the tree (leaf's lvl is 0).
+    Lvl_t 					numChildren;
+    Lvl_t 					numParents;
+    Lvl_t 					numPorts;
     DcId_t 					idOfParent;
     vector <DcId_t> dcIdOfChild; // dcIdOfChild[c] will hold the dcId of child c.
-    bool isRoot;
-    bool isLeaf;
-    DcId_t dcId;
-    DcId_t leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
-		Cpu_t cpuCapacity;
-		int numBuPktsRcvd; 
-  	bool 									reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
+    bool 					  isRoot;
+    bool 						isLeaf;
+    DcId_t 					dcId;
+    DcId_t 					leafId; // relevant only for leaves; counts the leaves from 0 to numLeaves-1. For non-leaf dc, will be set to -1
+		Cpu_t 					cpuCapacity;
+		int 						numBuPktsRcvd; 
+  	bool 						reshuffled; // true iff this datacenter was reshuffled at this time slot (sync mode).
     
 		//getter
 		void setLeafId (DcId_t leafId);
@@ -65,8 +65,8 @@ class Datacenter : public cSimpleModule
     unordered_set <ChainId_t>  placedChains, potPlacedChains;
     
   private:
-  	static const Lvl_t 	portToPrnt=0;
-  	int prntGateId; // gateId of msgs arriving prnt
+  	static const Lvl_t 		portToPrnt=0;
+  	int 				 					prntGateId; // gateId of msgs arriving prnt
     vector <cQueue>     	outputQ; // Output packets queueu at each output port
     vector <cChannel*>  	xmtChnl;
     vector <int> 					gateIdToChild; // gateIdToChild[c] will hold the gateId of the gate towards child # c
@@ -85,7 +85,7 @@ class Datacenter : public cSimpleModule
 		float MY_ACCUMULATION_DELAY;
 		
     // Dynamic
-    Cpu_t  								 availCpu;
+    Cpu_t  				availCpu;
     vector<Chain> notAssigned; 
 		
 		// A small buffer, used for printing results / log
