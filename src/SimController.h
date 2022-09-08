@@ -57,7 +57,9 @@ class SimController : public cSimpleModule
     int numSeeds; // num of seeds to run a sim' for in a sim' camapaign
     int algStts; // stts of the last run of the alg'
     bool mode; // either Sync, or Async
+    bool runningRtProbSim;
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
+		string   RtSimResFileName;
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
@@ -144,8 +146,9 @@ class SimController : public cSimpleModule
 				 
   public:
 		int netType;
-    ifstream traceFile;
+    ifstream traceFile, RtSimResFile; 
  		string LogFileName   = "example.txt";
+ 		string   RtSimFileName;
 		static const int bufSize = 512;
 		char buf[bufSize];
 		static const int settingsBufSize = 256;

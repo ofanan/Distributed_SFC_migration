@@ -59,9 +59,10 @@ void SimController::initialize (int stage)
 {
 
   if (stage==0) {
-		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+		network         = (cModule*) (getParentModule ()); 
 		RtProb				  = (double)  (network -> par ("RtProb"));
-		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
+		runningRtProbSim = (bool)   (network -> par ("runningRtProbSim"));
+ 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t)  (network -> par ("height"));
 		srand(seed); // set the seed of random num generation
@@ -97,7 +98,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = numeric_limits<float>::max();
+    simLenInSec           = 2; //numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -188,7 +189,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.6; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.1; //1.6; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
@@ -215,6 +216,10 @@ void SimController::continueBinSearch ()
 			sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 			printBufToLog ();
 		}
+		if (MyConfig::runningRtProbSim) {
+//			continueRtProbSim (); 
+		}
+
 		return; // scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
 	}
 	if (algStts==SCCS) {
@@ -267,6 +272,19 @@ void SimController::openFiles ()
   if (!traceFile.is_open ()) {
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
+
+	if (MyConfig::runningRtProbSim) {
+		if (MyConfig::netType==MonacoIdx) {
+			RtSimResFileName = "Monaco_RtProb.res";
+		}
+		else if (MyConfig::netType==LuxIdx) {
+			RtSimResFileName = "Lux_RtProb.res";
+		}
+		else {
+			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
+		}
+		RtSimResFile = ifstream ("res/" + RtSimResFileName);
+	}
 
 	setOutputFileNames ();
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
@@ -1102,21 +1120,17 @@ void SimController::handleMessage (cMessage *msg)
 			runTimePeriod ();
 		}
 	}
-//  else if (msg->isSelfMessage() && strcmp (msg->getName(), "finBinSearchMsg")==0) { 
-//		if (MyConfig::runningRtProbSim) {
-//			continueRtProbSim (); 
-//		}
-//  }
-  
-  	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
+
+	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
 		if (this->mode==Async) {
 			error ("rcvd initFullReshMsg while being in Async mode"); 
 		}
-  	initFullReshSync ();
-  }
+		initFullReshSync ();
+}
   else if (strcmp (msg->getName(), "PrintAllDatacentersMsg")==0) { 
   	printAllDatacenters ();
   }
+  
   else if (strcmp (msg->getName(), "PrintStateAndEndSimMsg")==0) { 
   	PrintStateAndEndSim ();
   }
