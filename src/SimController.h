@@ -62,8 +62,8 @@ class SimController : public cSimpleModule
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
 		float RtProb; // prob' that a new chain is an RT chain
-  	vector <float> RtProbsVec []; // array of prob' that a new chain is an RT chain; used for a sim' campaign checking multiple probabilities
-  	short idxInRtProbsVec;
+/*  	vector <float> RtProbsVec []; // array of prob' that a new chain is an RT chain; used for a sim' campaign checking multiple probabilities*/
+/*  	short idxInRtProbsVec;*/
 
     //pathFromLeafToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. E.g., pathFromLeafToRoot[i][0] will hold the dcId of leaf # i.
     vector <vector<DcId_t>> pathFromLeafToRoot; 

@@ -1,4 +1,4 @@
-// = {0.1}; // 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1};/*************************************************************************************************************************************************
+/*************************************************************************************************************************************************
 Controller of the simulation:
 - reads the trace.
 - runs ths placing algorithm, by calling the relevant datacenter.
@@ -149,8 +149,8 @@ void SimController::initialize (int stage)
     	startTime = high_resolution_clock::now();
 		}
 //		 runTrace ();
-//		 initBinSearchSim ();
-		initRtProbSim ();
+		 initBinSearchSim ();
+//		initRtProbSim ();
 	}
 }
 
@@ -187,17 +187,17 @@ Init a binary search for a single values of probOfRt, and for multiple seeds for
 **************************************************************************************************************************************************/
 void SimController::initRtProbSim ()
 {
-	MyConfig::randomlySetChainType = true;
-	short RtProbsNum=2;
-	for (int i(0); i<RtProbsNum; i++) {
-		RtProbsVec.push_back (i*0.1);
-	}
-	RtProb = RtProbAr [idxInRtProbAr++];
-	updateRtChainRandInt ();
-  idxInRtProbsVec = 0;
-  seed = 0; // initial seed value
-  numSeeds = 2; 
-	initBinSearchSim 		 ();
+//	MyConfig::randomlySetChainType = true;
+//	short RtProbsNum=2;
+//	for (int i(0); i<RtProbsNum; i++) {
+//		RtProbsVec.push_back (i*0.1);
+//	}
+//	RtProb = RtProbAr [idxInRtProbAr++];
+//	updateRtChainRandInt ();
+//  idxInRtProbsVec = 0;
+//  seed = 0; // initial seed value
+//  numSeeds = 2; 
+//	initBinSearchSim 		 ();
 }
 
 
@@ -206,11 +206,11 @@ Init a binary search for a single values of probOfRt, and for multiple seeds for
 **************************************************************************************************************************************************/
 void SimController::continueRtProbSim ()
 {
-	MyConfig::randomlySetChainType = true;
-		if (idxInRtProbsVec==RtProbsVec.size()) {
-			finished simulation // 
-		}
-			initBinSearchSim ();
+//	MyConfig::randomlySetChainType = true;
+//		if (idxInRtProbsVec==RtProbsVec.size()) {
+//			finished simulation // 
+//		}
+//			initBinSearchSim ();
 }
 
 
@@ -246,7 +246,7 @@ void SimController::continueBinSearch ()
 			sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 			printBufToLog ();
 		}
-		return scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
+		return; // scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
 	}
 	if (algStts==SCCS) {
 		ub = MyConfig::cpuAtLeaf;	
@@ -1133,11 +1133,11 @@ void SimController::handleMessage (cMessage *msg)
 			runTimePeriod ();
 		}
 	}
-  else if (msg->isSelfMessage() && strcmp (msg->getName(), "finBinSearchMsg")==0) { 
-		if (MyConfig::runningRtProbSim) {
-			continueRtProbSim (); 
-		}
-  }
+//  else if (msg->isSelfMessage() && strcmp (msg->getName(), "finBinSearchMsg")==0) { 
+//		if (MyConfig::runningRtProbSim) {
+//			continueRtProbSim (); 
+//		}
+//  }
   
   	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
 		if (this->mode==Async) {
