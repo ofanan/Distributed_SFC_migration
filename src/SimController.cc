@@ -101,7 +101,7 @@ void SimController::initialize (int stage)
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
 			MyConfig::evenChainsAreRt			 = false;
-			RtProb = 0.0; // prob' that a new chain is an RT chain
+			RtProb = 0.0; // prob' that a new chain is an RT chain // read it as a param'
 		}
 		else {
 			RtProb = 0.5; // prob' that a new chain is an RT chain
