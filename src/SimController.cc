@@ -60,6 +60,7 @@ void SimController::initialize (int stage)
 
   if (stage==0) {
 		network         = (cModule*) (getParentModule ()); // No "new", because then need to dispose it.
+		RtProb				  = (double)  (network -> par ("RtProb"));
 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
 		height       		= (Lvl_t)  (network -> par ("height"));
@@ -71,6 +72,7 @@ void SimController::initialize (int stage)
 		MyConfig::FModePeriod = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
 		MyConfig::measureRunTime = true;
+		MyConfig::runningRtProbSim = (bool) (network -> par ("runningRtProbSim"));
 
 		if (mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -95,13 +97,13 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 2; //numeric_limits<float>::max();
+    simLenInSec           = numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
 			MyConfig::evenChainsAreRt			 = false;
-			RtProb = 0.0; // prob' that a new chain is an RT chain // read it as a param'
+			updateRtChainRandInt ();
 		}
 		else {
 			RtProb = 0.5; // prob' that a new chain is an RT chain
@@ -150,7 +152,6 @@ void SimController::initialize (int stage)
 		}
 //		 runTrace ();
 		 initBinSearchSim ();
-//		initRtProbSim ();
 	}
 }
 
@@ -183,43 +184,11 @@ void SimController::handleAlgFailure ()
 }
 
 /*************************************************************************************************************************************************
-Init a binary search for a single values of probOfRt, and for multiple seeds for each run
-**************************************************************************************************************************************************/
-void SimController::initRtProbSim ()
-{
-//	MyConfig::randomlySetChainType = true;
-//	short RtProbsNum=2;
-//	for (int i(0); i<RtProbsNum; i++) {
-//		RtProbsVec.push_back (i*0.1);
-//	}
-//	RtProb = RtProbAr [idxInRtProbAr++];
-//	updateRtChainRandInt ();
-//  idxInRtProbsVec = 0;
-//  seed = 0; // initial seed value
-//  numSeeds = 2; 
-//	initBinSearchSim 		 ();
-}
-
-
-/*************************************************************************************************************************************************
-Init a binary search for a single values of probOfRt, and for multiple seeds for each run
-**************************************************************************************************************************************************/
-void SimController::continueRtProbSim ()
-{
-//	MyConfig::randomlySetChainType = true;
-//		if (idxInRtProbsVec==RtProbsVec.size()) {
-//			finished simulation // 
-//		}
-//			initBinSearchSim ();
-}
-
-
-/*************************************************************************************************************************************************
 Run a binary search for the minimal amount of cpu required to find a feasible sol'
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.2; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.6; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;

@@ -61,9 +61,7 @@ class SimController : public cSimpleModule
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
-		float RtProb; // prob' that a new chain is an RT chain
-/*  	vector <float> RtProbsVec []; // array of prob' that a new chain is an RT chain; used for a sim' campaign checking multiple probabilities*/
-/*  	short idxInRtProbsVec;*/
+		double RtProb; // prob' that a new chain is an RT chain
 
     //pathFromLeafToRoot[i][j] will hold the j-th hop in the path from leaf i to the root. E.g., pathFromLeafToRoot[i][0] will hold the dcId of leaf # i.
     vector <vector<DcId_t>> pathFromLeafToRoot; 
@@ -134,10 +132,8 @@ class SimController : public cSimpleModule
 		inline void genSettingsBuf (bool printTime=true);
     void openFiles ();
 		void initBinSearchSim  (); // run a binary search for the minimum required rsrc aug' (actually, cpu at leaf) for finding a feasible sol'
-		void initRtProbSim (); // Run a binary search for multiple values of probOfRt
 
 		void continueBinSearch (); // After a failure / succesfully finishing the whole trace, this func' is called, to continue the binary search
-		void continueRtProbSim (); // After finishing a single run of a binary search,  this func' is called, to continue the RtProbSim
     
     // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
