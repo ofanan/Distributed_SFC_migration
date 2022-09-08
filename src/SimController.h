@@ -146,7 +146,8 @@ class SimController : public cSimpleModule
 				 
   public:
 		int netType;
-    ifstream traceFile, RtSimResFile; 
+    ifstream traceFile;
+    ofstream RtSimResFile; 
  		string LogFileName   = "example.txt";
  		string   RtSimFileName;
 		static const int bufSize = 512;
@@ -163,9 +164,9 @@ class SimController : public cSimpleModule
 		void initFullReshSync ();
 		void handleAlgFailure ();
 		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printChainIds=true);
-		void printBuCost ();
-		void 
-		printResLine ();
+		void printBuCost  ();
+		void genResLine   ();
+		void printResLine ();
 };
 
 #endif

@@ -98,7 +98,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 2; //numeric_limits<float>::max();
+    simLenInSec           = numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -189,7 +189,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.1; //1.6; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.6; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
@@ -217,7 +217,8 @@ void SimController::continueBinSearch ()
 			printBufToLog ();
 		}
 		if (MyConfig::runningRtProbSim) {
-//			continueRtProbSim (); 
+			genResLine ();
+			RtSimResFile << buf; 
 		}
 
 		return; // scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
@@ -243,7 +244,10 @@ void SimController::continueBinSearch ()
 	}
 	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
 	updateCpuAtLvl ();
-	runTrace ();
+	MyConfig::		rst ();
+	ChainsMaster::rst ();
+	rst 							();
+	return scheduleAt (simTime() + period, new cMessage ("RunTraceMsg")); // Schedule a self-event for handling the next time-step
 }
 
 /*************************************************************************************************************************************************
@@ -283,7 +287,7 @@ void SimController::openFiles ()
 		else {
 			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
 		}
-		RtSimResFile = ifstream ("res/" + RtSimResFileName);
+		RtSimResFile = ofstream (RtSimResFileName);
 	}
 
 	setOutputFileNames ();
@@ -1110,7 +1114,7 @@ void SimController::handleMessage (cMessage *msg)
 		isFirstPeriod = false;
 		if (MyConfig::runningBinSearchSim) {
 			if (isLastPeriod || algStts==FAIL) { 
-		  	continueBinSearch ();
+				continueBinSearch ();
 			}
 			else {
 				runTimePeriod ();			
@@ -1121,6 +1125,9 @@ void SimController::handleMessage (cMessage *msg)
 		}
 	}
 
+	else if (msg->isSelfMessage() && strcmp (msg->getName(), "RunTraceMsg")==0) {
+		runTrace ();
+	}
 	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
 		if (this->mode==Async) {
 			error ("rcvd initFullReshMsg while being in Async mode"); 
@@ -1154,9 +1161,9 @@ inline void SimController::genSettingsBuf (bool printTime)
 }
 
 /*************************************************************************************************************************************************
- * Print a solution for the problem to the output res file.
+ * Generate a line reporting of a solution for the problem. The report line is stored in this->buf.
 *************************************************************************************************************************************************/
-void SimController::printResLine ()
+void SimController::genResLine ()
 {
 	genSettingsBuf ();
 	MyConfig::printToRes (settingsBuf); 
@@ -1173,6 +1180,15 @@ void SimController::printResLine ()
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
   					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
   					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
+}
+
+
+/*************************************************************************************************************************************************
+ * Print a solution for the problem to the output res file.
+*************************************************************************************************************************************************/
+void SimController::printResLine ()
+{
+	genResLine	  ();
   printBufToRes ();
 }
 
