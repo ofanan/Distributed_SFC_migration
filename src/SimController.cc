@@ -235,8 +235,7 @@ void SimController::continueBinSearch ()
 				sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 				printBufToLog ();
 			}
-			genResLine ();
-			RtSimResFile << buf; 
+			printResLine (RtSimResFile.rdbuf());
 			return;
 		}
 		// need one last run to verify this ub
@@ -1201,6 +1200,8 @@ void SimController::genResLine ()
 void SimController::printResLine (streambuf* outBuf)
 {
 	genSettingsBuf ();
+	ostream os(outBuf);
+	os << settingsBuf;
 	MyConfig::printToRes (settingsBuf);
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
 	if (periodNonMigCost < 0) {
