@@ -88,7 +88,7 @@ class SimController : public cSimpleModule
     vector <Datacenter*> datacenters, leaves; // pointers to all the datacenters, and to all the leaves
 		vector <ChainId_t> usrsThatLeft; // list of chains that left the simulated area in the cur time priod.
     
-    //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i
+    //rcvdFinishedAlgMsgFromLeaves[i] will be true iff a message indicating the finish of the run of the sync placement alg' was rcvd from leaf i. Used only in Sync mode.
     vector <bool> rcvdFinishedAlgMsgFromLeaves; 
     
 
@@ -154,7 +154,6 @@ class SimController : public cSimpleModule
 		char buf[bufSize];
 		static const int settingsBufSize = 256;
 		char settingsBuf [settingsBufSize];
-		ofstream logFile;
     SimController ();
     ~SimController ();
     void checkParams (); // Sanity checks for various parameters    
@@ -167,6 +166,7 @@ class SimController : public cSimpleModule
 		void printBuCost  ();
 		void genResLine   ();
 		void printResLine ();
+		void printResLine (ofstream outFile);
 };
 
 #endif

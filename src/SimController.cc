@@ -98,7 +98,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = numeric_limits<float>::max();
+    simLenInSec           = 2; //numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -229,12 +229,14 @@ void SimController::continueBinSearch ()
 	else {
 		lb = MyConfig::cpuAtLeaf;
 	}
-	if (ub<=lb+2) { // converged
+	if (ub<=lb+1) { // converged
 		if (MyConfig::cpuAtLeaf==ub && algStts==SCCS) { // already successfully tested this ub
 			if (MyConfig::LOG_LVL>NO_LOG) {
 				sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 				printBufToLog ();
 			}
+			genResLine ();
+			RtSimResFile << buf; 
 			return;
 		}
 		// need one last run to verify this ub
@@ -1017,7 +1019,8 @@ void SimController::initAlgSync ()
 	for (auto item : chainsThatJoinedLeaf)
 	{
 		if (MyConfig::LOG_LVL==2) {
-			logFile << "Chains that joined dc " << item.first << ": ";
+			sprintf (buf, "Chains that joined dc %d", item.first); 
+			printBufToLog ();
 		}
 		leaves[item.first]->initBottomUp (item.second);
 		initAlgAtLeaf[item.first] = true;
@@ -1049,7 +1052,8 @@ void SimController::initAlgAsync ()
 	for (auto item : chainsThatJoinedLeaf)
 	{
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			logFile << "Chains that joined dc " << item.first << ": ";
+			sprintf (buf, "Chains that joined dc %d", item.first); 
+			printBufToLog ();
 		}
 		leaves[item.first]->initBottomUp (item.second);
 	}
@@ -1117,7 +1121,7 @@ void SimController::handleMessage (cMessage *msg)
 				continueBinSearch ();
 			}
 			else {
-				runTimePeriod ();			
+				runTimePeriod ();
 			}
 		}
 		else if (!isLastPeriod) {
@@ -1186,10 +1190,30 @@ void SimController::genResLine ()
 /*************************************************************************************************************************************************
  * Print a solution for the problem to the output res file.
 *************************************************************************************************************************************************/
+void SimController::printResLine (ofstream outFile)
+{
+}
+
+/*************************************************************************************************************************************************
+ * Print a solution for the problem to the output res file.
+*************************************************************************************************************************************************/
 void SimController::printResLine ()
 {
-	genResLine	  ();
-  printBufToRes ();
+	genSettingsBuf ();
+	MyConfig::printToRes (settingsBuf);
+	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
+	if (periodNonMigCost < 0) {
+		error ("t=%.3f ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.", MyConfig::traceTime);
+	}
+
+	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
+	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
+	int periodTotalCost = periodNonMigCost + periodMigCost;
+  snprintf (buf, bufSize, 
+  					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
+  					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
+  					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
+  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
 }
 
 

@@ -97,6 +97,7 @@ class MyConfig {
 		static void printToRes (string str);
     static void printToLog (vector <vector <int32_t>> mat);
 		static void printToLog (char* buf); 
+		static void printToLog (char* buf, ofstream outFile);
 		static void printToLog (string str);
 		static void printToLog (const int d); // print "d,", where d is the integer, to the log file
 		static void printToLog (vector <Chain> vec); // print all the IDs of the chains in the vec.
@@ -116,6 +117,7 @@ class MyConfig {
 
 		// erase the given key from the given set. Returns true iff the requested key was indeed found in the set
 		static bool eraseKeyFromSet (unordered_set <ChainId_t> &set, ChainId_t id); 
+		friend class SimController;
 };
 
 #endif

@@ -179,6 +179,11 @@ void MyConfig::printToRes (string str)
 	resFile << str;
 }
 
+void MyConfig::printToLog (char* buf, ofstream outFile) 
+{
+	outFile << buf; 
+}
+
 void MyConfig::printToLog (char* buf) 
 {
 	logFile << buf; 
