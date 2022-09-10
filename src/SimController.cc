@@ -25,7 +25,7 @@ float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last 
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
 bool  MyConfig::runningRtProbSim;
-bool  MyConfig::runningCampaign = true;
+bool  MyConfig::runningCampaign = false;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -72,7 +72,6 @@ void SimController::initialize (int stage)
 		MyConfig::FModePeriod = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
 		MyConfig::measureRunTime = true;
-		MyConfig::runningRtProbSim = (bool) (network -> par ("runningRtProbSim"));
 
 		if (mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -100,7 +99,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 1; // $$ numeric_limits<float>::max();
+    simLenInSec           = 2; // $$ numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -1131,10 +1130,9 @@ void SimController::handleMessage (cMessage *msg)
 				runTimePeriod ();
 			}
 		}
-		if (MyConfig::runningCampaign && algStts==FAIL) { // last run failed, and we're within a campaign - make this sim finish.
-		  delete (msg);
-			return; 		
-		}
+		else if (MyConfig::runningRtProbSim && isLastPeriod) { // in an Rt Prob sim, we would like to print a res line only in the last time period
+			printResLine (RtSimResFile.rdbuf());
+		} 
 		else if (!isLastPeriod) {
 			runTimePeriod ();
 		}
@@ -1176,38 +1174,14 @@ inline void SimController::genSettingsBuf (bool printTime)
 }
 
 /*************************************************************************************************************************************************
- * Generate a line reporting of a solution for the problem. The report line is stored in this->buf.
-*************************************************************************************************************************************************/
-void SimController::genResLine ()
-{
-	genSettingsBuf ();
-	MyConfig::printToRes (settingsBuf); 
-	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
-	if (periodNonMigCost < 0) {
-		error ("t=%.3f ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.", MyConfig::traceTime);
-	}
-
-	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
-	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
-	int periodTotalCost = periodNonMigCost + periodMigCost;
-  snprintf (buf, bufSize, 
-  					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
-  					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
-  					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
-  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
-}
-
-
-/*************************************************************************************************************************************************
  * Print the solution found for the placement problem to the requested output buffer. If not output buffer is given as argument, 
  * solution is written to MyConfig::resFile.
 *************************************************************************************************************************************************/
 void SimController::printResLine (streambuf* outBuf)
 {
-	genSettingsBuf ();
 	ostream os(outBuf);
+	genSettingsBuf ();
 	os << settingsBuf;
-	MyConfig::printToRes (settingsBuf);
 	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
 	if (periodNonMigCost < 0) {
 		error ("t=%.3f ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.", MyConfig::traceTime);
