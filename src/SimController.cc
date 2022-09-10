@@ -25,7 +25,7 @@ float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last 
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
 bool  MyConfig::runningRtProbSim;
-bool  MyConfig::runningCampaign = false;
+bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -180,7 +180,7 @@ void SimController::handleAlgFailure ()
 			printAllDatacenters (false, false, true); 
 		}
 		if (MyConfig::runningCampaign) {
-		 	cout << "this run failed. running a campaign, so continuing to the next run" << endl;
+		 	cout << "***** This run failed. running a campaign, so continuing to the next run *****" << endl;
 		}
 
 	}
@@ -1127,7 +1127,11 @@ void SimController::handleMessage (cMessage *msg)
 		}
 		else if (MyConfig::runningRtProbSim && isLastPeriod) { // in an Rt Prob sim, we would like to print a res line only in the last time period
 			printResLine (RtSimResFile.rdbuf());
-		} 
+		}
+		else if (MyConfig::runningCampaign && algStts==FAIL) {
+			delete (msg);
+			return;
+		}
 		else if (!isLastPeriod) {
 			runTimePeriod ();
 		}
