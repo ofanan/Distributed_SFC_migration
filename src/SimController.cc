@@ -61,7 +61,6 @@ void SimController::initialize (int stage)
   if (stage==0) {
 		network         		= (cModule*) (getParentModule ()); 
 		RtProb				  		= (double)  (network -> par ("RtProb"));
-		runningRtProbSim 		= (bool)   (network -> par ("runningRtProbSim"));
  		numDatacenters  		= (DcId_t) (network -> par ("numDatacenters"));
 		numLeaves       		= (DcId_t) (network -> par ("numLeaves"));
 		height       				= (Lvl_t)  (network -> par ("height"));
@@ -72,6 +71,7 @@ void SimController::initialize (int stage)
 		MyConfig::FModePeriod = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh = false;
 		MyConfig::measureRunTime = true;
+		MyConfig::runningRtProbSim = (bool)   (network -> par ("runningRtProbSim"));
 
 		if (mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -99,7 +99,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 2; // $$ numeric_limits<float>::max();
+    simLenInSec           = numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -199,7 +199,6 @@ void SimController::initBinSearchSim ()
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
 	ub = Cpu_t (MyConfig::cpuAtLeaf*max_R);
-	// $$ MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
 	updateCpuAtLvl ();
 	runTrace ();
 }
@@ -742,14 +741,10 @@ void SimController::rdNewUsrsLine (string line)
 		if (genRtChain(chainId)) {
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RtChain::mu_u_len};
 			chain = RtChain (chainId, S_u);
-			sprintf (buf, "\nc%d is Rt", chainId); //$$$$$
-			printBufToLog (); //$$$
 		}
 		else {
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+NonRtChain::mu_u_len};
 			chain = NonRtChain (chainId, S_u); 
-			sprintf (buf, "\nc%d is Non", chainId); //$$$$$
-			printBufToLog (); //$$$
 		}
 		
 		insertToChainsThatJoinedLeaf (poaId, chain);
