@@ -698,7 +698,8 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 		simController->handleAlgFailure ();
 	}
 	else { 
-		scheduleErrMsgAndExit ();
+		simController->handleAlgFailure ();
+		// scheduleErrMsgAndExit ();
 	}
 }
 

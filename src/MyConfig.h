@@ -71,6 +71,7 @@ class MyConfig {
     static float traceTime; //current time (in the trace, in seconds)
     static bool runningBinSearchSim; 
     static bool runningRtProbSim;
+    static bool runningCampaign;
     static bool measureRunTime;
 
 		// Parameters determining how to define whether a new generated chain is RT or not

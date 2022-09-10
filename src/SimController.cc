@@ -8,7 +8,7 @@ Controller of the simulation:
 
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
-bool  MyConfig::randomlySetChainType = false; // default value; will be overwritten when running a rand sim
+bool  MyConfig::randomlySetChainType = true; // default value; will be overwritten when running a rand sim
 bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
@@ -25,7 +25,7 @@ float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last 
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
 bool  MyConfig::runningRtProbSim;
-
+bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -46,7 +46,7 @@ This function calculates RtChainRandInt based on the current RtProb.
 **************************************************************************************************************************************************/
 inline void SimController::updateRtChainRandInt ()
 {
-	RtChainRandInt = (int) (RtProb) * (float) (RAND_MAX);
+	RtChainRandInt = (int) (RtProb * float (RAND_MAX));
 }
 
 
@@ -59,13 +59,12 @@ void SimController::initialize (int stage)
 {
 
   if (stage==0) {
-		network         = (cModule*) (getParentModule ()); 
-		RtProb				  = (double)  (network -> par ("RtProb"));
-		runningRtProbSim = (bool)   (network -> par ("runningRtProbSim"));
- 		numDatacenters  = (DcId_t) (network -> par ("numDatacenters"));
-		numLeaves       = (DcId_t) (network -> par ("numLeaves"));
-		height       		= (Lvl_t)  (network -> par ("height"));
-		srand(seed); // set the seed of random num generation
+		network         		= (cModule*) (getParentModule ()); 
+		RtProb				  		= (double)  (network -> par ("RtProb"));
+		runningRtProbSim 		= (bool)   (network -> par ("runningRtProbSim"));
+ 		numDatacenters  		= (DcId_t) (network -> par ("numDatacenters"));
+		numLeaves       		= (DcId_t) (network -> par ("numLeaves"));
+		height       				= (Lvl_t)  (network -> par ("height"));
 		networkName 		= (network -> par ("name")).stdstringValue();
 		this->mode = Async; // either Sync / Async mode of running the sim
 		MyConfig::traceTime = -1.0;
@@ -89,7 +88,10 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
-		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
+		MyConfig::cpuAtLeaf = (int)    (network -> par ("cpuAtLeaf"));
+//		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
+		seed   							= (int)    (network -> par ("seed"));
+		srand(seed); // set the seed of random num generation
 		updateCpuAtLvl ();
 		openFiles ();
 		RtChain		::costAtLvl = MyConfig::RtChainCostAtLvl		[MyConfig::netType];
@@ -98,7 +100,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 2; //numeric_limits<float>::max();
+    simLenInSec           = 1; // $$ numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -151,8 +153,8 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
-//		 runTrace ();
-		 initBinSearchSim ();
+		 runTrace ();
+//		 initBinSearchSim ();
 	}
 }
 
@@ -169,15 +171,19 @@ void SimController::handleAlgFailure ()
 	}
 	algStts = FAIL;
 	printResLine ();
-	if (MyConfig::runningBinSearchSim) {
+	if (MyConfig::runningBinSearchSim || MyConfig::runningCampaign) {
 		MyConfig::discardAllMsgs = true;
 		for (DcId_t dc(0); dc<numDatacenters; dc++) {
 			datacenters[dc]->rst ();
 		}
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-			MyConfig::printToLog ("\n**** SimController::handleAlgFailure () : printing state and exiting\n");
+			MyConfig::printToLog ("\n**** SimController::handleAlgFailure () \n");
 			printAllDatacenters (false, false, true); 
 		}
+		if (MyConfig::runningCampaign) {
+		 	cout << "this run failed. running a campaign, so continuing to the next run" << endl;
+		}
+
 	}
 	else {
 		error ("alg failed not during a bin search run");
@@ -189,7 +195,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.6; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.2; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
@@ -217,8 +223,7 @@ void SimController::continueBinSearch ()
 			printBufToLog ();
 		}
 		if (MyConfig::runningRtProbSim) {
-			genResLine ();
-			RtSimResFile << buf; 
+			printResLine (RtSimResFile.rdbuf());
 		}
 
 		return; // scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
@@ -288,7 +293,8 @@ void SimController::openFiles ()
 		else {
 			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
 		}
-		RtSimResFile = ofstream (RtSimResFileName);
+//		RtSimResFile = ofstream (RtSimResFileName);
+	  RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
 	}
 
 	setOutputFileNames ();
@@ -737,19 +743,21 @@ void SimController::rdNewUsrsLine (string line)
 		if (genRtChain(chainId)) {
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RtChain::mu_u_len};
 			chain = RtChain (chainId, S_u);
-
+			sprintf (buf, "\nc%d is Rt", chainId); //$$$$$
+			printBufToLog (); //$$$
 		}
 		else {
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+NonRtChain::mu_u_len};
 			chain = NonRtChain (chainId, S_u); 
+			sprintf (buf, "\nc%d is Non", chainId); //$$$$$
+			printBufToLog (); //$$$
 		}
 		
 		insertToChainsThatJoinedLeaf (poaId, chain);
 		if (!ChainsMaster::insert (chainId, chain)) {
 			error ("t=%d new chain %d was already found in ChainsMaster", MyConfig::traceTime, chainId);
 		}
-	}	
-	
+	}
 }
 
 void SimController::insertToChainsThatLeftDc (DcId_t dcId, ChainId_t chainId) 
@@ -1123,6 +1131,10 @@ void SimController::handleMessage (cMessage *msg)
 				runTimePeriod ();
 			}
 		}
+		if (MyConfig::runningCampaign && algStts==FAIL) { // last run failed, and we're within a campaign - make this sim finish.
+		  delete (msg);
+			return; 		
+		}
 		else if (!isLastPeriod) {
 			runTimePeriod ();
 		}
@@ -1186,16 +1198,9 @@ void SimController::genResLine ()
 }
 
 
-///*************************************************************************************************************************************************
-// * Print a solution for the problem to the output res file.
-//*************************************************************************************************************************************************/
-//void SimController::printResLine (streambuf* outBuf)
-//{
-//	
-//}
-
 /*************************************************************************************************************************************************
- * Print a solution for the problem to the output res file.
+ * Print the solution found for the placement problem to the requested output buffer. If not output buffer is given as argument, 
+ * solution is written to MyConfig::resFile.
 *************************************************************************************************************************************************/
 void SimController::printResLine (streambuf* outBuf)
 {
@@ -1211,13 +1216,12 @@ void SimController::printResLine (streambuf* outBuf)
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-  snprintf (buf, bufSize, 
-  					" | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
+  sprintf (buf," | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
   					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
   					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
+  os << buf;
 }
-
 
 /*************************************************************************************************************************************************
  * Set the output file names based on the settings of this sim run
