@@ -727,20 +727,32 @@ void SimController::rdUsrsThatLeftLine (string line)
 **************************************************************************************************************************************************/
 bool SimController::genRtChain (ChainId_t chainId)
 {
-	if (MyConfig::randomlySetChainType) {
-		if (RtProb==1.0) { // to avoid problems of rounding and save time, immediately return true for this trivial case
-			return true;
-		}
-		else if (RtProb==0) { // to avoid problems of rounding and save time, immediately return false for this trivial case
-			return false;
-		}
+	if (RtProb==1.0) { // to avoid problems of rounding and save time, immediately return true for this trivial case
+		return true;
+	}
+	else if (RtProb==0) { // to avoid problems of rounding and save time, immediately return false for this trivial case
+		return false;
+	}
+	else if (MyConfig::randomlySetChainType) {
 		return (rand () < RtChainRandInt);
 	}
 	else if (MyConfig::evenChainsAreRt) {
 		return (chainId%2==0);
 	}
 	else {
-		return (float(chainId % 10)/10) < RtProb;
+//		cout << "RtProb= " << RtProb << endl;
+//		for (int i(0); i<20; i++) {
+//			cout << "float is now " << float(i % 10)/10;
+//			if (float(i % 10)/10 < float(RtProb)) {
+////			if (0.9 < 0.9) {
+//				cout << " true " << endl;
+//			}
+//			else {
+//				cout << " false " << endl;			
+//			}
+//		}
+//		error ("inaal dinack");
+		return (float(chainId % 10)/10) < float (RtProb);
 	}
 }			
 			
