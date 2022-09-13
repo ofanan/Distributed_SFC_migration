@@ -75,7 +75,7 @@ class MyConfig {
     static bool measureRunTime;
 
 		// Parameters determining how to define whether a new generated chain is RT or not
-		static float probOfRt; // prob' that a new chain is an RT chain
+/*		static float probOfRt; // prob' that a new chain is an RT chain*/
 		static bool randomlySetChainType;
 		static bool evenChainsAreRt;
 

@@ -1,3 +1,2 @@
-Lux: Cheapest options with deter (deciding wheter a chain is Rt by %10): 119.
-Lux seeed14 cheapest options with deter (deciding wheter a chain is Rt by %10): 119.
+<!> Model error: t=30262.000 ChainsMaster::calcNonMigCost returned a negative number. Check log file for details. -- in module (SimController) Lux.sim_controller (id=2), at t=262.000006s, event #2016498
 

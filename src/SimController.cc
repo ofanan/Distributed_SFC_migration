@@ -65,7 +65,7 @@ void SimController::initialize (int stage)
 		numLeaves       		= (DcId_t) (network -> par ("numLeaves"));
 		height       				= (Lvl_t)  (network -> par ("height"));
 		networkName 		= (network -> par ("name")).stdstringValue();
-		this->mode = Async; // either Sync / Async mode of running the sim
+		this->mode = Sync; // either Sync / Async mode of running the sim
 		MyConfig::traceTime = -1.0;
 		maxTraceTime = numeric_limits<float>::max();
 		MyConfig::FModePeriod = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -99,7 +99,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = numeric_limits<float>::max();
+    simLenInSec           = 1; // numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -152,6 +152,14 @@ void SimController::initialize (int stage)
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
+		
+		if (MyConfig::runningRtProbSim) { 
+			char* RtSimResFileNameAsChar = &RtSimResFileName[0];
+			sprintf (buf, "grep  t30599_%s %s | g p%.1f_sd%dstts1", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
+			cout << buf;
+			error ("plz read cout");
+		}
+		error ("gamad");
 		 runTrace ();
 //		 initBinSearchSim ();
 	}
@@ -283,10 +291,10 @@ void SimController::openFiles ()
 
 	if (MyConfig::runningRtProbSim) {
 		if (MyConfig::netType==MonacoIdx) {
-			RtSimResFileName = "Monaco_RtProb.res";
+			RtSimResFileName = "Monaco_RtProb_1secs.res";
 		}
 		else if (MyConfig::netType==LuxIdx) {
-			RtSimResFileName = "Lux_RtProb.res";
+			RtSimResFileName = "Lux_RtProb_1secs.res";
 		}
 		else {
 			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
@@ -1181,11 +1189,13 @@ void SimController::printResLine (streambuf* outBuf)
 	ostream os(outBuf);
 	genSettingsBuf ();
 	os << settingsBuf;
-	int periodNonMigCost = ChainsMaster::calcNonMigCost ();
-	if (periodNonMigCost < 0) {
-		error ("t=%.3f ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.", MyConfig::traceTime);
+	int periodNonMigCost=-1;
+	if (algStts==SCCS) {
+		periodNonMigCost = ChainsMaster::calcNonMigCost ();
+		if (periodNonMigCost < 0) {
+			error ("t=%.3f ChainsMaster::calcNonMigCost returned a negative number. Check log file for details.", MyConfig::traceTime);
+		}
 	}
-
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
 	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;

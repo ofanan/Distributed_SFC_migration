@@ -484,9 +484,6 @@ void Datacenter::regainRsrcOfpushedUpChains ()
 				placedChains.erase (chainPtr -> id);
 				
 				// We don't inform ChainsMaster, as the Dc that pushed-up that chain should have already informed ChainsMaster.
-				// if (!ChainsMaster::modifyLvl  (chainPtr->id,  chainPtr->curLvl)){ // inform ChainMaster about the chain's place 
-				//	error ("Datacenter::RegainRsrcOfPushedUpChains failed to update the lvl of c%d", chainPtr->id);
-				// }
 				chainPtr = pushUpList.erase (chainPtr); // finished handling this chain --> remove it from the pushUpList, and go on to the next chain
 				continue;
 			}
@@ -691,16 +688,11 @@ Handle a failure to place an old (exiting) chain
 *************************************************************************************************************************************************/
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
-	sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
-	printBufToLog ();
-
-	if (MyConfig::runningBinSearchSim) {
-		simController->handleAlgFailure ();
-	}
-	else { 
-		simController->handleAlgFailure ();
-		// scheduleErrMsgAndExit ();
-	}
+	if (MyConfig::LOG_LVL>0) {
+		sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
+		printBufToLog ();
+	}	
+	simController->handleAlgFailure ();
 }
 
 /************************************************************************************************************************************************
