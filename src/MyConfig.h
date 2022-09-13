@@ -111,6 +111,7 @@ class MyConfig {
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'
+		static string exec(const char* cmd);
 		static void setNetTypeFromString (string str);
 		static int  getNetTypeFromString (string str);
 		static ofstream getlogFile ();

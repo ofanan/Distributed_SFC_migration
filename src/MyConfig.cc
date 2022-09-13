@@ -18,6 +18,24 @@ const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl   = {{544, 278, 148
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				   = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		   = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 
+
+/*************************************************************************************************************************************************
+* Run a given (Linux) command, and return its output
+**************************************************************************************************************************************************/
+string MyConfig::exec(const char* cmd)
+{
+    array<char, 128> buffer;
+    string result;
+    unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) {
+        throw runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
+}
+
 /*************************************************************************************************************************************************
 * Init parameters and variables is currently done mainly in SimController.cc
 **************************************************************************************************************************************************/

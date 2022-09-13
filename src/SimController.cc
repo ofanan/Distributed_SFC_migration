@@ -153,17 +153,27 @@ void SimController::initialize (int stage)
     	startTime = high_resolution_clock::now();
 		}
 		
-		if (MyConfig::runningRtProbSim) { 
-			char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-			sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
-			cout << buf;
-			system (buf);
-			error ("plz read cout");
+		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
+			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
+			return;
 		}
-		error ("gamad");
 		 runTrace ();
 //		 initBinSearchSim ();
 	}
+}
+
+/*************************************************************************************************************************************************
+Returns true iff a previous run has successfully run the all trace, using the current seed, RtProb.
+**************************************************************************************************************************************************/
+bool SimController::alreadySucceededWithThisSeed ()
+{
+		char* RtSimResFileNameAsChar = &RtSimResFileName[0];
+		sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
+		string res = MyConfig::exec (buf);
+		stringstream ss (res); 
+		int grepRes;
+		ss >> grepRes;
+		return (grepRes>0);
 }
 
 /*************************************************************************************************************************************************
