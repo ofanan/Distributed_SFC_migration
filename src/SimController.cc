@@ -8,7 +8,7 @@ Controller of the simulation:
 
 class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
-bool  MyConfig::randomlySetChainType = true; // default value; will be overwritten when running a rand sim
+bool  MyConfig::randomlySetChainType; // when true, use real randomization; else, use a pseudo-random scheme, based on the chain's id
 bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
@@ -59,19 +59,19 @@ void SimController::initialize (int stage)
 {
 
   if (stage==0) {
-		network         		= (cModule*) (getParentModule ()); 
-		RtProb				  		= (double)  (network -> par ("RtProb"));
- 		numDatacenters  		= (DcId_t) (network -> par ("numDatacenters"));
-		numLeaves       		= (DcId_t) (network -> par ("numLeaves"));
-		height       				= (Lvl_t)  (network -> par ("height"));
-		networkName 		= (network -> par ("name")).stdstringValue();
-		this->mode = Sync; // either Sync / Async mode of running the sim
-		MyConfig::traceTime = -1.0;
-		maxTraceTime = numeric_limits<float>::max();
-		MyConfig::FModePeriod = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
-		MyConfig::useFullResh = false;
-		MyConfig::measureRunTime = true;
-		MyConfig::runningRtProbSim = (bool)   (network -> par ("runningRtProbSim"));
+		network         					 = (cModule*) (getParentModule ()); 
+		RtProb				  					 = (double)   (network -> par ("RtProb"));
+ 		numDatacenters  					 = (DcId_t)   (network -> par ("numDatacenters"));
+		numLeaves       					 = (DcId_t)   (network -> par ("numLeaves"));
+		height       							 = (Lvl_t)    (network -> par ("height"));
+		networkName 						   = 				    (network -> par ("name")).stdstringValue();
+		MyConfig::runningRtProbSim = (bool)     (network -> par ("runningRtProbSim"));
+		this->mode 							 	 = Sync; // either Sync / Async mode of running the sim
+		MyConfig::traceTime 		   = -1.0;
+		maxTraceTime 						   = numeric_limits<float>::max();
+		MyConfig::FModePeriod 	   = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+		MyConfig::useFullResh 	   = false;
+		MyConfig::measureRunTime   = true;
 
 		if (mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -88,8 +88,8 @@ void SimController::initialize (int stage)
 	
   if (stage==1) {
 		MyConfig::cpuAtLeaf = (int)    (network -> par ("cpuAtLeaf"));
-//		MyConfig::cpuAtLeaf = MyConfig::nonAugmentedCpuAtLeaf[MyConfig::netType];
 		seed   							= (int)    (network -> par ("seed"));
+		MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 		srand(seed); // set the seed of random num generation
 		updateCpuAtLvl ();
 		openFiles ();
@@ -99,7 +99,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 1; // numeric_limits<float>::max();
+    simLenInSec           = numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
@@ -136,6 +136,14 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
+		if (MyConfig::measureRunTime==true) {
+    	startTime = high_resolution_clock::now();
+		}
+		
+		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
+			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
+			return;
+		}
 		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 2;
 		MyConfig::RES_LVL				 = 1;
@@ -149,14 +157,6 @@ void SimController::initialize (int stage)
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
 		
-		if (MyConfig::measureRunTime==true) {
-    	startTime = high_resolution_clock::now();
-		}
-		
-		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
-			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
-			return;
-		}
 		 runTrace ();
 //		 initBinSearchSim ();
 	}
@@ -728,6 +728,12 @@ void SimController::rdUsrsThatLeftLine (string line)
 bool SimController::genRtChain (ChainId_t chainId)
 {
 	if (MyConfig::randomlySetChainType) {
+		if (RtProb==1.0) { // to avoid problems of rounding and save time, immediately return true for this trivial case
+			return true;
+		}
+		else if (RtProb==0) { // to avoid problems of rounding and save time, immediately return false for this trivial case
+			return false;
+		}
 		return (rand () < RtChainRandInt);
 	}
 	else if (MyConfig::evenChainsAreRt) {
@@ -758,10 +764,16 @@ void SimController::rdNewUsrsLine (string line)
 	while (ss >> chainId) {
 		ss >> poaId;
 		if (genRtChain(chainId)) {
+			if (RtProb==0.0) {
+				error ("probOfRt==0, but an Rt chain was generated");
+			}
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RtChain::mu_u_len};
 			chain = RtChain (chainId, S_u);
 		}
 		else {
+			if (RtProb==1.0) {
+				error ("probOfRt==1, but a non-Rt chain was generated. RtChainRandInt=%d. RandMax=%d", RtChainRandInt,RAND_MAX);
+			}
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+NonRtChain::mu_u_len};
 			chain = NonRtChain (chainId, S_u); 
 		}
