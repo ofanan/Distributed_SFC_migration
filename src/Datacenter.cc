@@ -692,7 +692,7 @@ void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 		sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
 		printBufToLog ();
 	}	
-	simController->handleAlgFailure ();
+	simController-> handleAlgFailure ();
 }
 
 /************************************************************************************************************************************************
@@ -747,11 +747,16 @@ void Datacenter::bottomUp ()
 						if (!ChainsMaster::blockChain (chainPtr->id)) {
 							error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 						}
-						error ("BU Sync blocked a chain");
-//					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
+						sprintf (buf, "BU Sync blocked a chain");
+						if (MyConfig::LOG_LVL>0) {
+							printBufToLog ();
+							cout << buf << endl;
+						}
+						return simController-> handleAlgFailure ();
+					if (MyConfig::LOG_LVL>=DETAILED_LOG) { 
 						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
 						printBufToLog ();
-//					} //$$
+					} 
 						chainPtr = notAssigned.erase (chainPtr); 
 					}
 					else { // Failed to place an old chain even after resh
