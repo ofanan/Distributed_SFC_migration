@@ -155,8 +155,9 @@ void SimController::initialize (int stage)
 		
 		if (MyConfig::runningRtProbSim) { 
 			char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-			sprintf (buf, "grep  t30599_%s %s | g p%.1f_sd%dstts1", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
+			sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
 			cout << buf;
+			system (buf);
 			error ("plz read cout");
 		}
 		error ("gamad");
