@@ -1,2 +1,0 @@
-MigCost==0 only when runningRtProbSim.
-

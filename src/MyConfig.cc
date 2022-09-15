@@ -1,6 +1,4 @@
 // Configuration parameters, writing to files, and accessory functions.
-
-
 #include "MyConfig.h"
 
 using namespace omnetpp;
