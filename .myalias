@@ -36,6 +36,7 @@ alias rex='c; l $PROJ_PATH/res.res'
 alias ltp='ltr $PROJ_PATH/results/poa_files'
 alias gee='cd $PROJ_PATH/src; ge MyConfig.h MyConfig.cc SimController.h SimController.cc Datacenter.h Datacenter.cc ChainsMaster.h ChainsMaster.cc &'
 alias geL='ge $PROJ_PATH/Lux.ini &'
+alias geM='ge $PROJ_PATH/Monaco.ini &'
 alias cdd='cd $PROJ_PATH'
 alias t='tail'
 

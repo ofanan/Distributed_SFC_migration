@@ -30,7 +30,7 @@ bool ChainsMaster::eraseChains (vector <ChainId_t> &vec)
 	for (auto chainId : vec) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
-			snprintf (buf, bufSize, "\nERROR: ChainsMaster::eraseChains didn't find chain %d", chainId);
+			snprintf (buf, bufSize, "\nerror: ChainsMaster::eraseChains didn't find c%d", chainId);
 			MyConfig::printToLog (buf);
 			return false;
 		}
@@ -65,7 +65,7 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 * Inserts the chain, given its id, into the by-ref argument chain.
 * Returns false the ChainId_t was already found in allChains.
 **************************************************************************************************************************************************/
-bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
+bool ChainsMaster::insert (ChainId_t chainId, Chain &chain)
 {
   if (MyConfig::DEBUG_LVL>0 && chain.S_u.size()==0) {
   	sprintf (buf, "ChainsMaster::insert was called with c%d with S_u_len==0", chain.id);
@@ -82,7 +82,6 @@ bool ChainsMaster::insert (ChainId_t chainId, Chain chain)
 	return true;
 }
 
-
 /*************************************************************************************************************************************************
 * Finds the chain, given its id, into the by-ref argument chain.
 * Returns true iff the ChainId_t is found in allChains.
@@ -97,8 +96,9 @@ bool ChainsMaster::findChain (ChainId_t chainId, Chain &chain)
   	sprintf (buf, "ChainsMaster::findChain encountered c%d with S_u_len==0", it->second.id);
   	return false;
   }
-  Chain foundChain = it->second;
-  chain = foundChain;
+//  Chain foundChain = it->second;
+//  chain = foundChain;
+  chain = it->second;
   return true;
 }
 

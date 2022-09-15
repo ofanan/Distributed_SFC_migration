@@ -10,6 +10,10 @@ network Monaco
 		int numLeaves   	= default(int (numChildren^(height-1)));
     double channelDelay	@unit(s); 
     double basicDatarate @unit(Gbps);
+    double RtProb; // prob' that a new chain is an RT chain
+    bool   runningRtProbSim;
+    int    seed;
+    int    cpuAtLeaf;
 
   types:
     channel Channel extends ned.DatarateChannel {

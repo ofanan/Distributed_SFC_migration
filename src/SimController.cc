@@ -66,7 +66,7 @@ void SimController::initialize (int stage)
 		height       							 = (Lvl_t)    (network -> par ("height"));
 		networkName 						   = 				    (network -> par ("name")).stdstringValue();
 		MyConfig::runningRtProbSim = (bool)     (network -> par ("runningRtProbSim"));
-		this->mode 							 	 = Sync; // either Sync / Async mode of running the sim
+		this->mode 							 	 = Async; // either Sync / Async mode of running the sim
 		MyConfig::traceTime 		   = -1.0;
 		maxTraceTime 						   = numeric_limits<float>::max();
 		MyConfig::FModePeriod 	   = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -624,11 +624,11 @@ void SimController::concludeTimePeriod ()
 
 	if (algStts==SCCS && chainsMasterStts!=0 ) {
 		if (chainsMasterStts==1) {
-			sprintf (buf, "error: traceT=%.3f, sim t=%f: ChainsMaster::concludeTimePeriod. encounterd unplaced c%d", 
+			sprintf (buf, "error: traceT=%.3f, sim t=%.4f: ChainsMaster::concludeTimePeriod. encounterd unplaced c%d", 
 								MyConfig::traceTime, simTime().dbl(), errChainId);
 		}
-		if (chainsMasterStts==1) {
-			sprintf (buf, "error: traceT=%.3f, sim t=%f: ChainsMaster::concludeTimePeriod. encounterd problematic c%d", 
+		if (chainsMasterStts==2) {
+			sprintf (buf, "error: traceT=%.3f, sim t=%.4f: ChainsMaster::concludeTimePeriod. encounterd problematic c%d", 
 								MyConfig::traceTime, simTime().dbl(), errChainId);
 		}
 		if (MyConfig::DEBUG_LVL >= 0) {
@@ -740,18 +740,6 @@ bool SimController::genRtChain (ChainId_t chainId)
 		return (chainId%2==0);
 	}
 	else {
-//		cout << "RtProb= " << RtProb << endl;
-//		for (int i(0); i<20; i++) {
-//			cout << "float is now " << float(i % 10)/10;
-//			if (float(i % 10)/10 < float(RtProb)) {
-////			if (0.9 < 0.9) {
-//				cout << " true " << endl;
-//			}
-//			else {
-//				cout << " false " << endl;			
-//			}
-//		}
-//		error ("inaal dinack");
 		return (float(chainId % 10)/10) < float (RtProb);
 	}
 }			
