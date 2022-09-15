@@ -1,2 +1,2 @@
-<!> Model error: t=30262.000 ChainsMaster::calcNonMigCost returned a negative number. Check log file for details. -- in module (SimController) Lux.sim_controller (id=2), at t=262.000006s, event #2016498
+MigCost==0 only when runningRtProbSim.
 

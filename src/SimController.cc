@@ -506,6 +506,7 @@ void SimController::runTimePeriod ()
 			return scheduleAt (simTime() + period, new cMessage ("RunTimePeriodMsg")); // Schedule a self-event for handling the next time-step
 		}
   }
+
 	return scheduleAt (simTime(), new cMessage ("RunTimePeriodMsg")); // Schedule an immidiate self-event to conclude the trace run
 }
 
@@ -645,6 +646,9 @@ void SimController::concludeTimePeriod ()
 	if (MyConfig::RES_LVL > 0) {
 		 printResLine ();
 	}
+	else if (MyConfig::runningRtProbSim && isLastPeriod) { // in an Rt Prob sim, we would like to print a res line only in the last time period
+			printResLine (RtSimResFile.rdbuf());
+	}
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
 		snprintf (buf, bufSize, "\ntraceTime=%.3f, BUPU results (skipping empty DCs):", MyConfig::traceTime);
@@ -664,11 +668,13 @@ void SimController::concludeTimePeriod ()
 	}
 	
 	// reset state variables, in preparation for the next period
-	chainsThatJoinedLeaf.clear ();
-	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	numMigsAtThisPeriod = 0; 
-	numCritUsrs					= 0;
-	MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
+		chainsThatJoinedLeaf.clear ();
+		fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+		numCritUsrs					= 0;
+		MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
+	if (!isLastPeriod) {
+		numMigsAtThisPeriod = 0; 
+	}
 }
 
 

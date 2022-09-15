@@ -13,7 +13,7 @@ bool ChainsMaster::eraseChain (ChainId_t chainId)
 {
 	auto it = ChainsMaster::allChains.find(chainId);
 	if (it == ChainsMaster::allChains.end()) { 
-		snprintf (buf, bufSize, "\nERROR: ChainsMaster::eraseChains didn't find chain %d", chainId);
+		snprintf (buf, bufSize, "\nerror: ChainsMaster::eraseChains didn't find c%d", chainId);
 		MyConfig::printToLog (buf);
 		return false;
 	}
@@ -47,13 +47,14 @@ bool ChainsMaster::blockChain  (ChainId_t chainId)
 {
 	auto it = ChainsMaster::allChains.find(chainId);
 	if (it == ChainsMaster::allChains.end()) { 
-		snprintf (buf, bufSize, "\nERROR: ChainsMaster::eraseChain didn't find chain %d", chainId);
+		snprintf (buf, bufSize, "\error: ChainsMaster::eraseChain didn't find c%d", chainId);
 		MyConfig::printToLog (buf);
 		return false;
 	}
 	it->second.isBlocked = true;
 	if (MyConfig::DEBUG_LVL > 0 && (it->second.curLvl != UNPLACED_LVL || it-> second.curDc != UNPLACED_DC))  {
-	  	snprintf (buf, bufSize, "\ntrace Time=%.3f, chain %d was blocked whlie having curLvl=%d and curDc=%d", MyConfig::traceTime, chainId, it->second.curLvl, it->second.curDc);
+	  	snprintf (buf, bufSize, "\ntrace Time=%.3f, c%d was blocked whlie having curLvl=%d and curDc=%d", 
+	  														MyConfig::traceTime, chainId, it->second.curLvl, it->second.curDc);
 	  	MyConfig::printToLog (buf);
 	  	return false;
 	}
