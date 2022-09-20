@@ -1,4 +1,4 @@
-// Configuration parameters, writing to log files, and accessory functions.
+t// Configuration parameters, writing to log files, and accessory functions.
 
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H

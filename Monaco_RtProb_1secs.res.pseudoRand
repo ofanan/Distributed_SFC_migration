@@ -1,0 +1,15 @@
+t30599_SyncPartResh_cpu838_p0.0_sd-1_stts1 | cpu_cost=1544803 | link_cost = 0 | mig_cost=0 | tot_cost=1544803 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu838_p0.1_sd-1_stts1 | cpu_cost=1548827 | link_cost = 0 | mig_cost=0 | tot_cost=1548827 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu838_p0.2_sd-1_stts1 | cpu_cost=1553317 | link_cost = 0 | mig_cost=0 | tot_cost=1553317 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu842_p0.3_sd-1_stts1 | cpu_cost=1560333 | link_cost = 0 | mig_cost=0 | tot_cost=1560333 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu867_p0.4_sd-1_stts1 | cpu_cost=1541074 | link_cost = 0 | mig_cost=0 | tot_cost=1541074 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu1063_p0.5_sd-1_stts1 | cpu_cost=1326601 | link_cost = 0 | mig_cost=0 | tot_cost=1326601 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu1292_p0.6_sd-1_stts1 | cpu_cost=1283302 | link_cost = 0 | mig_cost=0 | tot_cost=1283302 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu1508_p0.7_sd-1_stts1 | cpu_cost=1379552 | link_cost = 0 | mig_cost=0 | tot_cost=1379552 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu1709_p0.8_sd-1_stts1 | cpu_cost=1490377 | link_cost = 0 | mig_cost=0 | tot_cost=1490377 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu1989_p0.9_sd-1_stts1 | cpu_cost=1595550 | link_cost = 0 | mig_cost=0 | tot_cost=1595550 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_SyncPartResh_cpu2192_p1.0_sd-1_stts1 | cpu_cost=1733360 | link_cost = 0 | mig_cost=0 | tot_cost=1733360 | ratio=[1.00 0.00 0.00] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu836_p0.0_sd-1_stts1 | cpu_cost=1581177 | link_cost = 0 | mig_cost=16200 | tot_cost=1597377 | ratio=[0.99 0.00 0.01] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=2
+t30599_Async_cpu1091_p0.1_sd-1_stts1 | cpu_cost=1183319 | link_cost = 0 | mig_cost=10800 | tot_cost=1194119 | ratio=[0.99 0.00 0.01] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu1078_p0.2_sd-1_stts1 | cpu_cost=1211490 | link_cost = 0 | mig_cost=13800 | tot_cost=1225290 | ratio=[0.99 0.00 0.01] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu1049_p0.3_sd-1_stts1 | cpu_cost=1263246 | link_cost = 0 | mig_cost=13800 | tot_cost=1277046 | ratio=[0.99 0.00 0.01] | num_usrs=8394 | num_crit_usrs=0 | resh=-1 | blocked=0

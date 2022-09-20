@@ -243,7 +243,7 @@ void SimController::continueBinSearch ()
 			printResLine (RtSimResFile.rdbuf());
 		}
 
-		return; // scheduleAt (simTime() + period, new cMessage ("finBinSearchMsg")); 
+		return; 
 	}
 	if (algStts==SCCS) {
 		ub = MyConfig::cpuAtLeaf;	
