@@ -144,6 +144,8 @@ class Datacenter : public cSimpleModule
 		/*    void incChainsUpCnt  (); // increase the count of # of chains info that I will send to my prnt  in the next pkt*/
 		/*    void incChainsDwnCnt (); // increase the count of # of chains info that I will send to my child in the next pkt*/
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
+		inline int bitLengthOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
+		
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool canPlaceThisChainHigher 	 (const Chain chain) const;

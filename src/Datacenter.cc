@@ -228,6 +228,15 @@ void Datacenter::setLeafId (DcId_t leafId)
 }
 
 /*************************************************************************************************************************************************
+calculate the len of a pkt, given the # of Rt and NonRt chains in it
+*************************************************************************************************************************************************/
+inline int Datacenter::bitLengthOfPkt (const int numRtChains, const int &numNonRtChains)
+{
+	return MyConfig::sizeofRtChain * numRtChains + MyConfig::sizeofNonRtChain * numNonRtChains;
+}
+
+
+/*************************************************************************************************************************************************
 increase the count of # of chains info that I will send in the next pkt
 *************************************************************************************************************************************************/
 void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains)

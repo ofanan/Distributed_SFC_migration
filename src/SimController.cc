@@ -22,6 +22,8 @@ int   MyConfig::RES_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 bool  MyConfig::manuallySetPktSize;
+int   MyConfig::sizeofRtChain;
+int   MyConfig::sizeofNonRtChain;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
@@ -69,8 +71,8 @@ void SimController::initialize (int stage)
 		this->mode                 	 = ((bool)    (network -> par ("syncMode")))? Sync : Async;
 		MyConfig::manuallySetPktSize = ((bool)    (network -> par ("manuallySetPktSize")))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = (bool)     (network -> par ("runningRtProbSim"));
-		int sizeofRtChain = par ("sizeofRtChain");
-		int sizeofRtNonChain = par ("sizeofNonRtChain");
+		MyConfig::sizeofRtChain 		 = par ("sizeofRtChain");
+		MyConfig::sizeofNonRtChain   = par ("sizeofNonRtChain");
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
 		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
