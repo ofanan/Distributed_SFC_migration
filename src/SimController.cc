@@ -21,6 +21,7 @@ int   MyConfig::DEBUG_LVL;
 int   MyConfig::RES_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
+bool  MyConfig::manuallySetPktSize;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
@@ -59,25 +60,28 @@ void SimController::initialize (int stage)
 {
 
   if (stage==0) {
-		network         					 = (cModule*) (getParentModule ()); 
-		RtProb				  					 = (double)   (network -> par ("RtProb"));
- 		numDatacenters  					 = (DcId_t)   (network -> par ("numDatacenters"));
-		numLeaves       					 = (DcId_t)   (network -> par ("numLeaves"));
-		height       							 = (Lvl_t)    (network -> par ("height"));
-		networkName 						   = 				    (network -> par ("name")).stdstringValue();
-		MyConfig::runningRtProbSim = (bool)     (network -> par ("runningRtProbSim"));
-		this->mode 							 	 = Async; // either Sync / Async mode of running the sim
-		MyConfig::traceTime 		   = -1.0;
-		maxTraceTime 						   = numeric_limits<float>::max();
-		MyConfig::FModePeriod 	   = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
-		MyConfig::useFullResh 	   = false;
-		MyConfig::measureRunTime   = true;
+		network         					 	 = (cModule*) (getParentModule ()); 
+		RtProb				  					 	 = (double)   (network -> par ("RtProb"));
+ 		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));
+		numLeaves       					 	 = (DcId_t)   (network -> par ("numLeaves"));
+		height       							 	 = (Lvl_t)    (network -> par ("height"));
+		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
+		this->mode                 	 = ((bool)    (network -> par ("syncMode")))? Sync : Async;
+		MyConfig::manuallySetPktSize = ((bool)    (network -> par ("manuallySetPktSize")))? Sync : Async;
+		MyConfig::runningRtProbSim 	 = (bool)     (network -> par ("runningRtProbSim"));
+		int sizeofRtChain = par ("sizeofRtChain");
+		int sizeofRtNonChain = par ("sizeofNonRtChain");
+		MyConfig::traceTime 		   	 = -1.0;
+		maxTraceTime 						   	 = numeric_limits<float>::max();
+		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
+		MyConfig::useFullResh 	   	 = false;
+		MyConfig::measureRunTime   	 = true;
 
 		if (mode==Sync) {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
+			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}
 		else {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
+			sprintf (MyConfig::modeStr, "Async"); 
 		}
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
@@ -99,7 +103,7 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = numeric_limits<float>::max();
+    simLenInSec           = 1; //numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain

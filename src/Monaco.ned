@@ -4,14 +4,16 @@ package src;
 network Monaco
 {
   parameters:
-  	string name     = default("Monaco");
+  	string name     		= default("Monaco");
 		int height 					= default (3);
     int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
-		int numLeaves   	= default(int (numChildren^(height-1)));
+		int numLeaves   		= default(int (numChildren^(height-1)));
     double channelDelay	@unit(s); 
     double basicDatarate @unit(Gbps);
     double RtProb; // prob' that a new chain is an RT chain
     bool   runningRtProbSim;
+    bool   syncMode			= default (false);
+		bool manuallySetPktSize = default (true);
     int    seed;
     int    cpuAtLeaf;
 

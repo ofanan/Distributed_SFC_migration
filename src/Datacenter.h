@@ -14,7 +14,6 @@
 #include "EndXmtMsg_m.h"
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
-#include "PrepareReshSyncPkt_m.h"
 #include "ReshAsyncPkt_m.h"
 
 using namespace omnetpp;
@@ -107,8 +106,8 @@ class Datacenter : public cSimpleModule
 		inline bool 	withinResh 							() const;
 		inline bool 	withinAnotherResh 			(const Lvl_t reshInitiatorLvl) const;
 		inline bool 	wasPushedUp 						(const Chain &chain) const;
-    void sndViaQ         												(int16_t portNum, cPacket* pkt2send);
-    void xmt              											(int16_t portNum, cPacket *pkt2send);
+    void sndViaQ         												(int16_t portNum, cMessage* msg2snd);
+    void xmt              											(int16_t portNum, cMessage* msg2snd);
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();
@@ -140,7 +139,11 @@ class Datacenter : public cSimpleModule
     void insertMyAssignedChainsIntoPushDwnReq ();
     void failedToPlaceOldChain (ChainId_t chainId);
     bool checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain);
-    
+		/*    void incPktUpCnt    (); // increase the count of pkts sent up (to the higher lvl)*/
+		/*    void incPktDwnCnt   (); // increase the count of pkts sent down (to the lower lvl)*/
+		/*    void incChainsUpCnt  (); // increase the count of # of chains info that I will send to my prnt  in the next pkt*/
+		/*    void incChainsDwnCnt (); // increase the count of # of chains info that I will send to my child in the next pkt*/
+		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
     inline bool canPlaceThisChainHigher 	 (const Chain chain) const;

@@ -9,6 +9,8 @@ simple SimController
   parameters:
     @display("i=misc/node_vs,gold");
     double decisionPariod @unit(s) = default(1s);
-	gates:
+	  int sizeofRtChain 	 = default (1);
+    int sizeofNonRtChain = default (100);
+gates:
 		input directMsgsPort;
 }

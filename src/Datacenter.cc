@@ -227,6 +227,32 @@ void Datacenter::setLeafId (DcId_t leafId)
 	this->leafId = leafId;
 }
 
+/*************************************************************************************************************************************************
+increase the count of # of chains info that I will send in the next pkt
+*************************************************************************************************************************************************/
+void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains)
+{
+	if (chain.isRtChain) {
+		numRtChains++;
+	}
+	else {
+		numNonRtChains++;
+	}
+}
+
+///*************************************************************************************************************************************************
+//increase the count of # of chains info that I will send to my prnt  in the next pkt
+//*************************************************************************************************************************************************/
+//void Datacenter::incChainsUpCnt ()
+//{
+//}
+
+///*************************************************************************************************************************************************
+//increase the count of # of chains info that I will send to my prnt  in the next pkt
+//*************************************************************************************************************************************************/
+//void Datacenter::incChainsDwnCnt ()
+//{
+//}
 
 /*************************************************************************************************************************************************
  * Handle an arriving EndXmtMsg, indicating the end of the transmission of a pkt.
@@ -277,6 +303,14 @@ void Datacenter::handleMessage (cMessage *msg)
 	  isInBuAccumDelay = false;
   	bottomUp();
 	}
+  else if (strcmp (msg->getName(), "prepareReshSyncMsg")==0) {
+    if (MyConfig::mode==Sync) { 
+    	prepareReshSync ();
+    }
+    else {
+    	error ("rcvd a prepareReshSyncMsg while being in Async mode");
+    }
+  }
   else if (strcmp (msg->getName(), "errorMsg")==0) {
  		printBufToLog ();
  		if (MyConfig::DEBUG_LVL >=0) {
@@ -299,15 +333,7 @@ void Datacenter::handleMessage (cMessage *msg)
   else if (dynamic_cast<PushUpPkt*>(curHandledMsg) != nullptr) {
   	handlePushUpPkt ();
   }
-  else if (dynamic_cast<PrepareReshSyncPkt*>(curHandledMsg) != nullptr)
-  {
-    if (MyConfig::mode==Sync) { 
-    	prepareReshSync ();
-    }
-    else {
-    	error ("rcvd a PrepareReshSyncPkt while being in Async mode");
-    }
-  }
+  
   else if (dynamic_cast<ReshAsyncPkt*>(curHandledMsg) != nullptr)
   {
   	if (arrivedFromPrnt ()) {
@@ -569,11 +595,13 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 	PushUpPkt* pkt;	 // the packet to be sent 
 	for (Lvl_t child(0); child<numChildren; child++) { // for each child...
 		pkt = new PushUpPkt;
+		int numRtChains=0, numNonRtChains=0;
 		pkt->setPushUpVecArraySize (pushUpList.size ()); // default size of pushUpVec, for case that all chains in pushUpList belong to this child; will later shrink pushUpVec otherwise 
 		int idxInPushUpVec = 0;
 		for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {	// consider all the chains in pushUpList
 			if (chainPtr->S_u[lvl-1]==dcIdOfChild[child])   { /// this chain is associated with (the sub-tree of) this child
 				pkt->setPushUpVec (idxInPushUpVec++, *chainPtr);
+				incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);
 				chainPtr = pushUpList.erase (chainPtr);
 			}
 			else {
@@ -956,8 +984,10 @@ void Datacenter::genNsndBottomUpPktSync ()
 	BottomUpPkt* pkt2snd = new BottomUpPkt;
 
 	pkt2snd -> setNotAssignedArraySize (notAssigned.size());
+	int numRtChains=0, numNonRtChains=0;
 	for (int i=0; i<notAssigned.size(); i++) {
 		pkt2snd->setNotAssigned (i, notAssigned[i]);
+		incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 	}
 
 	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
@@ -969,6 +999,7 @@ void Datacenter::genNsndBottomUpPktSync ()
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
 		pkt2snd->setPushUpVec (idxInPushUpVec++, *chainPtr);
+		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);
 	}
 	pkt2snd -> setPushUpVecArraySize (idxInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
 
@@ -987,9 +1018,11 @@ void Datacenter::genNsndBottomUpFmodePktAsync ()
 {
 	if (!notAssigned.empty()) {
 		BottomUpPkt* pkt2snd = new BottomUpPkt;
+		int numRtChains=0, numNonRtChains=0; 
 		pkt2snd -> setNotAssignedArraySize (notAssigned.size());
 		for (int i=0; i<notAssigned.size(); i++) {
 			pkt2snd->setNotAssigned (i, notAssigned[i]);
+			incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 		}
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt
 	}	
@@ -1010,6 +1043,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 	BottomUpPkt* pkt2snd = new BottomUpPkt;
 
 	pkt2snd -> setPushUpVecArraySize (pushUpList.size()); // allocate default size of pushUpVec; will shrink it later to the exact required size.
+	int numRtChains=0, numNonRtChains=0;
 	int idxInPushUpVec = 0;
 	for (auto chainPtr=pushUpList.begin(); chainPtr!=pushUpList.end(); ) {
 		if (cannotPlaceThisChainHigher (*chainPtr)) { // if this chain cannot be placed higher, there's no use to include it in the pushUpVec to be xmtd to prnt
@@ -1022,6 +1056,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		
 		// now we know that this chain can be placed higher --> insert it into the pushUpVec to be xmtd to prnt
 		pkt2snd->setPushUpVec (idxInPushUpVec++, *chainPtr);
+		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);
 		chainPtr = pushUpList.erase (chainPtr); //erase the local entry for this chain in pushUpList; once the push-up repy arrives from the prnt, we'll re-insert it
 	}
 	
@@ -1031,6 +1066,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		pkt2snd -> setNotAssignedArraySize (notAssigned.size());
 		for (int i=0; i<notAssigned.size(); i++) {
 			pkt2snd->setNotAssigned (i, notAssigned[i]);
+			incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 		}
 
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
@@ -1274,8 +1310,8 @@ void Datacenter::prepareReshSync ()
 
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
-		PrepareReshSyncPkt *pkt = new PrepareReshSyncPkt;
-		sndViaQ (portToChild(child), pkt); //send the bottomUPpkt to the child
+	
+		sndViaQ (portToChild(child), new cMessage ("prepareReshSyncMsg")); //send the bottomUPpkt to the child
 	}
 	
 	if (isLeaf) {
@@ -1361,22 +1397,23 @@ void Datacenter::scheduleEndFModeEvent ()
  * If the output port is free, xmt the pkt immediately.
  * Else, queue the pkt until the output port is free, and then xmt it.
 *************************************************************************************************************************************************/
-void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
+void Datacenter::sndViaQ (int16_t portNum, cMessage* msg2snd)
 {
+	// $$ cout << "len of the msg2snd=" << msg2snd->	getBitLength() << endl; // $$$
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
-    outputQ[portNum].insert (pkt2snd);
+    outputQ[portNum].insert (msg2snd);
   }
   else {
-    xmt (portNum, pkt2snd);
+    xmt (portNum, msg2snd);
   }
 }
 
 /*************************************************************************************************************************************************
  * Xmt the given pkt to the given output port; schedule a self msg for the end of transmission.
 *************************************************************************************************************************************************/
-void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
+void Datacenter::xmt(int16_t portNum, cMessage* msg2snd)
 {
-	send(pkt2snd, "port$o", portNum);
+	send(msg2snd, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
   endXmtEvents[portNum] = new EndXmtMsg ("");

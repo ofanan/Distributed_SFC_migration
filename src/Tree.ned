@@ -5,12 +5,17 @@ network Tree
 {
   parameters:
   	string name     		= default("Tree");
+  	string mode     		= default("Async");
 		int height 					= default (3);
     int numChildren 		= default (4);
     int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
 		int numLeaves   		= default(int (numChildren^(height-1)));
     double channelDelay	@unit(s); 
     double basicDatarate @unit(Gbps);
+    double RtProb; // prob' that a new chain is an RT chain
+    bool   runningRtProbSim;
+    int    seed;
+    int    cpuAtLeaf;
 
   types:
     channel Channel extends ned.DatarateChannel {

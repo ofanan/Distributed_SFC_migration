@@ -4,10 +4,10 @@ package src;
 network Lux
 {
   parameters:
-  	string name     = default("Lux");
+  	string name     		= default("Lux");
 		int height 					= default (3);
     int numDatacenters 	= default(int((numChildren^height-1)/(numChildren-1)));
-		int numLeaves   	= default(int (numChildren^(height-1)));
+		int numLeaves   		= default(int (numChildren^(height-1)));
     double channelDelay	@unit(s); 
     double basicDatarate @unit(Gbps);
     double RtProb; // prob' that a new chain is an RT chain
