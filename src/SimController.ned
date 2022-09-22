@@ -14,6 +14,8 @@ simple SimController
     int cpuAtLeaf				 = default  (1);
     int    seed					 = default  (42);
     double simLenInSec   = default  (999999); // (numeric_limits<float>::max());
+    bool   syncMode			 = default (false);
+		bool manuallySetPktSize = default (true);
 gates:
 		input directMsgsPort;
 }

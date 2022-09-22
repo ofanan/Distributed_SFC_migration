@@ -12,8 +12,6 @@ network Monaco
     double basicDatarate @unit(Gbps);
     double RtProb; // prob' that a new chain is an RT chain
     bool   runningRtProbSim;
-    bool   syncMode			= default (false);
-		bool manuallySetPktSize = default (true);
 
   types:
     channel Channel extends ned.DatarateChannel {
