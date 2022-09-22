@@ -63,12 +63,10 @@ void SimController::initialize (int stage)
 
   if (stage==0) {
 		network         					 	 = (cModule*) (getParentModule ()); 
-		RtProb				  					 	 = (double)   (network -> par ("RtProb"));
  		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));
 		numLeaves       					 	 = (DcId_t)   (network -> par ("numLeaves"));
 		height       							 	 = (Lvl_t)    (network -> par ("height"));
 		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
-		MyConfig::runningRtProbSim 	 = (bool)     (network -> par ("runningRtProbSim"));
 		MyConfig::sizeofRtChain 		 = par ("sizeofRtChain");
 		MyConfig::sizeofNonRtChain   = par ("sizeofNonRtChain");
 		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
@@ -76,6 +74,8 @@ void SimController::initialize (int stage)
     simLenInSec           			 = double (par ("simLenInSec"));
 		MyConfig::manuallySetPktSize = bool   (par ("manuallySetPktSize"));
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
+		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
+		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
 		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives

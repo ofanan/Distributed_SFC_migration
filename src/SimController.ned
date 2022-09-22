@@ -16,6 +16,8 @@ simple SimController
     double simLenInSec   = default  (999999); // (numeric_limits<float>::max());
     bool   syncMode			 = default (false);
 		bool manuallySetPktSize = default (true);
+    bool   runningRtProbSim = default (false);
+    double RtProb				 = default (0.3); // prob' that a new chain is an RT chain
 gates:
 		input directMsgsPort;
 }
