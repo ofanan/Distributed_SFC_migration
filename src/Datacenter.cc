@@ -288,7 +288,18 @@ void Datacenter::handleEndXmtMsg ()
 void Datacenter::handleMessage (cMessage *msg)
 {
 
+	int pktLen;
+  if (MyConfig::logDelays && msg->isPacket()) {
+		cPacket *pktPtr = (cPacket*)(msg);
+		int pktLen=int(pktPtr->getBitLength());
+		if (pktLen>0) {
+			sprintf (buf, "\ns%d : rcvd pkt of len=%d, delay=%f", dcId, pktLen, (pktPtr->getCreationTime()-simTime()).dbl());	
+			printBufToLog ();
+		}
+  }
+
   curHandledMsg = msg;
+
 	if (MyConfig::discardAllMsgs) {
 		delete curHandledMsg;
 		return;
@@ -1415,7 +1426,6 @@ void Datacenter::scheduleEndFModeEvent ()
 *************************************************************************************************************************************************/
 void Datacenter::sndViaQ (int16_t portNum, cMessage* msg2snd)
 {
-	// $$ cout << "len of the msg2snd=" << msg2snd->	getBitLength() << endl; // $$$
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (msg2snd);
   }
@@ -1429,6 +1439,7 @@ void Datacenter::sndViaQ (int16_t portNum, cMessage* msg2snd)
 *************************************************************************************************************************************************/
 void Datacenter::xmt(int16_t portNum, cMessage* msg2snd)
 {
+
 	send(msg2snd, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
