@@ -14,8 +14,6 @@ network Monaco
     bool   runningRtProbSim;
     bool   syncMode			= default (false);
 		bool manuallySetPktSize = default (true);
-    int    seed;
-    int    cpuAtLeaf;
 
   types:
     channel Channel extends ned.DatarateChannel {

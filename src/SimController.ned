@@ -9,8 +9,11 @@ simple SimController
   parameters:
     @display("i=misc/node_vs,gold");
     double decisionPariod @unit(s) = default(1s);
-	  int sizeofRtChain 	 = default (1);
-    int sizeofNonRtChain = default (100);
+	  int sizeofRtChain 	 = default  (1);
+    int sizeofNonRtChain = default  (100);
+    int cpuAtLeaf				 = default  (1);
+    int    seed					 = default  (42);
+    double simLenInSec   = default  (999999); // (numeric_limits<float>::max());
 gates:
 		input directMsgsPort;
 }

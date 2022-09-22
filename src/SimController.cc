@@ -73,6 +73,9 @@ void SimController::initialize (int stage)
 		MyConfig::runningRtProbSim 	 = (bool)     (network -> par ("runningRtProbSim"));
 		MyConfig::sizeofRtChain 		 = par ("sizeofRtChain");
 		MyConfig::sizeofNonRtChain   = par ("sizeofNonRtChain");
+		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
+		seed				    						 = int (par ("seed"));
+    simLenInSec           			 = double (par ("simLenInSec"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
 		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -93,8 +96,6 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
-		MyConfig::cpuAtLeaf = (int)    (network -> par ("cpuAtLeaf"));
-		seed   							= (int)    (network -> par ("seed"));
 		MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 		srand(seed); // set the seed of random num generation
 		updateCpuAtLvl ();
@@ -105,7 +106,6 @@ void SimController::initialize (int stage)
 		NonRtChain::mu_u 			= MyConfig::NonRtChainMu_u 			[MyConfig::netType];
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
-    simLenInSec           = 1; //numeric_limits<float>::max();
     updateRtChainRandInt ();
 		
 		// Set the prob' of a generated chain to be an RtChain
