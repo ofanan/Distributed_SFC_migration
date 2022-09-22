@@ -74,6 +74,7 @@ class MyConfig {
     static bool runningCampaign;
     static bool measureRunTime;
 		static bool manuallySetPktSize;
+		static bool logDelays;
 		static int  sizeofRtChain;
 		static int  sizeofNonRtChain;
 

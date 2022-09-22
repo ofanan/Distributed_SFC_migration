@@ -8,16 +8,17 @@ simple SimController
 {
   parameters:
     @display("i=misc/node_vs,gold");
-    double decisionPariod @unit(s) = default(1s);
-	  int sizeofRtChain 	 = default  (1);
-    int sizeofNonRtChain = default  (100);
-    int cpuAtLeaf				 = default  (1);
-    int    seed					 = default  (42);
-    double simLenInSec   = default  (999999); // (numeric_limits<float>::max());
+	  int sizeofRtChain 	 = default (1);
+    int sizeofNonRtChain = default (100);
+    int cpuAtLeaf				 = default (1);
+    int    seed					 = default (42);
+    double simLenInSec   = default (999999); // (numeric_limits<float>::max());
     bool   syncMode			 = default (false);
+    double RtProb				 = default (0.3); // prob' that a new chain is an RT chain
+    bool logDelays			 = default (false);
 		bool manuallySetPktSize = default (true);
     bool   runningRtProbSim = default (false);
-    double RtProb				 = default (0.3); // prob' that a new chain is an RT chain
+    double decisionPariod @unit(s) = default(1s);
 gates:
 		input directMsgsPort;
 }

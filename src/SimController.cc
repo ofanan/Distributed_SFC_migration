@@ -15,6 +15,7 @@ Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
+bool  MyConfig::logDelays;
 int   MyConfig::mode;
 int   MyConfig::LOG_LVL;
 int   MyConfig::DEBUG_LVL;
@@ -75,6 +76,7 @@ void SimController::initialize (int stage)
 		MyConfig::manuallySetPktSize = bool   (par ("manuallySetPktSize"));
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
+		MyConfig::logDelays					 = bool   (par ("logDelays"));	
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
