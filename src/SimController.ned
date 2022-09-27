@@ -19,6 +19,9 @@ simple SimController
 		bool manuallySetPktSize = default (true);
     bool   runningRtProbSim = default (false);
     double decisionPariod @unit(s) = default(1s);
+    int byteLengthOfHeader 	= default (4);
+    int byteLengthOfRtChain = default (10);
+    int byteLengthOfNonRtChain = default (15);
 gates:
 		input directMsgsPort;
 }

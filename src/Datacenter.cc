@@ -232,7 +232,7 @@ calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
 inline int Datacenter::byteLengthOfPkt (const int numRtChains, const int &numNonRtChains)
 {
-	return MyConfig::byteLengthOfRtChain * numRtChains + MyConfig::byteLengthOfNonRtChain * numNonRtChains;
+	return MyConfig::byteLengthOfHeader + MyConfig::byteLengthOfRtChain * numRtChains + MyConfig::byteLengthOfNonRtChain * numNonRtChains;
 }
 
 
@@ -291,7 +291,7 @@ void Datacenter::handleMessage (cMessage *msg)
 	int pktLen;
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
-		int pktLen=int(pktPtr->getBitLength());
+		int pktLen=int(pktPtr->getByteLength());
 		if (pktLen>0) {
 			sprintf (buf, "\ns%d : rcvd pkt of len=%d, delay=%f", dcId, pktLen, (pktPtr->getCreationTime()-simTime()).dbl());	
 			printBufToLog ();
@@ -1444,18 +1444,18 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 
 	int cntrNum; // number of the counters to update
 	if (isRoot) {
-		cntrNum = MyConfig::height-1+lvl; // src of the pkt is lvl, and direction is UP
+		cntrNum = MyConfig::height-2+lvl; // src of the pkt is lvl, and direction is UP
 	}
 	else if (isLeaf) {
 		cntrNum = 0; // src of the pkt is lvl 0, and direction is UP
 	}
 	else {
-		cntrNum = (portNum==0)? lvl : MyConfig::height-1+lvl;
+		cntrNum = (portNum==0)? lvl : MyConfig::height-2+lvl;
 	}
 	
-																					//getBitLength () const
-	if (MyConfig::incCntr (cntrNum, pkt2snd->getBitLength())) {
-		error ("s%d : t=%.3f problem when calling MyConfig::incCntr", dcId, MyConfig::traceTime);
+	if (!MyConfig::incCntr (cntrNum, pkt2snd->getByteLength())) {
+		error ("s%d : t=%.3f problem when calling MyConfig::incCntr. lvl=%d, portNum=%d, cntrNum=%d, height=%d", 
+						dcId, MyConfig::traceTime, lvl, portNum, cntrNum, MyConfig::height);
 	}
 
 	send(pkt2snd, "port$o", portNum);

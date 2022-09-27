@@ -81,8 +81,8 @@ class MyConfig {
     static bool measureRunTime;
 		static bool manuallySetPktSize;
 		static bool logDelays;
-		static int  byteLengthOfRtChain;
-		static int  byteLengthOfNonRtChain;
+		static int  byteLengthOfRtChain, byteLengthOfNonRtChain, byteLengthOfHeader;
+
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static bool randomlySetChainType;
