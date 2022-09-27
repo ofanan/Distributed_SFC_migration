@@ -1259,11 +1259,13 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 
 	pushDwnReqFromChild.clear ();
 	while (nxtChildToSndReshAsync < numChildren) {
+		int numRtChains=0, numNonRtChains=0;
 		for (auto chainPtr=pushDwnReq.begin(); chainPtr!=pushDwnReq.end(); chainPtr++) {	// consider all the chains in pushDwnReq
 		    if (MyConfig::DEBUG_LVL>0 && chainPtr->S_u.size() < lvl) {
 		        error ("s%d : sndReshAsyncPktToNxtChild encountered in pushDwnReq c%d with S_u_len=%d while my lvl=%d", dcId, chainPtr->id, chainPtr->S_u.size(), lvl);
 		    }
 			if (chainPtr->S_u[lvl-1]==dcIdOfChild[nxtChildToSndReshAsync])   { /// this chain is associated with (the sub-tree of) this child
+				incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);
 				if (!checkNinsertChainToList (pushDwnReqFromChild, *chainPtr)) {
 					error ("Error in insertChainToList. See log file for details");
 				}
@@ -1303,6 +1305,9 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		for (auto chain : pushDwnReqFromChild) {	
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
+		
+		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + 4); // add to the regular cnt 2B for the deficitCpu field + 2B for the reshInitiator.
+		
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
