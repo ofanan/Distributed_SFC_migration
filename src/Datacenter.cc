@@ -323,19 +323,19 @@ void Datacenter::handleMessage (cMessage *msg)
 	  isInBuAccumDelay = false;
   	bottomUp();
 	}
-  else if (strcmp (msg->getName(), "prepareReshSyncMsg")==0) {
-    if (MyConfig::mode==Sync) { 
-    	prepareReshSync ();
-    }
-    else {
-    	error ("rcvd a prepareReshSyncMsg while being in Async mode");
-    }
-  }
   else if (strcmp (msg->getName(), "errorMsg")==0) {
  		printBufToLog ();
  		if (MyConfig::DEBUG_LVL >=0) {
 	 		error (buf);
 	 	}
+  }
+  else if (dynamic_cast <PrepareReshSyncPkt*>(curHandledMsg) != nullptr) {
+    if (MyConfig::mode==Sync) { 
+    	prepareReshSync ();
+    }
+    else {
+    	error ("rcvd a PrepareReshSynPkt while being in Async mode");
+    }
   }
   else if (dynamic_cast<BottomUpPkt*>(curHandledMsg) != nullptr) {
   	if (MyConfig::mode==Sync) { 
