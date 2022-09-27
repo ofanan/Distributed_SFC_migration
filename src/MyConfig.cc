@@ -18,7 +18,6 @@ const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl   = {{544, 278, 148
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				   = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		   = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 
-
 /*************************************************************************************************************************************************
 Given a cntrNum, increment the respective pktCnt 1, and the respective bitCnt by the given bitCnt.
 Return true if the counters were successfully update, false else.
@@ -34,6 +33,7 @@ bool MyConfig::incCntr (Lvl_t cntrNum, int64_t bitCnt)
 	MyConfig::bitCnt[cntrNum]+=bitCnt;
 	return true;
 }
+
 
 /*************************************************************************************************************************************************
 * Run a given (Linux) command, and return its output
@@ -69,6 +69,10 @@ void MyConfig::rst()
 	MyConfig::overallNumBlockedUsrs = 0; 
 	MyConfig::discardAllMsgs 				= false;
 	MyConfig::lvlOfHighestReshDc 		= UNPLACED_LVL;
+	for (int i(0); i<MyConfig::pktCnt.size(); i++) {
+		MyConfig::pktCnt[i] = 0;
+		MyConfig::bitCnt[i] = 0;
+	}
 }
 
 /*************************************************************************************************************************************************
