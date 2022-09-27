@@ -230,9 +230,9 @@ void Datacenter::setLeafId (DcId_t leafId)
 /*************************************************************************************************************************************************
 calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
-inline int Datacenter::bitLengthOfPkt (const int numRtChains, const int &numNonRtChains)
+inline int Datacenter::byteLengthOfPkt (const int numRtChains, const int &numNonRtChains)
 {
-	return MyConfig::sizeofRtChain * numRtChains + MyConfig::sizeofNonRtChain * numNonRtChains;
+	return MyConfig::byteLengthOfRtChain * numRtChains + MyConfig::byteLengthOfNonRtChain * numNonRtChains;
 }
 
 
@@ -633,7 +633,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
-			pkt->setBitLength (bitLengthOfPkt (numRtChains, numNonRtChains));
+			pkt->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 				sprintf (buf, "\n s%d : snding PU pkt to child %d. simTime=%f, PUL=", dcId, dcIdOfChild[child], simTime().dbl());
@@ -927,7 +927,7 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 			pkt2snd->setPushUpVec (i, chain);
 			incChainsInPktCnt (chain, numRtChains, numNonRtChains);
 		}
-		pkt2snd->setBitLength (bitLengthOfPkt (numRtChains, numNonRtChains));
+		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 		sndViaQ (portToChild(child), pkt2snd); //send the pkt to the child
 	}
 
@@ -1027,7 +1027,7 @@ void Datacenter::genNsndBottomUpPktSync ()
 		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);
 	}
 	pkt2snd -> setPushUpVecArraySize (idxInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
-	pkt2snd->setBitLength (bitLengthOfPkt (numRtChains, numNonRtChains));
+	pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 	sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 	if (!reshuffled) { 
 		notAssigned.clear ();
@@ -1049,7 +1049,7 @@ void Datacenter::genNsndBottomUpFmodePktAsync ()
 			pkt2snd->setNotAssigned (i, notAssigned[i]);
 			incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 		}
-		pkt2snd->setBitLength (bitLengthOfPkt (numRtChains, numNonRtChains));
+		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt
 	}	
 	notAssigned.clear ();
@@ -1095,7 +1095,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 			incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 		}
 
-		pkt2snd->setBitLength (bitLengthOfPkt (numRtChains, numNonRtChains));
+		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 	}
 	else { // no really data to send; in async mode there's no use to send an empty pkt, so just destroy it

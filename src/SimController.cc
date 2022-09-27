@@ -25,8 +25,8 @@ int		MyConfig::overallNumBlockedUsrs;
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 
 bool  MyConfig::manuallySetPktSize;
-int   MyConfig::sizeofRtChain;
-int   MyConfig::sizeofNonRtChain;
+int   MyConfig::byteLengthOfRtChain;
+int   MyConfig::byteLengthOfNonRtChain;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
@@ -73,8 +73,8 @@ void SimController::initialize (int stage)
 		MyConfig::height       		 	 = (Lvl_t)    (network -> par ("height"));
 		
 		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
-		MyConfig::sizeofRtChain 		 = par ("sizeofRtChain");
-		MyConfig::sizeofNonRtChain   = par ("sizeofNonRtChain");
+		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
+		MyConfig::byteLengthOfNonRtChain   = par ("byteLengthOfNonRtChain");
 		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
 		seed				    						 = int (par ("seed"));
     simLenInSec           			 = double (par ("simLenInSec"));
