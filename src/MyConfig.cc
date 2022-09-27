@@ -233,14 +233,6 @@ void MyConfig::printToLog (vector <ChainId_t> vec)
 	}
 }
 
-//void MyConfig::printToLog (vector <DcId_t> vec) 
-//{
-//	logFile << ",";
-//	for (const auto i : vec) {
-//		logFile << i << ",";
-//	}
-//}
-
 void MyConfig::printToLog (unordered_set <ChainId_t> set2print) 
 {
 	vector <ChainId_t> setAsVec;
@@ -276,7 +268,3 @@ bool MyConfig::eraseKeyFromSet (unordered_set <ChainId_t> &set, ChainId_t id)
 	}
 }
 
-//ofstream MyConfig::getLogFile ()
-//{
-//	return logFile;
-//}

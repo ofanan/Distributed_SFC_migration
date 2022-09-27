@@ -16,5 +16,13 @@ const Cpu_t		  UNPLACED_CPU   = -1;
 
 const int SCCS=1;
 const int FAIL=2;
+
+struct Cntr
+{
+	int32_t direction;
+	uint32_t pktCnt;
+	uint64_t RtChainsCnt, NonRtChainsCnt;
+};
+
 #endif
 

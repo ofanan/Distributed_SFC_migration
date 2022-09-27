@@ -779,14 +779,14 @@ void SimController::rdNewUsrsLine (string line)
 		ss >> poaId;
 		if (genRtChain(chainId)) {
 			if (RtProb==0.0) {
-				error ("probOfRt==0, but an Rt chain was generated");
+				error ("RtProb==0, but an Rt chain was generated");
 			}
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RtChain::mu_u_len};
 			chain = RtChain (chainId, S_u);
 		}
 		else {
 			if (RtProb==1.0) {
-				error ("probOfRt==1, but a non-Rt chain was generated. RtChainRandInt=%d. RandMax=%d", RtChainRandInt,RAND_MAX);
+				error ("RtProb==1, but a non-Rt chain was generated. RtChainRandInt=%d. RandMax=%d", RtChainRandInt,RAND_MAX);
 			}
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+NonRtChain::mu_u_len};
 			chain = NonRtChain (chainId, S_u); 
