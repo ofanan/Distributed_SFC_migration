@@ -1338,7 +1338,7 @@ void Datacenter::prepareReshSync ()
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
 	
-		sndViaQ (portToChild(child), new cMessage ("prepareReshSyncMsg")); //send the bottomUPpkt to the child
+		sndViaQ (portToChild(child), new PrepareReshSyncPkt ()); //send the bottomUPpkt to the child
 	}
 	
 	if (isLeaf) {
@@ -1424,23 +1424,41 @@ void Datacenter::scheduleEndFModeEvent ()
  * If the output port is free, xmt the pkt immediately.
  * Else, queue the pkt until the output port is free, and then xmt it.
 *************************************************************************************************************************************************/
-void Datacenter::sndViaQ (int16_t portNum, cMessage* msg2snd)
+void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 {
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
-    outputQ[portNum].insert (msg2snd);
+    outputQ[portNum].insert (pkt2snd);
   }
   else {
-    xmt (portNum, msg2snd);
+    xmt (portNum, pkt2snd);
   }
 }
 
 /*************************************************************************************************************************************************
- * Xmt the given pkt to the given output port; schedule a self msg for the end of transmission.
+- Xmt the given pkt to the given output port.
+- Update the pkt cnt and the bit cnt statistics accordingly.
+- Schedule a self msg for the end of transmission.
 *************************************************************************************************************************************************/
-void Datacenter::xmt(int16_t portNum, cMessage* msg2snd)
+void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 {
 
-	send(msg2snd, "port$o", portNum);
+	int cntrNum; // number of the counters to update
+	if (isRoot) {
+		cntrNum = MyConfig::height-1+lvl; // src of the pkt is lvl, and direction is UP
+	}
+	else if (isLeaf) {
+		cntrNum = 0; // src of the pkt is lvl 0, and direction is UP
+	}
+	else {
+		cntrNum = (portNum==0)? lvl : MyConfig::height-1+lvl;
+	}
+	
+																					//getBitLength () const
+	if (MyConfig::incCntr (cntrNum, pkt2snd->getBitLength())) {
+		error ("s%d : t=%.3f problem when calling MyConfig::incCntr", dcId, MyConfig::traceTime);
+	}
+
+	send(pkt2snd, "port$o", portNum);
 
   // Schedule an event for the time when last bit will leave the gate.
   endXmtEvents[portNum] = new EndXmtMsg ("");

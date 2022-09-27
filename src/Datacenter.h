@@ -15,6 +15,7 @@
 #include "BottomUpPkt_m.h"
 #include "PushUpPkt_m.h"
 #include "ReshAsyncPkt_m.h"
+#include "PrepareReshSyncPkt_m.h"
 
 using namespace omnetpp;
 using namespace std;
@@ -109,8 +110,8 @@ class Datacenter : public cSimpleModule
 		inline bool 	withinResh 							() const;
 		inline bool 	withinAnotherResh 			(const Lvl_t reshInitiatorLvl) const;
 		inline bool 	wasPushedUp 						(const Chain &chain) const;
-    void sndViaQ         												(int16_t portNum, cMessage* msg2snd);
-    void xmt              											(int16_t portNum, cMessage* msg2snd);
+    void sndViaQ         												(int16_t portNum, cPacket* pkt2snd);
+    void xmt              											(int16_t portNum, cPacket*  pkt2snd);
     void handleEndXmtMsg   		  ();
     void handleBottomUpPktSync 	();
     void handlePushUpPkt			 	();

@@ -13,6 +13,7 @@ bool  MyConfig::evenChainsAreRt;
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
+Lvl_t MyConfig::height;
 bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
 bool  MyConfig::logDelays;
@@ -22,6 +23,7 @@ int   MyConfig::DEBUG_LVL;
 int   MyConfig::RES_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
+
 bool  MyConfig::manuallySetPktSize;
 int   MyConfig::sizeofRtChain;
 int   MyConfig::sizeofNonRtChain;
@@ -34,6 +36,8 @@ bool  MyConfig::measureRunTime;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+vector <uint32_t> MyConfig::pktCnt; // MyConfig::pktCnt[i] will hold the # of pkts sent in direction i
+vector <uint64_t> MyConfig::bitCnt; // MyConfig::bitCnt[i] will hold the # of bits sent in direction i
 
 Define_Module(SimController);
 
@@ -66,7 +70,8 @@ void SimController::initialize (int stage)
 		network         					 	 = (cModule*) (getParentModule ()); 
  		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));
 		numLeaves       					 	 = (DcId_t)   (network -> par ("numLeaves"));
-		height       							 	 = (Lvl_t)    (network -> par ("height"));
+		MyConfig::height       		 	 = (Lvl_t)    (network -> par ("height"));
+		
 		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
 		MyConfig::sizeofRtChain 		 = par ("sizeofRtChain");
 		MyConfig::sizeofNonRtChain   = par ("sizeofNonRtChain");
@@ -123,6 +128,9 @@ void SimController::initialize (int stage)
 		checkParams (); 
 		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 		rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
+		MyConfig::pktCnt.resize (2*(MyConfig::height-1));
+		MyConfig::bitCnt.resize (2*(MyConfig::height-1));
+		
 		fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 		leaves.resize (numLeaves);
 		datacenters.resize (numDatacenters);
@@ -139,7 +147,7 @@ void SimController::initialize (int stage)
 			}
 		}
 		discoverPathsToRoot  ();
-//		calcDistBetweenAllDcs				 ();
+		// calcDistBetweenAllDcs				 ();
 		return;
 	}
 	
@@ -287,7 +295,7 @@ update the cpu capacity at each level based on the current rsrc aug lvl
 void SimController::updateCpuAtLvl ()
 {
 	MyConfig::cpuAtLvl.clear ();
-	for (Lvl_t lvl(0); lvl < height; lvl++) {
+	for (Lvl_t lvl(0); lvl < MyConfig::height; lvl++) {
 		MyConfig::cpuAtLvl.push_back ((MyConfig::netType==UniformTreeIdx)? MyConfig::cpuAtLeaf : (MyConfig::cpuAtLeaf*(lvl+1)));
 	}
 }
@@ -358,20 +366,20 @@ void SimController::discoverPathsToRoot () {
 	pathFromLeafToRoot.resize (numLeaves);
 	DcId_t dcId;
 	for (int leafId(0) ; leafId < numLeaves; leafId++)  {
-		pathFromLeafToRoot[leafId].resize (height);
+		pathFromLeafToRoot[leafId].resize (MyConfig::height);
 		dcId = leaves[leafId]->dcId;
-	  int height = 0;
+	  int cur_height = 0;
 		while (dcId != root_id) {
-		 	pathFromLeafToRoot[leafId][height++] = dcId;
+		 	pathFromLeafToRoot[leafId][cur_height++] = dcId;
 		 	dcId = datacenters[dcId]->idOfParent;
 		}
 	}
 	pathFromDcToRoot.resize (numDatacenters);
 	for (int leafId(0) ; leafId < numLeaves; leafId++)  {
-		for (Lvl_t lvl (0); lvl<height; lvl++) {
-			for (Lvl_t i(0); lvl+i<height; i++) {
+		for (Lvl_t lvl (0); lvl<MyConfig::height; lvl++) {
+			for (Lvl_t i(0); lvl+i<MyConfig::height; i++) {
 				dcId = pathFromLeafToRoot[leafId][lvl];
-				if (pathFromDcToRoot[dcId].size() < height - datacenters[dcId]->lvl) { // this path is not full yet -- need to add DCs to it.
+				if (pathFromDcToRoot[dcId].size() < MyConfig::height - datacenters[dcId]->lvl) { // this path is not full yet -- need to add DCs to it.
 					pathFromDcToRoot[pathFromLeafToRoot[leafId][lvl]].push_back(pathFromLeafToRoot[leafId][lvl+i]);
 				}
 			}
@@ -397,7 +405,7 @@ Lvl_t SimController::calcDistBetweenTwoDcs (DcId_t i, DcId_t j)
 	if (datacenters[i]->lvl < datacenters[j]->lvl) {
 		error ("calcDistBetweenTwoDcs cannot calculate the dist between i and j when j is in higher level than i");
 	}
-	for (Lvl_t lvl=datacenters[i]->lvl; lvl<height; lvl++) {
+	for (Lvl_t lvl=datacenters[i]->lvl; lvl<MyConfig::height; lvl++) {
 		if (pathFromDcToRoot[i][idxInpathFromDcToRoot(i, lvl)]==pathFromDcToRoot[j][idxInpathFromDcToRoot(j, lvl)]) {
 			return idxInpathFromDcToRoot(i, lvl) + idxInpathFromDcToRoot(j, lvl);
 		}
@@ -965,7 +973,7 @@ void SimController::initFullReshSync ()
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
 		MyConfig::printToLog ("\nbeginning full resh\n");
 	}
-	MyConfig::lvlOfHighestReshDc = height-1;
+	MyConfig::lvlOfHighestReshDc = MyConfig::height-1;
 	
 	// rlz all chains throughout
 	for (DcId_t dcId=0; dcId<numDatacenters; dcId++) {

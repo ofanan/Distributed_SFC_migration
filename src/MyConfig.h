@@ -48,20 +48,25 @@ class MyConfig {
 		static char 			buf[bufSize];
     static ofstream 	logFile, resFile;
 
+		// directions 0, 1, ..., height-1 indicate pkts where the source is 0,1, ... height -1, and the direction is north (to prnt).
+		// directions height-1, height, height+1, indicate pkts where the source is 1,2, ... height-1, and the direction is south (to child).
+		static vector <uint32_t> pktCnt; // pktCnt[i] will hold the # of pkts sent in direction i
+		static vector <uint64_t> bitCnt; // bitCnt[i] will hold the # of bits sent in direction i
+
 	public:
 
 		static int mode;
 		static string traceFileName;
 		static int netType;
 		const static int modeStrLen=20;
-		static char modeStr[modeStrLen]; 
+		static char modeStr[modeStrLen]; // a string characterizing the mode of operation ("syncPartResh", "SyncFullResh", "Async"). 
 		static int  overallNumBlockedUsrs; 
+		static Lvl_t height;// height of the tree 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
 		static const vector <vector <Cost_t>> RtChainCostAtLvl;
 		static const vector <vector <Cost_t>> NonRtChainCostAtLvl;
 		static const vector <vector <Cpu_t>>  RtChainMu_u;
 		static const vector <vector <Cpu_t>>  NonRtChainMu_u;
-		static 			 Cntr pktCnt;
 		static vector <Cpu_t> minCpuToPlaceAnyChainAtLvl;
 		static Cpu_t  cpuAtLeaf;
 		static vector <Cpu_t> cpuAtLvl; 
@@ -120,6 +125,7 @@ class MyConfig {
 		static int  getNetTypeFromString (string str);
 		static ofstream getlogFile ();
 		static vector<Cost_t> scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2); // returns the scalar product of two vectors
+		static bool incCntr (Lvl_t cntrNum, int64_t bitCnt);
 
 		// erase the given key from the given set. Returns true iff the requested key was indeed found in the set
 		static bool eraseKeyFromSet (unordered_set <ChainId_t> &set, ChainId_t id); 

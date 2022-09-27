@@ -20,6 +20,22 @@ const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		   = {{17, 17, 17, 17,
 
 
 /*************************************************************************************************************************************************
+Given a cntrNum, increment the respective pktCnt 1, and the respective bitCnt by the given bitCnt.
+Return true if the counters were successfully update, false else.
+**************************************************************************************************************************************************/
+bool MyConfig::incCntr (Lvl_t cntrNum, int64_t bitCnt)
+{
+	if (MyConfig::DEBUG_LVL>0 && (cntrNum<0 || cntrNum>2*MyConfig::height-3)) {
+		sprintf (buf, "MyConfig::incCntr was called with cntrNum=%d, while maximal allowed cntrNum is %d", cntrNum, 2*MyConfig::height-3);
+		MyConfig::printToLog (buf);
+		return false;
+	}
+	MyConfig::pktCnt[cntrNum]++;
+	MyConfig::bitCnt[cntrNum]+=bitCnt;
+	return true;
+}
+
+/*************************************************************************************************************************************************
 * Run a given (Linux) command, and return its output
 **************************************************************************************************************************************************/
 string MyConfig::exec(const char* cmd)
