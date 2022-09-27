@@ -21,6 +21,9 @@ using namespace std;
 
 class SimController;
 
+const bool UP	 = true;
+const bool DWN = false;
+
 class Datacenter : public cSimpleModule
 {
 
