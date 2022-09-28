@@ -82,7 +82,7 @@ class MyConfig {
 		static bool manuallySetPktSize;
 		static bool logDelays;
 		static int  byteLengthOfRtChain, byteLengthOfNonRtChain, byteLengthOfHeader;
-
+		static int  byteLengthOfreshAsyncPktFields;
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static bool randomlySetChainType;

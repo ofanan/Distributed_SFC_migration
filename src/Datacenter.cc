@@ -1306,7 +1306,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
 		
-		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + 4); // add to the regular cnt 2B for the deficitCpu field + 2B for the reshInitiator.
+		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + MyConfig::byteLengthOfreshAsyncPktFields); 
 		
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;

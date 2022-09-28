@@ -34,6 +34,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
+int   MyConfig::byteLengthOfreshAsyncPktFields;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
@@ -77,6 +78,7 @@ void SimController::initialize (int stage)
 		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
 		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
 		MyConfig::byteLengthOfNonRtChain   = par ("byteLengthOfNonRtChain");
+    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
 		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
 		seed				    						 = int (par ("seed"));
     simLenInSec           			 = double (par ("simLenInSec"));
