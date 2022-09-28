@@ -37,6 +37,7 @@ inline bool Datacenter::IAmTheReshIniator () const
 	return (this->reshInitiatorLvl == this->lvl);
 }
 
+// returns true iff the given chain was pushed up from me
 inline bool Datacenter::wasPushedUp (const Chain &chain) const 
 {
 	return (chain.curLvl > this->lvl); 
@@ -875,6 +876,7 @@ void Datacenter::handleBottomUpPktAsync ()
 	if (isInBuAccumDelay) {
 		return;
 	}	
+//	bottomUp (); //$$$$
 	isInBuAccumDelay = true;
 	scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("bottomUp")); //schedule a run of bottomUp
 }
@@ -1110,7 +1112,14 @@ void Datacenter::genNsndBottomUpPktAsync ()
 
 		
 /*************************************************************************************************************************************************
- Init an async reshuffle. called upon a failure to place a chain
+ Init an async reshuffle.
+ Upon a failure to place a chain, the dc waits some accumulation_delay period, and then 
+ run this func'.
+ Operation:
+ - Init relevant databases (pushDwnAck/pushDwnAck etc.)
+ - Check whether I have enough CPU to solve the prob' locally. If so, call bottomUpFMode, in order to solve the prob' w/o resh.
+ - insertMyAssignedChainsIntoPushDwnReq.
+ - Call rehAsyh
 *************************************************************************************************************************************************/
 void Datacenter::initReshAsync ()
 {
@@ -1160,7 +1169,10 @@ bool Datacenter::checkNinsertChainToList (list <Chain> &listOfChains, Chain &cha
 }
  
 /*************************************************************************************************************************************************
-run the async reshuffle algorithm. Called either by initReshAsync upon a failure to place a chain, or by an arrival of reshAsyncPkt
+run the async reshuffle algorithm. Called either by initReshAsync upon a failure to place a chain, or by an arrival of reshAsyncPkt from prnt.
+- If I'm a leaf and/or I can solve the "lack of rsrcs" prb' locally, do that (psuh-dwn chains, and call finreshAsync).
+- Else, generate and send reshAsync pkts to the next relevant child, if exists.
+- Finlly, call pushDwn to push-down to me chains (if possible), and the call finReshAsync.
 *************************************************************************************************************************************************/
 void Datacenter::reshAsync ()
 {
@@ -1243,8 +1255,8 @@ void Datacenter::insertMyAssignedChainsIntoPushDwnReq ()
 }
 
 /*************************************************************************************************************************************************
-Check whether there exists (at least one) additional child to which we should send a reshuffle pkt (in async mode) - and if so, send to him.
-returns true iff found a relevant child, and sent him a reshAsyncPkt.
+- Check whether there exists (at least one) additional child to which we should send a reshuffle pkt (in async mode) - and if so, send to him.
+- Returns true iff found a relevant child, and sent him a reshAsyncPkt.
 *************************************************************************************************************************************************/
 bool Datacenter::sndReshAsyncPktToNxtChild ()
 {
@@ -1592,9 +1604,12 @@ void Datacenter::handleReshAsyncPktFromChild ()
 	}
 }
 
-/*************************************************************************************************************************************************Finish the local run of a reshAsync alg':
-- if I'm the initiator, come back to run bottomUp, but in "F" (feasibility) mode.
-- Else, send a reshAsyncPkt to prnt.
+/*************************************************************************************************************************************************Finish the Finalize a run of the reshAsync alg':
+- Place all the potentially-placed chains.
+
+- if I'm not the initiator, send a reshAsyncPkt to prnt.
+- Run bottomUpFMode.
+- Rst the reshAsync params, as a preparation for the next run of reshAsync.
 *************************************************************************************************************************************************/
 void Datacenter::finReshAsync ()
 {  
@@ -1624,9 +1639,10 @@ void Datacenter::finReshAsync ()
 }
 
 /*************************************************************************************************************************************************
-push-down chains from the list pushDwnReq into me. 
+push-down chains from the list pushDwnReq into me.
 Update state vars (availCpu, deficitCpu, placedChains) accordingly.
-Return when either availCpu doesn't suffice to place any additional chain, or when deficitCpu <= 0.
+If a chain pushed-down to me appeared in my notAssigned, remove it from notAssigned.
+Return when either my availCpu doesn't suffice to place any additional chain, or when deficitCpu <= 0.
 *************************************************************************************************************************************************/
 void Datacenter::pushDwn ()
 {
