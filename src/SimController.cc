@@ -945,7 +945,11 @@ void SimController::checkChainsMasterData ()
 				}
 			}
 			if (chain.curDc != dcId) {
-				error ("\ntraceT=%f : checkChainsMasterData() : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", MyConfig::traceTime, chainId, dcId, chain.curDc);
+				if (chain.isBlocked) {
+					error ("\ntraceT=%f : blocked c%d is still placed s%d", MyConfig::traceTime, chainId, dcId);
+				}
+				error ("\ntraceT=%f : checkChainsMasterData() : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", 
+								MyConfig::traceTime, chainId, dcId, chain.curDc);
 			}
 		}
 	}
