@@ -40,7 +40,7 @@ vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
 
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = 30023; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 vector <uint32_t> MyConfig::pktCnt; // MyConfig::pktCnt[i] will hold the # of pkts sent in direction i
 vector <uint64_t> MyConfig::bitCnt; // MyConfig::bitCnt[i] will hold the # of bits sent in direction i
 
