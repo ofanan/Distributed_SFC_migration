@@ -117,12 +117,12 @@ void SimController::initialize (int stage)
 		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 
-		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] = 0;
-		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] = 0;
+		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] = 0.0;
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] = 0.0;
 
-		for (int lvl=1; lvl<height; lvl++) {
-			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = lvl*BU_ACCUM_DELAY_OF_LVL1;
-			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = lvl*RESH_ACCUM_DELAY_OF_LVL1;
+		for (int lvl=1; lvl<MyConfig::height; lvl++) {
+			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float (lvl*BU_ACCUM_DELAY_OF_LVL1);
+			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float (lvl*RESH_ACCUM_DELAY_OF_LVL1);
 		}
 
 		MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
