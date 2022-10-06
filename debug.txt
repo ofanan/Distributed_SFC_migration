@@ -1,0 +1,28 @@
+
+t30599_Async_cpu122_p0.0_sd-1_stts1 | cpu_cost=622593 | link_cost = 0 | mig_cost=0 | tot_cost=622593 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=1
+t30599_Async_cpu121_p0.1_sd-1_stts1 | cpu_cost=628037 | link_cost = 0 | mig_cost=0 | tot_cost=628037 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu112_p0.2_sd-1_stts1 | cpu_cost=670987 | link_cost = 0 | mig_cost=0 | tot_cost=670987 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=1
+t30599_Async_cpu119_p0.3_sd-1_stts1 | cpu_cost=638374 | link_cost = 0 | mig_cost=0 | tot_cost=638374 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu123_p0.4_sd-1_stts1 | cpu_cost=644901 | link_cost = 0 | mig_cost=0 | tot_cost=644901 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu126_p0.5_sd-1_stts1 | cpu_cost=638545 | link_cost = 0 | mig_cost=0 | tot_cost=638545 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu133_p0.6_sd-1_stts1 | cpu_cost=625207 | link_cost = 0 | mig_cost=0 | tot_cost=625207 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu138_p0.7_sd-1_stts1 | cpu_cost=610488 | link_cost = 0 | mig_cost=0 | tot_cost=610488 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu153_p0.8_sd-1_stts1 | cpu_cost=608466 | link_cost = 0 | mig_cost=0 | tot_cost=608466 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu170_p0.9_sd-1_stts1 | cpu_cost=653000 | link_cost = 0 | mig_cost=0 | tot_cost=653000 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+t30599_Async_cpu171_p1.0_sd-1_stts1 | cpu_cost=732434 | link_cost = 0 | mig_cost=0 | tot_cost=732434 | ratio=[1.00 0.00 0.00] | num_usrs=2912 | num_crit_usrs=0 | resh=-1 | blocked=0
+
+Error: Model error: error: traceT=30030.000, sim t=31.0000: ChainsMaster::concludeTimePeriod. encounterd unplaced c1024 -- in module (SimController) Lux.sim_controller (id=2), at t=31s, event #36174
+s100 : traceTime=30029.000000. finished BU-f. Rcs=224, a=54, used cpu=170, num_of_placed_chains=10 chains [,212,230,232,932,1024,1053,1824,2091,2607,2813,] 
+ln. 1802: 
+traceTime=30029.000, BUPU results (skipping empty DCs):
+s100 : Rcs=224, a=37, used cpu=187, num_of_placed_chains=11 chains [,212,230,232,932,1024,1053,1824,2086,2091,2607,2813,] 
+ln. 1896: s100 : Rcs=224, a=37, used cpu=187, num_of_placed_chains=11 chains [,212,230,232,932,1024,1053,1824,2086,2091,2607,2813,] 
+t30030:
+c1024 is pot-placed of s1793. 
+s1793 : finished BU. notAssigned=, Rcs=112, a=78, used cpu=34, num_of_placed_chains=0 chains [,] potPlaced=[,1024,2333,] pushUpList: 2333,1024,Chains that
+c1024 in PUL of s1793, s215, s58, s14, s3, s0. 
+The prob': maybe s1793, which pot-placed s1793, never recevies a PUL-Nack for it.
+
+
+
+

@@ -292,7 +292,7 @@ void Datacenter::handleMessage (cMessage *msg)
 	int pktLen;
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
-		int pktLen=int(pktPtr->getByteLength());
+		pktLen=int(pktPtr->getByteLength());
 		if (pktLen>0) {
 			sprintf (buf, "\ns%d : rcvd pkt of len=%d, delay=%f", dcId, pktLen, (pktPtr->getCreationTime()-simTime()).dbl());	
 			printBufToLog ();
@@ -322,7 +322,12 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "bottomUp")==0) {
 	  isInBuAccumDelay = false;
-  	bottomUp();
+		if (isInFMode){
+  		bottomUpFMode();
+  	}
+  	else {
+  		bottomUp();
+  	}
 	}
   else if (strcmp (msg->getName(), "errorMsg")==0) {
  		printBufToLog ();
@@ -866,7 +871,7 @@ Handle a bottomUP pkt, when running in Async mode:
 void Datacenter::handleBottomUpPktAsync ()
 {
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		snprintf (buf, bufSize, "\ns%d : handling a BU pkt. src=s%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
 		MyConfig::printToLog (", pushUpList=");
@@ -876,7 +881,6 @@ void Datacenter::handleBottomUpPktAsync ()
 	if (isInBuAccumDelay) {
 		return;
 	}	
-//	bottomUp (); //$$$$
 	isInBuAccumDelay = true;
 	scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("bottomUp")); //schedule a run of bottomUp
 }
@@ -894,7 +898,7 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 			snprintf (buf, bufSize, "\ns%d : rding BU pkt from s%d during accum delay", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 			printBufToLog ();
 		}
-		return rdBottomUpPkt ();
+		return handleBottomUpPktAsync ();
 	}
 
 	if (withinResh ()) {
@@ -969,7 +973,7 @@ void Datacenter::rdBottomUpPkt ()
 	}
 	
 	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : finished reading a BU pkt from s%d. notAssigned=", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+		sprintf (buf, "\ns%d : t=%f. finished reading a BU pkt from s%d. notAssigned=", dcId, simTime().dbl(), ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 		printBufToLog ();
 		MyConfig::printToLog (notAssigned);
 		MyConfig::printToLog (" pushUpList=");

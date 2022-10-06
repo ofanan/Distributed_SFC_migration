@@ -37,7 +37,7 @@ bool  MyConfig::measureRunTime;
 int   MyConfig::byteLengthOfreshAsyncPktFields;
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
+float beginVeryDetailedLogAtTraceTime = 30029; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 vector <uint32_t> MyConfig::pktCnt; // MyConfig::pktCnt[i] will hold the # of pkts sent in direction i
 vector <uint64_t> MyConfig::bitCnt; // MyConfig::bitCnt[i] will hold the # of bits sent in direction i
 
@@ -322,15 +322,14 @@ void SimController::openFiles ()
 
 	if (MyConfig::runningRtProbSim) {
 		if (MyConfig::netType==MonacoIdx) {
-			RtSimResFileName = "Monaco_RtProb_1secs.res";
+			RtSimResFileName = "dist_Monaco_RtProb_1secs.res";
 		}
 		else if (MyConfig::netType==LuxIdx) {
-			RtSimResFileName = "Lux_RtProb_1secs.res";
+			RtSimResFileName = "dist_Lux_RtProb_1secs.res";
 		}
 		else {
 			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
 		}
-//		RtSimResFile = ofstream (RtSimResFileName);
 	  RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
 	}
 
@@ -682,7 +681,7 @@ void SimController::concludeTimePeriod ()
 	if (MyConfig::DEBUG_LVL > 0) {
 		for (DcId_t dcId(0); dcId<numDatacenters; dcId++) {
 			if (!datacenters[dcId]->potPlacedChains.empty()) {
-				error ("t=%f. potPlacedChains of DC %d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
+				error ("t=%f. potPlacedChains of s%d is not empty at SimController::concludeTimePeriod\n", MyConfig::traceTime, dcId);
 			}
 		}
 	}
@@ -1047,7 +1046,7 @@ void SimController::preparePartialReshSync (DcId_t dcId, DcId_t leafId)
 	}
 	rlzRsrcOfChains (chainsToReplace);
 	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nSimCtrlr calling DC %d.initBottomUp with vecOfChainsThatJoined=", dcId);
+		snprintf (buf, bufSize, "\nSimCtrlr calling s%d.initBottomUp with vecOfChainsThatJoined=", dcId);
 		printBufToLog ();
 		MyConfig::printToLog (vecOfUsrsOfThisPoA);
 	}
@@ -1077,7 +1076,7 @@ void SimController::initAlgSync ()
 	for (auto item : chainsThatJoinedLeaf)
 	{
 		if (MyConfig::LOG_LVL==2) {
-			sprintf (buf, "Chains that joined dc %d", item.first); 
+			sprintf (buf, "\nChains that joined s%d", item.first); 
 			printBufToLog ();
 		}
 		leaves[item.first]->initBottomUp (item.second);
@@ -1110,7 +1109,7 @@ void SimController::initAlgAsync ()
 	for (auto item : chainsThatJoinedLeaf)
 	{
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			sprintf (buf, "Chains that joined dc %d", item.first); 
+			sprintf (buf, "Chains that joined s%d: ", item.first); 
 			printBufToLog ();
 		}
 		leaves[item.first]->initBottomUp (item.second);
@@ -1129,11 +1128,11 @@ void SimController::finishedAlg (DcId_t dcId, DcId_t leafId)
 
 	Enter_Method ("SimController::finishedAlg (DcId_t dcId, DcId_t)");
 	if (MyConfig::DEBUG_LVL>0 && MyConfig::mode==Async) {
-		error ("t = %f DC %d called finishedAlg in Async mode", MyConfig::traceTime, dcId);
+		error ("t = %f s%d called finishedAlg in Async mode", MyConfig::traceTime, dcId);
 	}
 	rcvdFinishedAlgMsgFromLeaves [leafId] = true; 
 	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-		snprintf (buf, bufSize, "\nrcvd fin alg msg from DC %d leaf %d", dcId, leafId);
+		snprintf (buf, bufSize, "\nrcvd fin alg msg from s%d leaf %d", dcId, leafId);
 		MyConfig::printToLog (buf);
 	}
 	
