@@ -194,16 +194,16 @@ void Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printCha
 	Enter_Method ("Datacenter::print (bool printPotPlaced, bool printPushUpList, bool printChainIds, bool beginWithNewLine)");
 
 	if (placedChains.empty() && (!printPotPlaced || potPlacedChains.empty()) && (!printPushUpList || pushUpList.empty())) {
-//		sprintf (buf, "\ns%d : empty", dcId);
-//		printBufToLog ();
+		// sprintf (buf, "\ns%d : empty", dcId);
+		// printBufToLog ();
 		return;
 	}
 	if (beginWithNewLine) {
-		snprintf (buf, bufSize, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
-														dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
+		sprintf (buf, "\ns%d : Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", 
+									  dcId, cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
 	}
 	else {
-		snprintf (buf, bufSize, " Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
+		sprintf (buf, " Rcs=%d, a=%d, used cpu=%d, num_of_placed_chains=%d", cpuCapacity, availCpu, cpuCapacity-availCpu, int(placedChains.size()) );
 	}
 	printBufToLog ();
 	if (printChainIds) {
@@ -696,7 +696,7 @@ void Datacenter::bottomUpFMode ()
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
 //					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
-						sprintf (buf, "\ns%d : blocked chain %d", dcId, chainPtr->id);
+						sprintf (buf, "\ns%d : simT=%.3f. blocked c%d", dcId, simTime().dbl(), chainPtr->id);
 						printBufToLog ();
 //					} //$$
 					chainPtr = notAssigned.erase (chainPtr); 
@@ -719,7 +719,7 @@ void Datacenter::bottomUpFMode ()
 	} // end for
 	
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : traceTime=%f. finished BU-f.", dcId, MyConfig::traceTime);
+		snprintf (buf, bufSize, "\ns%d : traceTime=%.0f. finished BU-f.", dcId, MyConfig::traceTime);
 		printBufToLog ();
 		print (false, true, true, false);
 	}
@@ -744,7 +744,7 @@ Handle a failure to place an old (exiting) chain
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
 	if (MyConfig::LOG_LVL>0) {
-		sprintf (buf, "\ntraceTime=%.3f, s%d : error : failed to place old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
+		sprintf (buf, "\ntraceTime=%.0f, s%d : error : failed to place old chain %d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
 		printBufToLog ();
 	}	
 	simController-> handleAlgFailure ();
@@ -1151,7 +1151,7 @@ void Datacenter::initReshAsync ()
 		return bottomUpFMode ();
 	}
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : *** simT=%.6f init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
+		snprintf (buf, bufSize, "\ns%d : *** simT=%.4f init resh at lvl %d. pushDwnReq=", dcId, simTime().dbl(), lvl);
 		printBufToLog();
 		MyConfig::printToLog (pushDwnReq);
 	}
@@ -1245,10 +1245,10 @@ void Datacenter::insertMyAssignedChainsIntoPushDwnReq ()
 	for (ChainId_t chainId : placedChains) {
 		if (!ChainsMaster::findChain (chainId, chain)) {
 			if (chain.S_u.size()==0) {
-				error ("traceTime=%f: insertMyAssignedChainsIntoPushDwnReq () : placed chain %d has S_u_len=0%", MyConfig::traceTime, chainId);
+				error ("traceTime=%.3f: insertMyAssignedChainsIntoPushDwnReq () : placed chain %d has S_u_len=0%", MyConfig::traceTime, chainId);
 			}
 			else {
-				error ("traceTime=%f: insertMyAssignedChainsIntoPushDwnReq () : placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
+				error ("traceTime=%.3f: insertMyAssignedChainsIntoPushDwnReq () : placed chain %d was not found in ChainMaster", MyConfig::traceTime, chainId);
 			}
 		}
 		Chain chain2insert = chain;
@@ -1726,7 +1726,7 @@ After sending the pkt, pushDwnAck is clear.
 void Datacenter::sndReshAsyncPktToPrnt ()
 {
 	if (MyConfig::LOG_LVL >= DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : snding to prnt", dcId);
+		snprintf (buf, bufSize, "\ns%d : simT=%.3f, snding to prnt", dcId, simTime().dbl());
 		printBufToLog ();
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog (" pushDwnAck=");
