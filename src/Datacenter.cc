@@ -122,7 +122,6 @@ void Datacenter::initialize(int stage)
 		return;
 	}
 	
-	MY_ACCUMULATION_DELAY = ACCUMULATION_DELAY * (1+float(lvl/2));
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
@@ -138,7 +137,7 @@ void Datacenter::initialize(int stage)
 *************************************************************************************************************************************************/
 void Datacenter::scheduleErrMsgAndExit ()
 {
-	scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("errorMsg")); 
+	scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("errorMsg")); 
 }
 
 /*************************************************************************************************************************************************
@@ -713,7 +712,7 @@ void Datacenter::bottomUpFMode ()
 					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
 					printBufToLog ();
 				}	
-				return scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //schedule a reshuffle
+				return scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
 			}
 		} // end case of not enough avail capacity
 	} // end for
@@ -834,7 +833,7 @@ void Datacenter::bottomUp ()
 					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
 					printBufToLog ();
 				}	
-				return scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
+				return scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
 			}
 		} // end case of not enough avail capacity
 	} // end "for each chain ...loop"
@@ -882,7 +881,7 @@ void Datacenter::handleBottomUpPktAsync ()
 		return;
 	}	
 	isInBuAccumDelay = true;
-	scheduleAt (simTime() + MY_ACCUMULATION_DELAY, new cMessage ("bottomUp")); //schedule a run of bottomUp
+	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); //schedule a run of bottomUp
 }
 
 /*************************************************************************************************************************************************
