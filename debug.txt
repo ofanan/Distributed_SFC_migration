@@ -21,3 +21,4 @@ ChainsMasterData:
 Also: should add a check whether a placed chain is actually blocked.
 
 Need to send info about blocked chain down, to verify that it's not placed somewhere below.
+Also: seems we have to wait b4 running finReshAsync after sending reshAsyncReq to the last child.

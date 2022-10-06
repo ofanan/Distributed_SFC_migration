@@ -642,7 +642,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			pkt->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-				sprintf (buf, "\n s%d : snding PU pkt to child %d. simTime=%f, PUL=", dcId, dcIdOfChild[child], simTime().dbl());
+				sprintf (buf, "\n s%d : simT=%f, snding PU pkt to child %d. PUL=", dcId, simTime().dbl(), dcIdOfChild[child]);
 				printBufToLog ();
 				for (int i(0); i<idxInPushUpVec; i++) {
 					Chain chain2print = pkt-> getPushUpVec (i);
@@ -1298,7 +1298,8 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 
 		// now we know that pushDwnReqFromChild isn't empty
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-      sprintf (buf, "\ns%d snding reshAsync pkt to child %d, dcId=%d", dcId, nxtChildToSndReshAsync, dcIdOfChild[nxtChildToSndReshAsync]);
+      sprintf (buf, "\ns%d : simT=%.3f, snding reshAsync pkt to child %d, dcId=%d", 
+      								dcId, simTime().dbl(), nxtChildToSndReshAsync, dcIdOfChild[nxtChildToSndReshAsync]);
 	    printBufToLog ();
 			MyConfig::printToLog (". pushDwnReq=");
 			MyConfig::printToLog (pushDwnReqFromChild);

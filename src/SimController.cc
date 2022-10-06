@@ -35,6 +35,9 @@ bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
 int   MyConfig::byteLengthOfreshAsyncPktFields;
+vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
+vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
+
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
 float beginVeryDetailedLogAtTraceTime = 30023; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
@@ -85,14 +88,14 @@ void SimController::initialize (int stage)
 		MyConfig::manuallySetPktSize = bool   (par ("manuallySetPktSize"));
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
-		MyConfig::logDelays					 = bool   (par ("logDelays"));	
+		MyConfig::logDelays					 = bool   (par ("logDelays"));
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
 		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh 	   	 = false;
 		MyConfig::measureRunTime   	 = true;
-
+		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}
@@ -107,6 +110,21 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
+  
+  	double BU_ACCUM_DELAY_OF_LVL1			 = double (par ("BU_ACCUM_DELAY_OF_LVL1"));
+		double RESH_ACCUM_DELAY_OF_LVL1		 = double (par ("RESH_ACCUM_DELAY_OF_LVL1"));
+		
+		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
+
+		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] = 0;
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] = 0;
+
+		for (int lvl=1; lvl<height; lvl++) {
+			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = lvl*BU_ACCUM_DELAY_OF_LVL1;
+			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = lvl*RESH_ACCUM_DELAY_OF_LVL1;
+		}
+
 		MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 		srand(seed); // set the seed of random num generation
 		updateCpuAtLvl ();
@@ -118,6 +136,8 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     updateRtChainRandInt ();
+    
+    
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -946,7 +966,7 @@ void SimController::checkChainsMasterData ()
 			}
 			if (chain.curDc != dcId) {
 				if (chain.isBlocked) {
-					error ("\ntraceT=%f : blocked c%d is still placed s%d", MyConfig::traceTime, chainId, dcId);
+					error ("\ntraceT=%f : blocked c%d is still placed on s%d", MyConfig::traceTime, chainId, dcId);
 				}
 				error ("\ntraceT=%f : checkChainsMasterData() : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", 
 								MyConfig::traceTime, chainId, dcId, chain.curDc);
