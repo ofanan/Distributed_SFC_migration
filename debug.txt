@@ -1,24 +1,3 @@
-traceT=30024.000000 : checkChainsMasterData() : c160 found in s101.placedChain is recorded in ChainsMaster as placed on s-1 -- in module (SimController) 
-t = 30023:
-S160 was placed on s5. 
+running Async_cpu123_p0.5_sd2. debug lvl=2, log lvl=0, sim len=999999
+traceT=30005.000000 : blocked c1007 is still placed on s101 -- in module (SimController) Lux.sim_controller (id=2), at t=6s, event #11807
 
-t = 30024:
-s1597 : rcvd vecOfChainsThatJoined=,160. 
-c160 notAssigned in s1597, s101, s26, s6, s1, s0.
-s0 : blocked chain 160
-So wy isn't that reflected in ChainsMasterData?
-But how is it blocked, if it was already placed on s160 in the previous period?
-Because it's a chain that left, and re-joined as "new".
-
-ln. 5264: 
-s0 : blocked chain 160
-ln. 5940: 
-c160 still appears in s101's placed chains. Why wasn't it removed as a "chain that left"?
-Probably because it didn't appear in the chainsmaster. 
-At t = 30023:
-ChainsMasterData:
-
-Also: should add a check whether a placed chain is actually blocked.
-
-Need to send info about blocked chain down, to verify that it's not placed somewhere below.
-Also: seems we have to wait b4 running finReshAsync after sending reshAsyncReq to the last child.
