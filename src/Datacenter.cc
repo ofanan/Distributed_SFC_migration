@@ -905,11 +905,8 @@ void Datacenter::handleBottomUpPktAsync ()
 		return;
 	}	
 	isInBuAccumDelay = true;
-	// schedule a BU run
-//	if (bottomUpEvent!=nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
-//		cancelAndDelete (bottomUpEvent);
-//	}
-	if (bottomUpEvent==nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
+	// if there isn't any scheduled BU run, schedule a run
+	if (bottomUpEvent==nullptr) {
 		bottomUpEvent = new cMessage ("bottomUp");
 		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
 	}
