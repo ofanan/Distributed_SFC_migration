@@ -714,9 +714,7 @@ void Datacenter::bottomUpFMode ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				isInAccumDelay				 = true;
-				return scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
-//				scheduleInitReshAsync (); //###
-//				return;
+				return scheduleInitReshAsync (); //###
 			}
 		} // end case of not enough avail capacity
 	} // end for
@@ -833,8 +831,7 @@ void Datacenter::bottomUp ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				isInAccumDelay				 = true;
-				return scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
-//								scheduleInitReshAsync ();
+				return scheduleInitReshAsync ();
 			}
 		} // end case of not enough avail capacity
 	} // end "for each chain ...loop"
