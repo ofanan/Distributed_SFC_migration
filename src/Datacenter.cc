@@ -56,7 +56,14 @@ Datacenter::~Datacenter()
   }
 	if (endFModeEvent != nullptr) {
 	  cancelAndDelete (endFModeEvent);
-	  cancelAndDelete (bottomUpEvent);
+	}
+	// Causes segfault
+	if (bottomUpEvent != nullptr) {
+		if (bottomUpEvent->isScheduled()) {
+		  cancelAndDelete (bottomUpEvent);
+		}
+	}
+	if (reshAsyncEvent != nullptr) {
 	  cancelAndDelete (reshAsyncEvent);
 	}
 }
@@ -322,6 +329,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	initReshAsync (); 
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "bottomUp")==0) {
+  	bottomUpEvent = nullptr;
 	  isInBuAccumDelay = false;
 		if (isInFMode){
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
@@ -869,9 +877,9 @@ void Datacenter::scheduleInitReshAsync ()
 		printBufToLog ();
 	}	
 	if (reshAsyncEvent == nullptr) {
-		if (bottomUpEvent != nullptr) {
-		 	cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
-		}
+//		if (bottomUpEvent != nullptr) {
+//		 	cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
+//		}
 		reshAsyncEvent = new cMessage ("initReshAsync");
 		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
 	}			
@@ -898,10 +906,11 @@ void Datacenter::handleBottomUpPktAsync ()
 	}	
 	isInBuAccumDelay = true;
 	// schedule a BU run
-//	if (bottomUpEvent==nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
-		bottomUpEvent = new cMessage ("bottomUp");
-		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
+//	if (bottomUpEvent!=nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
+//		cancelAndDelete (bottomUpEvent);
 //	}
+	bottomUpEvent = new cMessage ("bottomUp");
+	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
 }
 
 /*************************************************************************************************************************************************
