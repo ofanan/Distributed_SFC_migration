@@ -1,0 +1,9 @@
+Also: should add a check whether a placed chain is actually blocked.
+
+Need to send info about blocked chain down, to verify that it's not placed somewhere below.
+
+Cur prob': when 
+**.sim_controller.BU_ACCUM_DELAY_OF_LVL1   = 0.002 
+**.sim_controller.RESH_ACCUM_DELAY_OF_LVL1 = 0.0012
+no prob', when pr=0, sd=1, and cpu192.
+
