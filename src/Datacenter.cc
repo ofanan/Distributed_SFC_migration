@@ -714,8 +714,9 @@ void Datacenter::bottomUpFMode ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				isInAccumDelay				 = true;
-				scheduleInitReshAsync ();
-				return;
+				return scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
+//				scheduleInitReshAsync (); //###
+//				return;
 			}
 		} // end case of not enough avail capacity
 	} // end for
@@ -832,7 +833,8 @@ void Datacenter::bottomUp ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				isInAccumDelay				 = true;
-				scheduleInitReshAsync ();
+				return scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
+//								scheduleInitReshAsync ();
 			}
 		} // end case of not enough avail capacity
 	} // end "for each chain ...loop"
@@ -869,12 +871,12 @@ void Datacenter::scheduleInitReshAsync ()
 		sprintf (buf, "\ns%d : simT=%.3f, scheduling initReshAsync", dcId, simTime().dbl());
 		printBufToLog ();
 	}	
-	if (reshAsyncEvent == nullptr) {
+//	if (reshAsyncEvent == nullptr) {
 		//schedule a reshuffle
 		//cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
-		reshAsyncEvent = new cMessage ("initReshAsync");
-		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
-	}			
+//		reshAsyncEvent = new cMessage ("initReshAsync");
+		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
+//	}			
 }
 
 /*************************************************************************************************************************************************
@@ -899,8 +901,8 @@ void Datacenter::handleBottomUpPktAsync ()
 	isInBuAccumDelay = true;
 			//schedule a BU run
 	//if (bottomUpEvent==nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
-		bottomUpEvent = new cMessage ("bottomUp");
-		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); //schedule a reshuffle
+//		bottomUpEvent = new cMessage ("bottomUp");
+		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); //schedule a reshuffle
 	//}
 }
 

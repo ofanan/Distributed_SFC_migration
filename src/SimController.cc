@@ -40,7 +40,6 @@ vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
 
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 vector <uint32_t> MyConfig::pktCnt; // MyConfig::pktCnt[i] will hold the # of pkts sent in direction i
 vector <uint64_t> MyConfig::bitCnt; // MyConfig::bitCnt[i] will hold the # of bits sent in direction i
 
@@ -73,15 +72,10 @@ void SimController::initialize (int stage)
 
   if (stage==0) {
 		network         					 	 = (cModule*) (getParentModule ()); 
- 		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));
+ 		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));	
 		numLeaves       					 	 = (DcId_t)   (network -> par ("numLeaves"));
 		MyConfig::height       		 	 = (Lvl_t)    (network -> par ("height"));
-		
 		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
-		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
-		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
-		MyConfig::byteLengthOfNonRtChain   = par ("byteLengthOfNonRtChain");
-    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
 		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
 		seed				    						 = int (par ("seed"));
     simLenInSec           			 = double (par ("simLenInSec"));
@@ -95,6 +89,12 @@ void SimController::initialize (int stage)
 		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 		MyConfig::useFullResh 	   	 = false;
 		MyConfig::measureRunTime   	 = true;
+
+		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
+		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
+		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
+		MyConfig::byteLengthOfNonRtChain   = par ("byteLengthOfNonRtChain");
+    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
 		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -111,14 +111,13 @@ void SimController::initialize (int stage)
 	
   if (stage==1) {
   
-  	double BU_ACCUM_DELAY_OF_LVL1			 = double (par ("BU_ACCUM_DELAY_OF_LVL1"));
-		double RESH_ACCUM_DELAY_OF_LVL1		 = double (par ("RESH_ACCUM_DELAY_OF_LVL1"));
-		
 		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 
-		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] = 0.0;
-		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] = 0.0;
+  	double BU_ACCUM_DELAY_OF_LVL1			 		= double (par ("BU_ACCUM_DELAY_OF_LVL1"));
+		double RESH_ACCUM_DELAY_OF_LVL1		 		= double (par ("RESH_ACCUM_DELAY_OF_LVL1"));		
+		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] 	= 0.0;
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] 	= 0.0;
 
 		for (int lvl=1; lvl<MyConfig::height; lvl++) {
 			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float (lvl*BU_ACCUM_DELAY_OF_LVL1);
