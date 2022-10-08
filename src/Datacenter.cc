@@ -868,12 +868,11 @@ void Datacenter::scheduleInitReshAsync ()
 		sprintf (buf, "\ns%d : simT=%.3f, scheduling initReshAsync", dcId, simTime().dbl());
 		printBufToLog ();
 	}	
-//	if (reshAsyncEvent == nullptr) {
-		//schedule a reshuffle
-		//cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
-//		reshAsyncEvent = new cMessage ("initReshAsync");
-		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
-//	}			
+	if (reshAsyncEvent == nullptr) {
+		// cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
+		reshAsyncEvent = new cMessage ("initReshAsync");
+		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
+	}			
 }
 
 /*************************************************************************************************************************************************
