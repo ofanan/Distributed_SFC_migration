@@ -56,6 +56,8 @@ Datacenter::~Datacenter()
   }
 	if (endFModeEvent != nullptr) {
 	  cancelAndDelete (endFModeEvent);
+	  cancelAndDelete (bottomUpEvent);
+	  cancelAndDelete (reshAsyncEvent);
 	}
 }
 
@@ -322,6 +324,10 @@ void Datacenter::handleMessage (cMessage *msg)
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "bottomUp")==0) {
 	  isInBuAccumDelay = false;
 		if (isInFMode){
+			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+					sprintf (buf, "\ns%d : simT=%.3f, calling bottomUpFMode from handleMsg", dcId, simTime().dbl());
+					printBufToLog ();	
+			}
   		bottomUpFMode();
   	}
   	else {
@@ -694,10 +700,10 @@ void Datacenter::bottomUpFMode ()
 					if (!ChainsMaster::blockChain (chainPtr->id)) {
 						error ("s%d tried to block chain %d that wasn't found in ChainsMaster", dcId, chainPtr->id);
 					}
-//					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { //$$
+					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { 
 						sprintf (buf, "\ns%d : simT=%.3f. blocked c%d", dcId, simTime().dbl(), chainPtr->id);
 						printBufToLog ();
-//					} //$$
+					} 
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
@@ -708,17 +714,14 @@ void Datacenter::bottomUpFMode ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				isInAccumDelay				 = true;
-				if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
-					printBufToLog ();
-				}	
-				return scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //schedule a reshuffle
+				scheduleInitReshAsync ();
+				return;
 			}
 		} // end case of not enough avail capacity
 	} // end for
 	
 	if (MyConfig::LOG_LVL>=DETAILED_LOG) {
-		snprintf (buf, bufSize, "\ns%d : traceTime=%.0f. finished BU-f.", dcId, MyConfig::traceTime);
+		snprintf (buf, bufSize, "\ns%d : simT=%.3f. finished BU-f.", dcId, simTime().dbl());
 		printBufToLog ();
 		print (false, true, true, false);
 	}
@@ -829,11 +832,7 @@ void Datacenter::bottomUp ()
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
 				isInAccumDelay				 = true;
-				if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-					sprintf (buf, "\ns%d : schedule initReshAsync", dcId);
-					printBufToLog ();
-				}	
-				return scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); //reshuffle, after clearance delay (for letting other children call me)
+				scheduleInitReshAsync ();
 			}
 		} // end case of not enough avail capacity
 	} // end "for each chain ...loop"
@@ -862,6 +861,23 @@ void Datacenter::bottomUp ()
 }
 
 /*************************************************************************************************************************************************
+If there isn't an already-scheduled initReshAsync event, schedule such an event
+*************************************************************************************************************************************************/
+void Datacenter::scheduleInitReshAsync ()
+{
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+		sprintf (buf, "\ns%d : simT=%.3f, scheduling initReshAsync", dcId, simTime().dbl());
+		printBufToLog ();
+	}	
+	if (reshAsyncEvent == nullptr) {
+		//schedule a reshuffle
+		//cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
+		reshAsyncEvent = new cMessage ("initReshAsync");
+		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
+	}			
+}
+
+/*************************************************************************************************************************************************
 Handle a bottomUP pkt, when running in Async mode:
 - Write log messages, if needed.
 - Read the pkt's content into this->notAssigned, and this->pushUpList.
@@ -881,7 +897,11 @@ void Datacenter::handleBottomUpPktAsync ()
 		return;
 	}	
 	isInBuAccumDelay = true;
-	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); //schedule a run of bottomUp
+			//schedule a BU run
+	//if (bottomUpEvent==nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
+		bottomUpEvent = new cMessage ("bottomUp");
+		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); //schedule a reshuffle
+	//}
 }
 
 /*************************************************************************************************************************************************
@@ -947,6 +967,10 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 		MyConfig::printToLog (notAssigned);
 		MyConfig::printToLog (", pushUpList=");
 		MyConfig::printToLog (pushUpList, false);
+	}
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+			sprintf (buf, "\ns%d : simT=%.3f, calling bottomUpFMode from handleBottomUpPktAsyncFMode", dcId, simTime().dbl());
+			printBufToLog ();	
 	}
 	bottomUpFMode();
 }
@@ -1214,6 +1238,9 @@ void Datacenter::reshAsync ()
 		MyConfig::printToLog (pushDwnReq);
 	}
 
+//    if (MyConfig::traceTime>=3005 && dcId==26 && simTime().dbl() > 5.0024) { //$$$$
+//        cout << "dummy";
+//    }
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
 		return finReshAsync ();
@@ -1325,11 +1352,15 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + MyConfig::byteLengthOfreshAsyncPktFields); 
 		
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
+//		if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
+//			sprintf (buf, "\ns%d : simT=%.3f, sent reshAsync pkt to child %d", dcId, simTime().dbl(), nxtChildToSndReshAsync);
+//			printBufToLog ();
+//		}
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
 	}
 	if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
-		snprintf (buf, bufSize, "\ns%d : finished sending to all children", dcId);
+		sprintf (buf, "\ns%d : simT=%.3f, finished sending to all children", dcId, simTime().dbl());
 		printBufToLog ();
 	}
 	return false; // no additional relevant child to send to
@@ -1389,6 +1420,8 @@ void Datacenter::rst ()
 
 	rstReshAsync ();
 	endFModeEvent    = nullptr; 
+	bottomUpEvent    = nullptr; 
+	reshAsyncEvent   = nullptr; 
 	isInFMode 		   = false;
 	isInAccumDelay   = false;
 	isInBuAccumDelay = false;
@@ -1556,8 +1589,8 @@ Handle a reshuffle async pkt, received from a child.
 *************************************************************************************************************************************************/
 void Datacenter::handleReshAsyncPktFromChild ()
 {
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		sprintf (buf, "\ns%d : in handleReshAsyncPktFromChild", dcId);
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+		sprintf (buf, "\ns%d : simtT=%.3f, in handleReshAsyncPktFromChild", dcId, simTime().dbl());
 		printBufToLog ();
 	}
 	ReshAsyncPkt *pkt = (ReshAsyncPkt*)(curHandledMsg);
@@ -1637,6 +1670,10 @@ void Datacenter::finReshAsync ()
 			error ("t%f s%d b4 calling sndReshAsyncToPrnt I have this->reshInitiatorLvl==-1", MyConfig::traceTime, dcId);
 		}
 		sndReshAsyncPktToPrnt ();
+	}
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+			sprintf (buf, "\ns%d : simT=%.3f, calling bottomUpFMode from finReshAsync", dcId, simTime().dbl());
+			printBufToLog ();	
 	}
 	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode //$$$ maybe this should be called only if I'm the initiator?
 	rstReshAsync ();

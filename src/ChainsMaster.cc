@@ -265,13 +265,13 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, Chai
 		}
 		if (MyConfig::DEBUG_LVL>0 && it->second.curLvl == UNPLACED_LVL) {
 			errChainId = it->second.id;
-			sprintf (buf, "\nsimT=%.3f, error: ChainsMaster::concludeTimePeriod encountered chain %d which is unplaced\n", simTime().dbl(), it->second.id);
+			sprintf (buf, "\nsimT=%.3f, error: ChainsMaster::concludeTimePeriod encountered c%d which is unplaced\n", simTime().dbl(), it->second.id);
 			MyConfig::printToLog (buf); 
 			return 1;
 		}
     if ((int)(it->second.S_u).size()<(it->second.curLvl-1)) {
 				errChainId = it->second.id;
-				sprintf (buf, "\nsimT=%.3f, error: ChainsMaster::concludeTimePeriod encountered problematic chain %d:\n", simTime().dbl(), it->second.id);
+				sprintf (buf, "\nsimT=%.3f, error: ChainsMaster::concludeTimePeriod encountered problematic c%d:\n", simTime().dbl(), it->second.id);
 				MyConfig::printToLog (buf); 
         return 2;
     }
