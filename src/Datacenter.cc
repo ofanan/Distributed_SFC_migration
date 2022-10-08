@@ -877,9 +877,9 @@ void Datacenter::scheduleInitReshAsync ()
 		printBufToLog ();
 	}	
 	if (reshAsyncEvent == nullptr) {
-//		if (bottomUpEvent != nullptr) {
-//		 	cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
-//		}
+		if (bottomUpEvent != nullptr) {
+		 	cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
+		}
 		reshAsyncEvent = new cMessage ("initReshAsync");
 		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
 	}			
