@@ -83,8 +83,6 @@ class MyConfig {
 		static bool logDelays;
 		static int  byteLengthOfRtChain, byteLengthOfNonRtChain, byteLengthOfHeader;
 		static int  byteLengthOfreshAsyncPktFields;
-	  static vector <float> BU_ACCUM_DELAY_OF_LVL;
-	  static vector <float> RESH_ACCUM_DELAY_OF_LVL;
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static bool randomlySetChainType;
@@ -135,5 +133,6 @@ class MyConfig {
 };
 
 #endif
+
 
 
