@@ -6,4 +6,11 @@ Cur prob': when
 **.sim_controller.BU_ACCUM_DELAY_OF_LVL1   = 0.002 
 **.sim_controller.RESH_ACCUM_DELAY_OF_LVL1 = 0.0012
 no prob', when pr=0, sd=1, and cpu192.
+However, uncommenting
+//	if (bottomUpEvent==nullptr) {// && reshAsyncEvent==nullptr) { // if there's already a scheduled BU event/reshAsync event, no need to schedule a new one
+		bottomUpEvent = new cMessage ("bottomUp");
+		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
+//	}
+causes:
+<!> Error: Model error: error: traceT=30002.000, sim t=3.0000: ChainsMaster::concludeTimePeriod. encounterd unplaced c2903 -- in module (SimController) 
 

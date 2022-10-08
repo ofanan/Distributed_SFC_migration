@@ -186,7 +186,7 @@ void MyConfig::printToLog (list <Chain> list2print, bool printLvl)
 // print all the chain's data
 void MyConfig::printToLog (Chain chain)
 {
-	logFile << "c " << chain.id << ", l=" << chain.curLvl << ", curDc=" << chain.curDc << " S_u="; 
+	logFile << "c" << chain.id << ", l=" << chain.curLvl << ", curDc=" << chain.curDc << " S_u="; 
 	printToLog (chain.S_u);
 }
 
@@ -241,15 +241,15 @@ void MyConfig::printToLog (vector <Chain> vec)
 {
 	logFile  << ",";
 	for (const auto &chain : vec) {
-		logFile << chain.id << ",";
+		logFile << "c" << chain.id << ",";
 	}
 }
 
 void MyConfig::printToLog (vector <ChainId_t> vec) 
 {
 	logFile << ",";
-	for (const auto i : vec) {
-		logFile << i << ",";
+	for (const auto chainId : vec) {
+		logFile << "c" << chainId << ",";
 	}
 }
 
