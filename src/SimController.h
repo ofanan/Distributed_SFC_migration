@@ -140,8 +140,7 @@ class SimController : public cSimpleModule
 
 		void continueBinSearch (); // After a failure / succesfully finishing the whole trace, this func' is called, to continue the binary search
     
-    // Parameters and functions used for debugging
-		float beginVeryDetailedLogAtTraceTime; // time in which the simulation will begin to log many details. Used for debugging.
+    // Functions used for debugging
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
     void checkDcsEndTimePeriod (); // Sanity check for the DCs when concluding a time period
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
