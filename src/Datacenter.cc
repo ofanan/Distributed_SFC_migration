@@ -57,7 +57,6 @@ Datacenter::~Datacenter()
 	if (endFModeEvent != nullptr) {
 	  cancelAndDelete (endFModeEvent);
 	}
-	// Causes segfault
 	if (bottomUpEvent != nullptr) {
 		if (bottomUpEvent->isScheduled()) {
 		  cancelAndDelete (bottomUpEvent);
@@ -325,6 +324,7 @@ void Datacenter::handleMessage (cMessage *msg)
   	endFModeEvent = nullptr; 
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "initReshAsync")==0) {
+  	reshAsyncEvent = nullptr;
   	isInAccumDelay = false;
   	initReshAsync (); 
   }
