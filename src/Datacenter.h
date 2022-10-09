@@ -104,6 +104,7 @@ class Datacenter : public cSimpleModule
     
     Cpu_t requiredCpuToLocallyPlaceChain 	(const Chain chain) const;
     Cpu_t requiredCpuToPlaceChainAtLvl 		(const Chain chain, Lvl_t lvl) const;
+    inline bool thereIsScheduledReshEvent ();
 		inline Lvl_t 	portToChild 						(const Lvl_t child) const;  // returns the index of the port towards child # c
 		inline void   sndDirectToSimCtrlr 		(cMessage* msg);
 		inline void 	regainRsrcOfChain 			(const Chain &chain);

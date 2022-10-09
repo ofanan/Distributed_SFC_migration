@@ -824,7 +824,7 @@ void SimController::rdNewUsrsLine (string line)
 		
 		insertToChainsThatJoinedLeaf (poaId, chain);
 		if (!ChainsMaster::insert (chainId, chain)) {
-			error ("t=%d new chain %d was already found in ChainsMaster", MyConfig::traceTime, chainId);
+			error ("t=%d new c%d was already found in ChainsMaster", MyConfig::traceTime, chainId);
 		}
 	}
 }
@@ -878,7 +878,7 @@ void SimController::rdOldUsrsLine (string line)
 	
 	while (ss >> chainId) {
 		if (!ChainsMaster::findChain (chainId, chain)) { 
-			error ("t=%.3f: didn't find old chain %d", MyConfig::traceTime, chainId);
+			error ("t=%.3f: didn't find old c%d", MyConfig::traceTime, chainId);
 	  }
 	  // now "chain" contains the chain, found by the chainId that was read from the trace
     ss >> poaId;
@@ -975,12 +975,12 @@ void SimController::checkChainsMasterData ()
 	for (const auto &it : ChainsMaster::allChains) {
 		if (it.second.isBlocked) {
 			if (it.second.curDc!=UNPLACED_DC) {
-				error ("\nt=%f. chain %d is blocked, but its curDc is %d", MyConfig::traceTime, it.second.id, it.second.curDc);
+				error ("\nt=%f. c%d is blocked, but its curDc is %d", MyConfig::traceTime, it.second.id, it.second.curDc);
 			}
 		}
 		else { // the chain isn't blocked		
 			if (it.second.curDc == UNPLACED_DC) {
-				error ("t=%f. non-blocked chain %d is not placed yet.%d", MyConfig::traceTime, it.second.id);
+				error ("t=%f. non-blocked c%d is not placed yet.%d", MyConfig::traceTime, it.second.id);
 			}
 		}
 	}
@@ -1015,7 +1015,7 @@ void SimController::initFullReshSync ()
 		}
 		DcId_t leafId = datacenters[it.second.S_u[0]]->leafId;
 		if (leafId >= numLeaves || leafId<0) {
-			snprintf (buf, bufSize, "\t=%.3f. error in initFullReshSync: chain %d has leafId=%d", MyConfig::traceTime, it.second.id, leafId);
+			snprintf (buf, bufSize, "\t=%.3f. error in initFullReshSync: c%d has leafId=%d", MyConfig::traceTime, it.second.id, leafId);
 			printBufToLog();
 			error ("Error in initFullReshSync. Please check the log file.");
 		}

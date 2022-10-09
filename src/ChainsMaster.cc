@@ -140,7 +140,7 @@ bool ChainsMaster::modifyLvl (unordered_set <ChainId_t> &listOfChainIds, Lvl_t n
 	for (ChainId_t chainId : listOfChainIds) {
 		auto it = ChainsMaster::allChains.find(chainId);
 		if (it == ChainsMaster::allChains.end()) { 
-			sprintf (buf, "\nerror: ChainsMaster::modifyLvl didn't find chain %d", chainId);
+			sprintf (buf, "\nerror: ChainsMaster::modifyLvl didn't find c%d", chainId);
 			MyConfig::printToLog (buf);
 			return false;
 		}
@@ -221,7 +221,7 @@ int ChainsMaster::calcNonMigCost ()
 		}
 		int16_t chainNonMigCost = it->second.getCost ();
 		if (MyConfig::mode==Sync && chainNonMigCost == UNPLACED_COST) {
-			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: chain %d isn't placed yet", it->second.id);
+			snprintf (buf, bufSize, "ChainsMaster::calcNonMigCost: c%d isn't placed yet", it->second.id);
 			MyConfig::printToLog (buf);
 			return -1;
 		}
@@ -278,7 +278,7 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, Chai
 		if ( (it->second.curDc != UNPLACED_DC) && (it->second.curDc != it->second.S_u[it->second.curLvl]) ) { // Did that chain migrate?
 			numMigs++;
 			if (MyConfig::LOG_LVL >= TLAT_DETAILED_LOG) {
-				snprintf (buf, bufSize, "\nchain %d migrated from %d to %d", it->second.id, it->second.curDc, it->second.S_u[it->second.curLvl]);
+				snprintf (buf, bufSize, "\nc%d migrated from %d to %d", it->second.id, it->second.curDc, it->second.S_u[it->second.curLvl]);
 				MyConfig::printToLog (buf);
 			}
 		}
@@ -296,7 +296,7 @@ int ChainsMaster::concludeTimePeriod (int &numMigs, int &curNumBlockedUsrs, Chai
 void ChainsMaster::printAllChains ()
 {
 	for (auto it=ChainsMaster::allChains.begin(); it!=allChains.end(); it++) {
-		snprintf (buf, bufSize, "chain %d, curDc=%d, curLvl=%d\n", it->second.id, it->second.curDc, it->second.curLvl);
+		snprintf (buf, bufSize, "c%d, curDc=%d, curLvl=%d\n", it->second.id, it->second.curDc, it->second.curLvl);
 		MyConfig::printToLog (buf);
 	}
 }
