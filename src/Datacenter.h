@@ -78,8 +78,6 @@ class Datacenter : public cSimpleModule
 		cMessage* 						bottomUpEvent; // will hold the self-event of running BU
 		cMessage* 						reshAsyncEvent; // will hold the self-event of running reshAsync.
 		bool									isInFMode; 
-		bool 									isInAccumDelay; // when true, only accumulate and parse arriving pkts, but don't run the relevant placing algs.
-		bool 									isInBuAccumDelay; // when true, I've already scheduled a Bu accum' delay
     cMessage 							*curHandledMsg; // Incoming message that is currently handled.
 		list <Chain> 					pushUpList;     // Used by the pushUp alg'
 		list <Chain> 					pushDwnReq, pushDwnAck; // List of chains requested to be pushed-down, acknowledged that were pushed-down
@@ -134,6 +132,8 @@ class Datacenter : public cSimpleModule
     bool arrivedFromPrnt        (); 
     void scheduleEndFModeEvent  ();
     void scheduleErrMsgAndExit  ();
+		void scheduleInitReshAsync  (); 
+		void scheduleBottomUpEvent  ();
     void handleBottomUpPktAsync ();
     void handleBottomUpPktAsyncFMode  ();
     void genNsndPushUpPktsToChildren  ();
@@ -151,7 +151,6 @@ class Datacenter : public cSimpleModule
 		/*    void incChainsDwnCnt (); // increase the count of # of chains info that I will send to my child in the next pkt*/
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
 		inline int byteLengthOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
-		void scheduleInitReshAsync (); 
 		
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}

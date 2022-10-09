@@ -140,7 +140,7 @@ void Datacenter::initialize(int stage)
 	rstReshAsync ();
 	endFModeEvent  = nullptr;
 	isInFMode 		 = false;
-	isInAccumDelay = false;
+//	isInAccumDelay = false;
 }
 
 /*************************************************************************************************************************************************
@@ -334,7 +334,7 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "bottomUp")==0) {
   	bottomUpEvent = nullptr;
-	  isInBuAccumDelay = false;
+//	  isInBuAccumDelay = false;
 		if (isInFMode){
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 					sprintf (buf, "\ns%d : simT=%.3f, calling bottomUpFMode from handleMsg", dcId, simTime().dbl());
@@ -871,6 +871,16 @@ void Datacenter::bottomUp ()
   }
 }
 
+void Datacenter::scheduleBottomUpEvent ()
+{
+	//	isInBuAccumDelay = true;
+		// if there isn't any scheduled BU run, schedule a run
+		if (bottomUpEvent==nullptr && reshAsyncEvent==nullptr) {
+			bottomUpEvent = new cMessage ("bottomUp");
+			scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
+		}
+//	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); 
+}
 /*************************************************************************************************************************************************
 If there isn't an already-scheduled initReshAsync event, schedule such an event
 *************************************************************************************************************************************************/
@@ -906,16 +916,12 @@ void Datacenter::handleBottomUpPktAsync ()
 		MyConfig::printToLog (pushUpList, false);
 	}
 	rdBottomUpPkt ();
-	if (isInBuAccumDelay) {
-		return;
+	if (bottomUpEvent!=nullptr) {
+		if (bottomUpEvent->isScheduled()) {
+			return;
+		}
 	}	
-	isInBuAccumDelay = true;
-	// if there isn't any scheduled BU run, schedule a run
-//	if (bottomUpEvent==nullptr) {
-//		bottomUpEvent = new cMessage ("bottomUp");
-//		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
-//	}
-	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); 
+	scheduleBottomUpEvent ();
 }
 
 /*************************************************************************************************************************************************
@@ -928,7 +934,7 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 
 	if (thereIsScheduledReshEvent()) {
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
-			snprintf (buf, bufSize, "\ns%d : rding BU pkt from s%d during accum delay", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
+			snprintf (buf, bufSize, "\ns%d : rding BU pkt from s%d while there's a scheduled resh event", dcId, ((Datacenter*) curHandledMsg->getSenderModule())->dcId);
 			printBufToLog ();
 		}
 		return handleBottomUpPktAsync ();
@@ -1437,8 +1443,8 @@ void Datacenter::rst ()
 	bottomUpEvent    = nullptr; 
 	reshAsyncEvent   = nullptr; 
 	isInFMode 		   = false;
-	isInAccumDelay   = false;
-	isInBuAccumDelay = false;
+//	isInAccumDelay   = false;
+//	isInBuAccumDelay = false;
 	reshuffled       = false;
 }
 
