@@ -140,7 +140,6 @@ void Datacenter::initialize(int stage)
 	rstReshAsync ();
 	endFModeEvent  = nullptr;
 	isInFMode 		 = false;
-//	isInAccumDelay = false;
 }
 
 /*************************************************************************************************************************************************
@@ -329,12 +328,10 @@ void Datacenter::handleMessage (cMessage *msg)
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "initReshAsync")==0) {
 		reshAsyncEvent = nullptr;
-  	// isInAccumDelay = false;
   	initReshAsync (); 
   }
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "bottomUp")==0) {
   	bottomUpEvent = nullptr;
-//	  isInBuAccumDelay = false;
 		if (isInFMode){
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 					sprintf (buf, "\ns%d : simT=%.3f, calling bottomUpFMode from handleMsg", dcId, simTime().dbl());
@@ -725,7 +722,6 @@ void Datacenter::bottomUpFMode ()
 			else { // not within a reshuffle
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
-				// isInAccumDelay				 = true;
 				return scheduleInitReshAsync (); //###
 			}
 		} // end case of not enough avail capacity
@@ -842,7 +838,6 @@ void Datacenter::bottomUp ()
 			else { // Async mode
 				this->reshInitiatorLvl = this->lvl; // assign my lvl as the lvl of the initiator of this reshuffle
 				isInFMode 			 			 = true;      // set myself to "F" mode
-				//isInAccumDelay				 = true;
 				return scheduleInitReshAsync ();
 			}
 		} // end case of not enough avail capacity
@@ -871,16 +866,18 @@ void Datacenter::bottomUp ()
   }
 }
 
+/*************************************************************************************************************************************************
+If there isn't any already-scheduled bottomUpEvent, or a reshAsyncEvent (that would also result in a BU-f run) --> schedule a new bottomUpEvent.
+*************************************************************************************************************************************************/
 void Datacenter::scheduleBottomUpEvent ()
 {
-	//	isInBuAccumDelay = true;
-		// if there isn't any scheduled BU run, schedule a run
-		if (bottomUpEvent==nullptr && reshAsyncEvent==nullptr) {
-			bottomUpEvent = new cMessage ("bottomUp");
-			scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
-		}
-//	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); 
+	if (bottomUpEvent==nullptr && reshAsyncEvent==nullptr) {
+		bottomUpEvent = new cMessage ("bottomUp");
+		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
+	}
+	//	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); 
 }
+
 /*************************************************************************************************************************************************
 If there isn't an already-scheduled initReshAsync event, schedule such an event
 *************************************************************************************************************************************************/
@@ -1443,8 +1440,6 @@ void Datacenter::rst ()
 	bottomUpEvent    = nullptr; 
 	reshAsyncEvent   = nullptr; 
 	isInFMode 		   = false;
-//	isInAccumDelay   = false;
-//	isInBuAccumDelay = false;
 	reshuffled       = false;
 }
 
