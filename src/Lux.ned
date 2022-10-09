@@ -10,10 +10,6 @@ network Lux
 		int numLeaves   		= default(int (numChildren^(height-1)));
     double channelDelay	@unit(s); 
     double basicDatarate @unit(Gbps);
-    double RtProb; // prob' that a new chain is an RT chain
-    bool   runningRtProbSim;
-    int    seed;
-    int    cpuAtLeaf;
 
   types:
     channel Channel extends ned.DatarateChannel {
@@ -24,14 +20,6 @@ network Lux
   submodules:
 
 		sim_controller 	: SimController;
-
-//		chain_generator : ChainGenerator;
-		
-//		cpu_augmenter 	: CpuAugmenter;
-
-//		sol_checker		: SolChecker;
-		
-//		param_checker 	: ParamChecker;//
 
     datacenters [numDatacenters] : Datacenter {
         parameters:
@@ -1878,4 +1866,5 @@ network Lux
 		datacenters[1836].port[0] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenters[146].port[9];
 		datacenters[1837].port[0] <--> {delay=channelDelay; datarate=basicDatarate;} <--> datacenters[141].port[16];
 }
+
 

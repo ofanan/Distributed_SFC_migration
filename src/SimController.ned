@@ -23,6 +23,9 @@ simple SimController
     int byteLengthOfRtChain = default (10);
     int byteLengthOfNonRtChain = default (15);
     int byteLengthOfreshAsyncPktFields = default (4);
+    double BU_ACCUM_DELAY_OF_LVL1;
+    double RESH_ACCUM_DELAY_OF_LVL1;
+		double beginVeryDetailedLogAtTraceTime;
 gates:
 		input directMsgsPort;
 }

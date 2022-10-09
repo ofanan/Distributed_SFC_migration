@@ -75,6 +75,8 @@ class Datacenter : public cSimpleModule
     vector <int> 					gateIdToChild; // gateIdToChild[c] will hold the gateId of the gate towards child # c
     vector <EndXmtMsg*> 	endXmtEvents; // endXmts[i] will hold the event of the end of the transmission of a pkt in output channel i
 		cMessage*							endFModeEvent; // will hold the event of finishing "F" mode
+		cMessage* 						bottomUpEvent; // will hold the self-event of running BU
+		cMessage* 						reshAsyncEvent; // will hold the self-event of running reshAsync.
 		bool									isInFMode; 
 		bool 									isInAccumDelay; // when true, only accumulate and parse arriving pkts, but don't run the relevant placing algs.
 		bool 									isInBuAccumDelay; // when true, I've already scheduled a Bu accum' delay
@@ -85,7 +87,6 @@ class Datacenter : public cSimpleModule
 		Lvl_t  nxtChildToSndReshAsync; // will hold the serial num (0, 1, ..., numChildren-1) of the next child to which the Dc may try to snd a reshAsyncPkt.
 		int deficitCpu;
 		Lvl_t reshInitiatorLvl; // will hold the level of the initiator of the currently running async reshuffle
-		float MY_ACCUMULATION_DELAY;
 		
     // Dynamic
     Cpu_t  				availCpu;
@@ -149,6 +150,7 @@ class Datacenter : public cSimpleModule
 		/*    void incChainsDwnCnt (); // increase the count of # of chains info that I will send to my child in the next pkt*/
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
 		inline int byteLengthOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
+		void scheduleInitReshAsync (); 
 		
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}

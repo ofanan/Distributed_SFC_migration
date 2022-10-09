@@ -35,9 +35,11 @@ bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
 int   MyConfig::byteLengthOfreshAsyncPktFields;
+vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
+vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
+
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
-float beginVeryDetailedLogAtTraceTime = 30029; //numeric_limits<float>::max(); // Used for debugging. While not debugging, should be numeric_limits<float>::max()
 vector <uint32_t> MyConfig::pktCnt; // MyConfig::pktCnt[i] will hold the # of pkts sent in direction i
 vector <uint64_t> MyConfig::bitCnt; // MyConfig::bitCnt[i] will hold the # of bits sent in direction i
 
@@ -70,22 +72,17 @@ void SimController::initialize (int stage)
 
   if (stage==0) {
 		network         					 	 = (cModule*) (getParentModule ()); 
- 		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));
+ 		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));	
 		numLeaves       					 	 = (DcId_t)   (network -> par ("numLeaves"));
 		MyConfig::height       		 	 = (Lvl_t)    (network -> par ("height"));
-		
 		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
-		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
-		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
-		MyConfig::byteLengthOfNonRtChain   = par ("byteLengthOfNonRtChain");
-    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
 		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
 		seed				    						 = int (par ("seed"));
     simLenInSec           			 = double (par ("simLenInSec"));
 		MyConfig::manuallySetPktSize = bool   (par ("manuallySetPktSize"));
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
-		MyConfig::logDelays					 = bool   (par ("logDelays"));	
+		MyConfig::logDelays					 = bool   (par ("logDelays"));
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
@@ -93,6 +90,12 @@ void SimController::initialize (int stage)
 		MyConfig::useFullResh 	   	 = false;
 		MyConfig::measureRunTime   	 = true;
 
+		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
+		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
+		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
+		MyConfig::byteLengthOfNonRtChain   = par ("byteLengthOfNonRtChain");
+    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
+		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}
@@ -107,6 +110,20 @@ void SimController::initialize (int stage)
 	}
 	
   if (stage==1) {
+  
+		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
+
+  	double BU_ACCUM_DELAY_OF_LVL1			 		= double (par ("BU_ACCUM_DELAY_OF_LVL1"));
+		double RESH_ACCUM_DELAY_OF_LVL1		 		= double (par ("RESH_ACCUM_DELAY_OF_LVL1"));		
+		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] 	= 0.0;
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] 	= 0.0;
+
+		for (int lvl=1; lvl<MyConfig::height; lvl++) {
+			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float (lvl*BU_ACCUM_DELAY_OF_LVL1);
+			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float (lvl*RESH_ACCUM_DELAY_OF_LVL1);
+		}
+
 		MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 		srand(seed); // set the seed of random num generation
 		updateCpuAtLvl ();
@@ -118,6 +135,8 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     updateRtChainRandInt ();
+    
+    
 		
 		// Set the prob' of a generated chain to be an RtChain
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -219,7 +238,7 @@ void SimController::handleAlgFailure ()
 			printAllDatacenters (false, false, true); 
 		}
 		if (MyConfig::runningCampaign) {
-		 	cout << "***** This run failed. running a campaign, so continuing to the next run *****" << endl;
+		 	cout << "------------------- This run failed. running a campaign, so continuing to the next run -------------------" << endl;
 		}
 
 	}
@@ -945,7 +964,11 @@ void SimController::checkChainsMasterData ()
 				}
 			}
 			if (chain.curDc != dcId) {
-				error ("\ntraceT=%f : checkChainsMasterData() : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", MyConfig::traceTime, chainId, dcId, chain.curDc);
+				if (chain.isBlocked) {
+					error ("\ntraceT=%f : blocked c%d is still placed on s%d", MyConfig::traceTime, chainId, dcId);
+				}
+				error ("\ntraceT=%f : checkChainsMasterData() : c%d found in s%d.placedChain is recorded in ChainsMaster as placed on s%d", 
+								MyConfig::traceTime, chainId, dcId, chain.curDc);
 			}
 		}
 	}

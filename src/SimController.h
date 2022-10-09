@@ -55,7 +55,6 @@ class SimController : public cSimpleModule
     string networkName; // name of the simulated netw: typically, either 'Lux', 'Monaco', or 'Tree'.
     DcId_t numDatacenters;
     DcId_t numLeaves;
-    Lvl_t  height; // height of the tree
     bool isFirstPeriod = true; 
     bool isLastPeriod = false;
     int seed = 0; // default randomization value; may be overwritten when running a sim' campaign
@@ -141,7 +140,8 @@ class SimController : public cSimpleModule
 
 		void continueBinSearch (); // After a failure / succesfully finishing the whole trace, this func' is called, to continue the binary search
     
-    // Functions used for debugging
+    // Parameters and functions used for debugging
+		float beginVeryDetailedLogAtTraceTime; // time in which the simulation will begin to log many details. Used for debugging.
     void checkChainsMasterData (); // Compare the chainsManager's chains' location data to the datacenters' placedChains data.
     void checkDcsEndTimePeriod (); // Sanity check for the DCs when concluding a time period
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
