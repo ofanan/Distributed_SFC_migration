@@ -185,7 +185,7 @@ void SimController::initialize (int stage)
 		}
 		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 2;
-		MyConfig::RES_LVL				 = 1;
+		MyConfig::RES_LVL				 = 0;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes   = false;  // when true, print to the log and to the .res file the results of the BUPU
 		Lvl_t h;
