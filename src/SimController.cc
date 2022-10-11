@@ -90,6 +90,7 @@ void SimController::initialize (int stage)
 		MyConfig::useFullResh 	   	 = false;
 		MyConfig::measureRunTime   	 = true;
 
+		MyConfig::runningBinSearchSim      = false; // default. will be changed if running a bin search sim.
 		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
 		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
 		MyConfig::byteLengthOfRtChain 		 = par ("byteLengthOfRtChain");
@@ -685,7 +686,7 @@ void SimController::concludeTimePeriod ()
 		 printResLine ();
 	}
 	else if (MyConfig::runningRtProbSim && isLastPeriod) { // in an Rt Prob sim, we would like to print a res line only in the last time period
-			printResLine (RtSimResFile.rdbuf());
+			//printResLine (RtSimResFile.rdbuf());
 	}
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
