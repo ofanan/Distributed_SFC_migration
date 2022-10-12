@@ -14,10 +14,12 @@ char 	MyConfig::modeStr[MyConfig::modeStrLen];
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 Lvl_t MyConfig::height;
+Lvl_t MyConfig::lvlOfRoot;
 bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
 bool  MyConfig::logDelays;
 int   MyConfig::mode;
+bool  MyConfig::logCommOh;
 int   MyConfig::LOG_LVL;
 int   MyConfig::DEBUG_LVL;
 int   MyConfig::RES_LVL;
@@ -74,6 +76,7 @@ void SimController::initialize (int stage)
  		numDatacenters  					 	 = (DcId_t)   (network -> par ("numDatacenters"));	
 		numLeaves       					 	 = (DcId_t)   (network -> par ("numLeaves"));
 		MyConfig::height       		 	 = (Lvl_t)    (network -> par ("height"));
+		MyConfig::lvlOfRoot					 = MyConfig::height-1;
 		networkName 						   	 = 				    (network -> par ("name")).stdstringValue(); // either "Lux", "Monaco" or "Tree".
 		MyConfig::cpuAtLeaf 				 = int (par ("cpuAtLeaf"));
 		seed				    						 = int (par ("seed"));
@@ -82,6 +85,7 @@ void SimController::initialize (int stage)
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
 		MyConfig::logDelays					 = bool   (par ("logDelays"));
+		MyConfig::logDelays					 = bool   (par ("logCommOh"));
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
@@ -151,8 +155,8 @@ void SimController::initialize (int stage)
 		checkParams (); 
 		// Init the vectors of "datacenters", and the vector of "leaves", with ptrs to all DCs, and all leaves, resp.
 		rcvdFinishedAlgMsgFromLeaves.resize(numLeaves);
-		MyConfig::pktCnt.resize (2*(MyConfig::height-1));
-		MyConfig::bitCnt.resize (2*(MyConfig::height-1));
+		MyConfig::pktCnt.resize (2*(MyConfig::lvlOfRoot));
+		MyConfig::bitCnt.resize (2*(MyConfig::lvlOfRoot));
 		
 		fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 		leaves.resize (numLeaves);
@@ -338,6 +342,11 @@ void SimController::openFiles ()
   if (!traceFile.is_open ()) {
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
+
+	if (MyConfig::logCommOh) {
+		commOhResFileName = "gamad.res";
+	  commOhResFile.open(commOhResFileName, std::ios_base::app | std::ios_base::in);
+	}
 
 	if (MyConfig::runningRtProbSim) {
 		if (MyConfig::netType==MonacoIdx) {
@@ -601,6 +610,8 @@ void SimController::finish ()
   cout << endl << "finished running trace at traceTime " << MyConfig::traceTime;
 	if (MyConfig::LOG_LVL>0) {
   	MyConfig::printToLog ("\nfinished sim\n");
+  }
+  if (MyConfig::logCommOh) {
   }
   std::chrono::time_point<std::chrono::high_resolution_clock> finishTime = std::chrono::high_resolution_clock::now();
   duration<double, std::micro> ms_double = finishTime - startTime;

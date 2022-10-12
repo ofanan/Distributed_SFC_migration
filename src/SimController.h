@@ -63,6 +63,8 @@ class SimController : public cSimpleModule
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
 		string   RtSimResFileName;
+		string	commOhResFileName;
+
     cMessage *curHandledMsg; // Incoming message that is currently handled.
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
@@ -152,7 +154,8 @@ class SimController : public cSimpleModule
   public:
 		int netType;
     ifstream traceFile;
-    ofstream RtSimResFile; 
+    ofstream RtSimResFile; // .res file when running "RtProb" sim (namely, varying the prob' of Rt).
+    ofstream commOhResFile; // .res file for the comm overhead.
  		string LogFileName   = "example.txt";
  		string   RtSimFileName;
 		static const int bufSize = 512;

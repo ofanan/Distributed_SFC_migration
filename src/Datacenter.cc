@@ -1498,13 +1498,13 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 
 	int cntrNum; // number of the counters to update
 	if (isRoot) {
-		cntrNum = MyConfig::height-2+lvl; // src of the pkt is lvl, and direction is UP
+		cntrNum = 2*MyConfig::lvlOfRoot-1; // A pkt from the root is always southbound
 	}
 	else if (isLeaf) {
 		cntrNum = 0; // src of the pkt is lvl 0, and direction is UP
 	}
 	else {
-		cntrNum = (portNum==0)? lvl : MyConfig::height-2+lvl;
+		cntrNum = (portNum==0)? lvl : MyConfig::lvlOfRoot-1+lvl;
 	}
 	
 	if (!MyConfig::incCntr (cntrNum, pkt2snd->getByteLength())) {

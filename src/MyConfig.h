@@ -48,8 +48,9 @@ class MyConfig {
 		static char 			buf[bufSize];
     static ofstream 	logFile, resFile;
 
-		// directions 0, 1, ..., height-1 indicate pkts where the source is 0,1, ... height -1, and the direction is north (to prnt).
-		// directions height-1, height, height+1, indicate pkts where the source is 1,2, ... height-1, and the direction is south (to child).
+		// directions 0, 1, ..., lvlOfRoot-1 indicate pkts where the source is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt); 
+		// from lvlOfRoot there're no northbound packet. 
+		// directions lvlOfRoot, lvlOfRoot+1, ..., 2*lvlOfRoot-1, indicate pkts where the source is 1,2, ... lvlOfRoot, and the direction is south (to child).
 		static vector <uint32_t> pktCnt; // pktCnt[i] will hold the # of pkts sent in direction i
 		static vector <uint64_t> bitCnt; // bitCnt[i] will hold the # of bits sent in direction i
 
@@ -62,6 +63,7 @@ class MyConfig {
 		static int netType;
 		static int  overallNumBlockedUsrs; 
 		static Lvl_t height;// height of the tree 
+		static Lvl_t lvlOfRoot; // level of the root (typically height-1).
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
 		static const vector <vector <Cost_t>> RtChainCostAtLvl;
 		static const vector <vector <Cost_t>> NonRtChainCostAtLvl;
@@ -94,7 +96,8 @@ class MyConfig {
 		static int 	LOG_LVL;
 		static int 	DEBUG_LVL;
 		static int 	RES_LVL;
-		static bool logDelays;
+		static bool logDelays; // when true, the sim generates a log of the delays
+		static bool logCommOh; // when true, the sim generates a log of the comm overhead (num and sizes of pkts).
 		static bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		static bool printBupuRes; // when true, print to the log the results of BUPU
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
