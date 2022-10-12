@@ -344,7 +344,7 @@ void SimController::openFiles ()
   }
 
 	if (MyConfig::logCommOh) {
-		commOhResFileName = "gamad.res";
+		commOhResFileName = networkName + "_comm.res";
 	  commOhResFile.open(commOhResFileName, std::ios_base::app | std::ios_base::in);
 	}
 
@@ -694,9 +694,6 @@ void SimController::concludeTimePeriod ()
 	}
 	if (MyConfig::RES_LVL > 0) {
 		 printResLine ();
-	}
-	else if (MyConfig::runningRtProbSim && isLastPeriod) { // in an Rt Prob sim, we would like to print a res line only in the last time period
-			//printResLine (RtSimResFile.rdbuf());
 	}
 
 	if (MyConfig::printBupuRes || MyConfig::LOG_LVL>=DETAILED_LOG) {
