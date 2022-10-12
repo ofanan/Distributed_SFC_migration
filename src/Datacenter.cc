@@ -31,6 +31,15 @@ inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const {
 // returns true iff the given chain was pushed up from me
 inline bool Datacenter::wasPushedUp (const Chain &chain) const {return (chain.curLvl > this->lvl);}
 
+/*************************************************************************************************************************************************
+calculate the len of a pkt, given the # of Rt and NonRt chains in it
+*************************************************************************************************************************************************/
+inline int  Datacenter::byteLengthOfPkt (const int numRtChains, const int &numNonRtChains)
+{
+	return MyConfig::byteLengthOfHeader + MyConfig::byteLengthOfRtChain * numRtChains + MyConfig::byteLengthOfNonRtChain * numNonRtChains;
+}
+
+
 Datacenter::Datacenter() {}
 
 Datacenter::~Datacenter()
@@ -63,7 +72,6 @@ bool Datacenter::arrivedFromPrnt ()
 	if (isRoot) {
 		return false;
 	}
-	
 	return curHandledMsg->arrivedOn (prntGateId); 
 }
 
@@ -121,7 +129,7 @@ void Datacenter::initialize(int stage)
 	// parameters that depend upon MyConfig can be initialized only after stage 0, in which MyConfig is initialized.
 	cpuCapacity   = MyConfig::cpuAtLvl[lvl]; 
   availCpu    	= cpuCapacity; // initially, all cpu rsrcs are available (no chain is assigned)
-	rstReshAsync ();
+	rstReshAsync (); // Reset parameters relevant to resh
 	endFModeEvent  = nullptr;
 	isInFMode 		 = false;
 }
@@ -223,15 +231,6 @@ void Datacenter::setLeafId (DcId_t leafId)
 }
 
 /*************************************************************************************************************************************************
-calculate the len of a pkt, given the # of Rt and NonRt chains in it
-*************************************************************************************************************************************************/
-inline int Datacenter::byteLengthOfPkt (const int numRtChains, const int &numNonRtChains)
-{
-	return MyConfig::byteLengthOfHeader + MyConfig::byteLengthOfRtChain * numRtChains + MyConfig::byteLengthOfNonRtChain * numNonRtChains;
-}
-
-
-/*************************************************************************************************************************************************
 increase the count of # of chains info that I will send in the next pkt
 *************************************************************************************************************************************************/
 void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains)
@@ -284,6 +283,8 @@ void Datacenter::handleMessage (cMessage *msg)
 {
 
 	int pktLen;
+	
+	// Log the delay of the arriving packet, if needed
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
 		pktLen=int(pktPtr->getByteLength());
@@ -295,13 +296,17 @@ void Datacenter::handleMessage (cMessage *msg)
 
   curHandledMsg = msg;
 
+	// Sometimes (e.g., before initiating a sync' resh), it's required to discard all incoming msgs.
 	if (MyConfig::discardAllMsgs) {
 		delete curHandledMsg;
 		return;
 	}
-  else if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) {
+	
+	// A self-msg notifying the end of xmt of a pkt
+  else if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) { 
   	handleEndXmtMsg ();
   }
+  
   else if (msg->isSelfMessage() && strcmp (msg->getName(), "endFModeEvent")==0) { 
   	if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
   		snprintf (buf, bufSize, "\ns%d : exiting F mode", dcId);
@@ -587,6 +592,7 @@ void Datacenter::pushUp ()
 		}
 	}
 	
+	// sort-insert all the pushed-up chains (with the updated data about them) again into this->pushUpList.
 	for (auto chainPtr=pushedUpChains.begin(); chainPtr!=pushedUpChains.end(); chainPtr++) {
 		if (MyConfig::DEBUG_LVL>0 && chainPtr->S_u.size() ==0) {
 			error ("s%d : encountered pushedUpChain c%d with S_u_len=0", dcId, chainPtr->id);
@@ -633,7 +639,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 			}
 		}
 		
-		// shrink pushUpVec to its real size
+		// Set the pushUpVec field in the pkt to be sent to child into the real size.
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
@@ -863,7 +869,7 @@ void Datacenter::scheduleBottomUpEvent ()
 }
 
 /*************************************************************************************************************************************************
-If there isn't an already-scheduled initReshAsync event, schedule such an event
+If there isn't an already-scheduled initReshAsync event, or a scheduled bottomUpEvent, schedule a initReshAsync event
 *************************************************************************************************************************************************/
 void Datacenter::scheduleInitReshAsync ()
 {
@@ -878,7 +884,6 @@ void Datacenter::scheduleInitReshAsync ()
 		reshAsyncEvent = new cMessage ("initReshAsync");
 		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
 	}			
-//	scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("initReshAsync")); schedule a reshuffle
 }
 
 /*************************************************************************************************************************************************
@@ -1137,7 +1142,6 @@ void Datacenter::genNsndBottomUpPktAsync ()
 		pushUp ();
 	}
 }
-
 		
 /*************************************************************************************************************************************************
  Init an async reshuffle.
@@ -1239,9 +1243,6 @@ void Datacenter::reshAsync ()
 		MyConfig::printToLog (pushDwnReq);
 	}
 
-//    if (MyConfig::traceTime>=3005 && dcId==26 && simTime().dbl() > 5.0024) { //$$$$
-//        cout << "dummy";
-//    }
 	if (!sndReshAsyncPktToNxtChild ()) { // send a reshAyncPkt to the next relevant child, if exists
 		pushDwn(); // no more children to call --> finish the run of the reshuffling alg' in my sub-tree (including myself)
 		return finReshAsync ();
@@ -1674,7 +1675,7 @@ void Datacenter::finReshAsync ()
 			sprintf (buf, "\ns%d : simT=%.3f, calling bottomUpFMode from finReshAsync", dcId, simTime().dbl());
 			printBufToLog ();	
 	}
-	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode //$$$ maybe this should be called only if I'm the initiator?
+	bottomUpFMode (); // come back to bottomUp, but in F ("feasibility") mode 
 	rstReshAsync ();
 }
 
@@ -1795,6 +1796,4 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 	sndViaQ (portToPrnt, pkt2snd);
 	pushDwnAck.clear ();
 }
-
-
 

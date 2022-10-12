@@ -56,10 +56,10 @@ class MyConfig {
 	public:
 
 		static int mode;
+		const  static int modeStrLen=20;
+		static char modeStr[modeStrLen]; // a string characterizing the mode of operation ("syncPartResh", "SyncFullResh", "Async"). 
 		static string traceFileName;
 		static int netType;
-		const static int modeStrLen=20;
-		static char modeStr[modeStrLen]; // a string characterizing the mode of operation ("syncPartResh", "SyncFullResh", "Async"). 
 		static int  overallNumBlockedUsrs; 
 		static Lvl_t height;// height of the tree 
 		static const vector <Cpu_t> nonAugmentedCpuAtLeaf; 
@@ -80,7 +80,6 @@ class MyConfig {
     static bool runningCampaign;
     static bool measureRunTime;
 		static bool manuallySetPktSize;
-		static bool logDelays;
 		static int  byteLengthOfRtChain, byteLengthOfNonRtChain, byteLengthOfHeader;
 		static int  byteLengthOfreshAsyncPktFields;
 	  static vector <float> BU_ACCUM_DELAY_OF_LVL;
@@ -90,14 +89,15 @@ class MyConfig {
 		static bool randomlySetChainType;
 		static bool evenChainsAreRt;
 
+		// parameters determining the debug and output files (.log and .res files)
+    static string logFileName, resFileName;
+		static int 	LOG_LVL;
+		static int 	DEBUG_LVL;
+		static int 	RES_LVL;
+		static bool logDelays;
 		static bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		static bool printBupuRes; // when true, print to the log the results of BUPU
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
-
-    static string logFileName, resFileName;
-		static int LOG_LVL;
-		static int DEBUG_LVL;
-		static int RES_LVL;
 
 		//Init and reset
 		static void init ();
