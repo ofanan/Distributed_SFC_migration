@@ -1267,7 +1267,13 @@ inline void SimController::genSettingsBuf (bool printTime)
 void SimController::printSimCommOh ()
 {
 	streambuf* outBuf = commOhResFile.rdbuf();
-	error ("naanas");
+	ostream os(outBuf);
+	genSettingsBuf ();
+	os << settingsBuf;
+	int numPkts = 1;
+	int numBytes = 2;
+	sprintf (buf, " | numPkts = %d | numBytes = %d\n", numPkts, numBytes);
+	os << buf; 
 }
 
 /*************************************************************************************************************************************************

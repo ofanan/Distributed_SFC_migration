@@ -128,6 +128,7 @@ class MyConfig {
 		static string exec(const char* cmd);
 		static void setNetTypeFromString (string str);
 		static int  getNetTypeFromString (string str);
+		static int 	getOverallNumPkts ();
 		static ofstream getlogFile ();
 		static vector<Cost_t> scalarProdcut (const vector<Cpu_t> &vec1, const vector<Cost_t> &vec2); // returns the scalar product of two vectors
 		static bool incCntr (Lvl_t cntrNum, int64_t bitCnt);

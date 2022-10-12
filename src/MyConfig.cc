@@ -36,6 +36,20 @@ bool MyConfig::incCntr (Lvl_t cntrNum, int64_t bitCnt)
 
 
 /*************************************************************************************************************************************************
+Given a cntrNum, increment the respective pktCnt 1, and the respective bitCnt by the given bitCnt.
+Return true if the counters were successfully update, false else.
+**************************************************************************************************************************************************/
+int MyConfig::getOverallNumPkts ()
+{
+	int overallNumPkts = 0;
+	for (auto cntr : MyConfig::pktCnt) {
+		overallNumPkts += cntr;
+	}
+	return overallNumPkts;
+}
+
+
+/*************************************************************************************************************************************************
 * Run a given (Linux) command, and return its output
 **************************************************************************************************************************************************/
 string MyConfig::exec(const char* cmd)
