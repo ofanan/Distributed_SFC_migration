@@ -612,11 +612,21 @@ void SimController::finish ()
   	MyConfig::printToLog ("\nfinished sim\n");
   }
   if (MyConfig::logCommOh) {
+    printSimCommOh ();
   }
   std::chrono::time_point<std::chrono::high_resolution_clock> finishTime = std::chrono::high_resolution_clock::now();
   duration<double, std::micro> ms_double = finishTime - startTime;
   sprintf (buf, "\nsimTime=%f", float(ms_double.count()/1000000));
 	printBufToLog ();
+}
+
+/*************************************************************************************************************************************************
+* Print data about the comm overhead (e.g., # of pkts and of bytes sent at each level/direction, overall # of pkts and of bytes).
+* The data is written to resCommOhFile
+**************************************************************************************************************************************************/
+void SimController::printSimCommOh ()
+{
+
 }
 
 /*************************************************************************************************************************************************

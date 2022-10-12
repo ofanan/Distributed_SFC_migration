@@ -173,6 +173,7 @@ class SimController : public cSimpleModule
 		void printAllDatacenters (bool printPotPlaced=false, bool printPushUpList=false, bool printChainIds=true);
 		void printBuCost  ();
 		void printResLine (streambuf* outBuf=MyConfig::resFile.rdbuf());
+		void printSimCommOh ();
 };
 
 #endif
