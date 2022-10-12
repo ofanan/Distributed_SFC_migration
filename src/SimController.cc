@@ -85,7 +85,7 @@ void SimController::initialize (int stage)
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
 		MyConfig::logDelays					 = bool   (par ("logDelays"));
-		MyConfig::logDelays					 = bool   (par ("logCommOh"));
+		MyConfig::logCommOh					 = bool   (par ("logCommOh"));
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
@@ -618,15 +618,6 @@ void SimController::finish ()
   duration<double, std::micro> ms_double = finishTime - startTime;
   sprintf (buf, "\nsimTime=%f", float(ms_double.count()/1000000));
 	printBufToLog ();
-}
-
-/*************************************************************************************************************************************************
-* Print data about the comm overhead (e.g., # of pkts and of bytes sent at each level/direction, overall # of pkts and of bytes).
-* The data is written to resCommOhFile
-**************************************************************************************************************************************************/
-void SimController::printSimCommOh ()
-{
-
 }
 
 /*************************************************************************************************************************************************
@@ -1267,6 +1258,16 @@ inline void SimController::genSettingsBuf (bool printTime)
   else {
   	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed);
   }
+}
+
+/*************************************************************************************************************************************************
+* Print data about the comm overhead (e.g., # of pkts and of bytes sent at each level/direction, overall # of pkts and of bytes).
+* The data is written to resCommOhFile
+**************************************************************************************************************************************************/
+void SimController::printSimCommOh ()
+{
+	streambuf* outBuf = commOhResFile.rdbuf();
+	error ("naanas");
 }
 
 /*************************************************************************************************************************************************
