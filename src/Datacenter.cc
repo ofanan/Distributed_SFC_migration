@@ -4,50 +4,34 @@ using namespace omnetpp;
 using namespace std;
 
 Define_Module(Datacenter);
+
 /*************************************************************************************************************************************************
  * Infline functions
 *************************************************************************************************************************************************/
-
+// returns true iff the lhs chain currently consumes less/equal cpu as the rhs chain. Currently unused.
 inline bool sortChainsByCpuUsage (Chain lhs, Chain rhs) {return lhs.getCpu() <= rhs.getCpu();}
 
 inline bool Datacenter::thereIsScheduledReshEvent () {return reshAsyncEvent!=nullptr;}
 inline bool Datacenter::cannotPlaceThisChainHigher (const Chain chain) const {return chain.mu_u_len() <= this->lvl+1;}
 inline bool Datacenter::canPlaceThisChainHigher 	 (const Chain chain) const {return !cannotPlaceThisChainHigher(chain);}
 
-inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const {return chain.mu_u_at_lvl(lvl);}
-
-inline Cpu_t Datacenter::requiredCpuToPlaceChainAtLvl (const Chain chain, const Lvl_t lvl) const {return chain.mu_u_at_lvl(lvl);}
+inline Cpu_t Datacenter::requiredCpuToLocallyPlaceChain (const Chain chain) const 								 {return chain.mu_u_at_lvl(lvl);}
+inline Cpu_t Datacenter::requiredCpuToPlaceChainAtLvl 	(const Chain chain, const Lvl_t lvl) const {return chain.mu_u_at_lvl(lvl);}
 
 // Given the number of a child (0, 1, ..., numChildren-1), returns the port # connecting to this child.
 inline Lvl_t Datacenter::portToChild (const Lvl_t child) const {if (isRoot) return child; else return child+1;} 
 
-inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg) {sendDirect (msg, simController, "directMsgsPort");}
-
-inline void	Datacenter::printStateAndEndSim () { sndDirectToSimCtrlr (new cMessage ("PrintStateAndEndSimMsg"));}
-
+inline void Datacenter::sndDirectToSimCtrlr (cMessage* msg)    {sendDirect (msg, simController, "directMsgsPort");}
+inline void	Datacenter::printStateAndEndSim () 							   {sndDirectToSimCtrlr (new cMessage ("PrintStateAndEndSimMsg"));}
 inline void Datacenter::regainRsrcOfChain (const Chain &chain) {availCpu += chain.mu_u_at_lvl(lvl); }
-
-inline bool Datacenter::withinResh () const {return this->reshInitiatorLvl!=UNPLACED_LVL;}
-
-inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const 
-{
-	return (withinResh() && this->reshInitiatorLvl!=reshInitiatorLvl);
-}
-
-inline bool Datacenter::IAmTheReshIniator () const
-{
-	return (this->reshInitiatorLvl == this->lvl);
-}
+inline bool Datacenter::withinResh () const 									 {return this->reshInitiatorLvl!=UNPLACED_LVL;}
+inline bool Datacenter::IAmTheReshIniator () const 						 {return (this->reshInitiatorLvl == this->lvl);}
+inline bool Datacenter::withinAnotherResh (const Lvl_t reshInitiatorLvl) const {return (withinResh() && this->reshInitiatorLvl!=reshInitiatorLvl);}
 
 // returns true iff the given chain was pushed up from me
-inline bool Datacenter::wasPushedUp (const Chain &chain) const 
-{
-	return (chain.curLvl > this->lvl); 
-}
+inline bool Datacenter::wasPushedUp (const Chain &chain) const {return (chain.curLvl > this->lvl);}
 
-Datacenter::Datacenter()
-{
-}
+Datacenter::Datacenter() {}
 
 Datacenter::~Datacenter()
 {
@@ -60,14 +44,14 @@ Datacenter::~Datacenter()
 	  cancelAndDelete (endFModeEvent);
 	}
 	if (bottomUpEvent != nullptr) {
-//		if (bottomUpEvent->isScheduled()) {
-//		  cancelAndDelete (bottomUpEvent);
-//		}
+		if (bottomUpEvent->isScheduled()) {
+		  cancelAndDelete (bottomUpEvent);
+		}
 	}
 	if (reshAsyncEvent != nullptr) {
-//		if (reshAsyncEvent -> isScheduled()) {
-//		  cancelAndDelete (reshAsyncEvent);
-//		}
+		if (reshAsyncEvent -> isScheduled()) {
+		  cancelAndDelete (reshAsyncEvent);
+		}
 	}
 }
 

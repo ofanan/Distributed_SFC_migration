@@ -62,8 +62,7 @@ inline void SimController::updateRtChainRandInt ()
 }
 
 
-SimController::SimController() {
-}
+SimController::SimController() {}
 
 SimController::~SimController() {}
 
@@ -203,7 +202,7 @@ void SimController::initialize (int stage)
 }
 
 /*************************************************************************************************************************************************
-Returns true iff a previous run has successfully run the all trace, using the current seed, RtProb.
+Returns true iff a previous run has successfully run the all trace, using the current seed and RtProb.
 **************************************************************************************************************************************************/
 bool SimController::alreadySucceededWithThisSeed ()
 {

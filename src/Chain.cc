@@ -203,7 +203,8 @@ Cost_t Chain::getCostAtLvl (const Lvl_t lvl) const
 }
 
 /*************************************************************************************************************************************************
-* Return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise
+* Return the current cpu consumption of the chain if it's already placed; UNPLACED_CPU otherwise. 
+** curently unused.
 **************************************************************************************************************************************************/
 Cpu_t Chain::getCpu () const
 {
