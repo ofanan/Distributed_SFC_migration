@@ -85,6 +85,7 @@ class MyConfig {
     static bool runningCampaign;
     static bool measureRunTime;
 		static bool manuallySetPktSize;
+		static bool isFirstPeriod; // will be true iff this the first decision period in the sim
 		static int  byteLengthOfRtChain, byteLengthOfNonRtChain, byteLengthOfHeader;
 		static int  byteLengthOfreshAsyncPktFields;
 	  static vector <float> BU_ACCUM_DELAY_OF_LVL;

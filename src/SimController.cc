@@ -10,6 +10,7 @@ class Datacenter;
 bool  MyConfig::notifiedReshInThisPeriod;
 bool  MyConfig::randomlySetChainType; // when true, use real randomization; else, use a pseudo-random scheme, based on the chain's id
 bool  MyConfig::evenChainsAreRt;
+bool  MyConfig::isFirstPeriod; // // will be true iff this the first decision period in the sim
 char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
@@ -485,7 +486,7 @@ Run a single time step. Such a time step is assumed to include (at most) a singl
 void SimController::runTimePeriod () 
 {
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
-	if (!isFirstPeriod) {
+	if (!MyConfig::isFirstPeriod) {
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 		MyConfig::mode = this->mode; // when running Lux/Monaco, the first period is always sync; the next cycles may be either sync, or async. 
 		if (MyConfig::mode==Sync) {
@@ -521,7 +522,7 @@ void SimController::runTimePeriod ()
 			}
 			isLastPeriod = false;
 			MyConfig::traceTime = new_t;
-			if (isFirstPeriod) {
+			if (MyConfig::isFirstPeriod) {
 				maxTraceTime = new_t + simLenInSec;
 			}
 			
@@ -592,7 +593,7 @@ void SimController::rst ()
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	numMigsAtThisPeriod = 0; 
 	numCritUsrs					= 0;
-	isFirstPeriod 			= true;
+	MyConfig::isFirstPeriod 			= true;
 	isLastPeriod 				= false;
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
 	traceFile.clear();
@@ -1217,7 +1218,7 @@ void SimController::PrintStateAndEndSim ()
 void SimController::handleMessage (cMessage *msg)
 {
 	if (msg->isSelfMessage() && strcmp (msg->getName(), "RunTimePeriodMsg")==0) {
-		isFirstPeriod = false;
+		MyConfig::isFirstPeriod = false;
 		if (MyConfig::runningBinSearchSim) {
 			if (isLastPeriod || algStts==FAIL) { 
 				continueBinSearch ();
@@ -1285,6 +1286,13 @@ void SimController::printSimCommOh ()
 	os << settingsBuf;
 	int numPkts = 1;
 	int numBytes = 2;
+	if (MyConfig::DEBUG_LVL>0 && RtProb==1.0) {
+		if (MyConfig::pktCnt  [  MyConfig::lvlOfRoot-1]>0 || MyConfig::pktCnt  [  MyConfig::lvlOfRoot-2]>0 || MyConfig::pktCnt  [  MyConfig::lvlOfRoot-3]>0 || 
+			  MyConfig::pktCnt  [2*MyConfig::lvlOfRoot-1]>0 || MyConfig::pktCnt  [2*MyConfig::lvlOfRoot-2]>0 || MyConfig::pktCnt  [2*MyConfig::lvlOfRoot-3]>0 ||
+			  MyConfig::bitCnt [  MyConfig::lvlOfRoot-1]>0 || MyConfig::bitCnt [  MyConfig::lvlOfRoot-2]>0 || MyConfig::bitCnt [  MyConfig::lvlOfRoot-3]>0 || 
+			  MyConfig::bitCnt [2*MyConfig::lvlOfRoot-1]>0 || MyConfig::bitCnt [2*MyConfig::lvlOfRoot-2]>0 || MyConfig::bitCnt [2*MyConfig::lvlOfRoot-3]>0)
+			  error ("RtProb=1.0, but there were pkts transmitted in the 3 top lvls of the tree.");
+	}
 	for (int i(0); i<MyConfig::pktCnt.size(); i++) {
 		sprintf (buf, " | nPkts%d = %d", i, MyConfig::pktCnt[i]);
 		os << buf; 
