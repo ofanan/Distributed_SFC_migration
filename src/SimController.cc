@@ -344,8 +344,15 @@ void SimController::openFiles ()
   }
 
 	if (MyConfig::logCommOh) {
-		commOhResFileName = networkName + "_comm.res";
+		commOhResFileName = networkName + ".com";
 	  commOhResFile.open(commOhResFileName, std::ios_base::app | std::ios_base::in);
+	  commOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
+		commOhResFile << "// T is the slot cnt (read from the input file)" << endl;
+		commOhResFile << "// Mode is the algorithm / solver used."  << endl;
+		commOhResFile << "// nPktsi, nBytesi indicate the number of pkts/bytes sent in direction j.\n";
+		commOhResFile << "// The directions are determined as follows:\n";
+		commOhResFile << "// directions 0, 1, ..., lvlOfRoot-1 indicate pkts whose src is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt).\n";
+		commOhResFile << "// directions lvlOfRoot, lvlOfRoot+1, ..., 2*lvlOfRoot-1, indicate pkts whose src is 1,2, ... lvlOfRoot, destined to the child.\n\n";
 	}
 
 	if (MyConfig::runningRtProbSim) {
@@ -1272,7 +1279,15 @@ void SimController::printSimCommOh ()
 	os << settingsBuf;
 	int numPkts = 1;
 	int numBytes = 2;
-	sprintf (buf, " | numPkts = %d | numBytes = %d\n", numPkts, numBytes);
+	for (int i(0); i<MyConfig::pktCnt.size(); i++) {
+		sprintf (buf, " | nPkts%d = %d", i, MyConfig::pktCnt[i]);
+		os << buf; 
+	}
+	for (int i(0); i<MyConfig::pktCnt.size(); i++) {
+		sprintf (buf, " | nBytes%d = %d", i, (int)MyConfig::bitCnt[i]);
+		os << buf; 
+	}
+	sprintf (buf, "\n");
 	os << buf; 
 }
 
