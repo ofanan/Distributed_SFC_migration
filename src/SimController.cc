@@ -131,7 +131,6 @@ void SimController::initialize (int stage)
 			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float (lvl*RESH_ACCUM_DELAY_OF_LVL1);
 		}
 
-		MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 		srand(seed); // set the seed of random num generation
 		updateCpuAtLvl ();
 		openFiles ();
@@ -147,11 +146,13 @@ void SimController::initialize (int stage)
 		
 		// Set the prob' of a generated chain to be an RtChain, and the initial sim mode
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
+			MyConfig::randomlySetChainType = (seed >= 0); // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 			MyConfig::evenChainsAreRt			 = false;
 			updateRtChainRandInt ();
 			MyConfig::mode = Sync; // when running Lux/Monaco, the first cycle is always sync, which is easier for initalization. 
 		}
 		else {
+			MyConfig::randomlySetChainType = false; // a nedgative seed indicates using pseudo-randomization of chains' types, based on the chainId.
 			RtProb = 0.5; // prob' that a new chain is an RT chain
 			MyConfig::evenChainsAreRt			 = true;
 			MyConfig::mode = this->mode; 

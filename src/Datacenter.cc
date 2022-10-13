@@ -235,6 +235,17 @@ increase the count of # of chains info that I will send in the next pkt
 *************************************************************************************************************************************************/
 void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains)
 {
+	if (MyConfig::LOG_LVL==TLAT_DETAILED_LOG) {
+		sprintf (buf, "\ns%d : inserting to pkt c%d which is ", dcId, chain.id); 
+		printBufToLog ();
+		if (chain.isRtChain) {
+			MyConfig::printToLog ("RT");
+		}
+		else {
+			MyConfig::printToLog ("Non RT");
+		}
+	}
+	
 	if (chain.isRtChain) {
 		numRtChains++;
 	}
@@ -1342,10 +1353,6 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		pkt2snd -> setPushDwnVecArraySize (pushDwnReqFromChild.size());
 		
 		int idxInPushDwnVec = 0;
-//		for (auto chainPtr=pushDwnReqFromChild.begin(); chainPtr!=pushDwnReqFromChild.end(); ) {	
-//			pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
-//			chainPtr = pushDwnReqFromChild.erase (chainPtr);
-//		}
 	
 		for (auto chain : pushDwnReqFromChild) {	
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
@@ -1509,7 +1516,7 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 	
 	if (MyConfig::logCommOh) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			sprintf (buf, "\ns%d : snding pktSize=%d", dcId, (int)pkt2snd->getByteLength());
+			sprintf (buf, "\ns%d : xmting pktSize=%d", dcId, (int)pkt2snd->getByteLength());
 			printBufToLog ();
 		}
 		bool stts =  MyConfig::incCntr (cntrNum, pkt2snd->getByteLength());
@@ -1797,9 +1804,12 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 	pkt2snd -> setDeficitCpu 		      (deficitCpu);
 	pkt2snd -> setPushDwnVecArraySize (pushDwnAck.size());
 	int idxInPushDwnVec = 0;
+	int numRtChains=0, numNonRtChains=0;
 	for (auto chainPtr=pushDwnAck.begin(); chainPtr!=pushDwnAck.end(); chainPtr++) {	
+		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);	
 		pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
 	}
+	pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
 	sndViaQ (portToPrnt, pkt2snd);
 	pushDwnAck.clear ();
 }
