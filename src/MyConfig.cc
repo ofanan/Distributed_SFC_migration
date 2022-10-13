@@ -27,7 +27,6 @@ bool MyConfig::incCntr (Lvl_t cntrNum, int64_t bitCnt)
 	if (MyConfig::isFirstPeriod) { // ignore data xmt in the first period, which is used only to generate the initial sol
 		return true;
 	}
-	MyConfig::printToLog ("incrementing cntr");
 	
 	if (MyConfig::DEBUG_LVL>0 && (cntrNum<0 || cntrNum>2*MyConfig::height-3)) {
 		sprintf (buf, "MyConfig::incCntr was called with cntrNum=%d, while maximal allowed cntrNum is %d", cntrNum, 2*MyConfig::height-3);
