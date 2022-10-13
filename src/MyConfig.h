@@ -56,7 +56,10 @@ class MyConfig {
 
 	public:
 
-		static int mode;
+		// simulation mode: currently, either Sync/Async. This variable may be changed along the sim. In particular, for large (Lux/Monaco) sim, 
+		// we begin the sim' in Sync mode, for easy init; switch to mode==Async at the second decision period
+		static int mode; 
+		
 		const  static int modeStrLen=20;
 		static char modeStr[modeStrLen]; // a string characterizing the mode of operation ("syncPartResh", "SyncFullResh", "Async"). 
 		static string traceFileName;

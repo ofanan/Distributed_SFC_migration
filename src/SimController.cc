@@ -18,8 +18,11 @@ Lvl_t MyConfig::lvlOfRoot;
 bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
 bool  MyConfig::logDelays;
-int   MyConfig::mode;
 bool  MyConfig::logCommOh;
+
+// simulation mode: currently, either Sync/Async. This variable may be changed along the sim. In particular, for large (Lux/Monaco) sim, 
+// we begin the sim' in Sync mode, for easy init; switch to mode==Async at the second decision period
+int   MyConfig::mode; 
 int   MyConfig::LOG_LVL;
 int   MyConfig::DEBUG_LVL;
 int   MyConfig::RES_LVL;
@@ -142,14 +145,16 @@ void SimController::initialize (int stage)
     
     
 		
-		// Set the prob' of a generated chain to be an RtChain
+		// Set the prob' of a generated chain to be an RtChain, and the initial sim mode
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
 			MyConfig::evenChainsAreRt			 = false;
 			updateRtChainRandInt ();
+			MyConfig::mode = Sync; // when running Lux/Monaco, the first cycle is always sync, which is easier for initalization. 
 		}
 		else {
 			RtProb = 0.5; // prob' that a new chain is an RT chain
 			MyConfig::evenChainsAreRt			 = true;
+			MyConfig::mode = this->mode; 
 		}
 
 		checkParams (); 
@@ -187,7 +192,7 @@ void SimController::initialize (int stage)
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
 			return;
 		}
-		MyConfig::LOG_LVL				 = NO_LOG;
+		MyConfig::LOG_LVL				 = VERY_DETAILED_LOG;
 		MyConfig::DEBUG_LVL			 = 2;
 		MyConfig::RES_LVL				 = 0;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
@@ -481,7 +486,7 @@ void SimController::runTimePeriod ()
 	isLastPeriod = true; // will reset this flag only if there's still new info to read from the trace
 	if (!isFirstPeriod) {
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
-		MyConfig::mode = this->mode; // the first period is always sync; the next cycles may be either sync, or async. 
+		MyConfig::mode = this->mode; // when running Lux/Monaco, the first period is always sync; the next cycles may be either sync, or async. 
 		if (MyConfig::mode==Sync) {
 			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}

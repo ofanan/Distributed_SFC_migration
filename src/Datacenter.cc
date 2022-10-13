@@ -1507,9 +1507,16 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 		cntrNum = (portNum==0)? lvl : MyConfig::lvlOfRoot-1+lvl;
 	}
 	
-	if (!MyConfig::incCntr (cntrNum, pkt2snd->getByteLength())) {
-		error ("s%d : t=%.3f problem when calling MyConfig::incCntr. lvl=%d, portNum=%d, cntrNum=%d, height=%d", 
-						dcId, MyConfig::traceTime, lvl, portNum, cntrNum, MyConfig::height);
+	if (MyConfig::logCommOh) {
+		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
+			sprintf (buf, "\ns%d : snding pktSize=%d", dcId, (int)pkt2snd->getByteLength());
+			printBufToLog ();
+		}
+		bool stts =  MyConfig::incCntr (cntrNum, pkt2snd->getByteLength());
+		if (MyConfig::DEBUG_LVL>0 && (!stts)) {
+			error ("s%d : t=%.3f problem when calling MyConfig::incCntr. lvl=%d, portNum=%d, cntrNum=%d, height=%d", 
+							dcId, MyConfig::traceTime, lvl, portNum, cntrNum, MyConfig::height);
+		}
 	}
 
 	send(pkt2snd, "port$o", portNum);

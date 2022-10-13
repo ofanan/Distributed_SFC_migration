@@ -79,7 +79,6 @@ void MyConfig::init()
 void MyConfig::rst()
 {
 	MyConfig::traceTime 				  	= -1.0;
-	MyConfig::mode 									= Sync; // Possibley, Begin the sim' in Sync mode, for easy init; switch to mode==Async at the second period
 	MyConfig::overallNumBlockedUsrs = 0; 
 	MyConfig::discardAllMsgs 				= false;
 	MyConfig::lvlOfHighestReshDc 		= UNPLACED_LVL;
