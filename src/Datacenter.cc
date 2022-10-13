@@ -235,7 +235,7 @@ increase the count of # of chains info that I will send in the next pkt
 *************************************************************************************************************************************************/
 void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains)
 {
-	if (MyConfig::LOG_LVL==TLAT_DETAILED_LOG) {
+	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
 		sprintf (buf, "\ns%d : inserting to pkt c%d which is ", dcId, chain.id); 
 		printBufToLog ();
 		if (chain.isRtChain) {
@@ -253,20 +253,6 @@ void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonR
 		numNonRtChains++;
 	}
 }
-
-///*************************************************************************************************************************************************
-//increase the count of # of chains info that I will send to my prnt  in the next pkt
-//*************************************************************************************************************************************************/
-//void Datacenter::incChainsUpCnt ()
-//{
-//}
-
-///*************************************************************************************************************************************************
-//increase the count of # of chains info that I will send to my prnt  in the next pkt
-//*************************************************************************************************************************************************/
-//void Datacenter::incChainsDwnCnt ()
-//{
-//}
 
 /*************************************************************************************************************************************************
  * Handle an arriving EndXmtMsg, indicating the end of the transmission of a pkt.
@@ -292,9 +278,8 @@ void Datacenter::handleEndXmtMsg ()
 *************************************************************************************************************************************************/
 void Datacenter::handleMessage (cMessage *msg)
 {
-
 	int pktLen;
-	
+
 	// Log the delay of the arriving packet, if needed
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
@@ -1359,12 +1344,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 		}
 		
 		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + MyConfig::byteLengthOfreshAsyncPktFields); 
-		
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
-//		if (MyConfig::LOG_LVL >= DETAILED_LOG && !isLeaf) {
-//			sprintf (buf, "\ns%d : simT=%.3f, sent reshAsync pkt to child %d", dcId, simTime().dbl(), nxtChildToSndReshAsync);
-//			printBufToLog ();
-//		}
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
 	}
@@ -1398,8 +1378,9 @@ void Datacenter::prepareReshSync ()
 
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
-	
-		sndViaQ (portToChild(child), new PrepareReshSyncPkt ()); //send the bottomUPpkt to the child
+		PrepareReshSyncPkt* pkt2snd = new PrepareReshSyncPkt;
+		pkt2snd->setByteLength (byteLengthOfPkt (0, 0)); 	
+		sndViaQ (portToChild(child), pkt2snd); //send the bottomUPpkt to the child
 	}
 	
 	if (isLeaf) {
@@ -1487,6 +1468,9 @@ void Datacenter::scheduleEndFModeEvent ()
 *************************************************************************************************************************************************/
 void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 {
+	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getByteLength()<MyConfig::byteLengthOfHeader) {
+		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getByteLength(), MyConfig::byteLengthOfHeader);
+	}
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (pkt2snd);
   }
@@ -1568,6 +1552,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setReshInitiatorLvl    (pkt->getReshInitiatorLvl ());
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
+		pkt2snd->setByteLength (byteLengthOfPkt (0,0) + MyConfig::byteLengthOfreshAsyncPktFields); 
 		sndViaQ (portToPrnt, pkt2snd);
 		return; 
 	}

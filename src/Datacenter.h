@@ -145,10 +145,6 @@ class Datacenter : public cSimpleModule
     void insertMyAssignedChainsIntoPushDwnReq ();
     void failedToPlaceOldChain (ChainId_t chainId);
     bool checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain);
-		/*    void incPktUpCnt    (); // increase the count of pkts sent up (to the higher lvl)*/
-		/*    void incPktDwnCnt   (); // increase the count of pkts sent down (to the lower lvl)*/
-		/*    void incChainsUpCnt  (); // increase the count of # of chains info that I will send to my prnt  in the next pkt*/
-		/*    void incChainsDwnCnt (); // increase the count of # of chains info that I will send to my child in the next pkt*/
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
 		inline int byteLengthOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
 		
