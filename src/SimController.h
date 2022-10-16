@@ -77,7 +77,10 @@ class SimController : public cSimpleModule
 
 		int numMigsAtThisPeriod=0; // number of migration performed	at this period (according to the found sol).	
 		int numBlockedUsrs;
-		int numCritUsrs=0; // number of critical usrs at the beginning of this period
+		int numCritRtUsrs, numCritNonRtUsrs; // number of Rt, NonRt critical usrs at the beginning of this period
+		int numNewRtUsrs,  numNewNonRtUsrs; // number of Rt, NonRt critical usrs at the beginning of this period
+		int64_t overallCritRtUsrs, overallCritNonRtUsrs;
+		int64_t overallNewRtUsrs, overallNewNonRtUsrs;	
 		float     period=1.0;
 		Cpu_t lb, ub; // lower bound, upper bound amount of the cpu at the leaf for the binary search alg'
 		bool lastBinSearchRun;

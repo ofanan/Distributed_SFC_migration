@@ -582,9 +582,12 @@ void SimController::rst ()
 	usrsThatLeft.				 clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
 	numMigsAtThisPeriod = 0; 
-	numCritUsrs					= 0;
-	MyConfig::isFirstPeriod 			= true;
-	isLastPeriod 				= false;
+	numCritRtUsrs 			= 0;
+	numCritNonRtUsrs    = 0;
+	numNewRtUsrs 			  = 0;
+	numNewNonRtUsrs     = 0;
+	MyConfig::isFirstPeriod = true;
+	isLastPeriod 					  = false;
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
 	traceFile.clear();
 	traceFile.seekg(0); // return to the beginning of the trace file
@@ -721,7 +724,14 @@ void SimController::concludeTimePeriod ()
 	// reset state variables, in preparation for the next period
 		chainsThatJoinedLeaf.clear ();
 		fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-		numCritUsrs					= 0;
+		overallCritRtUsrs 	 += numCritRtUsrs;
+		overallCritNonRtUsrs += numCritNonRtUsrs;
+		overallNewRtUsrs 		 += numNewRtUsrs;
+		overallNewNonRtUsrs  += numNewNonRtUsrs;
+		numCritRtUsrs 	 		  = 0;
+		numCritNonRtUsrs 			= 0;
+		numNewRtUsrs 	   			= 0;
+		numNewNonRtUsrs  			= 0;
 		MyConfig::lvlOfHighestReshDc=UNPLACED_LVL;
 	if (!isLastPeriod) {
 		numMigsAtThisPeriod = 0; 
@@ -826,6 +836,7 @@ void SimController::rdNewUsrsLine (string line)
 			}
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+RtChain::mu_u_len};
 			chain = RtChain (chainId, S_u);
+			numNewRtUsrs++;
 		}
 		else {
 			if (RtProb==1.0) {
@@ -833,6 +844,7 @@ void SimController::rdNewUsrsLine (string line)
 			}
 			vector<DcId_t> S_u = {pathFromLeafToRoot[poaId].begin(), pathFromLeafToRoot[poaId].begin()+NonRtChain::mu_u_len};
 			chain = NonRtChain (chainId, S_u); 
+			numNewNonRtUsrs++;
 		}
 		
 		insertToChainsThatJoinedLeaf (poaId, chain);
@@ -906,7 +918,14 @@ void SimController::rdOldUsrsLine (string line)
 			error ("t=%.3f: at rdOldUsrsLine, old usr %d wasn't placed yet\n", MyConfig::traceTime, chainId);
 		}
 		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
-			numCritUsrs++;
+			if (!MyConfig::isFirstPeriod) {
+				if (chain.isRtChain) {
+					numCritRtUsrs++;
+				}
+				else {
+					numCritNonRtUsrs++;
+				}
+			}
 			insertToChainsThatJoinedLeaf (poaId, chain);
 			insertToChainsThatLeftDc (chain.curDc, chain.id);
 //			chainsThatLeftDc[chain.curDc].push_back (chain.id); // need to rlz this chain's rsrcs from its current place
@@ -1267,6 +1286,8 @@ inline void SimController::genSettingsBuf (bool printTime)
 /*************************************************************************************************************************************************
 * Print data about the comm overhead (e.g., # of pkts and of bytes sent at each level/direction, overall # of pkts and of bytes).
 * The data is written to resComOhFile
+* If alg failed to find a feasible sol, the data about the comm o/h isnt' full, because alg failed in the middle.
+	Hence, only the settings string is written, w/o details about the comm o/h.
 **************************************************************************************************************************************************/
 void SimController::printSimComOh ()
 {
@@ -1274,6 +1295,9 @@ void SimController::printSimComOh ()
 	ostream os(outBuf);
 	genSettingsBuf ();
 	os << settingsBuf;
+	if (algStts==FAIL) {
+		return;
+	}
 	int numPkts = 1;
 	int numBytes = 2;
 	if (MyConfig::DEBUG_LVL>0 && RtProb==1.0) {
@@ -1291,6 +1315,8 @@ void SimController::printSimComOh ()
 		sprintf (buf, " | nBytes%d = %d", i, (int)MyConfig::bitCnt[i]);
 		os << buf; 
 	}
+	sprintf (buf, " | overallCritNNewRtUsrs = %d  | overallCritNNewNonRtUsrs = %d", (int)(overallCritRtUsrs+overallNewRtUsrs), (int)(overallCritNonRtUsrs+overallNewNonRtUsrs));
+	os << buf; 	
 	sprintf (buf, "\n");
 	os << buf; 
 }
@@ -1317,7 +1343,7 @@ void SimController::printResLine (streambuf* outBuf)
   sprintf (buf," | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
   					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
   					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
-  					(int)ChainsMaster::allChains.size(), numCritUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
+  					(int)ChainsMaster::allChains.size(), numCritRtUsrs+numCritNonRtUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
   os << buf;
 }
 
