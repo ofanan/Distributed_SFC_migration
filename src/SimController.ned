@@ -27,6 +27,9 @@ simple SimController
     double BU_ACCUM_DELAY_OF_LVL1;
     double RESH_ACCUM_DELAY_OF_LVL1;
 		double beginVeryDetailedLogAtTraceTime;
+		int    LOG_LVL = default (0);
+		int    RES_LVL = default (1);
+		int    DEBUG_LVL = default (1);
 gates:
 		input directMsgsPort;
 }

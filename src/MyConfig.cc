@@ -114,10 +114,8 @@ bool MyConfig::openFiles()
 	
 	if (fileExists (resFileName)) {
 	  resFile.open(resFileName, std::ios_base::app);	
-	  logFile << "res file exists";
 	}
 	else {
-	  logFile << "res file does NOT exist";
 		resFile.open(resFileName);		  
 		resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
 		resFile << "// T is the slot cnt (read from the input file)" << endl;

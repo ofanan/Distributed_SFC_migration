@@ -25,8 +25,8 @@ bool  MyConfig::logComOh;
 // we begin the sim' in Sync mode, for easy init; switch to mode==Async at the second decision period
 int   MyConfig::mode; 
 int   MyConfig::LOG_LVL;
-int   MyConfig::DEBUG_LVL;
 int   MyConfig::RES_LVL;
+int   MyConfig::DEBUG_LVL;
 int		MyConfig::overallNumBlockedUsrs; 
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 
@@ -93,6 +93,9 @@ void SimController::initialize (int stage)
 		MyConfig::logDelays					 = bool   (par ("logDelays"));
 		MyConfig::logComOh					 = bool   (par ("logComOh"));
 		RtProb				  					 	 = double (par ("RtProb"));
+		MyConfig::LOG_LVL				 		 = int 	  (par ("LOG_LVL"));
+		MyConfig::RES_LVL				 		 = int 	  (par ("RES_LVL"));
+		MyConfig::DEBUG_LVL				 	 = int 	  (par ("DEBUG_LVL"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
 		MyConfig::FModePeriod 	   	 = 10; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -196,9 +199,6 @@ void SimController::initialize (int stage)
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
 			return;
 		}
-		MyConfig::LOG_LVL				 = NO_LOG;
-		MyConfig::DEBUG_LVL			 = 2;
-		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes   = false;  // when true, print to the log and to the .res file the results of the BUPU
 		Lvl_t h;
@@ -616,7 +616,7 @@ void SimController::finish ()
   	MyConfig::printToLog ("\nfinished sim\n");
   }
   if (MyConfig::logComOh) {
-    printSimCommOh ();
+    printSimComOh ();
   }
   std::chrono::time_point<std::chrono::high_resolution_clock> finishTime = std::chrono::high_resolution_clock::now();
   duration<double, std::micro> ms_double = finishTime - startTime;
@@ -1266,11 +1266,11 @@ inline void SimController::genSettingsBuf (bool printTime)
 
 /*************************************************************************************************************************************************
 * Print data about the comm overhead (e.g., # of pkts and of bytes sent at each level/direction, overall # of pkts and of bytes).
-* The data is written to resCommOhFile
+* The data is written to resComOhFile
 **************************************************************************************************************************************************/
-void SimController::printSimCommOh ()
+void SimController::printSimComOh ()
 {
-	streambuf* outBuf = commOhResFile.rdbuf();
+	streambuf* outBuf = MyConfig::comOhResFile.rdbuf();								   	
 	ostream os(outBuf);
 	genSettingsBuf ();
 	os << settingsBuf;
