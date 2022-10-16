@@ -18,6 +18,16 @@ const vector <vector <Cost_t>> MyConfig::NonRtChainCostAtLvl   = {{544, 278, 148
 const vector <vector <Cpu_t>>  MyConfig::RtChainMu_u 				   = {{17, 17, 19}, 								{17, 17, 19},								 {1, 	1 	 },  {17, 17, 19}};
 const vector <vector <Cpu_t>>  MyConfig::NonRtChainMu_u 		   = {{17, 17, 17, 17, 17, 17},			{17, 17, 17, 17, 17, 17}, 	 {1, 	1, 	1},  {17, 17, 17}};
 
+
+/*************************************************************************************************************************************************
+Inline functions
+**************************************************************************************************************************************************/
+inline bool MyConfig::fileExists (const std::string& name) // returns true iff the given fileName already exists
+{
+	struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
+
 /*************************************************************************************************************************************************
 Given a cntrNum, increment the respective pktCnt 1, and the respective bitCnt by the given bitCnt.
 Return true if the counters were successfully update, false else.
@@ -101,14 +111,39 @@ void MyConfig::rst()
 bool MyConfig::openFiles()
 {
 	logFile.open (logFileName);
-  resFile.open(resFileName, std::ios_base::app | std::ios_base::in);
-    
-	resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
-	resFile << "// T is the slot cnt (read from the input file)" << endl;
-	resFile << "// Mode is the algorithm / solver used."  << endl;
-	resFile << "// C is the num of CPU units used in the leaf"  << endl;
-	resFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
-	resFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else."  << endl  << endl;
+	
+	if (fileExists (resFileName)) {
+	  resFile.open(resFileName, std::ios_base::app);	
+	  logFile << "res file exists";
+	}
+	else {
+	  logFile << "res file does NOT exist";
+		resFile.open(resFileName);		  
+		resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
+		resFile << "// T is the slot cnt (read from the input file)" << endl;
+		resFile << "// Mode is the algorithm / solver used."  << endl;
+		resFile << "// C is the num of CPU units used in the leaf"  << endl;
+		resFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
+		resFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else."  << endl  << endl;
+	}
+	
+	if (logComOh) {
+		if (fileExists (comOhResFileName)) {
+		  comOhResFile.open(comOhResFileName, std::ios_base::app);
+		}
+		else {
+			comOhResFile.open(comOhResFileName);
+			comOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
+			comOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
+			comOhResFile << "// T is the slot cnt (read from the input file)" << endl;
+			comOhResFile << "// Mode is the algorithm / solver used."  << endl;
+			comOhResFile << "// nPktsi, nBytesi indicate the number of pkts/bytes sent in direction j.\n";
+			comOhResFile << "// The directions are determined as follows:\n";
+			comOhResFile << "// directions 0, 1, ..., lvlOfRoot-1 indicate pkts whose src is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt).\n";
+			comOhResFile << "// directions lvlOfRoot, lvlOfRoot+1, ..., 2*lvlOfRoot-1, indicate pkts whose src is 1,2, ... lvlOfRoot, destined to the child.\n\n";
+		}
+	}
+
 	return true;
 }
 

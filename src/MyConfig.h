@@ -2,7 +2,10 @@
 
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H
+#include <sys/stat.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <string>
 #include <string.h>
 #include <omnetpp.h>
 #include <iostream>
@@ -46,7 +49,7 @@ class MyConfig {
 		// A buffer for print-outs
 		static const int 	bufSize = 512;
 		static char 			buf[bufSize];
-    static ofstream 	logFile, resFile;
+    static ofstream 	logFile, resFile, comOhResFile;
 
 		// directions 0, 1, ..., lvlOfRoot-1 indicate pkts where the source is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt); 
 		// from lvlOfRoot there're no northbound packet. 
@@ -96,12 +99,12 @@ class MyConfig {
 		static bool evenChainsAreRt;
 
 		// parameters determining the debug and output files (.log and .res files)
-    static string logFileName, resFileName;
+    static string logFileName, resFileName, comOhResFileName;
 		static int 	LOG_LVL;
 		static int 	DEBUG_LVL;
 		static int 	RES_LVL;
 		static bool logDelays; // when true, the sim generates a log of the delays
-		static bool logCommOh; // when true, the sim generates a log of the comm overhead (num and sizes of pkts).
+		static bool logComOh; // when true, the sim generates a log of the comm overhead (num and sizes of pkts).
 		static bool printBuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		static bool printBupuRes; // when true, print to the log the results of BUPU
 		static bool notifiedReshInThisPeriod; // true iff already notified about resh in this period in the log file
@@ -129,6 +132,7 @@ class MyConfig {
 		static void printSuToLog (Chain chain);
 		
 		// Other accessories funcs'
+    static inline bool fileExists (const std::string& name);
 		static string exec(const char* cmd);
 		static void setNetTypeFromString (string str);
 		static int  getNetTypeFromString (string str);

@@ -19,7 +19,7 @@ Lvl_t MyConfig::lvlOfRoot;
 bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
 bool  MyConfig::logDelays;
-bool  MyConfig::logCommOh;
+bool  MyConfig::logComOh;
 
 // simulation mode: currently, either Sync/Async. This variable may be changed along the sim. In particular, for large (Lux/Monaco) sim, 
 // we begin the sim' in Sync mode, for easy init; switch to mode==Async at the second decision period
@@ -43,6 +43,8 @@ bool  MyConfig::measureRunTime;
 int   MyConfig::byteLengthOfreshAsyncPktFields;
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
+string MyConfig::comOhResFileName;
+ofstream MyConfig::comOhResFile;
 
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -89,7 +91,7 @@ void SimController::initialize (int stage)
 		this->mode                 	 = bool   (par ("syncMode"))? Sync : Async;
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
 		MyConfig::logDelays					 = bool   (par ("logDelays"));
-		MyConfig::logCommOh					 = bool   (par ("logCommOh"));
+		MyConfig::logComOh					 = bool   (par ("logComOh"));
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::traceTime 		   	 = -1.0;
 		maxTraceTime 						   	 = numeric_limits<float>::max();
@@ -196,7 +198,7 @@ void SimController::initialize (int stage)
 		}
 		MyConfig::LOG_LVL				 = NO_LOG;
 		MyConfig::DEBUG_LVL			 = 2;
-		MyConfig::RES_LVL				 = 0;
+		MyConfig::RES_LVL				 = 1;
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes   = false;  // when true, print to the log and to the .res file the results of the BUPU
 		Lvl_t h;
@@ -349,18 +351,6 @@ void SimController::openFiles ()
   if (!traceFile.is_open ()) {
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
-
-	if (MyConfig::logCommOh) {
-		commOhResFileName = networkName + ".com";
-	  commOhResFile.open(commOhResFileName, std::ios_base::app | std::ios_base::in);
-	  commOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
-		commOhResFile << "// T is the slot cnt (read from the input file)" << endl;
-		commOhResFile << "// Mode is the algorithm / solver used."  << endl;
-		commOhResFile << "// nPktsi, nBytesi indicate the number of pkts/bytes sent in direction j.\n";
-		commOhResFile << "// The directions are determined as follows:\n";
-		commOhResFile << "// directions 0, 1, ..., lvlOfRoot-1 indicate pkts whose src is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt).\n";
-		commOhResFile << "// directions lvlOfRoot, lvlOfRoot+1, ..., 2*lvlOfRoot-1, indicate pkts whose src is 1,2, ... lvlOfRoot, destined to the child.\n\n";
-	}
 
 	if (MyConfig::runningRtProbSim) {
 		if (MyConfig::netType==MonacoIdx) {
@@ -625,7 +615,7 @@ void SimController::finish ()
 	if (MyConfig::LOG_LVL>0) {
   	MyConfig::printToLog ("\nfinished sim\n");
   }
-  if (MyConfig::logCommOh) {
+  if (MyConfig::logComOh) {
     printSimCommOh ();
   }
   std::chrono::time_point<std::chrono::high_resolution_clock> finishTime = std::chrono::high_resolution_clock::now();
@@ -1338,8 +1328,9 @@ void SimController::setOutputFileNames ()
 {
 	
 	string traceRawName = MyConfig::traceFileName.substr(0, MyConfig::traceFileName.find_last_of("."));
-	MyConfig::resFileName = traceRawName + "_" + MyConfig::modeStr + ".res";
-	MyConfig::logFileName = traceRawName + "_" + MyConfig::modeStr + ".log";
+	MyConfig::resFileName 			= traceRawName + "_" + MyConfig::modeStr + ".res";
+	MyConfig::logFileName 		  = traceRawName + "_" + MyConfig::modeStr + ".log";
+	MyConfig::comOhResFileName  = networkName + ".comoh";
 }
 
 

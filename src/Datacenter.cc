@@ -1498,7 +1498,7 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 		cntrNum = (portNum==0)? lvl : MyConfig::lvlOfRoot-1+lvl;
 	}
 	
-	if (MyConfig::logCommOh) {
+	if (MyConfig::logComOh) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 			sprintf (buf, "\ns%d : xmting pktSize=%d", dcId, (int)pkt2snd->getByteLength());
 			printBufToLog ();

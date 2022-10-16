@@ -16,7 +16,7 @@ simple SimController
     bool   syncMode			 = default (false);
     double RtProb				 = default (0.3); // prob' that a new chain is an RT chain
     bool logDelays			 = default (false);
-    bool logCommOh			 = default (false);
+    bool logComOh			   = default (false);
 		bool manuallySetPktSize = default (true);
     bool   runningRtProbSim = default (false);
     double decisionPariod @unit(s) = default(1s);
