@@ -744,6 +744,20 @@ void Datacenter::bottomUpFMode ()
 }
 
 /************************************************************************************************************************************************
+If chain (request) blocking is allowed, block the given chain, given its id.
+*************************************************************************************************************************************************/
+void Datacenter::blockChain (ChainId_t chainId)
+{
+	if (!ChainsMaster::blockChain (chainId)) {
+		error ("s%d tried to block c%d that wasn't found in ChainsMaster", dcId, chainId);
+	}
+	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { 
+		sprintf (buf, "\ns%d : simT=%.3f. blocked c%d", dcId, simTime().dbl(), chainId);
+		printBufToLog ();
+	} 
+}
+
+/************************************************************************************************************************************************
 Handle a failure to place an old (exiting) chain
 *************************************************************************************************************************************************/
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)

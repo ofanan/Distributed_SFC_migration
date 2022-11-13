@@ -88,6 +88,7 @@ class MyConfig {
     static bool runningCampaign;
     static bool measureRunTime;
 		static bool manuallySetPktSize;
+		static bool allowBlkChain;
 		static bool isFirstPeriod; // will be true iff this the first decision period in the sim
 		static int  bitLenOfRtChain, bitLenOfNonRtChain, bitLenOfHdr, bitLenOfRtChainInPdReqPkt, bitLenOfNonRtChainInPdReqPkt;
 		static int  lenOfChainId, lenOfDcId, lenOfClassId, lenOfCputAtInitiator, lenOfDefCpu;

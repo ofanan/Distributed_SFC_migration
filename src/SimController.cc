@@ -20,6 +20,7 @@ bool  MyConfig::discardAllMsgs;
 bool 	MyConfig::useFullResh;
 bool  MyConfig::logDelays;
 bool  MyConfig::logComOh;
+bool  MyConfig::allowBlkChain;
 
 // simulation mode: currently, either Sync/Async. This variable may be changed along the sim. In particular, for large (Lux/Monaco) sim, 
 // we begin the sim' in Sync mode, for easy init; switch to mode==Async at the second decision period
@@ -100,6 +101,7 @@ void SimController::initialize (int stage)
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
 		MyConfig::logDelays					 = bool   (par ("logDelays"));
 		MyConfig::logComOh					 = bool   (par ("logComOh"));
+		MyConfig::allowBlkChain      = bool   (par ("allowBlkChain"));
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::LOG_LVL				 		 = int 	  (par ("LOG_LVL"));
 		MyConfig::RES_LVL				 		 = int 	  (par ("RES_LVL"));

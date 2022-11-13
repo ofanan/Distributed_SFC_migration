@@ -20,6 +20,7 @@ simple SimController
 		bool manuallySetPktSize = default (true);
     bool   runningRtProbSim = default (false);
     double decisionPariod @unit(s) = default(1s);
+    bool allowBlkChain = default (false); // allow blocking of new requests
     int bitLenOfHdr 	= default (10);
     double BU_ACCUM_DELAY_OF_LVL1;
     double RESH_ACCUM_DELAY_OF_LVL1;
