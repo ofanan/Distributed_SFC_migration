@@ -110,7 +110,6 @@ void SimController::initialize (int stage)
 
 		MyConfig::runningBinSearchSim      = false; // default. will be changed if running a bin search sim.
 		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
-		MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
 		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -226,6 +225,7 @@ Sets and calculates the bit lens of packets and packets' fields.
   MyConfig::bitLenOfRtChain 	 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
   MyConfig::bitLenOfNonRtChain = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
 	MyConfig::bitLenOfReshAsyncPktFields = MyConfig::lenOfCputAtInitiator + MyConfig::lenOfDefCpu;
+	MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
 }
 
 /*************************************************************************************************************************************************
