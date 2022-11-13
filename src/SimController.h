@@ -152,6 +152,7 @@ class SimController : public cSimpleModule
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 		void printErrStrAndExit (const string &errorMsgStr);
 		bool alreadySucceededWithThisSeed ();
+	  void calcBitLens ();
 				 
   public:
 		int netType;

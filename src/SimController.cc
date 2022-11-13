@@ -105,9 +105,6 @@ void SimController::initialize (int stage)
 		MyConfig::runningBinSearchSim      = false; // default. will be changed if running a bin search sim.
 		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
 		MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
-		MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
-		MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
-    MyConfig::bitLenOfReshAsyncPktFields = par ("bitLenOfReshAsyncPktFields");
 		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -191,6 +188,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
+		calcBitLens ();
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
@@ -212,6 +210,16 @@ void SimController::initialize (int stage)
 		 runTrace ();
 //		 initBinSearchSim ();
 	}
+}
+
+void SimController::calcBitLens ()
+/*************************************************************************************************************************************************
+Sets and calculates the bit lens of packets and packets' fields.
+**************************************************************************************************************************************************/
+{
+  MyConfig::bitLenOfReshAsyncPktFields = par ("bitLenOfReshAsyncPktFields");
+	MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
+	MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
 }
 
 /*************************************************************************************************************************************************
