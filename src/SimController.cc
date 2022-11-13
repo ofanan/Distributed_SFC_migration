@@ -33,6 +33,8 @@ bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the l
 bool  MyConfig::manuallySetPktSize;
 int   MyConfig::bitLenOfHdr;
 int   MyConfig::bitLenOfRtChain;
+int   MyConfig::bitLenOfRtChainInPdReqPkt;
+int   MyConfig::bitLenOfNonRtChainInPdReqPkt;
 int   MyConfig::bitLenOfNonRtChain;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
@@ -40,7 +42,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
-int   MyConfig::bitLenOfReshAsyncPktFields;
+int   MyConfig::basicBitLenOfReshAsyncPkt;
 int   MyConfig::lenOfDcId 	 = 12;
 int   MyConfig::lenOfChainId = 14;
 int   MyConfig::lenOfClassId = 4;
@@ -222,10 +224,12 @@ void SimController::calcBitLens ()
 Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
-  MyConfig::bitLenOfRtChain 	 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
-  MyConfig::bitLenOfNonRtChain = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
-	MyConfig::bitLenOfReshAsyncPktFields = MyConfig::lenOfCputAtInitiator + MyConfig::lenOfDefCpu;
-	MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
+  MyConfig::bitLenOfRtChain 	 					 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
+  MyConfig::bitLenOfNonRtChain 					 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
+  MyConfig::bitLenOfRtChainInPdReqPkt 	 = MyConfig::bitLenOfRtChain    + MyConfig::lenOfCputAtInitiator;
+  MyConfig::bitLenOfNonRtChainInPdReqPkt = MyConfig::bitLenOfNonRtChain + MyConfig::lenOfCputAtInitiator;
+	MyConfig::bitLenOfHdr  		 	 				   = par ("bitLenOfHdr");
+	MyConfig::basicBitLenOfReshAsyncPkt 	 = MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
 }
 
 /*************************************************************************************************************************************************

@@ -34,9 +34,19 @@ inline bool Datacenter::wasPushedUp (const Chain &chain) const {return (chain.cu
 /*************************************************************************************************************************************************
 calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
-inline int  Datacenter::bitLenOfPkt (const int numRtChains, const int &numNonRtChains)
+int Datacenter::bitLenOfPkt (const int numRtChains, const int &numNonRtChains, bool isPdReqPkt, bool isPdAckPkt)
 {
-	return MyConfig::bitLenOfHdr + MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
+	if (isPdReqPkt) { 
+		return MyConfig::basicBitLenOfReshAsyncPkt + 
+		 		   MyConfig::bitLenOfRtChainInPdReqPkt * numRtChains + MyConfig::bitLenOfNonRtChainInPdReqPkt * numNonRtChains;
+	}
+	else if (isPdReqPkt) { 
+		return MyConfig::basicBitLenOfReshAsyncPkt + 
+		 		   MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
+	}
+	else {
+		return MyConfig::bitLenOfHdr + MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
+	}
 }
 
 
@@ -1343,7 +1353,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
 		
-		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains) + MyConfig::bitLenOfReshAsyncPktFields); 
+		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains)); 
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
@@ -1552,7 +1562,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setReshInitiatorLvl    (pkt->getReshInitiatorLvl ());
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
-		pkt2snd->setBitLength (bitLenOfPkt (0,0) + MyConfig::bitLenOfReshAsyncPktFields); 
+		pkt2snd->setBitLength (bitLenOfPkt (0,0)); 
 		sndViaQ (portToPrnt, pkt2snd);
 		return; 
 	}

@@ -147,7 +147,7 @@ class Datacenter : public cSimpleModule
     void failedToPlaceOldChain (ChainId_t chainId);
     bool checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain);
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
-		inline int bitLenOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
+		int bitLenOfPkt (const int numRtChains, const int &numNonRtChains, bool isPdReqPkt=false, bool isPdAckPkt=false); // calculate the len of a pkt
 		
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
