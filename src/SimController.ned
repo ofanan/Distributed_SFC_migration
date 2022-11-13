@@ -23,7 +23,7 @@ simple SimController
     int bitLenOfHdr 	= default (10);
     int bitLenOfRtChain = default (10);
     int bitLenOfNonRtChain = default (15);
-    int byteLengthOfreshAsyncPktFields = default (4);
+    int bitLenOfReshAsyncPktFields = default (4);
     double BU_ACCUM_DELAY_OF_LVL1;
     double RESH_ACCUM_DELAY_OF_LVL1;
 		double beginVeryDetailedLogAtTraceTime;

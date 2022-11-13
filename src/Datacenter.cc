@@ -1343,7 +1343,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
 		
-		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + MyConfig::byteLengthOfreshAsyncPktFields); 
+		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + MyConfig::bitLenOfReshAsyncPktFields); 
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
@@ -1552,7 +1552,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setReshInitiatorLvl    (pkt->getReshInitiatorLvl ());
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
-		pkt2snd->setByteLength (byteLengthOfPkt (0,0) + MyConfig::byteLengthOfreshAsyncPktFields); 
+		pkt2snd->setByteLength (byteLengthOfPkt (0,0) + MyConfig::bitLenOfReshAsyncPktFields); 
 		sndViaQ (portToPrnt, pkt2snd);
 		return; 
 	}

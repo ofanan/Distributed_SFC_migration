@@ -40,7 +40,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
-int   MyConfig::byteLengthOfreshAsyncPktFields;
+int   MyConfig::bitLenOfReshAsyncPktFields;
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
 string MyConfig::comOhResFileName;
@@ -107,7 +107,7 @@ void SimController::initialize (int stage)
 		MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
 		MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
 		MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
-    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
+    MyConfig::bitLenOfReshAsyncPktFields = par ("bitLenOfReshAsyncPktFields");
 		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
