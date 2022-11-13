@@ -223,14 +223,9 @@ void SimController::calcBitLens ()
 Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
-  MyConfig::bitLenOfReshAsyncPktFields = par ("bitLenOfReshAsyncPktFields");
   MyConfig::bitLenOfRtChain 	 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
   MyConfig::bitLenOfNonRtChain = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
-//int   MyConfig::lenOfCputAtInitiator = 5;
-//int   MyConfig::lenOfDefCpu = 16;
-
-//	MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
-//	MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
+	MyConfig::bitLenOfReshAsyncPktFields = MyConfig::lenOfCputAtInitiator + MyConfig::lenOfDefCpu;
 }
 
 /*************************************************************************************************************************************************
