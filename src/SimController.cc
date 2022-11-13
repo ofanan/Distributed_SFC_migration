@@ -41,6 +41,12 @@ bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
 int   MyConfig::bitLenOfReshAsyncPktFields;
+int   MyConfig::lenOfDcId 	 = 12;
+int   MyConfig::lenOfChainId = 14;
+int   MyConfig::lenOfClassId = 4;
+int   MyConfig::lenOfCputAtInitiator = 5;
+int   MyConfig::lenOfDefCpu = 16;
+
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
 string MyConfig::comOhResFileName;
@@ -218,6 +224,7 @@ Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
   MyConfig::bitLenOfReshAsyncPktFields = par ("bitLenOfReshAsyncPktFields");
+  MyConfig::bitLenOfRtChain = 
 	MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
 	MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
 }
