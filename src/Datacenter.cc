@@ -1353,7 +1353,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
 		
-		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains)); 
+		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains, true, false)); 
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
@@ -1562,7 +1562,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setReshInitiatorLvl    (pkt->getReshInitiatorLvl ());
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
-		pkt2snd->setBitLength (bitLenOfPkt (0,0)); 
+		pkt2snd->setBitLength (bitLenOfPkt (0,0, false, true)); 
 		sndViaQ (portToPrnt, pkt2snd);
 		return; 
 	}
@@ -1804,7 +1804,7 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);	
 		pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
 	}
-	pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
+	pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains, false, true));
 	sndViaQ (portToPrnt, pkt2snd);
 	pushDwnAck.clear ();
 }
