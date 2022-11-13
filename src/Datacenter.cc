@@ -34,9 +34,9 @@ inline bool Datacenter::wasPushedUp (const Chain &chain) const {return (chain.cu
 /*************************************************************************************************************************************************
 calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
-inline int  Datacenter::byteLengthOfPkt (const int numRtChains, const int &numNonRtChains)
+inline int  Datacenter::bitLenOfPkt (const int numRtChains, const int &numNonRtChains)
 {
-	return MyConfig::byteLengthOfHeader + MyConfig::byteLengthOfRtChain * numRtChains + MyConfig::byteLengthOfNonRtChain * numNonRtChains;
+	return MyConfig::bitLenOfHdr + MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
 }
 
 
@@ -283,7 +283,7 @@ void Datacenter::handleMessage (cMessage *msg)
 	// Log the delay of the arriving packet, if needed
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
-		pktLen=int(pktPtr->getByteLength());
+		pktLen=int(pktPtr->getBitLength());
 		if (pktLen>0) {
 			sprintf (buf, "\ns%d : rcvd pkt of len=%d, delay=%f", dcId, pktLen, (pktPtr->getCreationTime()-simTime()).dbl());	
 			printBufToLog ();
@@ -639,7 +639,7 @@ void Datacenter::genNsndPushUpPktsToChildren ()
 		pkt->setPushUpVecArraySize (idxInPushUpVec);
 		
 		if (MyConfig::mode==Sync || idxInPushUpVec>0) { // In sync' mode, send a pkt to each child; in async mode - send a pkt only if its push-up vec isn't empty
-			pkt->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
+			pkt->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
 			sndViaQ (portToChild(child), pkt); //send the pkt to the child
 			if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
 				sprintf (buf, "\n s%d : simT=%f, snding PU pkt to child %d. PUL=", dcId, simTime().dbl(), dcIdOfChild[child]);
@@ -954,7 +954,7 @@ void Datacenter::handleBottomUpPktAsyncFMode ()
 			pkt2snd->setPushUpVec (i, chain);
 			incChainsInPktCnt (chain, numRtChains, numNonRtChains);
 		}
-		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
+		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
 		sndViaQ (portToChild(child), pkt2snd); //send the pkt to the child
 	}
 
@@ -1058,7 +1058,7 @@ void Datacenter::genNsndBottomUpPktSync ()
 		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);
 	}
 	pkt2snd -> setPushUpVecArraySize (idxInPushUpVec); // adjust the array's size to the real number of chains inserted into it. 
-	pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
+	pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
 	sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 	if (!reshuffled) { 
 		notAssigned.clear ();
@@ -1080,7 +1080,7 @@ void Datacenter::genNsndBottomUpFmodePktAsync ()
 			pkt2snd->setNotAssigned (i, notAssigned[i]);
 			incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 		}
-		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
+		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt
 	}	
 	notAssigned.clear ();
@@ -1126,7 +1126,7 @@ void Datacenter::genNsndBottomUpPktAsync ()
 			incChainsInPktCnt (notAssigned[i], numRtChains, numNonRtChains);
 		}
 
-		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
+		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
 		sndViaQ (0, pkt2snd); //send the bottomUPpkt to my prnt	
 	}
 	else { // no really data to send; in async mode there's no use to send an empty pkt, so just destroy it
@@ -1343,7 +1343,7 @@ bool Datacenter::sndReshAsyncPktToNxtChild ()
 			pkt2snd->setPushDwnVec (idxInPushDwnVec++, chain);
 		}
 		
-		pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains) + MyConfig::byteLengthOfreshAsyncPktFields); 
+		pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains) + MyConfig::bitLenOfReshAsyncPktFields); 
 		sndViaQ (portToChild(nxtChildToSndReshAsync), pkt2snd); //send the pkt to the child
 		nxtChildToSndReshAsync++;
 		return true; // successfully sent pkt to the next child	
@@ -1379,7 +1379,7 @@ void Datacenter::prepareReshSync ()
 	clrRsrc ();
 	for (int child(0); child<numChildren; child++) { // for each child...
 		PrepareReshSyncPkt* pkt2snd = new PrepareReshSyncPkt;
-		pkt2snd->setByteLength (byteLengthOfPkt (0, 0)); 	
+		pkt2snd->setBitLength (bitLenOfPkt (0, 0)); 	
 		sndViaQ (portToChild(child), pkt2snd); //send the bottomUPpkt to the child
 	}
 	
@@ -1468,8 +1468,8 @@ void Datacenter::scheduleEndFModeEvent ()
 *************************************************************************************************************************************************/
 void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 {
-	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getByteLength()<MyConfig::byteLengthOfHeader) {
-		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getByteLength(), MyConfig::byteLengthOfHeader);
+	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getBitLength()<MyConfig::bitLenOfHdr) {
+		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getBitLength(), MyConfig::bitLenOfHdr);
 	}
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (pkt2snd);
@@ -1500,10 +1500,10 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 	
 	if (MyConfig::logComOh) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			sprintf (buf, "\ns%d : xmting pktSize=%d", dcId, (int)pkt2snd->getByteLength());
+			sprintf (buf, "\ns%d : xmting pktSize=%d", dcId, (int)pkt2snd->getBitLength());
 			printBufToLog ();
 		}
-		bool stts =  MyConfig::incCntr (cntrNum, pkt2snd->getByteLength());
+		bool stts =  MyConfig::incCntr (cntrNum, pkt2snd->getBitLength());
 		if (MyConfig::DEBUG_LVL>0 && (!stts)) {
 			error ("s%d : t=%.3f problem when calling MyConfig::incCntr. lvl=%d, portNum=%d, cntrNum=%d, height=%d", 
 							dcId, MyConfig::traceTime, lvl, portNum, cntrNum, MyConfig::height);
@@ -1552,7 +1552,7 @@ void Datacenter::handleReshAsyncPktFromPrnt  ()
 		pkt2snd -> setReshInitiatorLvl    (pkt->getReshInitiatorLvl ());
 		pkt2snd -> setDeficitCpu 		      (pkt->getDeficitCpu());
 		pkt2snd -> setPushDwnVecArraySize (0);
-		pkt2snd->setByteLength (byteLengthOfPkt (0,0) + MyConfig::byteLengthOfreshAsyncPktFields); 
+		pkt2snd->setBitLength (bitLenOfPkt (0,0) + MyConfig::bitLenOfReshAsyncPktFields); 
 		sndViaQ (portToPrnt, pkt2snd);
 		return; 
 	}
@@ -1794,7 +1794,7 @@ void Datacenter::sndReshAsyncPktToPrnt ()
 		incChainsInPktCnt (*chainPtr, numRtChains, numNonRtChains);	
 		pkt2snd->setPushDwnVec (idxInPushDwnVec++, *chainPtr);
 	}
-	pkt2snd->setByteLength (byteLengthOfPkt (numRtChains, numNonRtChains));
+	pkt2snd->setBitLength (bitLenOfPkt (numRtChains, numNonRtChains));
 	sndViaQ (portToPrnt, pkt2snd);
 	pushDwnAck.clear ();
 }
