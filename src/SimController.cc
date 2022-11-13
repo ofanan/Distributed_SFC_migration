@@ -31,7 +31,7 @@ int		MyConfig::overallNumBlockedUsrs;
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 
 bool  MyConfig::manuallySetPktSize;
-int   MyConfig::byteLengthOfHeader;
+int   MyConfig::bitLenOfHdr;
 int   MyConfig::bitLenOfRtChain;
 int   MyConfig::bitLenOfNonRtChain;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -104,7 +104,7 @@ void SimController::initialize (int stage)
 
 		MyConfig::runningBinSearchSim      = false; // default. will be changed if running a bin search sim.
 		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
-		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
+		MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
 		MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
 		MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
     MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");

@@ -20,7 +20,7 @@ simple SimController
 		bool manuallySetPktSize = default (true);
     bool   runningRtProbSim = default (false);
     double decisionPariod @unit(s) = default(1s);
-    int byteLengthOfHeader 	= default (10);
+    int bitLenOfHdr 	= default (10);
     int bitLenOfRtChain = default (10);
     int bitLenOfNonRtChain = default (15);
     int byteLengthOfreshAsyncPktFields = default (4);

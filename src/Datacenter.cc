@@ -36,7 +36,7 @@ calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
 inline int  Datacenter::byteLengthOfPkt (const int numRtChains, const int &numNonRtChains)
 {
-	return MyConfig::byteLengthOfHeader + MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
+	return MyConfig::bitLenOfHdr + MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
 }
 
 
@@ -1468,8 +1468,8 @@ void Datacenter::scheduleEndFModeEvent ()
 *************************************************************************************************************************************************/
 void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 {
-	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getByteLength()<MyConfig::byteLengthOfHeader) {
-		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getByteLength(), MyConfig::byteLengthOfHeader);
+	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getByteLength()<MyConfig::bitLenOfHdr) {
+		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getByteLength(), MyConfig::bitLenOfHdr);
 	}
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (pkt2snd);
