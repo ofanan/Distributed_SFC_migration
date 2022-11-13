@@ -283,7 +283,7 @@ void Datacenter::handleMessage (cMessage *msg)
 	// Log the delay of the arriving packet, if needed
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
-		pktLen=int(pktPtr->getByteLength());
+		pktLen=int(pktPtr->getBitLength());
 		if (pktLen>0) {
 			sprintf (buf, "\ns%d : rcvd pkt of len=%d, delay=%f", dcId, pktLen, (pktPtr->getCreationTime()-simTime()).dbl());	
 			printBufToLog ();
@@ -1468,8 +1468,8 @@ void Datacenter::scheduleEndFModeEvent ()
 *************************************************************************************************************************************************/
 void Datacenter::sndViaQ (int16_t portNum, cPacket* pkt2snd)
 {
-	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getByteLength()<MyConfig::bitLenOfHdr) {
-		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getByteLength(), MyConfig::bitLenOfHdr);
+	if (MyConfig::DEBUG_LVL>0 && pkt2snd->getBitLength()<MyConfig::bitLenOfHdr) {
+		error ("s%d : sndViaQ got a pkt with length=%d, while the header length is %d", dcId, pkt2snd->getBitLength(), MyConfig::bitLenOfHdr);
 	}
   if (endXmtEvents[portNum]!=nullptr && endXmtEvents[portNum]->isScheduled()) { // if output Q is busy
     outputQ[portNum].insert (pkt2snd);
@@ -1500,10 +1500,10 @@ void Datacenter::xmt(int16_t portNum, cPacket* pkt2snd)
 	
 	if (MyConfig::logComOh) {
 		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) {
-			sprintf (buf, "\ns%d : xmting pktSize=%d", dcId, (int)pkt2snd->getByteLength());
+			sprintf (buf, "\ns%d : xmting pktSize=%d", dcId, (int)pkt2snd->getBitLength());
 			printBufToLog ();
 		}
-		bool stts =  MyConfig::incCntr (cntrNum, pkt2snd->getByteLength());
+		bool stts =  MyConfig::incCntr (cntrNum, pkt2snd->getBitLength());
 		if (MyConfig::DEBUG_LVL>0 && (!stts)) {
 			error ("s%d : t=%.3f problem when calling MyConfig::incCntr. lvl=%d, portNum=%d, cntrNum=%d, height=%d", 
 							dcId, MyConfig::traceTime, lvl, portNum, cntrNum, MyConfig::height);
