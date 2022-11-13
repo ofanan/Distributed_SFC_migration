@@ -702,13 +702,7 @@ void Datacenter::bottomUpFMode ()
 			// Not enough availCpu for this chain, and it cannot be placed higher
 			if (withinResh ()) { // within (or just finished) a reshuffle --> don't initiate a new reshuffle, even upon a failure to place a chain
 				if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
-					if (!ChainsMaster::blockChain (chainPtr->id)) {
-						error ("s%d tried to block c%d that wasn't found in ChainsMaster", dcId, chainPtr->id);
-					}
-					if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { 
-						sprintf (buf, "\ns%d : simT=%.3f. blocked c%d", dcId, simTime().dbl(), chainPtr->id);
-						printBufToLog ();
-					} 
+					blockChain (chainPtr->id);
 					chainPtr = notAssigned.erase (chainPtr); 
 				}
 				else { // Failed to place an old chain even after resh
@@ -748,13 +742,31 @@ If chain (request) blocking is allowed, block the given chain, given its id.
 *************************************************************************************************************************************************/
 void Datacenter::blockChain (ChainId_t chainId)
 {
-	if (!ChainsMaster::blockChain (chainId)) {
-		error ("s%d tried to block c%d that wasn't found in ChainsMaster", dcId, chainId);
+
+	if (MyConfig::mode==Sync) {
+		sprintf (buf, "BU Sync blocked a chain");
+		if (MyConfig::LOG_LVL>0) {
+			printBufToLog ();
+			cout << buf << endl;
+		}
+		return simController-> handleAlgFailure ();
 	}
-	if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { 
-		sprintf (buf, "\ns%d : simT=%.3f. blocked c%d", dcId, simTime().dbl(), chainId);
-		printBufToLog ();
-	} 
+	else if (!MyConfig::allowBlkChain) {
+		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { 
+			sprintf (buf, "\ns%d : simT=%.3f. tried to block c%d", dcId, simTime().dbl(), chainId);
+			printBufToLog ();
+		} 
+		return simController-> handleAlgFailure ();
+	}
+	else { // now we know that mode==Async, and chain blking is allowed
+		if (!ChainsMaster::blockChain (chainId)) {
+			error ("s%d tried to block c%d that wasn't found in ChainsMaster", dcId, chainId);
+		}
+		if (MyConfig::LOG_LVL>=VERY_DETAILED_LOG) { 
+			sprintf (buf, "\ns%d : simT=%.3f. blocked c%d", dcId, simTime().dbl(), chainId);
+			printBufToLog ();
+		} 
+	}
 }
 
 /************************************************************************************************************************************************
@@ -818,15 +830,8 @@ void Datacenter::bottomUp ()
 				if (reshuffled) {
 					if (chainPtr -> isNew()) { // Failed to place a new chain even after resh
 						MyConfig::overallNumBlockedUsrs++;
-						if (!ChainsMaster::blockChain (chainPtr->id)) {
-							error ("s%d tried to block c%d that wasn't found in ChainsMaster", dcId, chainPtr->id);
-						}
-						sprintf (buf, "BU Sync blocked a chain");
-						if (MyConfig::LOG_LVL>0) {
-							printBufToLog ();
-							cout << buf << endl;
-						}
-						return simController-> handleAlgFailure ();
+						blockChain (chainPtr->id);
+						return;
 					if (MyConfig::LOG_LVL>=DETAILED_LOG) { 
 						sprintf (buf, "\ns%d : blocked c%d", dcId, chainPtr->id);
 						printBufToLog ();
