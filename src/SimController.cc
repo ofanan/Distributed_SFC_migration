@@ -31,7 +31,7 @@ int		MyConfig::overallNumBlockedUsrs;
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 
 bool  MyConfig::manuallySetPktSize;
-int   MyConfig::bitLenOfHdr;
+int   MyConfig::byteLengthOfHeader;
 int   MyConfig::bitLenOfRtChain;
 int   MyConfig::bitLenOfNonRtChain;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
@@ -40,7 +40,7 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
-int   MyConfig::bitLenOfReshAsyncPktFields;
+int   MyConfig::byteLengthOfreshAsyncPktFields;
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
 string MyConfig::comOhResFileName;
@@ -104,10 +104,10 @@ void SimController::initialize (int stage)
 
 		MyConfig::runningBinSearchSim      = false; // default. will be changed if running a bin search sim.
 		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
-		MyConfig::bitLenOfHdr  		 = par ("bitLenOfHdr");
+		MyConfig::byteLengthOfHeader  		 = par ("byteLengthOfHeader");
 		MyConfig::bitLenOfRtChain 		 = par ("bitLenOfRtChain");
 		MyConfig::bitLenOfNonRtChain   = par ("bitLenOfNonRtChain");
-    MyConfig::bitLenOfReshAsyncPktFields = par ("bitLenOfReshAsyncPktFields");
+    MyConfig::byteLengthOfreshAsyncPktFields = par ("byteLengthOfreshAsyncPktFields");
 		
 		if (mode==Sync) {
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
@@ -126,18 +126,15 @@ void SimController::initialize (int stage)
   
 		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
-		
+
   	double BU_ACCUM_DELAY_OF_LVL1			 		= double (par ("BU_ACCUM_DELAY_OF_LVL1"));
 		double RESH_ACCUM_DELAY_OF_LVL1		 		= double (par ("RESH_ACCUM_DELAY_OF_LVL1"));		
+		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] 	= 0.0;
+		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] 	= 0.0;
 
-		if (bool (par("useZeroAccumDelay"))) {
-      memset(&MyConfig::RESH_ACCUM_DELAY_OF_LVL[0], 0.0, MyConfig::RESH_ACCUM_DELAY_OF_LVL.size() * sizeof MyConfig::RESH_ACCUM_DELAY_OF_LVL[0]);
-		}
-		else {
-			for (int lvl=0; lvl<MyConfig::height; lvl++) {
-				MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float (lvl*BU_ACCUM_DELAY_OF_LVL1);
-				MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float (lvl*RESH_ACCUM_DELAY_OF_LVL1);
-			}
+		for (int lvl=1; lvl<MyConfig::height; lvl++) {
+			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float (lvl*BU_ACCUM_DELAY_OF_LVL1);
+			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float (lvl*RESH_ACCUM_DELAY_OF_LVL1);
 		}
 
 		srand(seed); // set the seed of random num generation
@@ -268,7 +265,7 @@ Run a binary search for the minimal amount of cpu required to find a feasible so
 **************************************************************************************************************************************************/
 void SimController::initBinSearchSim ()
 {
-	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.4; // maximum rsrc aug ratio to consider
+	float max_R = (MyConfig::netType==UniformTreeIdx)? 8 : 1.2; // maximum rsrc aug ratio to consider
 	lastBinSearchRun = false;
 	MyConfig::runningBinSearchSim = true;
 	lb = MyConfig::cpuAtLeaf;
@@ -584,15 +581,11 @@ void SimController::rst ()
 	chainsThatLeftDc.		 clear ();
 	usrsThatLeft.				 clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	numMigsAtThisPeriod     = 0; 
-	numCritRtUsrs 			    = 0;
-	numCritNonRtUsrs        = 0;
-	numNewRtUsrs 			      = 0;
-	numNewNonRtUsrs         = 0;
-	overallCritRtUsrs 	    = 0;
-	overallCritNonRtUsrs    = 0;
-	overallNewRtUsrs 		    = 0;
-	overallNewNonRtUsrs     = 0;
+	numMigsAtThisPeriod = 0; 
+	numCritRtUsrs 			= 0;
+	numCritNonRtUsrs    = 0;
+	numNewRtUsrs 			  = 0;
+	numNewNonRtUsrs     = 0;
 	MyConfig::isFirstPeriod = true;
 	isLastPeriod 					  = false;
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
@@ -1076,7 +1069,7 @@ void SimController::prepareFullReshSync ()
 {
 	Enter_Method ("SimController::prepareFullReshSync ()");
 	MyConfig::discardAllMsgs = true;
-	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL.back(), new cMessage ("InitFullReshMsg"));
+	scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("InitFullReshMsg"));
 }
 
 
@@ -1365,6 +1358,7 @@ void SimController::setOutputFileNames ()
 	MyConfig::logFileName 		  = traceRawName + "_" + MyConfig::modeStr + ".log";
 	MyConfig::comOhResFileName  = networkName + ".comoh";
 }
+
 
 
 

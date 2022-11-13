@@ -40,6 +40,9 @@ const int uniformChainMigCost = 600;
 // Mode: Sync, or Async
 const bool Sync  = 0;
 const bool Async = 1;
+
+// Determining the level of debug and log.
+const float ACCUMULATION_DELAY = 0.05;
 										 
 class MyConfig { 
 
@@ -86,8 +89,8 @@ class MyConfig {
     static bool measureRunTime;
 		static bool manuallySetPktSize;
 		static bool isFirstPeriod; // will be true iff this the first decision period in the sim
-		static int  bitLenOfRtChain, bitLenOfNonRtChain, bitLenOfHdr;
-		static int  bitLenOfReshAsyncPktFields;
+		static int  bitLenOfRtChain, bitLenOfNonRtChain, byteLengthOfHeader;
+		static int  byteLengthOfreshAsyncPktFields;
 	  static vector <float> BU_ACCUM_DELAY_OF_LVL;
 	  static vector <float> RESH_ACCUM_DELAY_OF_LVL;
 
@@ -144,6 +147,7 @@ class MyConfig {
 };
 
 #endif
+
 
 
 

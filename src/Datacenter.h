@@ -35,6 +35,7 @@ class Datacenter : public cSimpleModule
     SimController 	*simController;
   	string 					networkName;
   	Lvl_t   				lvl; // level in the tree (leaf's lvl is 0).
+  	
     Lvl_t 					numChildren;
     Lvl_t 					numParents;
     Lvl_t 					numPorts;
@@ -146,7 +147,7 @@ class Datacenter : public cSimpleModule
     void failedToPlaceOldChain (ChainId_t chainId);
     bool checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain);
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
-		inline int bitLenOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
+		inline int byteLengthOfPkt (const int numRtChains, const int &numNonRtChains); // calculate the len of a pkt, given the # of Rt and NonRt chains in it
 		
     // Print functions
     inline void printBufToLog () const {MyConfig::printToLog (buf);}
@@ -157,5 +158,6 @@ class Datacenter : public cSimpleModule
 };
 
 #endif
+
 
 
