@@ -238,7 +238,6 @@ Returns true iff a previous run has successfully run the all trace, using the cu
 **************************************************************************************************************************************************/
 bool SimController::alreadySucceededWithThisSeed ()
 {
-	return true; // $$$
 	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
 	sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
 	string res = MyConfig::exec (buf);
@@ -622,12 +621,10 @@ void SimController::rst ()
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
 	
-	rst 							();
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
 	cout << settingsBuf;
 	cout << ". debug lvl=" << MyConfig::DEBUG_LVL << ", log lvl=" << MyConfig::LOG_LVL << ", sim len=" << simLenInSec << endl;
-	return; // $$$$
 	runTimePeriod ();
 }
 
