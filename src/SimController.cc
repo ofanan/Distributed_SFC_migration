@@ -153,8 +153,6 @@ void SimController::initialize (int stage)
 		RtChain	  ::mu_u_len 	= RtChain		::mu_u.size();
 		NonRtChain::mu_u_len 	= NonRtChain::mu_u.size();
     updateRtChainRandInt ();
-    
-    
 		
 		// Set the prob' of a generated chain to be an RtChain, and the initial sim mode
 		if (MyConfig::netType==MonacoIdx || MyConfig::netType==LuxIdx) {
@@ -197,15 +195,11 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-		calcBitLens ();
+//		calcBitLens ();
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
 		
-		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
-			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
-			return;
-		}
 		MyConfig::printBuRes 		 = false; // when true, print to the log and to the .res file the results of the BU stage of BUPU
 		MyConfig::printBupuRes   = false;  // when true, print to the log and to the .res file the results of the BUPU
 		Lvl_t h;
@@ -216,7 +210,12 @@ void SimController::initialize (int stage)
 			MyConfig::minCpuToPlaceAnyChainAtLvl.push_back (NonRtChain::mu_u[h]);
 		}
 		
-		 runTrace ();
+		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
+			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
+			//return;
+		} 
+		rst 							();
+		runTrace ();
 //		 initBinSearchSim ();
 	}
 }
@@ -226,12 +225,12 @@ void SimController::calcBitLens ()
 Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
-  MyConfig::bitLenOfRtChain 	 					 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
-  MyConfig::bitLenOfNonRtChain 					 = MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
-  MyConfig::bitLenOfRtChainInPdReqPkt 	 = MyConfig::bitLenOfRtChain    + MyConfig::lenOfCputAtInitiator;
-  MyConfig::bitLenOfNonRtChainInPdReqPkt = MyConfig::bitLenOfNonRtChain + MyConfig::lenOfCputAtInitiator;
-	MyConfig::bitLenOfHdr  		 	 				   = par ("bitLenOfHdr");
-	MyConfig::basicBitLenOfReshAsyncPkt 	 = MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
+  MyConfig::bitLenOfRtChain 	 					 = 1; //MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
+  MyConfig::bitLenOfNonRtChain 					 = 1; //MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
+  MyConfig::bitLenOfRtChainInPdReqPkt 	 = 1; //MyConfig::bitLenOfRtChain    + MyConfig::lenOfCputAtInitiator;
+  MyConfig::bitLenOfNonRtChainInPdReqPkt = 1; //MyConfig::bitLenOfNonRtChain + MyConfig::lenOfCputAtInitiator;
+	MyConfig::bitLenOfHdr  		 	 				   =1; // par ("bitLenOfHdr");
+	MyConfig::basicBitLenOfReshAsyncPkt 	 = 1; //MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
 }
 
 /*************************************************************************************************************************************************
@@ -239,13 +238,14 @@ Returns true iff a previous run has successfully run the all trace, using the cu
 **************************************************************************************************************************************************/
 bool SimController::alreadySucceededWithThisSeed ()
 {
-		char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-		sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
-		string res = MyConfig::exec (buf);
-		stringstream ss (res); 
-		int grepRes;
-		ss >> grepRes;
-		return (grepRes>0);
+	return true; // $$$
+	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
+	sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
+	string res = MyConfig::exec (buf);
+	stringstream ss (res); 
+	int grepRes;
+	ss >> grepRes;
+	return (grepRes>0);
 }
 
 /*************************************************************************************************************************************************
@@ -291,7 +291,8 @@ void SimController::initBinSearchSim ()
 	lb = MyConfig::cpuAtLeaf;
 	ub = Cpu_t (MyConfig::cpuAtLeaf*max_R);
 	updateCpuAtLvl ();
-	runTrace ();
+	rst 					 ();
+	runTrace 			 ();
 }
 
 /*************************************************************************************************************************************************
@@ -339,8 +340,6 @@ void SimController::continueBinSearch ()
 	}
 	MyConfig::cpuAtLeaf = Cpu_t (lb+ub)/2;
 	updateCpuAtLvl ();
-	MyConfig::		rst ();
-	ChainsMaster::rst ();
 	rst 							();
 	return scheduleAt (simTime() + period, new cMessage ("RunTraceMsg")); // Schedule a self-event for handling the next time-step
 }
@@ -611,6 +610,11 @@ void SimController::rst ()
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
 	traceFile.clear();
 	traceFile.seekg(0); // return to the beginning of the trace file
+	MyConfig::		rst ();
+	ChainsMaster::rst ();
+	for (DcId_t dc(0); dc<numDatacenters; dc++) {
+		datacenters[dc]->rst ();
+	}
 }
 
 /*************************************************************************************************************************************************
@@ -618,16 +622,12 @@ void SimController::rst ()
 **************************************************************************************************************************************************/
 void SimController::runTrace () {
 	
-	MyConfig::		rst ();
-	ChainsMaster::rst ();
 	rst 							();
-	for (DcId_t dc(0); dc<numDatacenters; dc++) {
-		datacenters[dc]->rst ();
-	}
 	genSettingsBuf (false);
 	MyConfig::printToLog (settingsBuf); 
 	cout << settingsBuf;
 	cout << ". debug lvl=" << MyConfig::DEBUG_LVL << ", log lvl=" << MyConfig::LOG_LVL << ", sim len=" << simLenInSec << endl;
+	return; // $$$$
 	runTimePeriod ();
 }
 
@@ -1269,6 +1269,7 @@ void SimController::handleMessage (cMessage *msg)
 	}
 
 	else if (msg->isSelfMessage() && strcmp (msg->getName(), "RunTraceMsg")==0) {
+		rst 		 ();
 		runTrace ();
 	}
 	else if (strcmp (msg->getName(), "InitFullReshMsg")==0) {
@@ -1318,8 +1319,6 @@ void SimController::printSimComOh ()
 	if (algStts==FAIL) {
 		return;
 	}
-	int numPkts = 1;
-	int numBytes = 2;
 	if (MyConfig::DEBUG_LVL>0 && RtProb==1.0) {
 		if (MyConfig::pktCnt  [  MyConfig::lvlOfRoot-1]>0 || MyConfig::pktCnt  [  MyConfig::lvlOfRoot-2]>0 || MyConfig::pktCnt  [  MyConfig::lvlOfRoot-3]>0 || 
 			  MyConfig::pktCnt  [2*MyConfig::lvlOfRoot-1]>0 || MyConfig::pktCnt  [2*MyConfig::lvlOfRoot-2]>0 || MyConfig::pktCnt  [2*MyConfig::lvlOfRoot-3]>0 ||

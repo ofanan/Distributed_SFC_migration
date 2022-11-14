@@ -36,11 +36,12 @@ calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
 int Datacenter::bitLenOfPkt (const int numRtChains, const int &numNonRtChains, bool isPdReqPkt, bool isPdAckPkt)
 {
+	return 7; // $$$$
 	if (isPdReqPkt) { 
 		return MyConfig::basicBitLenOfReshAsyncPkt + 
 		 		   MyConfig::bitLenOfRtChainInPdReqPkt * numRtChains + MyConfig::bitLenOfNonRtChainInPdReqPkt * numNonRtChains;
 	}
-	else if (isPdReqPkt) { 
+	else if (isPdAckPkt) { 
 		return MyConfig::basicBitLenOfReshAsyncPkt + 
 		 		   MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
 	}
@@ -290,10 +291,11 @@ void Datacenter::handleMessage (cMessage *msg)
 {
 	int pktLen;
 
+	return; // $$$
 	// Log the delay of the arriving packet, if needed
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
-		pktLen=int(pktPtr->getBitLength());
+		pktLen= 7; // $$$$ int(pktPtr->getBitLength());
 		if (pktLen>0) {
 			sprintf (buf, "\ns%d : rcvd pkt of len=%d, delay=%f", dcId, pktLen, (pktPtr->getCreationTime()-simTime()).dbl());	
 			printBufToLog ();
