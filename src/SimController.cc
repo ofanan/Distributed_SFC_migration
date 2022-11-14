@@ -262,9 +262,10 @@ void SimController::handleAlgFailure ()
 	printResLine ();
 	if (MyConfig::runningBinSearchSim || MyConfig::runningCampaign) {
 		MyConfig::discardAllMsgs = true;
-		for (DcId_t dc(0); dc<numDatacenters; dc++) {
-			datacenters[dc]->rst ();
-		}
+		rst ();
+//		for (DcId_t dc(0); dc<numDatacenters; dc++) {
+//			datacenters[dc]->rst ();
+//		}
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog ("\n**** SimController::handleAlgFailure () \n");
 			printAllDatacenters (false, false, true); 
