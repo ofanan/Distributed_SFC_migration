@@ -11,7 +11,9 @@ bool  MyConfig::notifiedReshInThisPeriod;
 bool  MyConfig::randomlySetChainType; // when true, use real randomization; else, use a pseudo-random scheme, based on the chain's id
 bool  MyConfig::evenChainsAreRt;
 bool  MyConfig::isFirstPeriod; // // will be true iff this the first decision period in the sim
-char 	MyConfig::modeStr[MyConfig::modeStrLen]; 
+char 	MyConfig::modeStr[MyConfig::modeStrLen];
+char  MyConfig::cityName[MyConfig::cityNameLen];
+ 
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
 Lvl_t MyConfig::height;
@@ -191,6 +193,7 @@ void SimController::initialize (int stage)
 	
 	if (stage==2) {
 //		calcBitLens ();
+
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
 		}
@@ -351,9 +354,11 @@ void SimController::updateCpuAtLvl ()
 void SimController::openFiles ()
 {
 	if (MyConfig::netType==MonacoIdx) {
+		sprintf (MyConfig::cityName, "Monaco");
 		MyConfig::traceFileName = "Monaco_0820_0830_1secs_Telecom.poa";
 	}
 	else if (MyConfig::netType==LuxIdx) {
+		sprintf (MyConfig::cityName, "Lux");
 		MyConfig::traceFileName = "Lux_0820_0830_1secs_post.poa";  //"Lux_short.poa"; // 
 	}
 	else {
@@ -364,25 +369,17 @@ void SimController::openFiles ()
   	printErrStrAndExit ("trace file " + tracePath + MyConfig::traceFileName + " was not found");
   }
 
-	if (MyConfig::runningRtProbSim) {
-		if (MyConfig::netType==MonacoIdx) {
-			sprintf (RtSimResFileName, "Monaco_%s_RtProb_1secs.res", MyConfig::modeStr);
-		}
-		else if (MyConfig::netType==LuxIdx) {
-			sprintf (RtSimResFileName, "Lux_%s_RtProb_1secs.res", MyConfig::modeStr);
-		}
-		else {
-			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
-		}
-	  RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
-	}
-
 	setOutputFileNames ();
 	int traceNetType = MyConfig::getNetTypeFromString (MyConfig::traceFileName);
 	if (traceNetType!=MyConfig::MyConfig::netType) {
 		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
 	}
-	// Now, after stage 0 is done, we know that the network and all the datacenters have woken up.
+
+	if (MyConfig::runningRtProbSim) {
+		sprintf (RtSimResFileName, "RtProb_%s_%s_1secs.res", MyConfig::cityName, MyConfig::modeStr);
+		RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
+	}
+
 	if (!MyConfig::openFiles ()) {
 		error ("MyConfig::openFiles failed");
 	}

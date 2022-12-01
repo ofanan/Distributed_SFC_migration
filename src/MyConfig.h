@@ -48,6 +48,8 @@ class MyConfig {
 
 		// A buffer for print-outs
 		static const int 	bufSize = 512;
+		static const int  cityNameLen = 10;
+		static char       cityName[cityNameLen];
 		static char 			buf[bufSize];
     static ofstream 	logFile, resFile, comOhResFile;
 

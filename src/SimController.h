@@ -62,8 +62,7 @@ class SimController : public cSimpleModule
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
 		const  static int RtSimResFileNameLen=50;
-		char RtSimResFileName[RtSimResFileNameLen]; 
-/*		string   RtSimResFileName;*/
+		char RtSimResFileName[RtSimResFileNameLen];
 		string	commOhResFileName;
 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
