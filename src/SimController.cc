@@ -207,7 +207,7 @@ void SimController::initialize (int stage)
 		
 		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
-			//return;
+			return;
 		} 
 		rst 							();
 		runTrace ();
@@ -1375,7 +1375,7 @@ void SimController::setModeStr ()
 			sprintf (MyConfig::modeStr, "AsyncBlk"); 
 		}
 		else {
-			sprintf (MyConfig::modeStr, "Async"); 
+			sprintf (MyConfig::modeStr, "AsyncNBlk"); 
 		}
 	}
 }

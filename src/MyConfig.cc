@@ -120,7 +120,7 @@ bool MyConfig::openFiles()
 		resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
 		resFile << "// T is the slot cnt (read from the input file)" << endl;
 		resFile << "// Mode is the algorithm / solver used. Possble modes are:"  << endl;
-		resFile << "// AsyncBlk allows blocking new requests, while Async doesn't. SyncPartResh, SyncFullResh allow partial, full reshuffling, resp."  << endl;
+		resFile << "// AsyncBlk allows blocking new requests, while AsyncNBlk doesn't. SyncPartResh, SyncFullResh allow partial, full reshuffling, resp."  << endl;
 		resFile << "// C is the num of CPU units used in the leaf"  << endl;
 		resFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
 		resFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else."  << endl  << endl;
