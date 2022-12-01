@@ -114,18 +114,8 @@ void SimController::initialize (int stage)
 
 		MyConfig::runningBinSearchSim      = false; // default. will be changed if running a bin search sim.
 		beginVeryDetailedLogAtTraceTime 	 = double ( par ("beginVeryDetailedLogAtTraceTime"));
-		
-		if (mode==Sync) {
-			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
-		}
-		else {
-			if (MyConfig::allowBlkChain) {
-				sprintf (MyConfig::modeStr, "AsyncBlk"); 
-			}
-			else {
-				sprintf (MyConfig::modeStr, "Async"); 
-			}
-		}
+
+		setModeStr ();		
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
 			printErrStrAndExit ("The .ini files assigns network.name=" + networkName + " This network name is currently not supported ");
@@ -244,7 +234,7 @@ Returns true iff a previous run has successfully run the all trace, using the cu
 bool SimController::alreadySucceededWithThisSeed ()
 {
 	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-	sprintf (buf, "grep  t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
+	sprintf (buf, "grep t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
 	string res = MyConfig::exec (buf);
 	stringstream ss (res); 
 	int grepRes;
@@ -503,12 +493,7 @@ void SimController::runTimePeriod ()
 	if (!MyConfig::isFirstPeriod) {
 	  concludeTimePeriod (); // gather and print the results of the alg' in the previous time step
 		MyConfig::mode = this->mode; // when running Lux/Monaco, the first period is always sync; the next cycles may be either sync, or async. 
-		if (MyConfig::mode==Sync) {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
-		}
-		else {
-			snprintf (MyConfig::modeStr, MyConfig::modeStrLen, "Async"); 
-		}
+		setModeStr (); // set again MyConfig::modeStr, as the mode of running (Sync / Async) may be changed during the sim'
 	}
 	
 	MyConfig::notifiedReshInThisPeriod = false;
@@ -1360,11 +1345,11 @@ void SimController::printResLine (streambuf* outBuf)
 		}
 	}
 	int periodMigCost 	= numMigsAtThisPeriod * uniformChainMigCost;
-	int periodLinkCost  = 0;  // link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
 	int periodTotalCost = periodNonMigCost + periodMigCost;
-  sprintf (buf," | cpu_cost=%d | link_cost = %d | mig_cost=%d | tot_cost=%d | ratio=[%.2f %.2f %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
-  					periodNonMigCost, periodLinkCost, periodMigCost, periodTotalCost,
-  					float(periodNonMigCost)/float(periodTotalCost), float(periodLinkCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
+	// link cost is used merely a place-holder, for backward-compitability with the res format used in (centralized) "SFC_migration".
+  sprintf (buf," | cpu_cost=%d | link_cost = 0 | mig_cost=%d | tot_cost=%d | ratio=[%.2f 0 %.2f] | num_usrs=%d | num_crit_usrs=%d | resh=%d | blocked=%d\n", 
+  					periodNonMigCost, periodMigCost, periodTotalCost,
+  					float(periodNonMigCost)/float(periodTotalCost), float(periodMigCost)/float(periodTotalCost), 
   					(int)ChainsMaster::allChains.size(), numCritRtUsrs+numCritNonRtUsrs, MyConfig::lvlOfHighestReshDc, MyConfig::overallNumBlockedUsrs);
   os << buf;
 }
@@ -1381,6 +1366,22 @@ void SimController::setOutputFileNames ()
 	MyConfig::comOhResFileName  = networkName + ".comoh";
 }
 
-
+void SimController::setModeStr ()
+/*************************************************************************************************************************************************
+ * Set MyConfig::modeStr to the correct string, according to the simulated mode ("Sync", "Async" etc.).
+*************************************************************************************************************************************************/
+{
+	if (mode==Sync) {
+		sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
+	}
+	else {
+		if (MyConfig::allowBlkChain) {
+			sprintf (MyConfig::modeStr, "AsyncBlk"); 
+		}
+		else {
+			sprintf (MyConfig::modeStr, "Async"); 
+		}
+	}
+}
 
 

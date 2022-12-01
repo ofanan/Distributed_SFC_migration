@@ -153,7 +153,8 @@ class SimController : public cSimpleModule
 		void printErrStrAndExit (const string &errorMsgStr);
 		bool alreadySucceededWithThisSeed ();
 	  void calcBitLens ();
-				 
+	  void setModeStr (); //Set MyConfig::modeStr to the correct string, according to the simulated mode ("Sync", "Async" etc.).
+	  
   public:
 		int netType;
     ifstream traceFile;
