@@ -207,7 +207,7 @@ void SimController::initialize (int stage)
 		
 		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
-			//return;
+			//return; // causes segfault
 		} 
 		rst 							();
 		runTrace ();
