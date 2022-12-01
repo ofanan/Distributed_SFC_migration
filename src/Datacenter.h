@@ -92,7 +92,7 @@ class Datacenter : public cSimpleModule
     vector<Chain> notAssigned; 
 		
 		// A small buffer, used for printing results / log
-		static const int bufSize = 512;
+		static const int bufSize = 256;
 		char 	 buf[bufSize];
 
     void initialize(int stage);

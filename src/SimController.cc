@@ -209,7 +209,7 @@ void SimController::initialize (int stage)
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
 			rst 							();
 			MyConfig::discardAllMsgs = true;
-			return; // causes segfault
+			return; // causes segfault?
 		} 
 		rst 							();
 		runTrace ();
@@ -235,8 +235,8 @@ Returns true iff a previous run has successfully run the all trace, using the cu
 **************************************************************************************************************************************************/
 bool SimController::alreadySucceededWithThisSeed ()
 {
-	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-	sprintf (buf, "grep t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileNameAsChar, RtProb, seed);
+//	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
+	sprintf (buf, "grep t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileName, RtProb, seed);
 	string res = MyConfig::exec (buf);
 	stringstream ss (res); 
 	int grepRes;
@@ -366,10 +366,10 @@ void SimController::openFiles ()
 
 	if (MyConfig::runningRtProbSim) {
 		if (MyConfig::netType==MonacoIdx) {
-			RtSimResFileName = "dist_Monaco_RtProb_1secs.res";
+			sprintf (RtSimResFileName, "Monaco_%s_RtProb_1secs.res", MyConfig::modeStr);
 		}
 		else if (MyConfig::netType==LuxIdx) {
-			RtSimResFileName = "dist_Lux_RtProb_1secs.res";
+			sprintf (RtSimResFileName, "Lux_%s_RtProb_1secs.res", MyConfig::modeStr);
 		}
 		else {
 			error ("runningRtProbSim was set while city is the network is neither Monaco nor Lux");
