@@ -256,22 +256,18 @@ void SimController::handleAlgFailure ()
 	algStts = FAIL;
 	printResLine ();
 	if (MyConfig::runningBinSearchSim || MyConfig::runningCampaign) {
-		MyConfig::discardAllMsgs = true;
-		rst ();
-//		for (DcId_t dc(0); dc<numDatacenters; dc++) {
-//			datacenters[dc]->rst ();
-//		}
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog ("\n**** SimController::handleAlgFailure () \n");
 			printAllDatacenters (false, false, true); 
 		}
 		if (MyConfig::runningCampaign) {
-		 	cout << "------------------- This run failed. running a campaign, so continuing to the next run -------------------" << endl;
+		 	cout << "----------------- simT=" << simTime().dbl() << " This run failed. running a campaign, so continuing to the next run -------------------" << endl;
 		}
-
+		MyConfig::discardAllMsgs = true;
+		//		rst (); // $$$ Do we need a rst here? There's anyway a rst each time before calling runTrace ()
 	}
 	else {
-		error ("alg failed not during a bin search run");
+		error ("alg failed not during a bin search run or a sim' campaign");
 	}
 }
 

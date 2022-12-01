@@ -245,16 +245,16 @@ increase the count of # of chains info that I will send in the next pkt
 *************************************************************************************************************************************************/
 void Datacenter::incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains)
 {
-	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
-		sprintf (buf, "\ns%d : inserting to pkt c%d which is ", dcId, chain.id); 
-		printBufToLog ();
-		if (chain.isRtChain) {
-			MyConfig::printToLog ("RT");
-		}
-		else {
-			MyConfig::printToLog ("Non RT");
-		}
-	}
+//	if (MyConfig::LOG_LVL==VERY_DETAILED_LOG) {
+//		sprintf (buf, "\ns%d : inserting to pkt c%d which is ", dcId, chain.id); 
+//		printBufToLog ();
+//		if (chain.isRtChain) {
+//			MyConfig::printToLog ("RT");
+//		}
+//		else {
+//			MyConfig::printToLog ("Non RT");
+//		}
+//	}
 	
 	if (chain.isRtChain) {
 		numRtChains++;
@@ -288,8 +288,15 @@ void Datacenter::handleEndXmtMsg ()
 *************************************************************************************************************************************************/
 void Datacenter::handleMessage (cMessage *msg)
 {
-	int pktLen;
 
+	// Sometimes (e.g., before initiating a new run of the whole trace during a sim' campaing), it's required to discard all incoming msgs.
+	if (MyConfig::discardAllMsgs) {
+		delete msg;
+		return;
+	}
+
+  curHandledMsg = msg;
+	int pktLen;
 	// Log the delay of the arriving packet, if needed
   if (MyConfig::logDelays && msg->isPacket()) {
 		cPacket *pktPtr = (cPacket*)(msg);
@@ -299,14 +306,6 @@ void Datacenter::handleMessage (cMessage *msg)
 			printBufToLog ();
 		}
   }
-
-  curHandledMsg = msg;
-
-	// Sometimes (e.g., before initiating a sync' resh), it's required to discard all incoming msgs.
-	if (MyConfig::discardAllMsgs) {
-		delete curHandledMsg;
-		return;
-	}
 	
 	// A self-msg notifying the end of xmt of a pkt
   else if (dynamic_cast<EndXmtMsg*>(curHandledMsg) != nullptr) { 
@@ -592,7 +591,7 @@ void Datacenter::pushUp ()
 			chainPtr 						 = pushUpList.erase (chainPtr); // remove the pushed-up chain from the list of potentially pushed-up chains; to be replaced by a modified chain
 			placedChains.				 insert (pushedUpChain.id);
 			if (!ChainsMaster::modifyLvl  (pushedUpChain.id, lvl)){ // inform ChainMaster about the chain's place 
-				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+				error ("Datacenter::pushUp failed to update the lvl of c%d", chainPtr->id);
 			}
 			pushedUpChains.insert (pushedUpChains.begin(), pushedUpChain);
 		}
@@ -775,7 +774,7 @@ Handle a failure to place an old (exiting) chain
 void Datacenter::failedToPlaceOldChain (ChainId_t chainId)
 {
 	if (MyConfig::LOG_LVL>0) {
-		sprintf (buf, "\ntraceTime=%.0f, s%d : error : failed to place old c%d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
+		sprintf (buf, "\ntraceTime=%.0f, s%d : alg failure : failed to place old c%d even after reshuffling. notAssigned=\n", MyConfig::traceTime, dcId, chainId);
 		printBufToLog ();
 	}	
 	simController-> handleAlgFailure ();
@@ -803,7 +802,7 @@ void Datacenter::bottomUp ()
 				if (cannotPlaceThisChainHigher (*chainPtr)) { // Am I the highest delay-feasible DC of this chain?
 					placedChains.		  insert  (chainPtr->id);
 					if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
-						error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+						error ("Datacenter::bottomUp failed to update the lvl of c%d", chainPtr->id);
 					}
 				}
 				else { // This chain can be placed higher --> potentially-place it, and insert it to the push-up list, indicating me as its current level
@@ -1443,6 +1442,8 @@ void Datacenter::rst ()
 	reshAsyncEvent   = nullptr; 
 	isInFMode 		   = false;
 	reshuffled       = false;
+	notAssigned.clear ();
+	pushUpList.clear  ();
 }
 
 /*************************************************************************************************************************************************
@@ -1741,7 +1742,7 @@ void Datacenter::pushDwn ()
 			placedChains.insert 		(chainPtr->id); 
 
 			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
-				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+				error ("Datacenter::pushDwn failed to update the lvl of c%d", chainPtr->id);
 			}
 			if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 				snprintf (buf, bufSize, "c%d from l%d, ", chainPtr->id, chainPtr->curLvl);
@@ -1762,7 +1763,7 @@ void Datacenter::pushDwn ()
 			availCpu -= requiredCpuToLocallyPlaceThisChain;
 			placedChains.insert 		(chainPtr->id); 				// locally-place the chain
 			if (!ChainsMaster::modifyLvl  (chainPtr->id, lvl)){ // inform ChainMaster about the chain's place 
-				error ("Datacenter::bottomUpFMode failed to update the lvl of c%d", chainPtr->id);
+				error ("Datacenter::pushDwn failed to update the lvl of c%d", chainPtr->id);
 			}
 			eraseChainFromVec (notAssigned, *chainPtr); // verify that the chain I pushed-down to myself isn't in my notAssigned list
 			if (chainPtr->curLvl == reshInitiatorLvl) { // Did I push-down this chain from the initiator?
