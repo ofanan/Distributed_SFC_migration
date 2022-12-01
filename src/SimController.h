@@ -106,7 +106,7 @@ class SimController : public cSimpleModule
 		void setOutputFileNames ();
 		void discoverPathsToRoot ();
 		Lvl_t dist (DcId_t i, DcId_t j);
-		void rst ();
+		void rst (bool rstDCs=true);
 
 		// Termination functions
 		void finish ();

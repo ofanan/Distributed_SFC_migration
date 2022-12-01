@@ -43,7 +43,7 @@ bool ChainsMaster::eraseChains (vector <ChainId_t> &vec)
 * Block a chain, given its id
 * Returns false if the chains to block wasn't found in allChains, else true.
 **************************************************************************************************************************************************/
-bool ChainsMaster::blockChain  (ChainId_t chainId) 
+bool ChainsMaster::blkChain  (ChainId_t chainId) 
 {
 	auto it = ChainsMaster::allChains.find(chainId);
 	if (it == ChainsMaster::allChains.end()) { 

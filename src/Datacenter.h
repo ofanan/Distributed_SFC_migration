@@ -145,7 +145,7 @@ class Datacenter : public cSimpleModule
     bool sndReshAsyncPktToNxtChild    ();
     void insertMyAssignedChainsIntoPushDwnReq ();
     void failedToPlaceOldChain (ChainId_t chainId);
-    void blockChain (ChainId_t chainId);
+    bool blkChain (ChainId_t chainId); // try to block a (new) chain. Return true if blocking is allowed, and blocking succeeded.
     bool checkNinsertChainToList (list <Chain> &listOfChains, Chain &chain);
 		void incChainsInPktCnt (Chain &chain, int &numRtChains, int &numNonRtChains); // inc the # of either Rt/NonRt chains info that I will send in the next pkt
 		int bitLenOfPkt (const int numRtChains, const int &numNonRtChains, bool isPdReqPkt=false, bool isPdAckPkt=false); // calculate the len of a pkt

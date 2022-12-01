@@ -103,7 +103,7 @@ void SimController::initialize (int stage)
 		MyConfig::runningRtProbSim 	 = bool   (par ("runningRtProbSim"));
 		MyConfig::logDelays					 = bool   (par ("logDelays"));
 		MyConfig::logComOh					 = bool   (par ("logComOh"));
-		MyConfig::allowBlkChain      = bool   (par ("allowBlkChain"));
+		MyConfig::allowBlkChain      = (this->mode==Sync)? false : bool (par ("allowBlkChain")); // Sync mode: blkChain is forbidden. Async mode: use given param.
 		RtProb				  					 	 = double (par ("RtProb"));
 		MyConfig::LOG_LVL				 		 = int 	  (par ("LOG_LVL"));
 		MyConfig::RES_LVL				 		 = int 	  (par ("RES_LVL"));
@@ -266,10 +266,34 @@ void SimController::handleAlgFailure ()
 			printAllDatacenters (false, false, true); 
 		}
 		if (MyConfig::runningCampaign) {
-		 	cout << "----------------- simT=" << simTime().dbl() << " This run failed. running a campaign, so continuing to the next run -------------------" << endl;
+		 	cout << "----------------- simT=" << simTime().dbl() << " This run failed. Running a campaign, so continuing to the next run -------------------" << endl;
 		}
-		rst (); // $$$ Do we need a rst here? There's anyway a rst each time runTrace ()
+	rst (); // $$$ Do we need a rst here? There's anyway a rst each time runTrace ()
+//	chainsThatJoinedLeaf.clear ();
+//	chainsThatLeftDc.		 clear ();
+//	usrsThatLeft.				 clear ();
+//	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
+//	numMigsAtThisPeriod = 0; 
+//	numCritRtUsrs 			= 0;
+//	numCritNonRtUsrs    = 0;
+//	numNewRtUsrs 			  = 0;
+//	numNewNonRtUsrs     = 0;
+//	MyConfig::isFirstPeriod = true;
+//	isLastPeriod 					  = false;
+//  MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
+//	traceFile.clear();
+//	traceFile.seekg(0); // return to the beginning of the trace file
+//	MyConfig::		rst ();
+//	ChainsMaster::rst ();
+//		for (DcId_t dc(0); dc<numDatacenters; dc++) {
+////			if (dc==19) {
+////				continue;
+////			}
+//			datacenters[dc]->rst ();
+////		cout << "4 "; //$$$
+//		}
 		MyConfig::discardAllMsgs = true;
+//		cout << "7 ";  //$$$
 	}
 	else {
 		error ("alg failed not during a bin search run or a sim' campaign");
@@ -579,7 +603,7 @@ void SimController::printErrStrAndExit (const string &errorMsgStr)
 /*************************************************************************************************************************************************
 * Reset all the data structures and counters before running a trace
 **************************************************************************************************************************************************/
-void SimController::rst () 
+void SimController::rst (bool rstDCs) 
 {
 	chainsThatJoinedLeaf.clear ();
 	chainsThatLeftDc.		 clear ();
@@ -595,11 +619,17 @@ void SimController::rst ()
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
 	traceFile.clear();
 	traceFile.seekg(0); // return to the beginning of the trace file
+//	cout << "2 "; //$$$
 	MyConfig::		rst ();
 	ChainsMaster::rst ();
-	for (DcId_t dc(0); dc<numDatacenters; dc++) {
-		datacenters[dc]->rst ();
+//	cout << "3 "; //$$$
+	if (rstDCs) {
+		for (DcId_t dc(0); dc<numDatacenters; dc++) {
+			datacenters[dc]->rst ();
+//		cout << "4 "; //$$$
+		}
 	}
+//	cout << "5 "; //$$$
 }
 
 /*************************************************************************************************************************************************
