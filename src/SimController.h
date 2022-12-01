@@ -61,6 +61,8 @@ class SimController : public cSimpleModule
     int algStts; // stts of the last run of the alg'
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
+/*		const  static int modeStrLen=20;*/
+/*		static char modeStr[modeStrLen]; // a string characterizing the mode of operation ("syncPartResh", "SyncFullResh", "Async"). */
 		string   RtSimResFileName;
 		string	commOhResFileName;
 

@@ -208,7 +208,8 @@ void SimController::initialize (int stage)
 		if (MyConfig::runningRtProbSim && alreadySucceededWithThisSeed ()) { 
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
 			rst 							();
-			return; 
+			MyConfig::discardAllMsgs = true;
+			return; // causes segfault
 		} 
 		rst 							();
 		runTrace ();
@@ -264,8 +265,8 @@ void SimController::handleAlgFailure ()
 		if (MyConfig::runningCampaign) {
 		 	cout << "----------------- simT=" << simTime().dbl() << " This run failed. running a campaign, so continuing to the next run -------------------" << endl;
 		}
+		rst (); // $$$ Do we need a rst here? There's anyway a rst each time runTrace ()
 		MyConfig::discardAllMsgs = true;
-				rst (); // $$$ Do we need a rst here? There's anyway a rst each time runTrace ()
 	}
 	else {
 		error ("alg failed not during a bin search run or a sim' campaign");
@@ -1376,7 +1377,7 @@ void SimController::setModeStr ()
 			sprintf (MyConfig::modeStr, "AsyncBlk"); 
 		}
 		else {
-			sprintf (MyConfig::modeStr, "Async"); 
+			sprintf (MyConfig::modeStr, "AsyncNBlk"); 
 		}
 	}
 }
