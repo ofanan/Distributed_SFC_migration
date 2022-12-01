@@ -268,32 +268,8 @@ void SimController::handleAlgFailure ()
 		if (MyConfig::runningCampaign) {
 		 	cout << "----------------- simT=" << simTime().dbl() << " This run failed. Running a campaign, so continuing to the next run -------------------" << endl;
 		}
-	rst (); // $$$ Do we need a rst here? There's anyway a rst each time runTrace ()
-//	chainsThatJoinedLeaf.clear ();
-//	chainsThatLeftDc.		 clear ();
-//	usrsThatLeft.				 clear ();
-//	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-//	numMigsAtThisPeriod = 0; 
-//	numCritRtUsrs 			= 0;
-//	numCritNonRtUsrs    = 0;
-//	numNewRtUsrs 			  = 0;
-//	numNewNonRtUsrs     = 0;
-//	MyConfig::isFirstPeriod = true;
-//	isLastPeriod 					  = false;
-//  MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
-//	traceFile.clear();
-//	traceFile.seekg(0); // return to the beginning of the trace file
-//	MyConfig::		rst ();
-//	ChainsMaster::rst ();
-//		for (DcId_t dc(0); dc<numDatacenters; dc++) {
-////			if (dc==19) {
-////				continue;
-////			}
-//			datacenters[dc]->rst ();
-////		cout << "4 "; //$$$
-//		}
+		rst (); 
 		MyConfig::discardAllMsgs = true;
-//		cout << "7 ";  //$$$
 	}
 	else {
 		error ("alg failed not during a bin search run or a sim' campaign");
@@ -619,17 +595,13 @@ void SimController::rst (bool rstDCs)
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
 	traceFile.clear();
 	traceFile.seekg(0); // return to the beginning of the trace file
-//	cout << "2 "; //$$$
 	MyConfig::		rst ();
 	ChainsMaster::rst ();
-//	cout << "3 "; //$$$
 	if (rstDCs) {
 		for (DcId_t dc(0); dc<numDatacenters; dc++) {
 			datacenters[dc]->rst ();
-//		cout << "4 "; //$$$
 		}
 	}
-//	cout << "5 "; //$$$
 }
 
 /*************************************************************************************************************************************************
