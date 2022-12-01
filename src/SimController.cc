@@ -119,7 +119,12 @@ void SimController::initialize (int stage)
 			sprintf (MyConfig::modeStr, (MyConfig::useFullResh)? "SyncFullResh" : "SyncPartResh");
 		}
 		else {
-			sprintf (MyConfig::modeStr, "Async"); 
+			if (MyConfig::allowBlkChain) {
+				sprintf (MyConfig::modeStr, "AsyncBlk"); 
+			}
+			else {
+				sprintf (MyConfig::modeStr, "Async"); 
+			}
 		}
 		MyConfig::setNetTypeFromString (networkName);
 		if (MyConfig::netType<0) {		
