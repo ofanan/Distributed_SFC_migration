@@ -34,7 +34,7 @@ inline bool Datacenter::wasPushedUp (const Chain &chain) const {return (chain.cu
 /*************************************************************************************************************************************************
 calculate the len of a pkt, given the # of Rt and NonRt chains in it
 *************************************************************************************************************************************************/
-int Datacenter::bitLenOfPkt (const int numRtChains, const int &numNonRtChains, bool isPdReqPkt, bool isPdAckPkt)
+int Datacenter::bitLenOfPkt (const int &numRtChains, const int &numNonRtChains, bool isPdReqPkt, bool isPdAckPkt)
 {
 	if (isPdReqPkt) { 
 		return MyConfig::basicBitLenOfPdPkt + 

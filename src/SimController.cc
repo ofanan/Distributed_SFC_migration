@@ -235,11 +235,11 @@ void SimController::calcBitLens ()
 Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
-//	MyConfig::basicBitLenOfReshAsyncPkt 	 = 1;  //MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
-  MyConfig::bitLenOfRtChain 	 					 = calcBitLenOfChainRecord (RtChain::mu_u_len, 		false);
-  MyConfig::bitLenOfNonRtChain 					 = calcBitLenOfChainRecord (NonRtChain::mu_u_len, false);
-  MyConfig::bitLenOfRtChainInPdReqPkt 	 = calcBitLenOfChainRecord (RtChain::mu_u_len, 		true);
-  MyConfig::bitLenOfNonRtChainInPdReqPkt = calcBitLenOfChainRecord (NonRtChain::mu_u_len, true);
+  MyConfig::bitLenOfRtChain 	 					 	= calcBitLenOfChainRecord (RtChain::mu_u_len, 		false);
+  MyConfig::bitLenOfNonRtChain 						= calcBitLenOfChainRecord (NonRtChain::mu_u_len, false);
+  MyConfig::bitLenOfRtChainInPdReqPkt 	 	= calcBitLenOfChainRecord (RtChain::mu_u_len, 		true);
+  MyConfig::bitLenOfNonRtChainInPdReqPkt 	= calcBitLenOfChainRecord (NonRtChain::mu_u_len, true);
+	MyConfig::basicBitLenOfPdPkt						= MyConfig::bitLenOfHdr + MyConfig::bitLenOfDcId + MyConfig::bitLenOfDefCpu;
 }
 
 /*************************************************************************************************************************************************
