@@ -202,7 +202,7 @@ void SimController::initialize (int stage)
 	}
 	
 	if (stage==2) {
-//		calcBitLens ();
+		calcBitLens ();
 
 		if (MyConfig::measureRunTime==true) {
     	startTime = high_resolution_clock::now();
