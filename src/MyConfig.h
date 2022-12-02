@@ -93,8 +93,7 @@ class MyConfig {
 		static bool allowBlkChain;
 		static bool isFirstPeriod; // will be true iff this the first decision period in the sim
 		static short int bitLenOfDcId, bitLenOfChainId, bitLenOfClassId, bitLenOfCpuAlloc, bitLenOfDefCpu;
-		static short int  bitLenOfRtChain, bitLenOfNonRtChain, bitLenOfHdr, bitLenOfRtChainInPdReqPkt, bitLenOfNonRtChainInPdReqPkt;
-		static int  basicBitLenOfReshAsyncPkt;
+		static short int  bitLenOfRtChain, bitLenOfNonRtChain, bitLenOfHdr, bitLenOfRtChainInPdReqPkt, bitLenOfNonRtChainInPdReqPkt, basicBitLenOfPdPkt;
 	  static vector <float> BU_ACCUM_DELAY_OF_LVL;
 	  static vector <float> RESH_ACCUM_DELAY_OF_LVL;
 

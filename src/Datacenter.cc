@@ -37,11 +37,11 @@ calculate the len of a pkt, given the # of Rt and NonRt chains in it
 int Datacenter::bitLenOfPkt (const int numRtChains, const int &numNonRtChains, bool isPdReqPkt, bool isPdAckPkt)
 {
 	if (isPdReqPkt) { 
-		return MyConfig::basicBitLenOfReshAsyncPkt + 
+		return MyConfig::basicBitLenOfPdPkt + 
 		 		   MyConfig::bitLenOfRtChainInPdReqPkt * numRtChains + MyConfig::bitLenOfNonRtChainInPdReqPkt * numNonRtChains;
 	}
 	else if (isPdAckPkt) { 
-		return MyConfig::basicBitLenOfReshAsyncPkt + 
+		return MyConfig::basicBitLenOfPdPkt + 
 		 		   MyConfig::bitLenOfRtChain * numRtChains + MyConfig::bitLenOfNonRtChain * numNonRtChains;
 	}
 	else {

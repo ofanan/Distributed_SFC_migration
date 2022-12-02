@@ -40,17 +40,17 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
-int   MyConfig::basicBitLenOfReshAsyncPkt;
 short int MyConfig::bitLenOfHdr 			= 80;
 short int MyConfig::bitLenOfDcId 			= 12;
 short int MyConfig::bitLenOfChainId 	= 14; 
 short int MyConfig::bitLenOfClassId 	= 4;
 short int MyConfig::bitLenOfCpuAlloc	= 5;
 short int MyConfig::bitLenOfDefCpu 		= 16;
+short int MyConfig::basicBitLenOfPdPkt;
 short int MyConfig::bitLenOfRtChain;
-short int  MyConfig::bitLenOfNonRtChain;
-short int  MyConfig::bitLenOfRtChainInPdReqPkt;
-short int  MyConfig::bitLenOfNonRtChainInPdReqPkt;
+short int MyConfig::bitLenOfNonRtChain;
+short int MyConfig::bitLenOfRtChainInPdReqPkt;
+short int MyConfig::bitLenOfNonRtChainInPdReqPkt;
 
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
@@ -76,7 +76,8 @@ inline int SimController::calcBitLenOfChainRecord (const Lvl_t Su_len, bool inPd
 Calculates the bit len of a chain record in a sent packet, given the length of the packet's S_u (list of delay-feasible DCs).
 **************************************************************************************************************************************************/
 {
-	return MyConfig::bitLenOfChainId + MyConfig::bitLenOfClassId + MyConfig::bitLenOfDcId*(Su_len + 2)	;
+	return (inPdReqPkt)? MyConfig::bitLenOfChainId + MyConfig::bitLenOfClassId + MyConfig::bitLenOfDcId*(Su_len + 2) + MyConfig::bitLenOfCpuAlloc: 
+											 MyConfig::bitLenOfChainId + MyConfig::bitLenOfClassId + MyConfig::bitLenOfDcId*(Su_len + 2);
 }
 
 
@@ -237,6 +238,8 @@ Sets and calculates the bit lens of packets and packets' fields.
 //	MyConfig::basicBitLenOfReshAsyncPkt 	 = 1;  //MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
   MyConfig::bitLenOfRtChain 	 					 = calcBitLenOfChainRecord (RtChain::mu_u_len, 		false);
   MyConfig::bitLenOfNonRtChain 					 = calcBitLenOfChainRecord (NonRtChain::mu_u_len, false);
+  MyConfig::bitLenOfRtChainInPdReqPkt 	 = calcBitLenOfChainRecord (RtChain::mu_u_len, 		true);
+  MyConfig::bitLenOfNonRtChainInPdReqPkt = calcBitLenOfChainRecord (NonRtChain::mu_u_len, true);
 }
 
 /*************************************************************************************************************************************************
