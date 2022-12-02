@@ -154,7 +154,8 @@ class SimController : public cSimpleModule
 		void printErrStrAndExit (const string &errorMsgStr);
 		bool alreadySucceededWithThisSeed ();
 	  void calcBitLens ();
-	  void setModeStr (); //Set MyConfig::modeStr to the correct string, according to the simulated mode ("Sync", "Async" etc.).
+		inline int  calcBitLenOfChainRecord (const Lvl_t Su_len, bool inPdReqPkt);
+		void setModeStr (); //Set MyConfig::modeStr to the correct string, according to the simulated mode ("Sync", "Async" etc.).
 	  
   public:
 		int netType;

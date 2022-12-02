@@ -34,11 +34,6 @@ int		MyConfig::overallNumBlockedUsrs;
 bool  MyConfig::printBuRes, MyConfig::printBupuRes; // when true, print to the log and to the .res file the results of the BU stage of BUPU / the results of Bupu.
 
 bool  MyConfig::manuallySetPktSize;
-int   MyConfig::bitLenOfHdr;
-int   MyConfig::bitLenOfRtChain;
-int   MyConfig::bitLenOfRtChainInPdReqPkt;
-int   MyConfig::bitLenOfNonRtChainInPdReqPkt;
-int   MyConfig::bitLenOfNonRtChain;
 float MyConfig::FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
 float MyConfig::traceTime;
 bool	MyConfig::runningBinSearchSim;  
@@ -46,11 +41,16 @@ bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
 int   MyConfig::basicBitLenOfReshAsyncPkt;
-int   MyConfig::lenOfDcId 	 = 12;
-int   MyConfig::lenOfChainId = 14;
-int   MyConfig::lenOfClassId = 4;
-int   MyConfig::lenOfCputAtInitiator = 5;
-int   MyConfig::lenOfDefCpu = 16;
+short int MyConfig::bitLenOfHdr 			= 80;
+short int MyConfig::bitLenOfDcId 			= 12;
+short int MyConfig::bitLenOfChainId 	= 14; 
+short int MyConfig::bitLenOfClassId 	= 4;
+short int MyConfig::bitLenOfCpuAlloc	= 5;
+short int MyConfig::bitLenOfDefCpu 		= 16;
+short int MyConfig::bitLenOfRtChain;
+short int  MyConfig::bitLenOfNonRtChain;
+short int  MyConfig::bitLenOfRtChainInPdReqPkt;
+short int  MyConfig::bitLenOfNonRtChainInPdReqPkt;
 
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
@@ -70,6 +70,15 @@ inline Lvl_t  SimController::idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl) {return
 // convert leafId <--> dcId
 inline DcId_t SimController::leafId2DcId (DcId_t leafId) {return leaves		 [leafId]->dcId;}
 inline DcId_t SimController::dcId2leafId (DcId_t dcId)   {return datacenters[dcId]  ->leafId;}
+
+inline int SimController::calcBitLenOfChainRecord (const Lvl_t Su_len, bool inPdReqPkt) 
+/*************************************************************************************************************************************************
+Calculates the bit len of a chain record in a sent packet, given the length of the packet's S_u (list of delay-feasible DCs).
+**************************************************************************************************************************************************/
+{
+	return MyConfig::bitLenOfChainId + MyConfig::bitLenOfClassId + MyConfig::bitLenOfDcId*(Su_len + 2)	;
+}
+
 
 /*************************************************************************************************************************************************
 RtChainRandInt is used to speedup the random decision, whether a new geenrated chain is RT or not.
@@ -225,12 +234,9 @@ void SimController::calcBitLens ()
 Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
-  MyConfig::bitLenOfRtChain 	 					 = 1; //MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + RtChain::   mu_u_len)*MyConfig::lenOfDcId;
-  MyConfig::bitLenOfNonRtChain 					 = 1; //MyConfig::lenOfChainId + MyConfig::lenOfClassId + (2 + NonRtChain::mu_u_len)*MyConfig::lenOfDcId;
-  MyConfig::bitLenOfRtChainInPdReqPkt 	 = 1; //MyConfig::bitLenOfRtChain    + MyConfig::lenOfCputAtInitiator;
-  MyConfig::bitLenOfNonRtChainInPdReqPkt = 1; //MyConfig::bitLenOfNonRtChain + MyConfig::lenOfCputAtInitiator;
-	MyConfig::bitLenOfHdr  		 	 				   =1; // par ("bitLenOfHdr");
-	MyConfig::basicBitLenOfReshAsyncPkt 	 = 1; //MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
+//	MyConfig::basicBitLenOfReshAsyncPkt 	 = 1;  //MyConfig::bitLenOfHdr +  MyConfig::lenOfDefCpu + MyConfig::lenOfDcId;
+  MyConfig::bitLenOfRtChain 	 					 = calcBitLenOfChainRecord (RtChain::mu_u_len, 		false);
+  MyConfig::bitLenOfNonRtChain 					 = calcBitLenOfChainRecord (NonRtChain::mu_u_len, false);
 }
 
 /*************************************************************************************************************************************************
