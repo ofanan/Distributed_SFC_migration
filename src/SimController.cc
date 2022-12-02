@@ -212,11 +212,11 @@ void SimController::initialize (int stage)
 			cout << "((((((( already successfully ran with this seed. Skipping to the next run ))))))";
 			rst 							();
 			MyConfig::discardAllMsgs = true;
-			return; // causes segfault?
+			return; 
 		} 
 		rst 							();
 		runTrace ();
-//		 initBinSearchSim ();
+		//		 initBinSearchSim (); // currently not supported
 	}
 }
 
@@ -259,7 +259,9 @@ void SimController::handleAlgFailure ()
 		printBufToLog ();
 	}
 	algStts = FAIL;
-	printResLine ();
+	if (!MyConfig::runningRtProbSim) { // in Rt Prob Sim, print only the results of successfully finished traces
+		printResLine ();
+	}
 	if (MyConfig::runningBinSearchSim || MyConfig::runningCampaign) {
 		if (MyConfig::LOG_LVL >= VERY_DETAILED_LOG) {
 			MyConfig::printToLog ("\n**** SimController::handleAlgFailure () \n");
@@ -311,7 +313,6 @@ void SimController::continueBinSearch ()
 		if (MyConfig::runningRtProbSim) {
 			printResLine (RtSimResFile.rdbuf());
 		}
-
 		return; 
 	}
 	if (algStts==SCCS) {
