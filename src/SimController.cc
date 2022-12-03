@@ -48,7 +48,7 @@ bool  MyConfig::measureRunTime;
 //short int MyConfig::bitLenOfDefCpu 		= 1; 
 short int MyConfig::bitLenOfHdr 			= 80;
 short int MyConfig::bitLenOfDcId 			= 12;
-short int MyConfig::bitLenOfChainId 	= 14; 
+short int MyConfig::bitLenOfChainId 	= 14;  
 short int MyConfig::bitLenOfClassId 	= 4;
 short int MyConfig::bitLenOfCpuAlloc	= 5;
 short int MyConfig::bitLenOfDefCpu 		= 16;
@@ -241,9 +241,9 @@ void SimController::calcBitLens ()
 Sets and calculates the bit lens of packets and packets' fields.
 **************************************************************************************************************************************************/
 {
-  MyConfig::bitLenOfRtChain 	 					 	= calcBitLenOfChainRecord (RtChain::mu_u_len, 		false);
+  MyConfig::bitLenOfRtChain 	 					 	= calcBitLenOfChainRecord (RtChain::mu_u_len, 	 false);
   MyConfig::bitLenOfNonRtChain 						= calcBitLenOfChainRecord (NonRtChain::mu_u_len, false);
-  MyConfig::bitLenOfRtChainInPdReqPkt 	 	= calcBitLenOfChainRecord (RtChain::mu_u_len, 		true);
+  MyConfig::bitLenOfRtChainInPdReqPkt 	 	= calcBitLenOfChainRecord (RtChain::mu_u_len, 	 true);
   MyConfig::bitLenOfNonRtChainInPdReqPkt 	= calcBitLenOfChainRecord (NonRtChain::mu_u_len, true);
 	MyConfig::basicBitLenOfPdPkt						= MyConfig::bitLenOfHdr + MyConfig::bitLenOfDcId + MyConfig::bitLenOfDefCpu;
 }

@@ -1,0 +1,6 @@
+cur prob': 
+Allocating only 1Mbps to the link cap makes msgs arrive after more than a sec (intervening with the next "cycle").
+Solved this by allocatin 10Mbps.
+Another prob':
+overallCritNNewRtUsrs in Moanco.comoh results in invalid values.
+

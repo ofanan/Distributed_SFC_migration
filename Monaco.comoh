@@ -1,0 +1,11 @@
+// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where
+// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where
+// T is the slot cnt (read from the input file)
+// Mode is the algorithm / solver used.
+// nPktsi, nBytesi indicate the number of pkts/bytes sent in direction j.
+// The directions are determined as follows:
+// directions 0, 1, ..., lvlOfRoot-1 indicate pkts whose src is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt).
+// directions lvlOfRoot, lvlOfRoot+1, ..., 2*lvlOfRoot-1, indicate pkts whose src is 1,2, ... lvlOfRoot, destined to the child.
+
+t30001_AsyncNBlk_cpu838_p0.0_sd1_stts1 | nPkts0 = 20 | nPkts1 = 19 | nPkts2 = 16 | nPkts3 = 9 | nPkts4 = 3 | nPkts5 = 20 | nPkts6 = 19 | nPkts7 = 16 | nPkts8 = 9 | nPkts9 = 3 | nBytes0 = 250 | nBytes1 = 249 | nBytes2 = 246 | nBytes3 = 239 | nBytes4 = 233 | nBytes5 = 250 | nBytes6 = 249 | nBytes7 = 246 | nBytes8 = 239 | nBytes9 = 233 | overallCritNNewRtUsrs = 34413408  | overallCritNNewNonRtUsrs = 28889232
+t30001_AsyncNBlk_cpu838_p0.0_sd1_stts1 | nPkts0 = 20 | nPkts1 = 19 | nPkts2 = 16 | nPkts3 = 9 | nPkts4 = 3 | nPkts5 = 20 | nPkts6 = 19 | nPkts7 = 16 | nPkts8 = 9 | nPkts9 = 3 | nBytes0 = 250 | nBytes1 = 249 | nBytes2 = 246 | nBytes3 = 239 | nBytes4 = 233 | nBytes5 = 250 | nBytes6 = 249 | nBytes7 = 246 | nBytes8 = 239 | nBytes9 = 233 | overallCritNNewRtUsrs = 10488304  | overallCritNNewNonRtUsrs = 412389520
