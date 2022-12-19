@@ -601,11 +601,15 @@ void SimController::rst (bool rstDCs)
 	chainsThatLeftDc.		 clear ();
 	usrsThatLeft.				 clear ();
 	fill(rcvdFinishedAlgMsgFromLeaves.begin(), rcvdFinishedAlgMsgFromLeaves.end(), false);
-	numMigsAtThisPeriod = 0; 
-	numCritRtUsrs 			= 0;
-	numCritNonRtUsrs    = 0;
-	numNewRtUsrs 			  = 0;
-	numNewNonRtUsrs     = 0;
+	numMigsAtThisPeriod 	= 0; 
+	numCritRtUsrs 				= 0;
+	numCritNonRtUsrs    	= 0;
+	numNewRtUsrs 			  	= 0;
+	numNewNonRtUsrs     	= 0;
+	overallCritRtUsrs 	 	= 0;
+	overallCritNonRtUsrs 	= 0;
+	overallNewRtUsrs 		 	= 0;
+	overallNewNonRtUsrs  	= 0;
 	MyConfig::isFirstPeriod = true;
 	isLastPeriod 					  = false;
   MyConfig::lvlOfHighestReshDc  = UNPLACED_LVL;
@@ -938,14 +942,13 @@ void SimController::rdOldUsrsLine (string line)
 		if (MyConfig::DEBUG_LVL>0 && chain.curDc == UNPLACED_DC) {
 			error ("t=%.3f: at rdOldUsrsLine, old usr %d wasn't placed yet\n", MyConfig::traceTime, chainId);
 		}
-		if (chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's a critical chain
-			if (!MyConfig::isFirstPeriod) {
-				if (chain.isRtChain) {
-					numCritRtUsrs++;
-				}
-				else {
-					numCritNonRtUsrs++;
-				}
+		if (!MyConfig::isFirstPeriod // We don't collect this stat at the first period, in which all chains are "new" ,and the stat is biased.
+			   && chain.curLvl==UNPLACED_LVL) { // if the current place of this chain isn't delay-feasible for it anymore --> it's critical
+			if (chain.isRtChain) {
+				numCritRtUsrs++;
+			}
+			else {
+				numCritNonRtUsrs++;
 			}
 			insertToChainsThatJoinedLeaf (poaId, chain);
 			insertToChainsThatLeftDc (chain.curDc, chain.id);
@@ -1313,10 +1316,17 @@ inline void SimController::genSettingsBuf (bool printTime)
 **************************************************************************************************************************************************/
 void SimController::printSimComOh ()
 {
-	streambuf* outBuf = MyConfig::comOhResFile.rdbuf();								   	
+	streambuf* outBuf = MyConfig::comOhResFile.rdbuf();				   	
 	ostream os(outBuf);
 	genSettingsBuf ();
-	os << settingsBuf;
+	if (algStts!=SCCS) { // if the run failed, its result will appear in comments
+		os << "// ";
+		os << settingsBuf;
+		os << "\n";
+	}
+	else {
+		os << settingsBuf;
+	}
 	if (algStts==FAIL) {
 		return;
 	}
@@ -1335,7 +1345,7 @@ void SimController::printSimComOh ()
 		sprintf (buf, " | nBytes%d = %d", i, (int)MyConfig::bitCnt[i]);
 		os << buf; 
 	}
-	sprintf (buf, " | overallCritNNewRtUsrs = %d  | overallCritNNewNonRtUsrs = %d", (int)(overallCritRtUsrs+overallNewRtUsrs), (int)(overallCritNonRtUsrs+overallNewNonRtUsrs));
+	sprintf (buf, " | overallCritNNewRtUsrs = %.d  | overallCritNNewNonRtUsrs = %d", int(overallCritRtUsrs+overallNewRtUsrs), int(overallCritNonRtUsrs+overallNewNonRtUsrs));
 	os << buf; 	
 	sprintf (buf, "\n");
 	os << buf; 
