@@ -1342,7 +1342,7 @@ void SimController::printSimComOh ()
 		os << buf; 
 	}
 	for (int i(0); i<MyConfig::pktCnt.size(); i++) {
-		sprintf (buf, " | nBytes%d = %d", i, (int)MyConfig::bitCnt[i]);
+		sprintf (buf, " | nBytes%d = %d", i, int (round (float(MyConfig::bitCnt[i])/8)));
 		os << buf; 
 	}
 	sprintf (buf, " | overallCritNNewRtUsrs = %.d  | overallCritNNewNonRtUsrs = %d", int(overallCritRtUsrs+overallNewRtUsrs), int(overallCritNonRtUsrs+overallNewNonRtUsrs));
