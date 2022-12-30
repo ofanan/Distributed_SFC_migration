@@ -1345,7 +1345,9 @@ void SimController::printSimComOh ()
 		sprintf (buf, " | nBytes%d = %d", i, int (round (float(MyConfig::bitCnt[i])/8)));
 		os << buf; 
 	}
-	sprintf (buf, " | overallCritNNewRtUsrs = %.d  | overallCritNNewNonRtUsrs = %d", int(overallCritRtUsrs+overallNewRtUsrs), int(overallCritNonRtUsrs+overallNewNonRtUsrs));
+	
+//	int overallCritNNewRtUsrs = max (0, int(overallCritRtUsrs+overallNewRtUsrs));
+	sprintf (buf, " | overallCritNNewRtUsrs = %d  | overallCritNNewNonRtUsrs = %d", int(overallCritRtUsrs+overallNewRtUsrs), int(overallCritNonRtUsrs+overallNewNonRtUsrs));
 	os << buf; 	
 	sprintf (buf, "\n");
 	os << buf; 

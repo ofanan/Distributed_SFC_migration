@@ -1,0 +1,15 @@
+// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where
+// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where
+// T is the slot cnt (read from the input file)
+// Mode is the algorithm / solver used.
+// nPktsi, nBytesi indicate the number of pkts/bytes sent in direction j.
+// The directions are determined as follows:
+// directions 0, 1, ..., lvlOfRoot-1 indicate pkts whose src is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt).
+// directions lvlOfRoot, lvlOfRoot+1, ..., 2*lvlOfRoot-1, indicate pkts whose src is 1,2, ... lvlOfRoot, destined to the child.
+
+t30599_AsyncNBlk_cpu142_p0.0_sd1_stts1 | nPkts0 = 50942 | nPkts1 = 37039 | nPkts2 = 23360 | nPkts3 = 8651 | nPkts4 = 2106 | nPkts5 = 50623 | nPkts6 = 36974 | nPkts7 = 23346 | nPkts8 = 8640 | nPkts9 = 2088 | nBytes0 = 1335777 | nBytes1 = 1185838 | nBytes2 = 1032834 | nBytes3 = 821528 | nBytes4 = 677840 | nBytes5 = 1324592 | nBytes6 = 1184020 | nBytes7 = 1037178 | nBytes8 = 839199 | nBytes9 = 697564 | overallCritNNewRtUsrs =   | overallCritNNewNonRtUsrs = 60879
+t30599_AsyncNBlk_cpu142_p0.2_sd1_stts1 | nPkts0 = 51978 | nPkts1 = 37269 | nPkts2 = 19934 | nPkts3 = 8407 | nPkts4 = 2151 | nPkts5 = 51555 | nPkts6 = 37223 | nPkts7 = 19873 | nPkts8 = 8382 | nPkts9 = 2128 | nBytes0 = 1285786 | nBytes1 = 1110953 | nBytes2 = 748992 | nBytes3 = 605478 | nBytes4 = 497272 | nBytes5 = 1272597 | nBytes6 = 1111912 | nBytes7 = 757238 | nBytes8 = 619708 | nBytes9 = 513962 | overallCritNNewRtUsrs = 18001  | overallCritNNewNonRtUsrs = 44042
+t30599_AsyncNBlk_cpu142_p0.4_sd1_stts1 | nPkts0 = 52647 | nPkts1 = 37203 | nPkts2 = 15639 | nPkts3 = 7784 | nPkts4 = 2136 | nPkts5 = 52207 | nPkts6 = 37112 | nPkts7 = 15542 | nPkts8 = 7745 | nPkts9 = 2113 | nBytes0 = 1240084 | nBytes1 = 1044336 | nBytes2 = 507404 | nBytes3 = 409879 | nBytes4 = 324772 | nBytes5 = 1227923 | nBytes6 = 1048836 | nBytes7 = 511531 | nBytes8 = 423609 | nBytes9 = 340485 | overallCritNNewRtUsrs = 33762  | overallCritNNewNonRtUsrs = 29343
+t30599_AsyncNBlk_cpu142_p0.6_sd1_stts1 | nPkts0 = 53848 | nPkts1 = 37384 | nPkts2 = 9783 | nPkts3 = 6189 | nPkts4 = 2180 | nPkts5 = 53223 | nPkts6 = 37215 | nPkts7 = 9656 | nPkts8 = 6144 | nPkts9 = 2160 | nBytes0 = 1207705 | nBytes1 = 988700 | nBytes2 = 275060 | nBytes3 = 233878 | nBytes4 = 182934 | nBytes5 = 1195743 | nBytes6 = 994894 | nBytes7 = 273712 | nBytes8 = 239332 | nBytes9 = 195577 | overallCritNNewRtUsrs = 49112  | overallCritNNewNonRtUsrs = 15481
+// t-1_AsyncNBlk_cpu142_p0.8_sd1_stts2
+// t-1_AsyncNBlk_cpu142_p1.0_sd1_stts2
