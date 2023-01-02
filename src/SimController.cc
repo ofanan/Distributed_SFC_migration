@@ -392,6 +392,7 @@ void SimController::openFiles ()
 	if (MyConfig::runningRtProbSim) {
 		sprintf (RtSimResFileName, "RtProb_%s_%s_1secs.res", MyConfig::cityName, MyConfig::modeStr);
 		RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
+//		RtSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , RESH_ACCUM_DELAY_OF_LVL0 = " << MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] << endl; 
 	}
 
 	if (!MyConfig::openFiles ()) {
