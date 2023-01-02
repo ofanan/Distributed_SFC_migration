@@ -124,10 +124,10 @@ bool MyConfig::openFiles()
 		resFile << "// C is the num of CPU units used in the leaf"  << endl;
 		resFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
 		resFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else."  << endl  << endl;
-		resFile << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] << " , RESH_ACCUM_DELAY_OF_LVL0 = " << MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] << endl << endl; 
 
 	}
-	
+	resFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] << " , RESH_ACCUM_DELAY_OF_LVL0 = " << MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] << endl; 
+
 	if (logComOh) {
 		if (fileExists (comOhResFileName)) {
 		  comOhResFile.open(comOhResFileName, std::ios_base::app);
