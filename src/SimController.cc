@@ -252,7 +252,7 @@ Returns true iff a previous run has successfully run the all trace, using the cu
 bool SimController::alreadySucceededWithThisSeed ()
 {
 //	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-	sprintf (buf, "grep t30599_%s %s | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileName, RtProb, seed);
+	sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileName, RtProb, seed);
 	string res = MyConfig::exec (buf);
 	stringstream ss (res); 
 	int grepRes;
