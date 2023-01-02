@@ -143,17 +143,15 @@ void SimController::initialize (int stage)
 	
   if (stage==1) {
   
-		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
+		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize   (MyConfig::height);
 		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 
-  	double BU_ACCUM_DELAY_OF_LVL1			 		= double (par ("BU_ACCUM_DELAY_OF_LVL1"));
-		double RESH_ACCUM_DELAY_OF_LVL1		 		= double (par ("RESH_ACCUM_DELAY_OF_LVL1"));		
-		MyConfig::BU_ACCUM_DELAY_OF_LVL  [0] 	= 0.0;
-		MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] 	= 0.0;
+  	double BU_ACCUM_DELAY_OF_LVL0			 		= double (par ("BU_ACCUM_DELAY_OF_LVL0"));
+		double RESH_ACCUM_DELAY_OF_LVL0		 		= double (par ("RESH_ACCUM_DELAY_OF_LVL0"));		
 
-		for (int lvl=1; lvl<MyConfig::height; lvl++) {
-			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float (lvl*BU_ACCUM_DELAY_OF_LVL1);
-			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float (lvl*RESH_ACCUM_DELAY_OF_LVL1);
+		for (int lvl=0; lvl<MyConfig::height; lvl++) {
+			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float ((lvl+1)*BU_ACCUM_DELAY_OF_LVL0);
+			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float ((lvl+1)*RESH_ACCUM_DELAY_OF_LVL0);
 		}
 
 		srand(seed); // set the seed of random num generation

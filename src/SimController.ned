@@ -21,8 +21,8 @@ simple SimController
     bool   runningRtProbSim = default (false);
     double decisionPariod @unit(s) = default(1s);
     bool allowBlkChain = default (false); // allow blocking of new requests
-    double BU_ACCUM_DELAY_OF_LVL1;
-    double RESH_ACCUM_DELAY_OF_LVL1;
+    double BU_ACCUM_DELAY_OF_LVL0;
+    double RESH_ACCUM_DELAY_OF_LVL0;
 		double beginVeryDetailedLogAtTraceTime;
 		int    LOG_LVL = default (0);
 		int    RES_LVL = default (1);
