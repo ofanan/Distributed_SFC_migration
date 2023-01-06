@@ -1304,9 +1304,9 @@ void SimController::genSettingsBuf (bool printTime, bool printAccDelay)
 {
   if (printTime) {
   	if (printAccDelay) {
-  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.1f_pdd%.1f",	
+  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.2f_pdd%.2f",	
   																						MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts, 
-  																						MyConfig::BU_ACCUM_DELAY_OF_LVL[0], MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
+  																						1000*MyConfig::BU_ACCUM_DELAY_OF_LVL[0], 1000*MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
 		}
 		else {  	
   		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	
