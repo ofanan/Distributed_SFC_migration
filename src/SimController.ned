@@ -22,7 +22,7 @@ simple SimController
     double decisionPariod @unit(s) = default(1s);
     bool allowBlkChain = default (false); // allow blocking of new requests
     double BU_ACCUM_DELAY_OF_LVL0;
-    double RESH_ACCUM_DELAY_OF_LVL0;
+    double PUSH_DWN_DELAY_OF_LVL0;
 		double beginVeryDetailedLogAtTraceTime;
 		int    LOG_LVL = default (0);
 		int    RES_LVL = default (1);

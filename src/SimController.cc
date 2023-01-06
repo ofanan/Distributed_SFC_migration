@@ -59,7 +59,7 @@ short int MyConfig::bitLenOfRtChainInPdReqPkt;
 short int MyConfig::bitLenOfNonRtChainInPdReqPkt;
 
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
-vector <float> MyConfig::RESH_ACCUM_DELAY_OF_LVL;
+vector <float> MyConfig::PUSH_DWN_DELAY_OF_LVL;
 string MyConfig::comOhResFileName;
 ofstream MyConfig::comOhResFile;
 
@@ -144,14 +144,14 @@ void SimController::initialize (int stage)
   if (stage==1) {
   
 		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize   (MyConfig::height);
-		MyConfig::RESH_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
+		MyConfig::PUSH_DWN_DELAY_OF_LVL.resize (MyConfig::height);
 
   	double BU_ACCUM_DELAY_OF_LVL0			 		= double (par ("BU_ACCUM_DELAY_OF_LVL0"));
-		double RESH_ACCUM_DELAY_OF_LVL0		 		= double (par ("RESH_ACCUM_DELAY_OF_LVL0"));		
+		double PUSH_DWN_DELAY_OF_LVL0		 		= double (par ("PUSH_DWN_DELAY_OF_LVL0"));		
 
 		for (int lvl=0; lvl<MyConfig::height; lvl++) {
 			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float ((lvl+1)*BU_ACCUM_DELAY_OF_LVL0);
-			MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl] = float ((lvl+1)*RESH_ACCUM_DELAY_OF_LVL0);
+			MyConfig::PUSH_DWN_DELAY_OF_LVL[lvl] = float ((lvl+1)*PUSH_DWN_DELAY_OF_LVL0);
 		}
 
 		srand(seed); // set the seed of random num generation
@@ -392,7 +392,7 @@ void SimController::openFiles ()
 	if (MyConfig::runningRtProbSim) {
 		sprintf (RtSimResFileName, "RtProb_%s_%s_1secs.res", MyConfig::cityName, MyConfig::modeStr);
 		RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
-//		RtSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , RESH_ACCUM_DELAY_OF_LVL0 = " << MyConfig::RESH_ACCUM_DELAY_OF_LVL[0] << endl; 
+//		RtSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
 	}
 
 	if (!MyConfig::openFiles ()) {
@@ -1304,9 +1304,10 @@ void SimController::genSettingsBuf (bool printTime, bool printAccDelay)
 {
   if (printTime) {
   	if (printAccDelay) {
+  		error ("rgrgrg."); // $$ ???
   		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.1f_pdd%.1f",	
   																						MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts, 
-  																						MyConfig::BU_ACCUM_DELAY_OF_LVL, RESH_ACCUM_DELAY_OF_LVL);
+  																						MyConfig::BU_ACCUM_DELAY_OF_LVL[0], MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
 		}
 		else {  	
   		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	
@@ -1328,7 +1329,7 @@ void SimController::printSimComOh ()
 {
 	streambuf* outBuf = MyConfig::comOhResFile.rdbuf();				   	
 	ostream os(outBuf);
-	genSettingsBuf ();
+	genSettingsBuf (true, true); // first arg': print the time stamp; 2nc arg': print the acc delay and push-down delay in the settings str.
 	if (algStts!=SCCS) { // if the run failed, its result will appear in comments
 		os << "// ";
 		os << settingsBuf;

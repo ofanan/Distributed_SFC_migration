@@ -150,7 +150,7 @@ void Datacenter::initialize(int stage)
 *************************************************************************************************************************************************/
 void Datacenter::scheduleErrMsgAndExit ()
 {
-	scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("errorMsg")); 
+	scheduleAt (simTime() + MyConfig::PUSH_DWN_DELAY_OF_LVL[lvl], new cMessage ("errorMsg")); 
 }
 
 /*************************************************************************************************************************************************
@@ -903,7 +903,7 @@ void Datacenter::scheduleInitReshAsync ()
 		 	cancelAndDelete (bottomUpEvent); // no need to run BU before the reshAsync is run
 		}
 		reshAsyncEvent = new cMessage ("initReshAsync");
-		scheduleAt (simTime() + MyConfig::RESH_ACCUM_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
+		scheduleAt (simTime() + MyConfig::PUSH_DWN_DELAY_OF_LVL[lvl], reshAsyncEvent); //schedule a reshuffle
 	}			
 }
 

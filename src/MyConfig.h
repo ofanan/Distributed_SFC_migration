@@ -92,7 +92,7 @@ class MyConfig {
 		static short int bitLenOfDcId, bitLenOfChainId, bitLenOfClassId, bitLenOfCpuAlloc, bitLenOfDefCpu;
 		static short int  bitLenOfRtChain, bitLenOfNonRtChain, bitLenOfHdr, bitLenOfRtChainInPdReqPkt, bitLenOfNonRtChainInPdReqPkt, basicBitLenOfPdPkt;
 	  static vector <float> BU_ACCUM_DELAY_OF_LVL;
-	  static vector <float> RESH_ACCUM_DELAY_OF_LVL;
+	  static vector <float> PUSH_DWN_DELAY_OF_LVL;
 
 		// Parameters determining how to define whether a new generated chain is RT or not
 		static bool randomlySetChainType;
