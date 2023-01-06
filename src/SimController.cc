@@ -1296,11 +1296,17 @@ void SimController::handleMessage (cMessage *msg)
 
 /*************************************************************************************************************************************************
  * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
+Inputs:
+printTime - if true, write the time at the beginning of the settings string. Else, print "runnning... " and then the settings string.
+printAccDelay - if printTime and printAccDelay are true, write the accumulation delay and the push-down delay at the end of the settings string.
 *************************************************************************************************************************************************/
-inline void SimController::genSettingsBuf (bool printTime)
+void SimController::genSettingsBuf (bool printTime, bool printAccDelay=false)
 {
   if (printTime) {
-  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts);
+  	if (printAccDelay) {
+	  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	
+	  																					 MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts);
+		}	  																					 
   }
   else {
   	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed);
