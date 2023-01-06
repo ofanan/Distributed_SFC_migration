@@ -887,7 +887,6 @@ void Datacenter::scheduleBottomUpEvent ()
 		bottomUpEvent = new cMessage ("bottomUp");
 		scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], bottomUpEvent); 
 	}
-	//	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[lvl], new cMessage ("bottomUp")); 
 }
 
 /*************************************************************************************************************************************************

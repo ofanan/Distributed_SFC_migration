@@ -41,9 +41,6 @@ const int uniformChainMigCost = 600;
 const bool Sync  = 0;
 const bool Async = 1;
 
-// Determining the level of debug and log.
-const float ACCUMULATION_DELAY = 0.05;
-										 
 class MyConfig { 
 
 		// A buffer for print-outs

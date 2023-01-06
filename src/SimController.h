@@ -139,7 +139,7 @@ class SimController : public cSimpleModule
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
 		inline DcId_t leafId2DcId (DcId_t leafId);
 		inline DcId_t dcId2leafId (DcId_t dcId);
-		void genSettingsBuf (bool printTime=true, bool printAccDelay);
+		void genSettingsBuf (bool printTime=true, bool printAccDelay=false);*/
     void openFiles ();
 		void initBinSearchSim  (); // run a binary search for the minimum required rsrc aug' (actually, cpu at leaf) for finding a feasible sol'
 

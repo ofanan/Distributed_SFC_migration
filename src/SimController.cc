@@ -1092,7 +1092,7 @@ void SimController::prepareFullReshSync ()
 {
 	Enter_Method ("SimController::prepareFullReshSync ()");
 	MyConfig::discardAllMsgs = true;
-	scheduleAt (simTime() + ACCUMULATION_DELAY, new cMessage ("InitFullReshMsg"));
+	scheduleAt (simTime() + MyConfig::BU_ACCUM_DELAY_OF_LVL[MyConfig::lvlOfRoot], new cMessage ("InitFullReshMsg"));
 }
 
 
@@ -1300,13 +1300,18 @@ Inputs:
 printTime - if true, write the time at the beginning of the settings string. Else, print "runnning... " and then the settings string.
 printAccDelay - if printTime and printAccDelay are true, write the accumulation delay and the push-down delay at the end of the settings string.
 *************************************************************************************************************************************************/
-void SimController::genSettingsBuf (bool printTime, bool printAccDelay=false)
+void SimController::genSettingsBuf (bool printTime, bool printAccDelay)
 {
   if (printTime) {
   	if (printAccDelay) {
-	  	snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	
-	  																					 MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts);
-		}	  																					 
+  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.1f_pdd%.1f",	
+  																						MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts, 
+  																						MyConfig::BU_ACCUM_DELAY_OF_LVL, RESH_ACCUM_DELAY_OF_LVL);
+		}
+		else {  	
+  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	
+  																						MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts);
+  	}
   }
   else {
   	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed);
