@@ -145,6 +145,14 @@ bool MyConfig::openFiles()
 		}
 	}
 
+	// $$$ add info at the beginning of MyConfig::RtProbSimResFileName
+	if (MyConfig::runningRtProbSim) {
+		sprintf (RtProbSimResFileName, "RtProb_%s_%s_1secs.res", cityName, modeStr);
+		RtProbSimResFile.open(RtProbSimResFileName, std::ios_base::app | std::ios_base::in);
+////		resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
+//		MyConfig::RtProbSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
+	}
+
 	return true;
 }
 

@@ -383,13 +383,6 @@ void SimController::openFiles ()
 		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
 	}
 
-	// $$$ add info at the beginning of MyConfig::RtProbSimResFileName
-	if (MyConfig::runningRtProbSim) {
-		sprintf (MyConfig::RtProbSimResFileName, "RtProb_%s_%s_1secs.res", MyConfig::cityName, MyConfig::modeStr);
-		MyConfig::RtProbSimResFile.open(MyConfig::RtProbSimResFileName, std::ios_base::app | std::ios_base::in);
-//		MyConfig::RtProbSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
-	}
-
 	if (!MyConfig::openFiles ()) {
 		error ("MyConfig::openFiles failed");
 	}
