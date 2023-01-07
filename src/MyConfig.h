@@ -83,8 +83,10 @@ class MyConfig {
 		static float FModePeriod; // period of a Dc staying in F Mode after the last reshuffle msg arrives
     static float traceTime; //current time (in the trace, in seconds)
     static bool runningBinSearchSim; 
-    static bool runningRtProbSim;
     static bool runningCampaign;
+    static bool runningRtProbSim;
+		static char RtProbSimResFileName[50];
+    static ofstream RtProbSimResFile; // .res file when running "RtProb" sim (namely, varying the prob' of Rt).
     static bool measureRunTime;
 		static bool manuallySetPktSize;
 		static bool allowBlkChain;

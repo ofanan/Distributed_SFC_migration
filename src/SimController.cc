@@ -12,7 +12,6 @@ bool  MyConfig::randomlySetChainType; // when true, use real randomization; else
 bool  MyConfig::evenChainsAreRt;
 bool  MyConfig::isFirstPeriod; // // will be true iff this the first decision period in the sim
 char 	MyConfig::modeStr[MyConfig::modeStrLen];
-char  MyConfig::cityName[MyConfig::cityNameLen];
  
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
@@ -40,12 +39,6 @@ bool	MyConfig::runningBinSearchSim;
 bool  MyConfig::runningRtProbSim;
 bool  MyConfig::runningCampaign = true;
 bool  MyConfig::measureRunTime;
-//short int MyConfig::bitLenOfHdr 			= 1; 
-//short int MyConfig::bitLenOfDcId 			= 1; 
-//short int MyConfig::bitLenOfChainId 	= 1; 
-//short int MyConfig::bitLenOfClassId 	= 1; 
-//short int MyConfig::bitLenOfCpuAlloc	= 1; 
-//short int MyConfig::bitLenOfDefCpu 		= 1; 
 short int MyConfig::bitLenOfHdr 			= 80;
 short int MyConfig::bitLenOfDcId 			= 12;
 short int MyConfig::bitLenOfChainId 	= 14;  
@@ -61,7 +54,9 @@ short int MyConfig::bitLenOfNonRtChainInPdReqPkt;
 vector <float> MyConfig::BU_ACCUM_DELAY_OF_LVL;
 vector <float> MyConfig::PUSH_DWN_DELAY_OF_LVL;
 string MyConfig::comOhResFileName;
+char MyConfig::RtProbSimResFileName[];
 ofstream MyConfig::comOhResFile;
+ofstream MyConfig::RtProbSimResFile; // .res file when running "RtProb" sim (namely, varying the prob' of Rt).
 
 vector <Cpu_t> MyConfig::cpuAtLvl; 
 vector <Cpu_t> MyConfig::minCpuToPlaceAnyChainAtLvl;
@@ -251,8 +246,7 @@ Returns true iff a previous run has successfully run the all trace, using the cu
 **************************************************************************************************************************************************/
 bool SimController::alreadySucceededWithThisSeed ()
 {
-//	char* RtSimResFileNameAsChar = &RtSimResFileName[0];
-	sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, RtSimResFileName, RtProb, seed);
+	sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, MyConfig::RtProbSimResFileName, RtProb, seed);
 	string res = MyConfig::exec (buf);
 	stringstream ss (res); 
 	int grepRes;
@@ -324,7 +318,7 @@ void SimController::continueBinSearch ()
 			printBufToLog ();
 		}
 		if (MyConfig::runningRtProbSim) {
-			printResLine (RtSimResFile.rdbuf());
+			printResLine (MyConfig::RtProbSimResFile.rdbuf());
 		}
 		return; 
 	}
@@ -340,7 +334,7 @@ void SimController::continueBinSearch ()
 				sprintf (buf, "successfully finished bin search run, with cpu at leaf=%d", MyConfig::cpuAtLeaf);
 				printBufToLog ();
 			}
-			printResLine (RtSimResFile.rdbuf());
+			printResLine (MyConfig::RtProbSimResFile.rdbuf());
 			return;
 		}
 		// need one last run to verify this ub
@@ -389,10 +383,11 @@ void SimController::openFiles ()
 		printErrStrAndExit ("traceFileName " + MyConfig::traceFileName + " doesn't correspond .ini fileName " + networkName + ".ini");
 	}
 
+	// $$$ add info at the beginning of MyConfig::RtProbSimResFileName
 	if (MyConfig::runningRtProbSim) {
-		sprintf (RtSimResFileName, "RtProb_%s_%s_1secs.res", MyConfig::cityName, MyConfig::modeStr);
-		RtSimResFile.open(RtSimResFileName, std::ios_base::app | std::ios_base::in);
-//		RtSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
+		sprintf (MyConfig::RtProbSimResFileName, "RtProb_%s_%s_1secs.res", MyConfig::cityName, MyConfig::modeStr);
+		MyConfig::RtProbSimResFile.open(MyConfig::RtProbSimResFileName, std::ios_base::app | std::ios_base::in);
+//		MyConfig::RtProbSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
 	}
 
 	if (!MyConfig::openFiles ()) {
@@ -1260,7 +1255,7 @@ void SimController::handleMessage (cMessage *msg)
 			}
 		}
 		else if (MyConfig::runningRtProbSim && isLastPeriod) { // in an Rt Prob sim, we would like to print a res line only in the last time period
-			printResLine (RtSimResFile.rdbuf());
+			printResLine (MyConfig::RtProbSimResFile.rdbuf());
 		}
 		else if (MyConfig::runningCampaign && algStts==FAIL) {
 			delete (msg);
@@ -1304,9 +1299,9 @@ void SimController::genSettingsBuf (bool printTime, bool printAccDelay)
 {
   if (printTime) {
   	if (printAccDelay) {
-  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.2f_pdd%.2f",	
+  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.0f_pdd%.0f",	
   																						MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts, 
-  																						1000*MyConfig::BU_ACCUM_DELAY_OF_LVL[0], 1000*MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
+  																						1000000*MyConfig::BU_ACCUM_DELAY_OF_LVL[0], 1000000*MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
 		}
 		else {  	
   		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d",	

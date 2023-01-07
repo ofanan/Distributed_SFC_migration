@@ -61,8 +61,6 @@ class SimController : public cSimpleModule
     int algStts; // stts of the last run of the alg'
     bool mode; // either Sync, or Async
     int      RtChainRandInt; // the maximum randomized integer, for which we'll consider a new chain as a RT chain.
-		const  static int RtSimResFileNameLen=50;
-		char RtSimResFileName[RtSimResFileNameLen];
 		string	commOhResFileName;
 
     cMessage *curHandledMsg; // Incoming message that is currently handled.
@@ -160,10 +158,9 @@ class SimController : public cSimpleModule
   public:
 		int netType;
     ifstream traceFile;
-    ofstream RtSimResFile; // .res file when running "RtProb" sim (namely, varying the prob' of Rt).
     ofstream commOhResFile; // .res file for the comm overhead.
  		string LogFileName   = "example.txt";
- 		string   RtSimFileName;
+ 		string   RtSimResFileNameFileName;
 		static const int bufSize = 512;
 		char buf[bufSize];
 		static const int settingsBufSize = 256;

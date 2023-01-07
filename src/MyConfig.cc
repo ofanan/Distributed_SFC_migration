@@ -124,9 +124,8 @@ bool MyConfig::openFiles()
 		resFile << "// C is the num of CPU units used in the leaf"  << endl;
 		resFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
 		resFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else."  << endl  << endl;
-
-	}
 	resFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
+	}
 
 	if (logComOh) {
 		if (fileExists (comOhResFileName)) {
@@ -134,10 +133,11 @@ bool MyConfig::openFiles()
 		}
 		else {
 			comOhResFile.open(comOhResFileName);
-			comOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
+			comOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s}_ad{ad}_pdd{pdd} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
 			comOhResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | nPkts0=... | nPkts1=... | nBytes0=... |  , where" << endl;
 			comOhResFile << "// T is the slot cnt (read from the input file)" << endl;
 			comOhResFile << "// Mode is the algorithm / solver used."  << endl;
+			comOhResFile << "// ad, pdd are the accumulation delay, push-down delay, resp., in micro-sec."  << endl;
 			comOhResFile << "// nPktsi, nBytesi indicate the number of pkts/bytes sent in direction j.\n";
 			comOhResFile << "// The directions are determined as follows:\n";
 			comOhResFile << "// directions 0, 1, ..., lvlOfRoot-1 indicate pkts whose src is 0,1, ... lvlOfRoot-1, and the direction is north (to prnt).\n";
