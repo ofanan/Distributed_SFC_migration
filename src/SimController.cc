@@ -255,9 +255,10 @@ bool SimController::alreadySucceededWithThisSeed (bool considerDelays)
 		sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, MyConfig::RtProbSimResFileName, RtProb, seed);
 	}
 	string res = MyConfig::exec (buf);
-	char* resAsCharPtr = new char [res.length ()+1];
-	strcpy (resAsCharPtr, res.c_str());
-	cout << resAsCharPtr; //$$$
+	// uncoment the 3 rows below to print-out the result of the call to grep.
+	//	char* resAsCharPtr = new char [res.length ()+1];
+	//	strcpy (resAsCharPtr, res.c_str());
+	//	cout << resAsCharPtr; 
 	stringstream ss (res); 
 	int grepRes;
 	ss >> grepRes;
@@ -647,7 +648,7 @@ void SimController::finish ()
   duration<double, std::micro> ms_double = finishTime - startTime;
   sprintf (buf, "\nsimTime=%f", float(ms_double.count()/1000000));
 	printBufToLog ();
-	MyConfig::RtProbSimResFile.close (); // close the files
+	MyConfig::closeFiles ();
 }
 
 /*************************************************************************************************************************************************

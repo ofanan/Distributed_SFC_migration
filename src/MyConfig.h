@@ -115,6 +115,7 @@ class MyConfig {
 		static void init ();
 		static void rst ();
 		static bool openFiles ();
+		static void closeFiles ();
 		
 		//print
 		static void printToRes (char* buf); 

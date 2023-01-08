@@ -103,6 +103,19 @@ void MyConfig::rst()
 }
 
 /*************************************************************************************************************************************************
+* Close the log and result files.
+* To be called by the end of sim. If this is a part of a sim campain, the file will be opened at the next iter.
+* However, closing thf file is good for sync, consistency, and skipping if the exact same settings was already successfully tried.
+**************************************************************************************************************************************************/
+void MyConfig::closeFiles ()
+{
+	resFile					.close ();
+	RtProbSimResFile.close (); 
+	comOhResFile    .close ();
+}
+
+
+/*************************************************************************************************************************************************
 * Open the log and result files.
 * Check whether the actual traceFileName corresponds with the netType (set according to the .ini file). 
 * For instance, if the .ini file is "Lux.ini", then traceFileName must begin with "Lux".
