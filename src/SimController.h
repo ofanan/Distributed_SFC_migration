@@ -137,7 +137,7 @@ class SimController : public cSimpleModule
 		inline Lvl_t idxInpathFromDcToRoot (DcId_t i, Lvl_t lvl);
 		inline DcId_t leafId2DcId (DcId_t leafId);
 		inline DcId_t dcId2leafId (DcId_t dcId);
-		void genSettingsBuf (bool printTime=true, bool printAccDelay=false);
+		void genSettingsBuf (bool printTime=true, bool printAccDelay=true);
     void openFiles ();
 		void initBinSearchSim  (); // run a binary search for the minimum required rsrc aug' (actually, cpu at leaf) for finding a feasible sol'
 
@@ -150,7 +150,7 @@ class SimController : public cSimpleModule
     void printAllChainsPoas  	 (); //(ofstream &outFile, bool printSu, bool printleaf, bool printCurDatacenter); // print the PoA of each active user
     void PrintStateAndEndSim 	 (); // print the system's state, and end the simulation. 
 		void printErrStrAndExit (const string &errorMsgStr);
-		bool alreadySucceededWithThisSeed ();
+		bool alreadySucceededWithThisSeed (bool considerDelays=true);
 	  void calcBitLens ();
 		inline int  calcBitLenOfChainRecord (const Lvl_t Su_len, bool inPdReqPkt);
 		void setModeStr (); //Set MyConfig::modeStr to the correct string, according to the simulated mode ("Sync", "Async" etc.).

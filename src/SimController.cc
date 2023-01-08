@@ -12,6 +12,7 @@ bool  MyConfig::randomlySetChainType; // when true, use real randomization; else
 bool  MyConfig::evenChainsAreRt;
 bool  MyConfig::isFirstPeriod; // // will be true iff this the first decision period in the sim
 char 	MyConfig::modeStr[MyConfig::modeStrLen];
+char  MyConfig::cityName[];
  
 Lvl_t MyConfig::lvlOfHighestReshDc;
 Cpu_t MyConfig::cpuAtLeaf;
@@ -244,9 +245,16 @@ Sets and calculates the bit lens of packets and packets' fields.
 /*************************************************************************************************************************************************
 Returns true iff a previous run has successfully run the all trace, using the current seed and RtProb.
 **************************************************************************************************************************************************/
-bool SimController::alreadySucceededWithThisSeed ()
+bool SimController::alreadySucceededWithThisSeed (bool considerDelays)
 {
-	sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, MyConfig::RtProbSimResFileName, RtProb, seed);
+	if (considerDelays) {
+		sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1_ad%d_pdd%d | wc", MyConfig::modeStr, MyConfig::RtProbSimResFileName, RtProb, seed, 
+						 int(1000000*MyConfig::BU_ACCUM_DELAY_OF_LVL[0]), int(1000000*MyConfig::PUSH_DWN_DELAY_OF_LVL[0]));
+		error (buf); // $$$
+	}
+	else {
+		sprintf (buf, "grep t30599_%s %s | grep -v \"//\" | grep p%.1f_sd%d_stts1 | wc", MyConfig::modeStr, MyConfig::RtProbSimResFileName, RtProb, seed);
+	}
 	string res = MyConfig::exec (buf);
 	stringstream ss (res); 
 	int grepRes;

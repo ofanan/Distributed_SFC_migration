@@ -145,12 +145,17 @@ bool MyConfig::openFiles()
 		}
 	}
 
-	// $$$ add info at the beginning of MyConfig::RtProbSimResFileName
 	if (MyConfig::runningRtProbSim) {
 		sprintf (RtProbSimResFileName, "RtProb_%s_%s_1secs.res", cityName, modeStr);
 		RtProbSimResFile.open(RtProbSimResFileName, std::ios_base::app | std::ios_base::in);
-////		resFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
-//		MyConfig::RtProbSimResFile << endl << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::BU_ACCUM_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl; 
+		RtProbSimResFile << "// format: t{T}.{Mode}.cpu{C}.stts{s} | cpu_cost=... | link_cost=... | mig_cost=... | cost=... | ratio=[c,l,m] c | resh=lvl, , where" << endl;
+		RtProbSimResFile << "// T is the slot cnt (read from the input file)" << endl;
+		RtProbSimResFile << "// Mode is the algorithm / solver used. Possble modes are:"  << endl;
+		RtProbSimResFile << "// AsyncBlk allows blocking new requests, while AsyncNBlk doesn't. SyncPartResh, SyncFullResh allow partial, full reshuffling, resp."  << endl;
+		RtProbSimResFile << "// C is the num of CPU units used in the leaf"  << endl;
+		RtProbSimResFile << "// [c,l,m] are the ratio of the cpu, link, and mig cost out of the total cost, resp."  << endl;
+		RtProbSimResFile << "// lvl is the level of the highest reshuffling datacenter if the alg' has reshuffled for finding a solution at this slot, -1 else." << endl;
+	RtProbSimResFile << "// BU_ACCUM_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << " , PUSH_DWN_DELAY_OF_LVL0 = " << MyConfig::PUSH_DWN_DELAY_OF_LVL[0] << endl << endl; 
 	}
 
 	return true;
