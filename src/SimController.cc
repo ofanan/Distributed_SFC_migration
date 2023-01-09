@@ -139,15 +139,16 @@ void SimController::initialize (int stage)
 	
   if (stage==1) {
   
-		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize   (MyConfig::height);
+		MyConfig::BU_ACCUM_DELAY_OF_LVL.resize (MyConfig::height);
 		MyConfig::PUSH_DWN_DELAY_OF_LVL.resize (MyConfig::height);
 
-  	double BU_ACCUM_DELAY_OF_LVL0			 		= double (par ("BU_ACCUM_DELAY_OF_LVL0"));
-		double PUSH_DWN_DELAY_OF_LVL0		 		= double (par ("PUSH_DWN_DELAY_OF_LVL0"));		
+  	double BU_ACCUM_DELAY_OF_LVL0	= double (par ("BU_ACCUM_DELAY_OF_LVL0"));
+		double PDDD2AD_RATIO				 	= double (par ("PDDD2AD_RATIO"));
+		double PUSH_DWN_DELAY_OF_LVL0	= (PDDD2AD_RATIO>0)? PDDD2AD_RATIO*BU_ACCUM_DELAY_OF_LVL0 : double (par ("PUSH_DWN_DELAY_OF_LVL0"));		
 
 		for (int lvl=0; lvl<MyConfig::height; lvl++) {
 			MyConfig::BU_ACCUM_DELAY_OF_LVL  [lvl] = float ((lvl+1)*BU_ACCUM_DELAY_OF_LVL0);
-			MyConfig::PUSH_DWN_DELAY_OF_LVL[lvl] = float ((lvl+1)*PUSH_DWN_DELAY_OF_LVL0);
+			MyConfig::PUSH_DWN_DELAY_OF_LVL[lvl] 	 = float ((lvl+1)*PUSH_DWN_DELAY_OF_LVL0); 
 		}
 
 		srand(seed); // set the seed of random num generation
@@ -1298,13 +1299,13 @@ void SimController::handleMessage (cMessage *msg)
  * Writes to self.buf a string, detailing the sim' parameters (time, amount of CPU at leaves, probability of RT app' at leaf, status of the solution)
 Inputs:
 printTime - if true, write the time at the beginning of the settings string. Else, print "runnning... " and then the settings string.
-printAccDelay - if printTime and printAccDelay are true, write the accumulation delay and the push-down delay at the end of the settings string.
+printAccDelay - when true, write the accumulation delay and the push-down delay at the end of the settings string.
 *************************************************************************************************************************************************/
 void SimController::genSettingsBuf (bool printTime, bool printAccDelay)
 {
   if (printTime) {
   	if (printAccDelay) {
-  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.0f_pdd%.0f",	
+  		snprintf (settingsBuf, settingsBufSize, "t%.0f_%s_cpu%d_p%.1f_sd%d_stts%d_ad%.0f_pdd%.0f",
   																						MyConfig::traceTime, MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed, algStts, 
   																						1000000*MyConfig::BU_ACCUM_DELAY_OF_LVL[0], 1000000*MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
 		}
@@ -1314,7 +1315,14 @@ void SimController::genSettingsBuf (bool printTime, bool printAccDelay)
   	}
   }
   else {
-  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed);
+  	if (printAccDelay) {
+	  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d_ad%.0f_pdd%.0f", 
+	  						MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed,
+  							1000000*MyConfig::BU_ACCUM_DELAY_OF_LVL[0], 1000000*MyConfig::PUSH_DWN_DELAY_OF_LVL[0]);
+  	}
+  	else {
+	  	snprintf (settingsBuf, settingsBufSize, "\nrunning %s_cpu%d_p%.1f_sd%d", MyConfig::modeStr, MyConfig::cpuAtLeaf, RtProb, seed);
+	  }
   }
 }
 

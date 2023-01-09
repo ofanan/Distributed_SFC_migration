@@ -23,6 +23,7 @@ simple SimController
     bool allowBlkChain = default (false); // allow blocking of new requests
     double BU_ACCUM_DELAY_OF_LVL0;
     double PUSH_DWN_DELAY_OF_LVL0;
+    double PDDD2AD_RATIO;
 		double beginVeryDetailedLogAtTraceTime;
 		int    LOG_LVL = default (0);
 		int    RES_LVL = default (1);
