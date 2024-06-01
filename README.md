@@ -9,11 +9,10 @@ I. Cohen, P. Giaccone, and C.F. Chiasserini, [Distributed Asynchronous Protocol 
 
 #### Directories
 
-Omnet++'s code files (.cc, .h, .msg)  are found in ./src. 
+Omnet++'s code files (.cc, .h, .msg, .ned) are found in ./src. 
 The locations of vehicles along the simulated trace are found in ./res/pos_files.
 POA (Point Of Access) files detail the location of each vehicle along the trace.
 The directory ./ contains Omnet++'s configuration files (.ini), running scripts, and the results .comoh files.
-.comoh files are files that detail the communication overhead along the trace.
 
 #### .ini files
 .ini files detail the network's Omnet configuration. 
@@ -22,4 +21,11 @@ The files UniformTree.ini, NonUniformTree.ini detail the topology of smaller net
 Common.ini contains parameters that are common to Lux and Monaco.
 
 #### source files
-Source files
+Below is an overview of Omnet++'s code files, which are located in ./src. 
+SimController.cc: the main simulator's file. The file initializes the netowk and runs a simulation according to the chosen .ini file.
+
+
+
+#### Output files
+The simulations' output are written to files in the project's main directory.
+.comoh files are files that detail the communication overhead along the trace.
