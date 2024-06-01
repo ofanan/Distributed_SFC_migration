@@ -32,3 +32,4 @@ MyConfig.cc: configuration parameters, costs, and some accessory functions.
 The simulations' output are written to files in the project's main directory.
 .comoh files are files that detail the communication overhead along the trace.
 .res files detail, for each second in the simulated trace, whether a feasible sol was found, and if so - it costs computation, link and migration costs.
+.log files are used mainly for development / debugging.
