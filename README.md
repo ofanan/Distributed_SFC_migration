@@ -14,3 +14,12 @@ The locations of vehicles along the simulated trace are found in ./res/pos_files
 POA (Point Of Access) files detail the location of each vehicle along the trace.
 The directory ./ contains Omnet++'s configuration files (.ini), running scripts, and the results .comoh files.
 .comoh files are files that detail the communication overhead along the trace.
+
+#### .ini files
+.ini files detail the network's Omnet configuration. 
+The files Lux.ini, Monaco.ini detail the topology of Luxembourg and Monaco's networks.
+The files UniformTree.ini, NonUniformTree.ini detail the topology of smaller networks, used for development and debugging.
+Common.ini contains parameters that are common to Lux and Monaco.
+
+#### source files
+Source files
