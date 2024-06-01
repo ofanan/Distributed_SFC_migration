@@ -11,7 +11,6 @@ I. Cohen, P. Giaccone, and C.F. Chiasserini, [Distributed Asynchronous Protocol 
 
 Omnet++'s code files (.cc, .h, .msg)  are found in ./src. 
 The locations of vehicles along the simulated trace are found in ./res/pos_files.
-POA (Point Of Access) files.
-The result files are written to ./res. The traces should be found in the directory ../traces/.
-
-#### Source files
+POA (Point Of Access) files detail the location of each vehicle along the trace.
+The directory ./ contains Omnet++'s configuration files (.ini), running scripts, and the results .comoh files.
+.comoh files are files that detail the communication overhead along the trace.
