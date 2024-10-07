@@ -10,7 +10,9 @@ I. Cohen, P. Giaccone, and C.F. Chiasserini, [Distributed Asynchronous Protocol 
 ### Directories
 Omnet++'s code files (.cc, .h, .msg, .ned) are found in ./src. 
 The locations of vehicles along the simulated trace are found in ./res/pos_files.
-POA (Point Of Access) files detail the location of each vehicle along the trace.
+.poa (Point Of Access) files detail the location of each vehicle along the trace.
+Further details on how to generate and use .poa files can be found in the [SFC_migration rep](https://github.com/ofanan/SFC_migration).
+
 The directory ./ contains Omnet++'s configuration files (.ini), running scripts, and the results .comoh files.
 
 ### .ini files
