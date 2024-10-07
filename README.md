@@ -35,7 +35,13 @@ Class for handling lists of chains.
 Configuration parameters, costs, and some accessory functions.
 
 ### Output files
-The simulations' output are written to files in the project's main directory.
-.comoh files are files that detail the communication overhead along the trace.
-.res files detail, for each second in the simulated trace, whether a feasible sol was found, and if so - it costs computation, link and migration costs.
-.log files are used mainly for development / debugging.
+The simulations' outputs are written to files in the project's main directory using the following file formats.
+
+##### .comoh 
+Files that detail the communication overhead along the trace.
+
+##### .res 
+Files that detail, for each second in the simulated trace, whether a feasible sol was found, and if so - it costs computation, link, and migration costs.
+
+##### .log 
+Files that detail the status along the simulation. Used mainly for development / debugging.
