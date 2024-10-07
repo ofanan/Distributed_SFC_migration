@@ -22,11 +22,16 @@ Common.ini contains parameters that are common to Lux and Monaco.
 
 #### source files
 Below is an overview of Omnet++'s code files, which are located in ./src. 
-SimController.cc: the main simulator's file. The file initializes the netowk and runs a simulation according to the chosen .ini file.
-Datacenter.cc: the implementation of a single datacenter.
-Chain.cc: the data of a single VM, e.g.: the required capacity and cost of deploying it in each level.
-ChainMaster.cc: class for handling lists of chains.
-MyConfig.cc: configuration parameters, costs, and some accessory functions.
+##### SimController.cc 
+The main simulator's file. The file initializes the netowk and runs a simulation according to the chosen .ini file.
+##### Datacenter.cc 
+The implementation of a single datacenter.
+##### Chain.cc 
+The data of a single VM, e.g.: the required capacity and cost of deploying it in each level.
+##### ChainMaster.cc
+Class for handling lists of chains.
+##### MyConfig.cc
+Configuration parameters, costs, and some accessory functions.
 
 #### Output files
 The simulations' output are written to files in the project's main directory.
